@@ -37,13 +37,19 @@
 				var doc = document,
 					body = doc.body,
 					container = doc.createElement('div'),
-					feed = doc.createElement('div'),
+					feed = container.cloneNode(false),
+					reading = container.cloneNode(false),
+					twitter = container.cloneNode(false),
 					frag = doc.createDocumentFragment(),
 					user = gh.user('Integralist'); // Get User Object
 				
 				container.id = 'container';
 				feed.id = 'feed';
+				reading.id = 'reading';
+				twitter.id = 'twitter';
 				container.appendChild(feed);
+				container.appendChild(reading);
+				container.appendChild(twitter);
 				body.appendChild(container);
 				
 				// Get public data (you can access more data if you're logged in)
@@ -62,7 +68,8 @@
 						profile = doc.createElement('p');
 						profile.id = 'profile';
 						profile.appendChild(profile_txt);
-						profile.innerHTML += '<br><br>I\'m a passionate GitHubber and have been using it since ' + data.user.created_at.substring(0, 4) + ' and I sometimes blog at <a href="' + data.user.blog + '">' + data.user.blog + '.';
+						profile.innerHTML += '<br><br>I\'m a passionate GitHubber and have been using it since ' + data.user.created_at.substring(0, 4) + '. I also write technical related posts on my website <a href="' + data.user.blog + '">' + data.user.blog + '</a>.';
+						profile.innerHTML += '<br><br>Below is a list of GitHub projects (both my own and those I\'m watching), gists + my recent GitHub activity. I\'ve also included a list of developers on twitter I recommend you follow, as well as recommended programmer reading.';
 						frag.appendChild(profile);
 						
 					container.insertBefore(frag, feed);
@@ -146,28 +153,79 @@
 				});
 				
 				// My news feed
-				var loadScript = function(url, callback) {
+				var loadScript = function(url) {
 					var d = doc, 
 						s = d.getElementsByTagName('script')[0], 
-						done = false, 
 						script = d.createElement("script");		 
 						script.type = "text/javascript", 
 						script.src = url
-						 
-					script.onload = script.onreadystatechange = function() {
-						if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
-							done = true;
-							script.onload = script.onreadystatechange = null;
-							if (callback) {
-								callback();
-							}
-						}
-					};
 					
 					s.parentNode.insertBefore(script, s); // Find the <script> tag and insert new script above it
 				};
 				
 				loadScript('https://github.com/Integralist.json?callback=loadGithubFeed');
+				
+				// Recommended reading list
+				function createReading() {
+					var list = [
+							{ title:'Mastering Regular Expressions', author:'Jeffrey E. F. Fredl' },
+							{ title:'Regular Expressions Cookbook', author:'Jan Goyvaerts & Steven Levithan' },
+							{ title:'Version Control with Git', author:'Jon Loeliger' },
+							{ title:'Test-Driven JavaScript Development', author:'Christian Johansen' },
+							{ title:'JavaScript: The Definitive Guide', author:'David Flanagan' },
+							{ title:'High Performance JavaScript', author:'Nicholas C. Zakas' },
+							{ title:'Eloquent JavaScript', author:'Marijn Haverbeke' },
+							{ title:'JavaScript Patterns', author:'Stoyan Stefanov' },
+							{ title:'HTML5 Up and Running', author:'Mark Pilgrim' }
+						],
+						list_txt = doc.createTextNode('Below are a few books I recommend reading: '),
+						list_par = doc.createElement('p'),
+						list_ul = doc.createElement('ul'),
+						list_li = doc.createElement('li'),
+						list_clone,
+						len = list.length;
+					
+					list_par.appendChild(list_txt);
+					list_par.className = 'heading';
+					frag.appendChild(list_par);
+					
+					for (var i = 0; i < len; i++) {
+						list_clone = list_li.cloneNode(false);
+						list_clone.innerHTML = '<strong>' + list[i].title + '</strong><br><i>' + list[i].author + '</i><br><br>';
+						list_ul.appendChild(list_clone);
+					}
+					
+					frag.appendChild(list_ul);
+					container.appendChild(frag);
+				}
+				
+				createReading();
+				
+				// Recommended twitter people
+				function createTwitters() {
+					var twitters = ['petermichaux', 'Cinsoft', 'jdalton', 'kangax', 'xkit', '__DavidFlanagan', 'BrendanEich', 'littlecalculist', 'mathias', 'kitcambridge', 'millermedeiros', 'briancavalier', 'unscriptable', 'angusTweets', 'WebReflection', 'thomasfuchs', 'padolsey'],
+						tweet_txt = doc.createTextNode('Below are a few twitter\'ers I recommend following: '),
+						tweet_par = doc.createElement('p'),
+						tweet_ul = doc.createElement('ul'),
+						tweet_li = doc.createElement('li'),
+						tweet_clone,
+						len = twitters.length;
+					
+					tweet_par.appendChild(tweet_txt);
+					tweet_par.className = 'heading';
+					frag.appendChild(tweet_par);
+					
+					for (var i = 0; i < len; i++) {
+						tweet_clone = tweet_li.cloneNode(false);
+						tweet_clone.innerHTML = '<a href="http://twitter.com/' + twitters[i] + '">@' + twitters[i] + '</a>';
+						tweet_ul.appendChild(tweet_clone);
+					}
+					
+					frag.appendChild(tweet_ul);
+					container.appendChild(frag);
+				}
+				
+				createTwitters();
 			}
 		</script>
 		<style type="text/css">
@@ -206,6 +264,7 @@
 				border: 0.1em solid #999;
 				clear: right;
 				margin-bottom: 1.5em;
+				margin-top: 1.5em;
 				padding: 0.5em;
 			}
 			
