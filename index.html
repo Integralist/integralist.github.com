@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en" dir="ltr">
 	<head>
-		<title>Github Profile</title>
+		<title>GitHub Profile</title>
 		<meta charset="utf-8">
 		<script src="github.js"></script>
 		<script type="text/javascript">
 			function loadGithubFeed(data) {
 				var doc = document, 
-					container = doc.getElementById('container'),
+					feed = doc.getElementById('feed'),
 					frag = doc.createDocumentFragment(),
-					news_txt = doc.createTextNode('Below is my recent activity on Github: '),
+					news_txt = doc.createTextNode('Below is my recent activity on GitHub: '),
 					news_par = doc.createElement('p'),
 					news_ul = doc.createElement('ul'),
 					news_li = doc.createElement('li'),
@@ -17,10 +17,11 @@
 					len = data.length;
 				
 				news_par.appendChild(news_txt);
+				news_par.className = 'heading';
 				frag.appendChild(news_par);
 				
 				for (var i = 0; i < len; i++) {
-					// Just in case I ever have any private data on Github and I forget to update this script!
+					// Just in case I ever have any private data on GitHub and I forget to update this script!
 					if (data[i].public) {
 						news_clone = news_li.cloneNode(false);
 						news_clone.innerHTML = '<a href="' + data[i].url + '">' + data[i].url + '</a><br>' + data[i].created_at + '<br>' +  ((data[i].type === 'GistEvent') ? data[i].payload.desc : data[i].repository.description) + '<br><br>';
@@ -29,48 +30,47 @@
 				}
 				
 				frag.appendChild(news_ul);
-				container.appendChild(frag);
+				feed.appendChild(frag);
 			}
 				
 			window.onload = function() {
 				var doc = document,
 					body = doc.body,
 					container = doc.createElement('div'),
+					feed = doc.createElement('div'),
 					frag = doc.createDocumentFragment(),
 					user = gh.user('Integralist'); // Get User Object
 				
 				container.id = 'container';
+				feed.id = 'feed';
+				container.appendChild(feed);
 				body.appendChild(container);
 				
 				// Get public data (you can access more data if you're logged in)
 				user.show(function(data){
 					var photo = doc.createElement('img');
 						photo.id = 'photo';
-						photo.src = 'https://secure.gravatar.com/avatar/' + data.user.gravatar_id + '?s=140&d=https://github.com/images/gravatars/gravatar-140.png'
+						photo.src = 'https://secure.gravatar.com/avatar/' + data.user.gravatar_id + '?s=240&d=https://github.com/images/gravatars/gravatar-240.png'
 						frag.appendChild(photo);
 					
-					var url_txt = doc.createTextNode(data.user.blog),
-						url_para = doc.createElement('p'),
-						url = doc.createElement('a');
-						url.id = 'url';
-						url.href = data.user.blog;
-						url.appendChild(url_txt);
-						url_para.appendChild(url);
-						frag.appendChild(url_para);
-						
+					var header = doc.createElement('h1');
+						header.id = 'fullname';
+						header.innerHTML = data.user.name;
+						frag.appendChild(header);
+					
 					var profile_txt = doc.createTextNode('Hi, my name\'s ' + data.user.name + ' and I\'m a developer based in ' + data.user.location + ' with ' + data.user.public_repo_count + ' public repositories and ' + data.user.public_gist_count + ' public gists.'),
 						profile = doc.createElement('p');
 						profile.id = 'profile';
 						profile.appendChild(profile_txt);
-						profile.innerHTML += '<br><br>I\'m a passionate Github user and have been using it since ' + data.user.created_at.substring(0, 4) + ' and I sometimes blog at ' + data.user.blog + '.';
+						profile.innerHTML += '<br><br>I\'m a passionate GitHubber and have been using it since ' + data.user.created_at.substring(0, 4) + ' and I sometimes blog at <a href="' + data.user.blog + '">' + data.user.blog + '.';
 						frag.appendChild(profile);
 						
-					container.appendChild(frag);
+					container.insertBefore(frag, feed);
 				});
 				
 				// My repo's
 				user.watching(function(data){
-					var repo_txt = doc.createTextNode('Below are my own projects on Github (in no-particular order): '),
+					var repo_txt = doc.createTextNode('Below are my own projects on GitHub (in no-particular order): '),
 						repo_par = doc.createElement('p'),
 						repo_ul = doc.createElement('ul'),
 						repo_li = doc.createElement('li'),
@@ -79,6 +79,7 @@
 						len = repo.length;
 					
 					repo_par.appendChild(repo_txt);
+					repo_par.className = 'heading';
 					frag.appendChild(repo_par);
 					
 					for (var i = 0; i < len; i++) {
@@ -90,7 +91,7 @@
 					}
 					
 					frag.appendChild(repo_ul);
-					container.appendChild(frag);
+					container.insertBefore(frag, feed);
 					
 					// Repo's being watched
 					user.watching(function(data){
@@ -102,6 +103,7 @@
 							len = watching.length;
 						
 						watching_par.appendChild(watching_txt);
+						watching_par.className = 'heading';
 						frag.appendChild(watching_par);
 						
 						for (var i = 0; i < len; i++) {
@@ -113,13 +115,13 @@
 						}
 						
 						frag.appendChild(watching_ul);
-						container.appendChild(frag);
+						container.insertBefore(frag, feed);
 					});
 				});
 				
 				// My Gists
 				user.publicGists(function(data){
-					var gist_txt = doc.createTextNode('Below are my Gists on Github (in no-particular order): '),
+					var gist_txt = doc.createTextNode('Below are my Gists on GitHub (in no-particular order): '),
 						gist_par = doc.createElement('p'),
 						gist_ul = doc.createElement('ul'),
 						gist_li = doc.createElement('li'),
@@ -128,6 +130,7 @@
 						len = gist.length;
 					
 					gist_par.appendChild(gist_txt);
+					gist_par.className = 'heading';
 					frag.appendChild(gist_par);
 					
 					for (var i = 0; i < len; i++) {
@@ -139,7 +142,7 @@
 					}
 					
 					frag.appendChild(gist_ul);
-					container.appendChild(frag);
+					container.insertBefore(frag, feed);
 				});
 				
 				// My news feed
@@ -168,7 +171,48 @@
 			}
 		</script>
 		<style type="text/css">
+			body {
+				color: #444;
+				font-family: Georgia, Garamond, "Times New Roman", Times, serif;
+				font-size: 1.4em;
+				margin: 1em;
+			}
 			
+			#container {
+				background: #F5F5F5;
+				border: 1em solid #666;
+				border-width: 0.5em 0 0.2em;
+				margin: auto;
+				padding: 2%;
+				width: 80%;
+			}
+			
+			#photo {
+				background: #fff;
+				border: 0.1em solid #666;
+				float: right;
+				margin-bottom: 1em;
+				margin-left: 3em;
+				padding: 0.2em;
+			}
+			
+			h1, p {
+				font-weight: normal;
+				margin: 0 0 0.5em;
+			}
+			
+			.heading {
+				background-color: #ddd;
+				border: 0.1em solid #999;
+				clear: right;
+				margin-bottom: 1.5em;
+				padding: 0.5em;
+			}
+			
+			ul {
+				height: 20em;
+				overflow: auto;
+			}
 		</style>
 	</head>
 	<body>
