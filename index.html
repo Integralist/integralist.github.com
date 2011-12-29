@@ -1,1 +1,177 @@
-testing
+<!doctype html>
+<html lang="en" dir="ltr">
+	<head>
+		<title>Github Profile</title>
+		<meta charset="utf-8">
+		<script src="github.js"></script>
+		<script type="text/javascript">
+			function loadGithubFeed(data) {
+				var doc = document, 
+					container = doc.getElementById('container'),
+					frag = doc.createDocumentFragment(),
+					news_txt = doc.createTextNode('Below is my recent activity on Github: '),
+					news_par = doc.createElement('p'),
+					news_ul = doc.createElement('ul'),
+					news_li = doc.createElement('li'),
+					news_clone,
+					len = data.length;
+				
+				news_par.appendChild(news_txt);
+				frag.appendChild(news_par);
+				
+				for (var i = 0; i < len; i++) {
+					// Just in case I ever have any private data on Github and I forget to update this script!
+					if (data[i].public) {
+						news_clone = news_li.cloneNode(false);
+						news_clone.innerHTML = '<a href="' + data[i].url + '">' + data[i].url + '</a><br>' + data[i].created_at + '<br>' +  ((data[i].type === 'GistEvent') ? data[i].payload.desc : data[i].repository.description) + '<br><br>';
+						news_ul.appendChild(news_clone);
+					}
+				}
+				
+				frag.appendChild(news_ul);
+				container.appendChild(frag);
+			}
+				
+			window.onload = function() {
+				var doc = document,
+					body = doc.body,
+					container = doc.createElement('div'),
+					frag = doc.createDocumentFragment(),
+					user = gh.user('Integralist'); // Get User Object
+				
+				container.id = 'container';
+				body.appendChild(container);
+				
+				// Get public data (you can access more data if you're logged in)
+				user.show(function(data){
+					var photo = doc.createElement('img');
+						photo.id = 'photo';
+						photo.src = 'https://secure.gravatar.com/avatar/' + data.user.gravatar_id + '?s=140&d=https://github.com/images/gravatars/gravatar-140.png'
+						frag.appendChild(photo);
+					
+					var url_txt = doc.createTextNode(data.user.blog),
+						url_para = doc.createElement('p'),
+						url = doc.createElement('a');
+						url.id = 'url';
+						url.href = data.user.blog;
+						url.appendChild(url_txt);
+						url_para.appendChild(url);
+						frag.appendChild(url_para);
+						
+					var profile_txt = doc.createTextNode('Hi, my name\'s ' + data.user.name + ' and I\'m a developer based in ' + data.user.location + ' with ' + data.user.public_repo_count + ' public repositories and ' + data.user.public_gist_count + ' public gists.'),
+						profile = doc.createElement('p');
+						profile.id = 'profile';
+						profile.appendChild(profile_txt);
+						profile.innerHTML += '<br><br>I\'m a passionate Github user and have been using it since ' + data.user.created_at.substring(0, 4) + ' and I sometimes blog at ' + data.user.blog + '.';
+						frag.appendChild(profile);
+						
+					container.appendChild(frag);
+				});
+				
+				// My repo's
+				user.watching(function(data){
+					var repo_txt = doc.createTextNode('Below are my own projects on Github (in no-particular order): '),
+						repo_par = doc.createElement('p'),
+						repo_ul = doc.createElement('ul'),
+						repo_li = doc.createElement('li'),
+						repo_clone,
+						repo = data.repositories,
+						len = repo.length;
+					
+					repo_par.appendChild(repo_txt);
+					frag.appendChild(repo_par);
+					
+					for (var i = 0; i < len; i++) {
+						if (repo[i].owner === 'Integralist') {
+							repo_clone = repo_li.cloneNode(false);
+							repo_clone.innerHTML = '<strong>' + repo[i].name + '</strong><br><a href="' + repo[i].url + '">' + repo[i].url + '</a><br>' + repo[i].description + '<br><br>';
+							repo_ul.appendChild(repo_clone);
+						}
+					}
+					
+					frag.appendChild(repo_ul);
+					container.appendChild(frag);
+					
+					// Repo's being watched
+					user.watching(function(data){
+						var watching_txt = doc.createTextNode('Below are some of the projects I\'m watching (in no-particular order): '),
+							watching_par = doc.createElement('p'),
+							watching_ul = doc.createElement('ul'),
+							watching_li = doc.createElement('li'),
+							watching = data.repositories,
+							len = watching.length;
+						
+						watching_par.appendChild(watching_txt);
+						frag.appendChild(watching_par);
+						
+						for (var i = 0; i < len; i++) {
+							if (watching[i].owner !== 'Integralist') {
+								watching_clone = watching_li.cloneNode(false);
+								watching_clone.innerHTML = '<strong>' + watching[i].name + '</strong><br><a href="' + watching[i].url + '">' + watching[i].url + '</a><br>' + watching[i].description + '<br><br>';
+								watching_ul.appendChild(watching_clone);
+							}
+						}
+						
+						frag.appendChild(watching_ul);
+						container.appendChild(frag);
+					});
+				});
+				
+				// My Gists
+				user.publicGists(function(data){
+					var gist_txt = doc.createTextNode('Below are my Gists on Github (in no-particular order): '),
+						gist_par = doc.createElement('p'),
+						gist_ul = doc.createElement('ul'),
+						gist_li = doc.createElement('li'),
+						gist_clone,
+						gist = data.gists,
+						len = gist.length;
+					
+					gist_par.appendChild(gist_txt);
+					frag.appendChild(gist_par);
+					
+					for (var i = 0; i < len; i++) {
+						if (gist[i].owner === 'Integralist') {
+							gist_clone = gist_li.cloneNode(false);
+							gist_clone.innerHTML = '<a href="https://gist.github.com/' + gist[i].repo + '">https://gist.github.com/' + gist[i].repo + '</a><br>' + gist[i].description + '<br><br>';
+							gist_ul.appendChild(gist_clone);
+						}
+					}
+					
+					frag.appendChild(gist_ul);
+					container.appendChild(frag);
+				});
+				
+				// My news feed
+				var loadScript = function(url, callback) {
+					var d = doc, 
+						s = d.getElementsByTagName('script')[0], 
+						done = false, 
+						script = d.createElement("script");		 
+						script.type = "text/javascript", 
+						script.src = url
+						 
+					script.onload = script.onreadystatechange = function() {
+						if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
+							done = true;
+							script.onload = script.onreadystatechange = null;
+							if (callback) {
+								callback();
+							}
+						}
+					};
+					
+					s.parentNode.insertBefore(script, s); // Find the <script> tag and insert new script above it
+				};
+				
+				loadScript('https://github.com/Integralist.json?callback=loadGithubFeed');
+			}
+		</script>
+		<style type="text/css">
+			
+		</style>
+	</head>
+	<body>
+		
+	</body>
+</html>
