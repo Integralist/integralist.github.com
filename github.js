@@ -2,9 +2,9 @@
 //
 // Tries to map one-to-one with the GitHub API V2, but in a Javascripty manner.
 
-(function (globals) {
+define(function(){
 
-    // Before we implement the API methods, we will define all of our private
+	// Before we implement the API methods, we will define all of our private
     // variables and helper functions with one `var` statement.
     var
 
@@ -115,7 +115,7 @@
 
     // Expose the global `gh` variable, through which every API method is
     // accessed, but keep a local variable around so we can reference it easily.
-    gh = globals.gh = {};
+    gh = {};
 
     // Psuedo private home for JSONP callbacks (which are required to be global
     // by the nature of JSONP, as discussed earlier).
@@ -684,6 +684,8 @@
             return this;
         }
     );
+    
+    return gh;
 
-}(window));
+});
 
