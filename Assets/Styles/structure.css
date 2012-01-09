@@ -1,0 +1,43 @@
+body {
+	color: #444;
+	font-family: Georgia, Garamond, "Times New Roman", Times, serif;
+	font-size: 1.4em;
+	margin: 1em;
+}
+
+#container {
+	background: #F5F5F5;
+	border: 1em solid #666;
+	border-width: 0.5em 0 0.2em;
+	margin: auto;
+	padding: 2%;
+	width: 80%;
+}
+
+#photo {
+	background: #fff;
+	border: 0.1em solid #666;
+	float: right;
+	margin-bottom: 1em;
+	margin-left: 3em;
+	padding: 0.2em;
+}
+
+h1, p {
+	font-weight: normal;
+	margin: 0 0 0.5em;
+}
+
+.heading {
+	background-color: #ddd;
+	border: 0.1em solid #999;
+	clear: right;
+	margin-bottom: 1.5em;
+	margin-top: 1.5em;
+	padding: 0.5em;
+}
+
+ul {
+	height: 20em;
+	overflow: auto;
+}

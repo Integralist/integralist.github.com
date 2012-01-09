@@ -8,6 +8,9 @@ define(function(){
     // variables and helper functions with one `var` statement.
     var
 
+    // Global object
+    global = window,
+    
     // The username and authentication token of the library's user.
     authUsername,
     authToken,
@@ -115,7 +118,7 @@ define(function(){
 
     // Expose the global `gh` variable, through which every API method is
     // accessed, but keep a local variable around so we can reference it easily.
-    gh = {};
+    gh = global.gh = {};
 
     // Psuedo private home for JSONP callbacks (which are required to be global
     // by the nature of JSONP, as discussed earlier).
