@@ -1,4 +1,4 @@
-define(['require', 'Utils/github', 'Utils/when'], function(require, gh, when){
+define(['require', 'Utils/github', 'Utils/when', 'Utils/array'], function(require, gh, when, array){
 
 	// Reference:
 	// http://perfectionkills.com/unnecessarily-comprehensive-look-into-a-rather-insignificant-issue-of-global-objects-creation/
@@ -16,16 +16,13 @@ define(['require', 'Utils/github', 'Utils/when'], function(require, gh, when){
 		user = app.user = gh.user(username);
 	}
 	
-	//
+	// Get user's public Gists data and pass it to the callback function when loaded
 	user.publicGists(function(data){
+	
 		var gists = document.createElement('div'),
 			frag = doc.createDocumentFragment(),
 			gists_ul = doc.createElement('ul'),
-			gistlist = data.gists,
-			len = gistlist.length,
-			timer,
-			last,
-			fin;
+			gistlist = data.gists;
 		
 		gists.id = 'gists';
 		
@@ -48,20 +45,37 @@ define(['require', 'Utils/github', 'Utils/when'], function(require, gh, when){
 			return dfd.promise;
 		}
 		
-		function forloop() {
-			var dfd = when.defer(),
-				timer;
+		function generateHTML(gists) {
 			
-			// Because the outer for loop is processing asynchronous data
-			// we use a timer to keep track of 'fin' value
-			timer = global.setInterval(function(){
-				if (fin) {
-					global.clearInterval(timer);
-					dfd.resolve();
-				}
-			}, 25);
+			// when.reduce will preserve resolution order, so the resulting HTML will
+		    // end up in the "expected" order (i.e. same order as items in repositories input)
+		    // It also returns a Promise for the final, reduced value, which in this case
+		    // will be the accumulated HTML string
+		    return when.reduce(gists, function(html, gist, i) {
+		
+		        // If require() returned a promise, we wouldn't need this deferred,
+		        // but since it doesn't, we'll need to return our own promise, so that
+		        // when.reduce can know when to proceed.
+		        var dfd = when.defer();
+		
+		        // require the template, call async() to template it, then concat
+		        // the newly created fragment onto the end of the accumulating html
+		        require(['tpl!../Templates/Gists.tpl'], function(template) {
+		
+		            // wait for async to finish templating
+		            when(async(template, gist), function(htmlFragment) {
+		                    // Accumulate html fragments into final html
+		                    dfd.resolve(html + htmlFragment);
+		                },
+		                // If async fails, reject so that when.reduce knows something went wrong
+		                dfd.reject
+		            );
+		        });
+		
+		        // return the promise so when.reduce knows when to proceed
+		        return dfd.promise;
+		    }, ''); // blank string as the initial value for the reduce computation
 			
-			return dfd.promise;
 		}
 		
 		var p = doc.createElement('p');
@@ -69,50 +83,19 @@ define(['require', 'Utils/github', 'Utils/when'], function(require, gh, when){
 			p.innerHTML = 'Below are my Gists on GitHub (in no-particular order):';
 			gists.appendChild(p);
 		
-		// Loop through all the repositories finding those that below to the user
-		for (var i = 0; i < len; i++) {
-			// Keep track of the current iteration value
-			// If we're on the last interfaction set 'last' to true
-			if (i === len-1) {
-				last = true;
-			}
-			
-			if (gistlist[i].owner === username) {
-				// Because 'require' is asynchronous we need an immediately invoked function expression
-				// and to pass through the current repo as a parameter
-				(function(gist){
-					// Pull in relevant template and insert associated data
-					require(['tpl!../Templates/Gists.tpl'], function(template) {
-						/* 
-						 * Because the loading of the template is done asynchronously
-						 * we cannot insert each processed <li>.
-						 * So we put the template processing code inside a function and return a Promise(Deferred object)
-						 * Then when the Promise has been resolved we add the finished data to the <ul>
-						 * And lastly we set the 'fin' variable to true so we know the loop has finished (see 'forloop' function above).
-						 */
-						when(async(template, gist)).then(function(data){
-							gists_ul.innerHTML += data;
-							if (last) {
-								fin = true;
-							} 
-						});
-					});
-				}(gistlist[i]))
-			}
-		}
+		// Filter the repo's by owner
+		var owned = array.filter(gistlist, function(gist){
+			return gist.owner === username;
+		});
 		
-		/*
-		 * Because the above for loop is processing data asynchronously
-		 * we cannot just append the gists_ul data to the DOM at the bottom of the script
-		 * because the above loop is no longer a standard synchronous loop (so gists_ul would be empty)
-		 * So we execute a custom forloop() function which returns a Promise(Deferred object).
-		 * When the Promise is resolved we know we can append the data to the DOM.
-		 */
-		when(forloop()).then(function(){
+		// Wait for all HTML to be generated then insert into DOM
+		when(generateHTML(owned)).then(function(html){
+			gists_ul.innerHTML = html;
 			gists.appendChild(gists_ul);
 			frag.appendChild(gists);
 			container.appendChild(frag);
 		});
+		
 	});
 
 });

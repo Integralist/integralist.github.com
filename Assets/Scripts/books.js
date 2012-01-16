@@ -5,7 +5,7 @@ define(['Utils/when'], function(when){
 	var global = (function(){return this}()),
 		doc = document,
 		container = doc.getElementById('container'),
-		list = [
+		books = [
 			{ title:'Mastering Regular Expressions', author:'Jeffrey E. F. Fredl' },
 			{ title:'Regular Expressions Cookbook', author:'Jan Goyvaerts & Steven Levithan' },
 			{ title:'Version Control with Git', author:'Jon Loeliger' },
@@ -15,17 +15,13 @@ define(['Utils/when'], function(when){
 			{ title:'Eloquent JavaScript', author:'Marijn Haverbeke' },
 			{ title:'JavaScript Patterns', author:'Stoyan Stefanov' },
 			{ title:'HTML5 Up and Running', author:'Mark Pilgrim' }
-		],
-		books = document.createElement('div'),
-		frag = doc.createDocumentFragment(),
+		]
+		list = document.createElement('div'),
 		books_ul = doc.createElement('ul'),
-		len = list.length,
-		timer,
-		last,
-		fin;
+		frag = doc.createDocumentFragment();
 	
 	books.id = 'books';
-		
+	
 	function async(template, book) {
 		var dfd = when.defer(),
 			tmp = template({ 
@@ -45,67 +41,49 @@ define(['Utils/when'], function(when){
 		return dfd.promise;
 	}
 	
-	function forloop() {
-		var dfd = when.defer(),
-			timer;
+	function generateHTML(books) {
 		
-		// Because the outer for loop is processing asynchronous data
-		// we use a timer to keep track of 'fin' value
-		timer = global.setInterval(function(){
-			if (fin) {
-				global.clearInterval(timer);
-				dfd.resolve();
-			}
-		}, 25);
+		// when.reduce will preserve resolution order, so the resulting HTML will
+	    // end up in the "expected" order (i.e. same order as items in repositories input)
+	    // It also returns a Promise for the final, reduced value, which in this case
+	    // will be the accumulated HTML string
+	    return when.reduce(books, function(html, book, i) {
+	
+	        // If require() returned a promise, we wouldn't need this deferred,
+	        // but since it doesn't, we'll need to return our own promise, so that
+	        // when.reduce can know when to proceed.
+	        var dfd = when.defer();
+	
+	        // require the template, call async() to template it, then concat
+	        // the newly created fragment onto the end of the accumulating html
+	        require(['tpl!../Templates/Books.tpl'], function(template) {
+	
+	            when(async(template, book)).then(function(htmlFragment){
+	            		// Accumulate html fragments into final html
+                    	dfd.resolve(html + htmlFragment);
+					},
+	                // If async fails, reject so that when.reduce knows something went wrong
+	                dfd.reject
+				);
+				
+	        });
+	
+	        // return the promise so when.reduce knows when to proceed
+	        return dfd.promise;
+	    }, ''); // blank string as the initial value for the reduce computation
 		
-		return dfd.promise;
 	}
 	
 	var p = doc.createElement('p');
 		p.className = 'heading';
 		p.innerHTML = 'Below are a few books I recommend reading:';
-		books.appendChild(p);
+		list.appendChild(p);
 	
-	// Loop through all the repositories finding those that below to the user
-	for (var i = 0; i < len; i++) {
-		// Keep track of the current iteration value
-		// If we're on the last interfaction set 'last' to true
-		if (i === len-1) {
-			last = true;
-		}
-		
-		// Because 'require' is asynchronous we need an immediately invoked function expression
-		// and to pass through the current repo as a parameter
-		(function(book){
-			// Pull in relevant template and insert associated data
-			require(['tpl!../Templates/Books.tpl'], function(template) {
-				/* 
-				 * Because the loading of the template is done asynchronously
-				 * we cannot insert each processed <li>.
-				 * So we put the template processing code inside a function and return a Promise(Deferred object)
-				 * Then when the Promise has been resolved we add the finished data to the <ul>
-				 * And lastly we set the 'fin' variable to true so we know the loop has finished (see 'forloop' function above).
-				 */
-				when(async(template, book)).then(function(data){
-					books_ul.innerHTML += data;
-					if (last) {
-						fin = true;
-					} 
-				});
-			});
-		}(list[i]))
-	}
-	
-	/*
-	 * Because the above for loop is processing data asynchronously
-	 * we cannot just append the gists_ul data to the DOM at the bottom of the script
-	 * because the above loop is no longer a standard synchronous loop (so gists_ul would be empty)
-	 * So we execute a custom forloop() function which returns a Promise(Deferred object).
-	 * When the Promise is resolved we know we can append the data to the DOM.
-	 */
-	when(forloop()).then(function(){
-		books.appendChild(books_ul);
-		frag.appendChild(books);
+	// Wait for all HTML to be generated then insert into DOM
+	when(generateHTML(books)).then(function(html){
+		books_ul.innerHTML = html;
+		list.appendChild(books_ul);
+		frag.appendChild(list);
 		container.appendChild(frag);
 	});
 
