@@ -110,7 +110,11 @@
 
 .intro h1 + p a,
 .intro a:hover,
-.intro a:focus {
+.intro a:focus,
+.aside a:hover,
+.aside a:focus,
+.articles a:hover,
+.articles a:focus {
     color: #999;
     text-decoration: none;
 }
@@ -133,11 +137,18 @@
     margin-bottom: 0;
 }
 
+.articles a,
 .intro dt,
 .intro a,
 .aside a,
 .books dt {
     color: #c00;
+    
+    -webkit-transition: color 0.2s linear;
+	-moz-transition: color 0.2s linear;
+	-ms-transition: color 0.2s linear;
+	-o-transition: color 0.2s linear;
+	transition: color 0.2s linear;
 }
 
 .intro dt,
@@ -177,4 +188,13 @@
 
 .twitter-listens {
     width: 33%;
+}
+
+.articles ul {
+    margin-top: 1.5em;
+}
+
+.articles li {
+    font-size: 120%;
+    margin-bottom: 1em;
 }

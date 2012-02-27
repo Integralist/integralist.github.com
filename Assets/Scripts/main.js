@@ -14,7 +14,7 @@ require(['errorhandler'], function (handler) {
 
 require(['require', 'Utils/github', 'Utils/when', 'async!http://twitter.com/statuses/user_timeline/integralist.json'], function (require, gh, when, tw) {
 
-	//TODO
+	//TODO - make list dynamic so I only have to change it on twitter
 	//console.log(tw[0].user.description);
 	
 	// Reference:
