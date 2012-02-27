@@ -1,35 +1,40 @@
-define(['require', 'Utils/github', 'Utils/when'], function(require, gh, when){
+require.config({ 
+	catchError: {
+		define: true
+	},
+	paths: {
+		async: 'Plugins/async',
+		tpl: 'Plugins/tpl'
+	} 
+});
 
+require(['errorhandler'], function (handler) {
+	require.onError = handler;
+});
+
+require(['require', 'Utils/github', 'Utils/when', 'async!http://twitter.com/statuses/user_timeline/integralist.json'], function (require, gh, when, tw) {
+
+	//TODO
+	//console.log(tw[0].user.description);
+	
 	// Reference:
 	// http://perfectionkills.com/unnecessarily-comprehensive-look-into-a-rather-insignificant-issue-of-global-objects-creation/
 	var global = (function(){return this}()),
 		doc = document,
-		container = doc.getElementById('container'),
-		app = global.app || {},
-		username = 'Integralist',
-		user;
-	
-	// Every module uses Github data
-	// To prevent calling Github API for every script we cache the content in a variable
-	// So the first script to load creates a global property called 'app' and stores user data in 'app.user'
-	if (app.user === undefined) {
-		user = app.user = gh.user(username);
-	}
+		container = doc.getElementById('github'),
+		user = gh.user('Integralist');
 	
 	// Get user's Github profile data and pass it to the callback function when loaded
 	user.show(function(data){
 	
-		var profile = document.createElement('div'),
-			frag = doc.createDocumentFragment();
-		
-		profile.id = 'profile';
+        doc.getElementById('picture').src = 'https://secure.gravatar.com/avatar/' + data.user.gravatar_id + '?s=240&d=https://github.com/images/gravatars/gravatar-240.png';
+	
+		var profile = document.createElement('div');
 		
 		function async(template) {
 			var dfd = when.defer(),
 				tmp = template({
-					blog: data.user.blog,
 					gistcount: data.user.public_gist_count,
-					img: data.user.gravatar_id,
 					location: data.user.location,
 					name: data.user.name, 
 					repocount: data.user.public_repo_count,
@@ -58,8 +63,7 @@ define(['require', 'Utils/github', 'Utils/when'], function(require, gh, when){
 			 */
 			when(async(template)).then(function(data){
 				profile.innerHTML = data;
-				frag.appendChild(profile);
-				container.insertBefore(frag, container.firstChild);
+				container.appendChild(profile);
 			});
 		});
 		

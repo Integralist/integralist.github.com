@@ -2,7 +2,7 @@ define(function(){
 
 	return function(errObject) {
 		requireType = errObject.requireType; 
-        requireModules = errObject.requireModules.trim().split(' ');
+        requireModules = errObject.requireModules;
         console.log(requireType, requireModules);
 	};
 

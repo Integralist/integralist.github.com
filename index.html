@@ -1,12 +1,137 @@
 <!doctype html>
 <html lang="en" dir="ltr">
 	<head>
-		<title>GitHub Profile</title>
+		<title>Mark McDonnell (Integralist)</title>
 		<meta charset="utf-8">
+		<link rel="stylesheet" href="Assets/Styles/normalise.css">
+		<link rel="stylesheet" href="Assets/Styles/bootstrap.css">
 		<link rel="stylesheet" href="Assets/Styles/structure.css">
 	</head>
 	<body>
-		<div id="container"></div>
-		<script data-main="Assets/Scripts/init" src="Assets/Scripts/Require.js"></script>
+		<header class="bar shadow padded">
+            <ul class="box list horizontal">
+                <li><a href="http://www.github.com/integralist" class="btn github" title="GitHub"><span></span></a></li>
+                <li><a href="http://www.twitter.com/integralist" class="btn twitter" title="Twitter"><span></span></a></li>
+            </ul>
+		</header>
+		<section class="container box">
+            <header class="container bright">
+                <aside class="align-right">
+                    <a href="http://www.twitter.com/integralist" class="btn twitter follow"><span></span>FOLLOW</a>
+                </aside>
+                <img id="picture" class="rounded align-left" src="">
+                <div class="align-left intro">
+                    <h1>Integralist</h1>
+                    <p><a href="http://www.twitter.com/integralist">@integralist</a></p>
+                    <div id="github"></div>
+                    <dl class="twitter-enjoys align-left">
+                        <dt>Enjoys</dt>
+                        <dd>Regular Expressions</dd>
+                        <dd>JavaScript</dd>
+                        <dd>AMD (RequireJs)</dd>
+                        <dd>Test-Driven Development (BusterJs)</dd>
+                    </dl>
+                    <dl class="twitter-does align-left">
+                        <dt>Does</dt>
+                        <dd>Gracie Jiu-Jitsu</dd>
+                        <dd>Ishinryu Karate</dd>
+                        <dd>Kickboxing</dd>
+                    </dl>
+                    <dl class="twitter-listens align-left">
+                        <dt>Listens</dt>
+                        <dd>Tool</dd>
+                        <dd>Meshuggah</dd>
+                        <dd>Russian Circles</dd>
+                        <dd>Earthtone9</dd>
+                        <dd>Will Haven</dd>
+                        <dd>ISIS</dd>
+                    </dl>
+                </div>
+            </header>
+            <aside class="align-left aside">
+                <article class="container bright">
+                    <h2>GitHub Gists</h2>
+                    <ul>
+                        <li><a href="https://gist.github.com/1875544">Set-up remote git repo on standard server</a></li>
+                        <li><a href="https://gist.github.com/1625810">Sinon.js Fake XHR example</a></li>
+                        <li><a href="https://gist.github.com/1599740">Detect `onhashchange` support</a></li>
+                        <li><a href="https://gist.github.com/1593770">Details on Host Objects and how to list them</a></li>
+                        <li><a href="https://gist.github.com/1525378">Feature Testing a Host Method</a></li>
+                        <li><a href="https://gist.github.com/1525419">Execution context within JavaScript</a></li>
+                        <li><a href="https://gist.github.com/1530417">Determining the dimensions of elements</a></li>
+                        <li><a href="https://gist.github.com/1473166">How to create a facebook canvas app</a></li>
+                        <li><a href="https://gist.github.com/1442875">image onload issue (browser cache)</a></li>
+                        <li><a href="https://gist.github.com/1430271">Basic JSON-P example in PHP</a></li>
+                        <li><a href="https://gist.github.com/1391785">Composition not Inheritance</a></li>
+                        <li><a href="https://gist.github.com/1303355">Composition not Inheritance</a></li>
+                        <li><a href="https://gist.github.com/1213445">Better CSS Grid System</a></li>
+                        <li><a href="https://gist.github.com/890700">Generic JavaScript library</a></li>
+                        <li><a href="https://gist.github.com/1710256">Google Maps with HTML5 geolocation</a></li>
+                        <li><a href="https://gist.github.com/1677536">Sharing a site with Facebook</a></li>
+                    </ul>
+                </article>
+                <article class="container bright">
+                    <h2>GitHub Projects</h2>
+                    <ul>
+                        <li><a href="https://github.com/Integralist/Project-Template-Files">Project Template Files</a></li>
+                        <li><a href="https://github.com/Integralist/DOMready">DOMready</a></li>
+                        <li><a href="https://github.com/Integralist/RequireJs-Example">RequireJs Examples</a></li>
+                        <li><a href="https://github.com/Integralist/Blog-Posts">Blog Posts</a></li>
+                        <li><a href="https://github.com/Integralist/MVC-Start-up-Kit">MVC-Start-up-Kit</a></li>
+                        <li><a href="https://github.com/Integralist/Mobile-First-Desktop-Second">Mobile First, Desktop Second</a></li>
+                        <li><a href="https://github.com/Integralist/Mini-Com">Mini-Com</a></li>
+                    </ul>
+                </article>
+                <article class="container bright books">
+                    <h2>Recommended reading</h2>
+                    <dl>
+                        <dt>Mastering Regular Expressions</dt>
+                        <dd>Jeffrey E. F. Fredl</dd>
+                        <dt>Regular Expressions Cookbook</dt>
+                        <dd>Jan Goyvaerts & Steven Levithan</dd>
+                        <dt>Version Control with Git</dt>
+                        <dd>Jon Loeliger</dd>
+                        <dt>Test-Driven JavaScript Development</dt>
+                        <dd>Christian Johansen</dd>
+                        <dt>JavaScript: The Definitive Guide</dt>
+                        <dd>David Flanagan</dd>
+                        <dt>High Performance JavaScript</dt>
+                        <dd>Nicholas C. Zakas</dd>
+                        <dt>Eloquent JavaScript</dt>
+                        <dd>Marijn Haverbeke</dd>
+                        <dt>JavaScript Patterns</dt>
+                        <dd>Stoyan Stefanov</dd>
+                        <dt>HTML5 Up and Running</dt>
+                        <dd>Mark Pilgrim</dd>
+                    </dl>
+                </article>
+                <article class="container bright last">
+                    <h2>twitter'ers</h2>
+                    <ul>
+                        <li><a href="https://twitter.com/petermichaux">@petermichaux</a></li>
+                        <li><a href="https://twitter.com/Cinsoft">@Cinsoft</a></li>
+                        <li><a href="https://twitter.com/jdalton">@jdalton</a></li>
+                        <li><a href="https://twitter.com/kangax">@kangax</a></li>
+                        <li><a href="https://twitter.com/xkit">@xkit</a></li>
+                        <li><a href="https://twitter.com/__DavidFlanagan">@__DavidFlanagan</a></li>
+                        <li><a href="https://twitter.com/BrendanEich">@BrendanEich</a></li>
+                        <li><a href="https://twitter.com/littlecalculist">@littlecalculist</a></li>
+                        <li><a href="https://twitter.com/mathias">@mathias</a></li>
+                        <li><a href="https://twitter.com/kitcambridge">@kitcambridge</a></li>
+                        <li><a href="https://twitter.com/millermedeiros">@millermedeiros</a></li>
+                        <li><a href="https://twitter.com/briancavalier">@briancavalier</a></li>
+                        <li><a href="https://twitter.com/unscriptable">@unscriptable</a></li>
+                        <li><a href="https://twitter.com/angusTweets">@angusTweets</a></li>
+                        <li><a href="https://twitter.com/WebReflection">@WebReflection</a></li>
+                        <li><a href="https://twitter.com/thomasfuchs">@thomasfuchs</a></li>
+                        <li><a href="https://twitter.com/padolsey">@padolsey</a></li>
+                    </ul>
+                </article>
+            </aside>
+            <article class="container bright align-right articles">
+                TBA
+            </article>
+		</section>
+		<script data-main="Assets/Scripts/main" src="Assets/Scripts/Require.js"></script>
 	</body>
 </html>
