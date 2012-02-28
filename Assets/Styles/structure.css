@@ -198,3 +198,7 @@
     font-size: 120%;
     margin-bottom: 1em;
 }
+
+.ie li {
+	margin-bottom: 1em;
+}
