@@ -1,11 +1,15 @@
 @media only screen and (max-width: 1300px) {
+    .box {
+        width: 90%;
+    }
+    
     .aside {
         width: 100%;
     }
     
     .articles {
         margin-bottom: 1em;
-        width: 95%;
+        width: 96.3%;
     }
     
     #picture {
@@ -27,7 +31,7 @@
     }
     
     .articles {
-        width: 94%;
+        width: 96.2%;
     }
 }
 
@@ -41,19 +45,19 @@
     }
     
     .articles {
-        width: 93%;
+        width: 95.4%;
     }
 }
 
 @media only screen and (max-width: 740px) {
     .articles {
-        width: 92%;
+        width: 93.5%;
     }
 }
 
 @media only screen and (max-width: 615px) {
     .articles {
-        width: 91%;
+        width: 92.4%;
     }
     
     .twitter-enjoys {
@@ -70,12 +74,12 @@
 
 @media only screen and (max-width: 555px) {
     .articles {
-        width: 90%;
+        width: 91%;
     }
 }
 
 @media only screen and (max-width: 480px) {
     .articles {
-        width: 88%;
+        width: 89.5%;
     }
 }
