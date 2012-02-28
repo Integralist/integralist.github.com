@@ -1,0 +1,81 @@
+@media only screen and (max-width: 1300px) {
+    .aside {
+        width: 100%;
+    }
+    
+    .articles {
+        margin-bottom: 1em;
+        width: 95%;
+    }
+    
+    #picture {
+        float: right;
+    }
+    
+    .intro {
+        margin-left: 0;
+    }
+    
+    .follow {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 1220px) {
+    .intro {
+        width: 60%;
+    }
+    
+    .articles {
+        width: 94%;
+    }
+}
+
+@media only screen and (max-width: 1000px) {
+    #picture {
+        display: none;
+    }
+    
+    .intro {
+        width: 100%;
+    }
+    
+    .articles {
+        width: 93%;
+    }
+}
+
+@media only screen and (max-width: 740px) {
+    .articles {
+        width: 92%;
+    }
+}
+
+@media only screen and (max-width: 615px) {
+    .articles {
+        width: 91%;
+    }
+    
+    .twitter-enjoys {
+        margin-top: 1.5em;
+    }
+    
+    .twitter-enjoys,
+    .twitter-does,
+    .twitter-listens {
+        float: none;
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 555px) {
+    .articles {
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .articles {
+        width: 88%;
+    }
+}
