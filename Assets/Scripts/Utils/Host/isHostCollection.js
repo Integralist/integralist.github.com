@@ -12,7 +12,8 @@ define(function(){
 		var type = typeof object[property];
 
 		return (!!(type == 'object' && object[property])) || // Protect against ES3 'null' typeof result being 'object'
-			   type == 'function'; // For Safari 3 typeof result being 'function' instead of 'object'
+			   type == 'function' || // For Safari 3 typeof result being 'function' instead of 'object' 
+			   type == 'string'; // For IE <= 7
 	}
 
 	return isHostCollection;

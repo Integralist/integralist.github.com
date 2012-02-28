@@ -1,4 +1,4 @@
-define(['Utils/isIE', 'Utils/json'], function(isIE, JSON){
+define(['../Checks/isIE', '../Polyfills/json'], function(isIE, JSON){
 
 	// Note: wasn't able to require() in the json.js script for browsers that don't support it
 	// As it would load asynchronusly and the below callback function would have executed before the json.js was loaded
@@ -198,7 +198,7 @@ define(['Utils/isIE', 'Utils/json'], function(isIE, JSON){
 			xhr.send(null);
 		}
 
-	}
+	};
 
 	return ajax;
 

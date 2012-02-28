@@ -11,7 +11,7 @@ define(function(){
 	 * 
 	 * @reference: http://michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
 	 */
-
+	 
 	function isHostMethod(object, property) {
 		var type = typeof object[property];
 

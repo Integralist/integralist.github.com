@@ -1,4 +1,4 @@
-define(['Utils/isHostMethod'], function(isHostMethod){
+define(['../Host/isHostMethod'], function(isHostMethod){
 
 	/*
 	 * insertAdjacentHTML.js

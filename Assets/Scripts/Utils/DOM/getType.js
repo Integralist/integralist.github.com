@@ -2,6 +2,7 @@ define(function(){
 
 	/**
 	 * Following property stores a reference to the core Object's toString() method.
+	 * e.g. Object.prototype.toString.call(['a','b','c']).slice(8, -1) === 'Array'; // => true
 	 * This allows us to access JavaScript's internal [[Class]] property which helps us determine the type of certain primitives.
 	 * This version was updated to use @cowboy's version: https://gist.github.com/1131946
 	 * 
