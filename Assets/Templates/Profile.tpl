@@ -1,2 +1,2 @@
 <p>Hi, my name's <%= name %> and I'm a developer based in <%= location %> with <%= repocount %> public repositories and <%= gistcount %> public gists.</p>
-<p>I'm a passionate about Git and have been using GitHub since <%= since %>.</p>
+<p>I'm passionate about Git and have been using GitHub since <%= since %>.</p>
