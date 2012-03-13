@@ -82,4 +82,8 @@
     .articles {
         width: 89.5%;
     }
+    
+    .intro {
+    	font-size: 100%;
+    }
 }
