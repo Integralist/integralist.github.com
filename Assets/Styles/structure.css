@@ -36,7 +36,7 @@
 }
 
 .box {
-    width: 70%;
+    width: 960px;
 }
 
 .list {
@@ -61,6 +61,18 @@
 
 .align-right {
     float: right;
+}
+
+.pos-rel {
+	position: relative;
+}
+
+.pos-abs {
+	position: absolute;
+}
+
+.right {
+	right: 20px;
 }
 
 .github span,
@@ -97,7 +109,7 @@
 
 .intro {
     margin-left: 1em;
-    width: 70%;
+    width: 68.9583333%; /* 662px / 960px = percentage (move decimal over 2 places) */
 }
 
 .intro h1 {
@@ -125,11 +137,11 @@
 }
 
 .aside {
-    width: 32%;
+    width: 29.6956522%; /* 310px / 920px = percentage (move decimal over 2 places) - had to remove 4 from width? */
 }
 
 .articles {
-    width: 63%;
+    width: 64.1304348%; /* 590px / 920px = percentage (move decimal over 2 places) */
 }
 
 #github p:first-child,
@@ -179,15 +191,15 @@
 }
 
 .twitter-enjoys {
-    width: 33%;
+    width: 40.7854985%; /* 270px / 662px = percentage (move decimal over 2 places) */
 }
 
 .twitter-does {
-    width: 20%;
+    width: 18.8821752%; /* 125px / 662px = percentage (move decimal over 2 places) */
 }
 
 .twitter-listens {
-    width: 33%;
+    width: 15.1057402%; /* 100px / 662px = percentage (move decimal over 2 places) */
 }
 
 .articles ul {

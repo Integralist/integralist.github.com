@@ -1,89 +1,56 @@
-@media only screen and (max-width: 1300px) {
+/* iPad Landscape */
+@media only screen and (max-width: 1024px) and (orientation:landscape) {
+	.box {
+    	width: 964px;
+    }
+}
+
+/* iPad Portrait */
+@media only screen and (max-width: 768px) and (orientation:portrait) {
+	.box {
+    	width: 708px;
+    }
+}
+
+/* iPhone Landscape */
+@media only screen and (max-width: 480px) {
     .box {
-        width: 90%;
-    }
-    
-    .aside {
-        width: 100%;
-    }
-    
-    .articles {
-        margin-bottom: 1em;
-        width: 96.3%;
+    	width: 420px;
     }
     
     #picture {
-        float: right;
+    	display: none;
     }
     
-    .intro {
-        margin-left: 0;
-    }
-    
-    .follow {
-        display: none;
-    }
-}
-
-@media only screen and (max-width: 1220px) {
-    .intro {
-        width: 60%;
-    }
-    
-    .articles {
-        width: 96.2%;
-    }
-}
-
-@media only screen and (max-width: 1000px) {
-    #picture {
-        display: none;
-    }
-    
-    .intro {
-        width: 100%;
-    }
-    
-    .articles {
-        width: 95.4%;
-    }
-}
-
-@media only screen and (max-width: 740px) {
-    .articles {
-        width: 93.5%;
-    }
-}
-
-@media only screen and (max-width: 615px) {
-    .articles {
-        width: 92.4%;
+    .twitter-does,
+    .twitter-enjoys,
+    .twitter-listens {
+    	float: none;
+    	width: 100%;
     }
     
     .twitter-enjoys {
-        margin-top: 1.5em;
+    	border-top: 1px solid #C00;
+    	padding-top: 1.5em;
     }
     
-    .twitter-enjoys,
-    .twitter-does,
-    .twitter-listens {
-        float: none;
-        width: 100%;
+    .articles,
+    .aside {
+    	width: auto;
+    }
+    
+    .aside {
+    	margin-top: 20px;
     }
 }
 
-@media only screen and (max-width: 555px) {
-    .articles {
-        width: 91%;
-    }
-}
-
-@media only screen and (max-width: 480px) {
-    .articles {
-        width: 89.5%;
+/* iPhone Portrait */
+@media only screen and (max-width: 320px) {
+	.box {
+    	width: 260px;
     }
     
-    .intro {
-    	font-size: 100%;
+    .follow {
+    	display: none;
     }
 }
