@@ -15,13 +15,13 @@
     	display: none;
     }
 
-    .articles,
     .aside {
+        margin-top: 20px;
     	width: 100%;
     }
-    
-    .aside {
-    	margin-top: 20px;
+
+    .articles {
+    	width: 90%;
     }
 }
 
