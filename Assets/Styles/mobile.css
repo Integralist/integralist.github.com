@@ -14,6 +14,11 @@
     #picture {
     	display: none;
     }
+
+    .articles,
+    .aside {
+    	width: auto;
+    }
 }
 
 /* iPhone Landscape */
