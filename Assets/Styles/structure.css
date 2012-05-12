@@ -131,7 +131,7 @@
     text-decoration: none;
 }
 
-.aside .last,
+.aside .twitterers,
 .articles {
     margin-bottom: 0;
 }
@@ -199,7 +199,8 @@
 }
 
 .twitter-listens {
-    width: 15.1057402%; /* 100px / 662px = percentage (move decimal over 2 places) */
+    /*width: 15.1057402%;*/ /* 100px / 662px = percentage (move decimal over 2 places) */
+    width: 18.11% /* I forced up as some text was going on two lines unnecessarily */
 }
 
 .articles ul {
@@ -214,4 +215,12 @@
 .ie,
 .ie li {
 	margin-bottom: 1em;
+}
+
+.aside li {
+    margin-bottom: 1em;
+}
+
+.aside > article {
+    overflow: visible; /* with overflow:hidden originally set, Firefox will eventually cut-off long lists of content */
 }

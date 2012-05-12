@@ -55,6 +55,41 @@
     .aside {
     	margin-top: 20px;
     }
+    
+    .aside {
+    	float: left;
+    	display: box;
+    	display: -moz-box;
+    	display: -webkit-box;
+    	box-orient: vertical;
+    	-moz-box-orient: vertical;
+    	-webkit-box-orient: vertical;
+    }
+    
+    .aside .gists {
+    	box-ordinal-group: 2;
+    	-moz-box-ordinal-group: 2;
+    	-webkit-box-ordinal-group: 2;
+    }
+    
+    .aside .projects {
+    	box-ordinal-group: 1;
+    	-moz-box-ordinal-group: 1;
+    	-webkit-box-ordinal-group: 1;
+    }
+    
+    .aside .books {
+    	box-ordinal-group: 3;
+    	-moz-box-ordinal-group: 3;
+    	-webkit-box-ordinal-group: 3;
+    }
+    
+    .aside .twitterers {
+    	box-ordinal-group: 4;
+    	-moz-box-ordinal-group: 4;
+    	-webkit-box-ordinal-group: 4;
+    	margin-bottom: 1em;
+    }
 }
 
 /* iPhone Portrait */
@@ -65,5 +100,50 @@
     
     .follow {
     	display: none;
+    }
+    
+    .twitter-enjoys dd,
+    .twitter-does dd,
+    .twitter-listens dd {
+        font-size: 75%;
+    }
+    
+    .articles ul {
+        font-size: 85%;
+    }
+    
+    .aside {
+    	float: left;
+    	display: box;
+    	display: -moz-box;
+    	display: -webkit-box;
+    	box-orient: vertical;
+    	-moz-box-orient: vertical;
+    	-webkit-box-orient: vertical;
+    }
+    
+    .aside .gists {
+    	box-ordinal-group: 2;
+    	-moz-box-ordinal-group: 2;
+    	-webkit-box-ordinal-group: 2;
+    }
+    
+    .aside .projects {
+    	box-ordinal-group: 1;
+    	-moz-box-ordinal-group: 1;
+    	-webkit-box-ordinal-group: 1;
+    }
+    
+    .aside .books {
+    	box-ordinal-group: 3;
+    	-moz-box-ordinal-group: 3;
+    	-webkit-box-ordinal-group: 3;
+    }
+    
+    .aside .twitterers {
+    	box-ordinal-group: 4;
+    	-moz-box-ordinal-group: 4;
+    	-webkit-box-ordinal-group: 4;
+    	margin-bottom: 1em;
     }
 }

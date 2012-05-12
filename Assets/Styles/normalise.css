@@ -269,11 +269,22 @@ sub {
 ul,
 ol {
     margin-left: 0;
-    padding: 0 0 0 40px;
+    padding: 0 0 0 18px;
 }
 
 dd {
-    margin: 0 0 0 40px;
+    margin: 0 0 0 18px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    ul,
+    ol {
+        padding-left: 22px;
+    }
+    
+    dd {
+        margin-left: 22px;
+    }
 }
 
 nav ul,
