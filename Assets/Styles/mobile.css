@@ -1,14 +1,14 @@
 /* iPad Landscape */
 @media only screen and (max-width: 1024px) and (orientation:landscape) {
 	.box {
-    	width: 964px;
+    	/*width: 964px;*/
     }
 }
 
 /* iPad Portrait */
 @media only screen and (max-width: 768px) and (orientation:portrait) {
 	.box {
-    	width: 708px;
+    	/*width: 708px;*/
     }
 
     #picture {
@@ -28,7 +28,7 @@
 /* iPhone Landscape */
 @media only screen and (max-width: 480px) {
     .box {
-    	width: 420px;
+    	/*width: 420px;*/
     }
     
     #picture {
@@ -95,7 +95,7 @@
 /* iPhone Portrait */
 @media only screen and (max-width: 320px) {
 	.box {
-    	width: 260px;
+    	/*width: 260px;*/
     }
     
     .follow {
