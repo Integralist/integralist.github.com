@@ -35,8 +35,12 @@
     overflow: hidden;
 }
 
+.container {
+	max-width:960px; /* Added a max width here to stop the entire site being contained my the browser viewport */
+}
+
 .box {
-    width: 960px;
+    /*width: 960px;*/
 }
 
 .list {
@@ -110,6 +114,10 @@
 .intro {
     margin-left: 1em;
     width: 68.9583333%; /* 662px / 960px = percentage (move decimal over 2 places) */
+}
+
+.thumb {
+	max-width:25%; /* 240 / 960. Max width added here to force the image to scale appropriately */
 }
 
 .intro h1 {
