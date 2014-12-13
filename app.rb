@@ -82,7 +82,11 @@ posts = Dir.glob "posts/*.md"
 
 start = Time.now
 
-generate_posts posts
-generate_index posts
+threads = [:posts, :index].map do |item|
+  Thread.new do
+    send "generate_#{item}", posts
+  end
+end
+threads.each { |t| t.join }
 
 p "Execution time: #{Time.now - start} seconds"
