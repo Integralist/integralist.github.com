@@ -1,0 +1,278 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>The Clean Coder - How to be a Professional</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>The Clean Coder - How to be a Professional</h1>
+
+<ul>
+<li>Who is Robert C. Martin?</li>
+<li>What&#39;s it all about?</li>
+<li>Take responsibility</li>
+<li>Work ethic</li>
+<li>Know your field</li>
+<li>Stay current</li>
+<li>Collaborate</li>
+<li>Mentoring</li>
+<li>Know your domain</li>
+<li>Identify with your employer</li>
+<li>Learn to say no</li>
+<li>Rules and principles for coding</li>
+<li>Acceptance Tests</li>
+<li>Managing time
+
+<ul>
+<li>Meetings</li>
+<li>Scrum</li>
+<li>Sprint Planning</li>
+<li>Sprint Retro</li>
+<li>Discussions</li>
+<li>Code</li>
+</ul></li>
+<li>Estimations</li>
+<li>Pressure</li>
+<li>Conclusion</li>
+</ul>
+
+<h2>Who is Robert C. Martin?</h2>
+
+<p>Robert C. Martin is a legend in the development industry. Commonly referred to as simply &quot;Uncle Bob&quot;. He is a software consultant and has been programming since the mid 60&#39;s. Over the years he has written many books (some listed below) as well as shared his great knowledge of system design and coding best practices.</p>
+
+<ul>
+<li>Designing Object-Oriented C++ Applications</li>
+<li>Patterns Languages of Program Design</li>
+<li>Extreme Programming in Practice</li>
+<li>Agile Software Development: Principles, Patterns and Practices</li>
+<li>UML for Java Programmers</li>
+<li>Clean Code: A Handbook of Agile Software Craftsmanship</li>
+<li>The Clean Coder: A Code of Conduct for Professional Programmers</li>
+</ul>
+
+<p>The last book in that list is the focus of this post.</p>
+
+<h2>What&#39;s it all about?</h2>
+
+<p>Well, I&#39;ve taken the liberty to reference the author directly here as I feel his words convey the book&#39;s focus more than I ever could… </p>
+
+<blockquote>
+<p>I presume you just picked up this book because you are a computer programmer and are intrigued by the notion of professionalism. You should be. Professionalism is something that our profession is in dire need of.
+I&#39;m a programmer too. I&#39;ve been a programmer for 42 years (longer by the time you read this); and in that time I&#39;ve seen it all. I&#39;ve been fired. I&#39;ve been lauded. I&#39;ve been a team leader, a manager, a grunt and even a CEO. I&#39;ve worked with brilliant programmers and I&#39;ve worked with slugs. I&#39;ve worked on high-tech cutting-edge embedded software/hardware systems, and I&#39;ve worked on corporate payroll systems. I&#39;ve programmed in COLBOL, FORTRAN, BAL, PDP-8, PDP-11, C, C++, Java, Ruby, Smalltalk, and a plethora of other languages and systems. I&#39;ve worked with untrustworthy pay check thieves, and I&#39;ve worked with consummate professionals. It is that last classification that is the topic of this book.
+In the coming years I would be fired from one job for carelessly missing critical dates, and nearly fired from still another for inadvertently leaking confidential information to a customer. I would take the lead on a doomed project and ride it into the ground without calling for the help I knew I needed. I would aggressively defend my technical decisions even though they flew in the face of the customers’ needs. I would hire one wholly unqualified person, saddling my employer with a huge liability to deal with. And worst of all, I would get two other people fired because of my inability to lead.
+So think of this book as a catalog of my own errors, a blotter of my own crimes, and a set of guidelines for you to avoid walking in my early shoes.</p>
+</blockquote>
+
+<h2>Take responsibility</h2>
+
+<p>A professional takes responsibility for his code and his decisions. His primary focus should be to &#39;do no harm&#39;.</p>
+
+<p><strong>Don&#39;t harm the code:</strong></p>
+
+<p>Here is a short-list of things a professional will do… </p>
+
+<ul>
+<li>Ensure that QA (Quality Assurance) find nothing wrong. If there are bugs then a professional will take note of them, how they occurred and aim to prevent it from happening again. A professional doesn&#39;t rely on others to catch bugs for them.</li>
+<li>Know how all the code works (even the bits they didn&#39;t write). Understand all of the codebase and how the different components inter-lock. The only way a professional can apply an appropriate solution is to know the environment, its limitations and constraints.</li>
+<li>Write tests (unit &amp; acceptance) and will ensure they are automated. A professional who writes tests first before code will be more confident in adding new features and refactoring existing code as they have the tests to back them up as they make changes (especially if the tests are automated then the red/green/refactor cycle can be tightly integrated into the professionals work flow).</li>
+<li>100% code coverage (or at least in the 90% range). TDD (Test Driven-Development) means that the code design allows every line of code the professional writes to be easily testable.</li>
+</ul>
+
+<p><strong>Do not harm the code&#39;s architecture/structure:</strong></p>
+
+<p>A professional will keep in mind the following… </p>
+
+<ul>
+<li>Software should be easy to change.</li>
+<li>Making a change to the code base should be easy. If it isn&#39;t then the professional will look to change the design of the code to accommodate this requirement so the code becomes more flexible and allows changes to be made more easily in future.</li>
+<li>Any code the professional reads over or makes a change to will be analysed for any potential improvements to the code&#39;s structure (this is known as &#39;merciless refactoring&#39; or &#39;the boy scout rule&#39;). In other words always commit back a module in a better state than you originally checked it out.</li>
+<li>Make continuous changes to the code base. Constantly changing the code (i.e. improving it) should result in greater flexibility and modularity. If you leave the code static (e.g. you&#39;re afraid to change it in case it breaks something) then when management requests a change or new feature you may likely find the code is too rigid to be adapted.</li>
+<li>Don&#39;t be afraid to constantly change your code. Your tests are there to back you up and should be quick to run!</li>
+</ul>
+
+<h2>Work ethic</h2>
+
+<p>Your career is <em>your</em> responsibility, do not leave it up to your employer to train you, send you on courses or buy you books. Take control of yourself.</p>
+
+<p>The time you spend at work should be spent on your employers problems, not yours. A professional works hard for his employer and makes time for his &#39;career&#39; in his own time. This also doesn&#39;t mean you should spend all your time on your career. You have a family/life too. Balance your work, your career and your life in appropriate measures.</p>
+
+<h2>Know your field</h2>
+
+<p>Professionals not only know their chosen favourite technologies, but have an understanding and interest in other technologies outside of that circle.</p>
+
+<p>Professionals will know past techniques (and why they may no longer be relevant) as well as the current best practices.</p>
+
+<p>Professionals will also know the pros and cons to specific techniques and when to choose one over the other.</p>
+
+<p>Uncle Bob makes a comment which references the &quot;Santayana&#39;s curse&quot;… </p>
+
+<blockquote>
+<p>Those who cannot remember the past are condemned to repeat it.</p>
+</blockquote>
+
+<p>Here is a short list of things you should know (or at least be quite familiar with):</p>
+
+<ul>
+<li>Design patterns (GOF 24 patterns)</li>
+<li>Design principles (SOLID, DRY, SRP, DIP)</li>
+<li>Methods of working (Agile, Scrum, Kanban, Waterfall)</li>
+<li>Disciplines (TDD, BDD, OOP, CI, Pair Programming)</li>
+<li>Artifacts (UML, sequence diagrams, flow charts, decision tables)</li>
+</ul>
+
+<h2>Stay current</h2>
+
+<p>Practice. Doing your job isn&#39;t practice. Your job helps you improve your current skills, practice is learning new related skills.</p>
+
+<p>Professionals will participate in Code Katas. These aren&#39;t about solving problems because as a professional they would have already solved the problems presented in the kata. The purpose of code katas for a professional is to help warm them up for the days work and as a warm down at the end of the day. It allows them to try out different options for refactoring the solution and finding other shortcuts.</p>
+
+<h2>Collaborate</h2>
+
+<p>A professional will plan, design and write code together with their team/co-workers. This helps open their knowledge up to new ways of thinking and solutions they may not have considered otherwise. This also facilitates faster learning and making fewer errors.</p>
+
+<h2>Mentoring</h2>
+
+<p>Nothing demonstrates more how much you know about a subject than when you try to teach it to some one else. Juniors will ask all sorts of questions you may have long forgotten about (such as why you no longer build something in a certain way or using a certain technique). Professionals look after juniors and don&#39;t let them struggle on without help and direction.</p>
+
+<h2>Know your domain</h2>
+
+<p>A professional will research the business they are now building software for. So if you work for a travel agent then you should know a bit about that industry. You don&#39;t need to be an expert, just know enough to recognise concerns with certain technical requests or specifications.</p>
+
+<h2>Identify with your employer</h2>
+
+<p>Effectively your employers problems are your problems and so you need to take their perspective and understand the features they want implemented. A professional will be in a better position to advise whether those new features are actually right for the business.</p>
+
+<h2>Learn to say no</h2>
+
+<p>If your boss tells you to implement a feature by a certain date and you know that can&#39;t happen without compromising the quality and stability of the software, then be vocal and say &quot;no, that&#39;s not possible&quot;</p>
+
+<p>A professional wouldn&#39;t flat out say &quot;No&quot; and walk away, they would suggest a date that the work could be completed by, or possibly a compromise in the features that would be implemented by the deadline date. A professional will work with management to agree on what&#39;s achievable but won&#39;t settle for intimidation because management has tried to enforce an unrealistic request.</p>
+
+<p>As a professional you were hired to carry out a specific specialised job and it&#39;s your responsibility to educate management on what&#39;s feasible or not. Do not find yourself agreeing to impossible deadlines or saying &quot;I&#39;ll try&quot; (I&#39;ll try is usually interpreted by management as &quot;yes&quot;). Generally developers will agree to &quot;try&quot; because they want to avoid confrontations but it suggests that the work you were doing previously wasn&#39;t&#39; actually your all. </p>
+
+<p>What does &quot;I&#39;ll try&quot; actually mean any way? That you&#39;ll work longer hours or work weekends? No, of course not. So why tell management you&#39;ll &quot;try&quot; when you&#39;re just going to go ahead and do what you was planning on doing before. It will just let them down when you don&#39;t succeed to finish by the deadline because management will have interpreted your &quot;I&#39;ll try&quot; as &quot;I will&quot;.</p>
+
+<h2>Rules and principles for coding</h2>
+
+<p>A professional has a specific set of principles when it comes to how they work… </p>
+
+<ul>
+<li>Professionals are prepared (always focused and understanding)</li>
+<li>Professionals don&#39;t write code when tired or distracted as this just results in code that doesn&#39;t work or will just need to be rewritten later.</li>
+<li>Professionals avoid &quot;the zone&quot;. This sounds controversial as &quot;the zone&quot; is what most developers think gives them their edge. That sweet moment where everything seems to be flowing just right. But &quot;the zone&quot; just tricks you into thinking the speed you&#39;ve gained processing problems means they are really efficient. They aren&#39;t. You lose the bigger picture when you get into the &quot;flow&quot;. So don&#39;t buy into it. Be focused.</li>
+<li>Professionals don&#39;t code while listening to music. You aren&#39;t as productive as you think you are. This is something I&#39;ve personally experienced and agree with. Working in silence may seem boring or too solitary but I do my best work when the background noise disappears.</li>
+<li>Professionals handle interruptions politely and be willing to help regardless. Have you ever given an agitated response to someone who has interrupted you while working? Your snappy response could be because you&#39;re trying to figure out a complicated problem that requires total concentration (maybe you were trying to get &quot;into the zone&quot;). But a professional knows how to politely handle the situation and return to the problem at hand.</li>
+<li>Professionals know that &quot;writers block&quot; can usually be solved (or alleviated) by pair programming.</li>
+<li>Professionals know to produce creative output they need creative input. It&#39;ll be different for each individual but find out what gets your creative juices flowing and make sure you indulge that as often as possible to allow your more creative output to flow.</li>
+<li>Professionals avoid time fixing bugs. No other profession would stand for bugs in this way too long (could you imagine a doctor who made mistakes in diagnosis on every patient? he wouldn&#39;t last in this profession very long!), so a software professional should aim to reduce debugging time to zero.</li>
+<li>Professionals aren&#39;t afraid to go home when there is a bug they can&#39;t solve. They recognise their creative periods, and so know when to take a break. You&#39;ll find that your subconscious will figure out the solution while your brain takes a rest - so remember that it&#39;s ok to walk away and take a break.</li>
+<li>Professionals know that being late for a deadline is a fact of life and unavoidable. But a professional will constantly measure their progress and inform those who need to know as early as possible if they&#39;re not going to make the deadline. Don&#39;t let people down at the last minute.</li>
+<li>Professionals don&#39;t give false hope that a deadline will be met if there genuinely is no chance. Better to formulate a fall-back plan or agree what can be achieved. Stick to your estimates, don&#39;t let a manager try to convince you to &quot;do what it takes&quot; to make the deadline.</li>
+<li>Professionals don&#39;t build a wall around their code. Any developer should be allowed/able to make changes to other developers code.</li>
+<li>Professionals understand that pair programming is a good thing in that it helps you learn the system, find bugs faster and share knowledge more efficiently.</li>
+</ul>
+
+<h2>Acceptance Tests</h2>
+
+<p>Acceptance tests help avoid ambiguity in feature requests and how the existing system functions. They are different from unit-tests (which test individual components of the code) in that they ensure the finished application functions how the business expects it to (without the business having to understand the technical aspects of the system).</p>
+
+<p>These types of tests should be co-written by a stakeholder &amp; a programmer to ensure clarity and accuracy, and they should always be written so they can be executed automatically.</p>
+
+<p>Acceptance tests provide the entire team with the definition of &quot;done&quot; (e.g. code written, tests passing, code deployed &amp; QA satisfied).</p>
+
+<p>Professionals should never be passive-aggressive when it comes to acceptance tests. By this we mean: if you&#39;ve been asked to implement a test that you think is faulty then it is your responsibility as a professional to make the business understand why the test is faulty and to come to an agreement on what an acceptable test should be. So don&#39;t act passive-aggressively (in a &quot;well if this is what they wanted, then this is what they&#39;ll get&quot; way) by allowing a faulty test to pass.</p>
+
+<h2>Managing time</h2>
+
+<p>A professional knows how to manage their time. </p>
+
+<h3>Meetings</h3>
+
+<p>They don&#39;t go to every meeting they are invited to just because they&#39;re invited. They only go to those meetings that affect the immediate job they&#39;re working on. </p>
+
+<p>The people who invite you to meetings aren&#39;t responsible for managing your time, you are. Be wise about the time you give up as it otherwise will mean your work won&#39;t get done.</p>
+
+<p>A good manager will do what they should to keep you out of meetings.</p>
+
+<p>If a meeting gets boring: leave. It&#39;s unprofessional to stay in a meeting where your input is not needed. Be polite and excuse yourself.</p>
+
+<p>Only agree to attend meetings where a clear agenda has been determined. </p>
+
+<h3>Scrum</h3>
+
+<p>Participates in a Scrum stand-up meeting should spend no more than 20 seconds per question (what did I do yesterday, what am I doing today, what&#39;s blocking me)</p>
+
+<h3>Sprint Planning</h3>
+
+<p>Sprint Planning sessions are a notoriously difficult part of Agile to get right. But effectively: estimates for backlog items should already be done, ready for selection/rejection. Ideally acceptance tests will also have already been written. No more than 10mins should be spent reviewing any item. If more time is needed then another meeting should be scheduled with a subset of the team to discuss further.</p>
+
+<h3>Sprint Retro</h3>
+
+<p>Sprint Retro should only take 20mins and your sprint demo should only take 25mins. For most Agile teams it will only have been two weeks since your last retro so there shouldn&#39;t be <em>that much</em> to talk about.</p>
+
+<h3>Discussions</h3>
+
+<p>Any argument that lasts longer than 5mins can not be settled by arguing. Get data to back up your opinions and to solidify a decision.</p>
+
+<h3>Code</h3>
+
+<p>Avoid blind alleys. A blind alley is where you choose a technical solution and stick with it even though later on you realise it&#39;s not the right choice. Learn to stop digging that hole. Back out and try something different.</p>
+
+<p>Avoid messes. A mess is like a time black hole that sucks you in. Every step you think you&#39;re closer to the finish, and it seems to be better than starting over. Don&#39;t fall for it!</p>
+
+<p>Blind alleys and messes have very subtle differences but basically both should be recognised as early as possible so you can escape them.</p>
+
+<h2>Estimations</h2>
+
+<p>A professional will try not to estimate a job by themselves. Any one who does this should expect to go over by at least 3 times as long as their original estimate. </p>
+
+<p>Professionals will estimate with the help of their team as they know someone on the team may highlight an issue the others (including yourself) have missed or not considered.</p>
+
+<p>If appropriate, try breaking up a task into smaller tasks and estimating each smaller task. In doing so you&#39;ll likely find that the total sum of your estimate is larger than your original estimate would have been for the whole thing (i.e. before you split the task into smaller chunks).</p>
+
+<h2>Pressure</h2>
+
+<p>A professional knows to stay calm under pressure.</p>
+
+<p>A clear head is essential. No good comes from pent up frustration at management for tight deadlines, or poor software (when a build breaks just before going live). </p>
+
+<p>A professional resorts to discipline and training to get through these situations.</p>
+
+<p>Ultimately: by handling your job and your responsibilities <em>professionally</em> you&#39;ll be able to avoid pressure by avoiding situations that cause pressure.</p>
+
+<h2>Conclusion</h2>
+
+<p>This has been a bit of a whirlwind tour of &quot;The Clean Coder: A Code of Conduct for Professional Programmers&quot; but hopefully you&#39;ve learnt a few things about how to handle yourself in a professional manner and will want to pick up the book to get the full benefit of &quot;Uncle Bob&#39;s&quot; experience and advice.</p>
+
+<p>I cannot recommend this book enough. I can see it being a useful tool for not only developers but for managers as well, because although the book is primarily focused on people in the software engineering industry, the information and tips are still relevant cross-discipline.</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

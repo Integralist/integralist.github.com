@@ -1,0 +1,536 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Object-Oriented Design (OOD)</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>Object-Oriented Design (OOD)</h1>
+
+<ul>
+<li>Quick Summary</li>
+<li>Introduction</li>
+<li>Objects</li>
+<li>Class Analysis</li>
+<li>Dependencies</li>
+<li>Flexible Interfaces</li>
+<li>Duck Typing</li>
+<li>Inheritance</li>
+<li>Inheritance vs Composition</li>
+<li>Further good rules of development from Sandi Metz</li>
+<li>Summary</li>
+</ul>
+
+<h2>Quick Summary</h2>
+
+<p>Here is a short summary for those of you who prefer to see a quick bullet-point list of items covered... </p>
+
+<ul>
+<li>Decouple your code (<em>we discuss this in more detail below</em>)</li>
+<li>Describe your class to see if it does too much<br>
+e.g. for each class write down a single line description and try to avoid the words &#39;and&#39;, &#39;or&#39; from occuring</li>
+<li>Review each method thoroughly (you may find some methods don&#39;t belong in your class and deserve their own interface)</li>
+<li>Manage your dependencies:
+
+<ul>
+<li>Check the method arguments you&#39;re passing around</li>
+<li>Use dependency injection (don&#39;t hard code class names)</li>
+<li>Avoid direct references to complex data structures (transform your data into a more appropriate form)</li>
+<li>Abide by the Single Responsibility Principle (SRP)</li>
+<li>Review comments to ensure their purpose and usefulness
+
+<ul>
+<li>Your commented code could be better handled by moving into a separate method with a descriptive name</li>
+</ul></li>
+</ul></li>
+<li>Write more flexible interfaces:
+
+<ul>
+<li>Object-Oriented code is more about the &#39;messages&#39; sent between objects than the objects themselves</li>
+<li>Think about the messages you want to send and create objects/interfaces to handle them</li>
+<li>Ask for what you <em>want</em> and don&#39;t include <em>how</em> to do what you want</li>
+<li>Ensure messages you send (e.g. method calls you make) don&#39;t rely on knowledge of the object that implements the method</li>
+<li>Reduce your object&#39;s context (i.e. how much it knows about other objects). Dependency Injection can help here</li>
+</ul></li>
+<li>Trust your objects (e.g. Duck Typing design principles)</li>
+<li>If using the inheritance pattern:
+
+<ul>
+<li>Abstract your shared functionality into the base class</li>
+<li>Make sure sub classes inherit only what they need</li>
+<li>Avoid calling <code>super</code> as it&#39;s a code smell</li>
+</ul></li>
+</ul>
+
+<h2>Introduction</h2>
+
+<p>All of the following information has been distilled from Sandi Metz&#39; <a href="http://www.poodr.info/">Practical Object-Oriented Design in Ruby</a>, and although the code in this post is based on the Ruby language, don&#39;t worry - the concepts are applicable for any object-oriented language.</p>
+
+<p>I would highly recommend you read <a href="http://www.poodr.info/">Practical Object-Oriented Design in Ruby</a> as the author goes into far more code detail and background information (as well as covering other subjects such as test-driven development and the process of writing efficient unit tests) which will help you understand the concepts better than I could in this single post. But hopefully the following distilled version should be a sufficient starting point for your journey into writing more flexible and maintainable code.</p>
+
+<h2>Objects</h2>
+
+<p>The best description I have ever read regarding good Object-Oriented design goes like this... </p>
+
+<blockquote>
+<p>Object-Oriented Design is about the messages that get sent between objects and not the objects themselves.</p>
+</blockquote>
+
+<p>This single line quote perfectly captures the intention behind good Object-Oriented design. </p>
+
+<p>It seems our focus on objects has been wrong. We should be thinking primarily about the messages we want to send. This way we build up classes based on good clean interfaces and so our subsequent objects are clearer and more direct in their message handling.</p>
+
+<h2>Class Analysis</h2>
+
+<p>We want our classes to be as decoupled as possible. The benefit of this is to allow changes to occur over time with little to no side-effects. If your classes have too many dependencies, which are likely too tightly coupled to the class, then any design/code changes in the future could potentially have a negative knock-on effect on the rest of your code.</p>
+
+<p>To ensure a class only contains the behaviour it needs try describing your class in one sentence. If you find you have to use the word &quot;and&quot; within your description then the class appears to have more than one responsibility (this is a bad thing - your classes should be small and focused on a single responsibility). If you find you have used the word &quot;or&quot; to describe your class then you not only have more than one responsibility but the responsibilities aren&#39;t even related. That again would be an indication of a code smell.</p>
+
+<p>Another way to analyse your classes is to ask each method within the class a question, and to see if any of the answers sound out of place.</p>
+
+<p>e.g. &quot;Please Mr. <code>ClassName</code> what is your <code>method_name</code>?&quot;</p>
+
+<p>This sounds strange and maybe a bit childish, but it&#39;s surprising what methods suddenly appear to no longer fit within the responsibilities of the class being interrogated.</p>
+
+<p>For example, look at the following class which is based on a part of a bicycle (specifically gears)... </p>
+
+<p>```ruby
+class Gear
+    attr_reader :chainring, :cog, :rim, :tire</p>
+
+<pre><code>def initialize (chainring, cog, rim, tire)
+  @chainring = chainring
+  @cog       = cog
+  @rim       = rim
+  @tire      = tire
+end
+
+def ratio
+  chainring / cog.to_f
+end
+
+def gear_inches
+    # tire goes around rim twice for diameter
+    ratio * (rim + (tire * 2))
+end
+</code></pre>
+
+<p>end
+```</p>
+
+<p>...now start to ask each of its methods a question (remember that <code>attr_reader</code> generates a getter method and so those need to be queried as well)... </p>
+
+<ul>
+<li>&quot;Please Mr. <code>Gear</code> what is your <code>ratio</code>?&quot; <strong>- seems fine</strong></li>
+<li>&quot;Please Mr. <code>Gear</code> what is your <code>gear_inches</code>?&quot; <strong>- seems fine also</strong></li>
+<li>&quot;Please Mr. <code>Gear</code> what is your <code>tire</code>?&quot; <strong>- hmm? notice this doesn&#39;t sound like it quite fits the purpose of a &#39;Gears&#39; class</strong></li>
+</ul>
+
+<p>You can tell that the <code>tire</code> method doesn&#39;t fit in with a class which handles bicycle gears information and would be better suited to be placed in its own class. A simple querying of the methods has pointed us in the direction of a potential code smell.</p>
+
+<p>One other potential code smell worth avoiding is the direct referencing of class attributes/properties. You should only access them via a getter method to ensure good separation of data access. For example...</p>
+
+<p>```ruby
+class Gear
+    attr_reader :chainring, :cog</p>
+
+<pre><code>def initialize (chainring, cog)
+  @chainring = chainring
+  @cog       = cog
+end
+
+def ratio
+  @chainring / @cog.to_f # bad
+  chainring / cog.to_f   # good
+end
+</code></pre>
+
+<p>end
+```</p>
+
+<h2>Dependencies</h2>
+
+<p>Dependencies can be many things, for example: external class references or arguments passed to methods.</p>
+
+<p>Below are some rules to help you spot a dependency and how to better manage them... </p>
+
+<h3>Direct References</h3>
+
+<p>Avoid &#39;direct references&#39;. These are things like drilling down into a complex array structure to grab some data to work with. You may know the data structure now, but that&#39;s not to say it won&#39;t change in the future. But also, linking to a complicated data structure is confusing to other users because it obscures what the data really is and what it is meant to represent. </p>
+
+<p>So in the following example we are directly accessing <code>item[0]</code> and <code>item[1]</code> from a multi-dimensional array... </p>
+
+<p>```ruby</p>
+
+<h1>BAD</h1>
+
+<p>class MyClass
+    attr_reader :data</p>
+
+<pre><code>def initialize(data)
+    @data = data
+end
+
+def do_something
+    data.each do |item| 
+        puts item[0]
+        puts item[1]
+        puts &#39;---&#39;
+    end
+end
+</code></pre>
+
+<p>end</p>
+
+<p>obj = MyClass.new([[10, 25],[3, 9],[41, 7]])
+obj.do_something
+```</p>
+
+<p>...but the order of the items may not always be what you think they are and the direct access is not very descriptive of what the data is that you&#39;re accessing. </p>
+
+<p>Instead you should &#39;transform&#39; your data structure into a simpler and easier to understand structure (a good way to do this in Ruby is by using <code>Struct</code> which is perfect for creating basic data holding classes - which is what we want to do here)...</p>
+
+<p>```ruby</p>
+
+<h1>GOOD</h1>
+
+<p>class MyClass
+    attr<em>reader :new</em>data</p>
+
+<pre><code>def initialize(data)
+    @new_data = transform(data)
+end
+
+def do_something
+    new_data.each do |item| 
+        # now we are able to reference easily understandable 
+        # property names (rather than item[0], item[1])
+        puts item.coord_x
+        puts item.coord_y
+        puts &#39;---&#39;
+    end
+end
+
+Transform = Struct.new(:coord_x, :coord_y)
+
+def transform(data)
+    data.collect { |item| Transform.new(item[0], item[1]) }
+end
+</code></pre>
+
+<p>end</p>
+
+<p>obj = MyClass.new([[10, 25],[3, 9],[41, 7]])
+obj.do_something
+```</p>
+
+<h3>Single Responsibility Principle</h3>
+
+<p>You should refactor your methods so they do one thing (also known as the &#39;Single Responsibility Principle&#39;). One reason to do this is so that your methods become easier to test, and also their new found simplicity can provide a greater clarity that can highlight whether other methods within the class should even be there.</p>
+
+<p>So for example, you may have a complex algorithm contained within a single method of your class and because of its complexity you may miss the fact that some of the algorithm should actually have been handled by a separate class altogether.</p>
+
+<p>Following the Single Responsibility Principle will result in smaller (and greater number of) small sized methods. This result will encourage greater code reuse from yourself (as well as other users of your code) and will also make your methods easier to test and to move around into different classes.</p>
+
+<h3>Remove comments</h3>
+
+<p>If a piece of code needs a comment then chances are you need to extract that code into a separate method. The name of the method should serve the same purpose as the comment once did. This isn&#39;t always the case, but as part of your analysis you should reconsider any comments to ensure they are helpful or just noise.</p>
+
+<h3>Do not tightly couple your code</h3>
+
+<p>The best way to decouple your code is to manage your dependencies. </p>
+
+<p>For example, if you look at a class that utilises another class for some additional functionality, that secondary class has become the dependency. Also, if you use that dependency in multiple places and the class was to change in some way then consider how many places your class potentially could break or need to be updated? </p>
+
+<p>Now, a class referencing the name of another class isn&#39;t necessarily a major issue in itself (as the change of a class name can easily be rectified using a modern IDE find &amp; replace feature), the bigger problem is from the lack of code reuse. Your method is tightly coupled to a specific class. </p>
+
+<p>Some other things to look out for are:  </p>
+
+<ul>
+<li>arguments passed to a method on the dependency class<br>
+
+<ul>
+<li>if the class name itself is hard coded then technically that is an area of concern as well because if the dependency class was renamed then your code which references the old name would need to be updated. </li>
+</ul></li>
+<li>even down to things like the order of the arguments could be considered a dependency.<br></li>
+</ul>
+
+<p>Every dependency results in more brittle, tightly coupled code.</p>
+
+<h3>Facades</h3>
+
+<p>Do not let external dependencies permeate your code. </p>
+
+<p>One way to prevent this is to wrap any dependencies in a method so you can implement a facade over the original interface allowing it to match your own API.</p>
+
+<p>For example, if your dependency had a method which required arguments to be sent in a specific order then you could wrap the call to the method in a facade which allowed the user of your class to pass in the arguments in another format. Your facade could then normalise the data before passing it over to the dependency&#39;s method.</p>
+
+<h3>Dependency Directions</h3>
+
+<p>Make sure you spend time considering the direction of your dependencies.</p>
+
+<p>When considering the direction of your dependencies (e.g. does class A rely more on class B, or vice versa) remember to think about the following 3 points...</p>
+
+<ol>
+<li><p>Some classes are more likely to change than others</p></li>
+<li><p>Concrete classes are more likely to change than abstract classes.<br>
+Imagine you have a class with a hard coded reference to another class. We could make the primary class more abstract by injecting the  dependency of the secondary class rather than having to reference it directly. This way the primary class is able to accept an object successfully as long as it implements the required method.</p></li>
+<li><p>A class with many dependants could result in widespread consequences.</p></li>
+</ol>
+
+<h3>Summary of dependencies...</h3>
+
+<ul>
+<li><p>Dependency management is core to creating future-proof applications. </p></li>
+<li><p>Injecting dependencies creates loosely coupled objects that can be reused. </p></li>
+<li><p>Isolating dependencies allows objects to adapt to unexpected changes. </p></li>
+<li><p>Depending on abstractions decreases the likelihood of facing changes. </p></li>
+<li><p>The key to managing dependencies is to control their direction. </p></li>
+</ul>
+
+<p>And to quote another... </p>
+
+<blockquote>
+<p>&quot;Depend on things that change less often than you do&quot;</p>
+</blockquote>
+
+<h2>Flexible Interfaces</h2>
+
+<p>Object-Oriented applications are made up of objects(classes) but are defined by the messages that pass between these objects. </p>
+
+<p>Our code must handle...</p>
+
+<ul>
+<li>What objects <em>know</em> (i.e. their responsibility)</li>
+<li><em>Who</em> they know (i.e. their dependencies)</li>
+<li><em>How</em> they talk to one another</li>
+</ul>
+
+<p>...and this is done via our object&#39;s interfaces. </p>
+
+<p>Creating a flexible interface is essential to good Object-Oriented design. </p>
+
+<p>Each object should reveal as little about itself, and know as little about other objects as possible. </p>
+
+<p>There are two parts to our interfaces: a Public Interface and a Private Interface... </p>
+
+<h3>Public interface:</h3>
+
+<ul>
+<li>Should reveal the primary responsibility </li>
+<li>Is expected to be invoked by others</li>
+<li>Will be unlikely to change (so safe for other objects to depend on)</li>
+<li>Testable</li>
+</ul>
+
+<h3>Private interface</h3>
+
+<ul>
+<li>Should handle implementation details</li>
+<li>Not be accessible by other objects</li>
+<li>Can be changed at anytime without causing side effects for other objects</li>
+<li>Aren&#39;t even accessible by unit tests</li>
+</ul>
+
+<p>A good way to start designing your interfaces is to draw sequence diagrams (one way to do this is to use UML). Just remember to focus on the messages needing to be sent between objects rather than focusing on the objects themselves.</p>
+
+<p>When designing your interfaces you should ask yourself the question: &quot;I need to send this message, who should respond to it?&quot;. </p>
+
+<p>It&#39;s important to understand that you don&#39;t send messages because you have objects. You have objects because you send messages. If you keep that in mind then you can ensure your objects only handle responsibilities relevant to them.</p>
+
+<p>Avoid asking the question &quot;What should this class do?&quot; and make sure your interfaces are designed in such a way that they ask for what they want and don&#39;t try to tell another object what to do. </p>
+
+<p>For example, If you have a Mechanic class and you want the class to prepare a bike for you then don&#39;t call the Mechanic&#39;s individual methods: &quot;clean<em>bike&quot;, &quot;pump</em>tyres&quot;, &quot;check<em>brakes&quot; directly. Instead you know the message you want to send (in this case you want to have a bike prepared for you) so create an interface that supports that message requirement. Do this by creating a method on the Mechanic class called &quot;prepare</em>bike&quot; and send your message to that method. This way if the Mechanic class changes its implementation then the object that calls the &quot;prepare_bike&quot; method doesn&#39;t have to change as well. </p>
+
+<h3>Reducing Context</h3>
+
+<p>The things an object knows about other objects make up its &#39;context&#39;. </p>
+
+<p>An object may have a single responsibility but it expects a context. For example the object expects an object to respond to a specific method call. </p>
+
+<p>For an object to become more reusable and more easily testable it must reduce its contexts. If there is a context then to reuse the object you need to bring along the context every time (this makes code reuse and testing harder). </p>
+
+<p>Dependency injection reduces the context. For example if you had an object which called a generic method and passed &#39;self&#39; as an argument then the receiving object could handle the request (and because the first object was injected as a dependency) then the second object could call the first object when it&#39;s finished with the request. </p>
+
+<h3>Summary of Interfaces</h3>
+
+<p>Your interface defines your application and determines its future. </p>
+
+<p>Object-Oriented applications are defined by messages that pass between objects. This is handled via public interfaces. Ask for what you want and don&#39;t include any &#39;hows&#39; as part of the request which would be telling the receiving object how to behave rather than it handling the how itself. </p>
+
+<h2>Duck Typing</h2>
+
+<p>Duck Typing is the process of making code more flexible and less tightly coupled by taking into consideration that if an object &quot;sounds like a duck, and quacks like a duck&quot; then it stands to reason the object must indeed be (or act like) a duck.</p>
+
+<p>The principle idea behind Duck Typing is to trust your objects (e.g. do not worry about the class of an object, only that the object implement the expected interface - and trust that it does). Sounds scary/dangerous but it will help you to avoid writing code that tightly couples to your dependencies. </p>
+
+<p>Cleaning up a long and ugly switch/case statement which checks the class of an object to determine what action to take is one area where Duck Typing can help. The problem with this example is that the switch statement technique is fragile and likely to break when new class types need to be added. </p>
+
+<p>Instead, for each object create a generically named method (same name for each object) which handles the appropriate internal/specific details relevant for that object. This way you can just call the method (and even pass the calling object as a reference <code>self</code> in case the receiving object needs further information to carry out its work) and thus make your code more reusable by not tightly coupling a specific method to multiple object calls. </p>
+
+<p>Also, any where you see the use of <code>is_a?</code> or <code>responds_to?</code> then that is an indication of a potential code smell because the principle issue identical to the switch statement. </p>
+
+<h2>Inheritance</h2>
+
+<h3>Abstract your base class</h3>
+
+<p>When inheriting from another class it is essential that the parent class is as abstract as possible. For example, it only holds enough code that is relevant for all its sub classes. A sub class should never inherit redundant data or methods. If it does then your parent class isn&#39;t abstract enough. </p>
+
+<h3>Default values</h3>
+
+<p>Be careful when using default values. If your base class has a common property which is different for each sub class, but is required within each sub class (hence sticking it in the base class) then you won&#39;t want to give it a value inside the base class. Your base class should take in the value via the constructor and if the value isn&#39;t provided you should set the default using a method like so...</p>
+
+<p><code>xxx = args[:xxx] || default_xxx_value</code></p>
+
+<p>In this example <code>default_xxx_value</code> should be a method the sub class implements which provides the specific value. The reason we have written it like this is so that the sub class has better control over setting the default value. </p>
+
+<p>So far so good. But if a new user doesn&#39;t read the documentation (which states they must implement <code>default_xxx_value</code> within their sub class) then they will get an error thrown. In the above example it may be best to raise your own descriptive error by implementing the <code>default_xxx_value</code> method as an abstract method within the base class like so...</p>
+
+<p><code>ruby
+def default_xxx_value
+    raise NotImplementedError, &quot;#{self.class} cannot respond to: &quot;
+end
+</code></p>
+
+<p>Note: the above custom error message raised will display automatically the name of the method (<code>default_xxx_value</code>) at the end of the message when it is displayed to the user (hence we don&#39;t need to manually include it). </p>
+
+<h3>Super</h3>
+
+<p>Beware calls to <code>super</code> via a sub class, as this is a code smell. </p>
+
+<p>Why? Because it declares that the sub class knows the implementation of the base class. It says &quot;I know what you do, I know what to send to you and I know what returned value to expect&quot;. The sub class has more context than it should do and we&#39;ve created a dependency. </p>
+
+<p>In this example the sub class knows too much about the base class and so it is tightly coupled to it. If a new developer joins the project and creates a sub class, but doesn&#39;t call <code>super</code> at the appropriate time, then they would likely have a silent failure (or at least one that could be difficult to debug).</p>
+
+<p>To resolve the concern of using <code>super</code> we can use a &#39;hook message&#39; which effectively allows the sub class to stay decoupled from the base class. The sub class needs to be able to trust that the base class will do the right thing (which in this case is to call a method). </p>
+
+<p>The way the hook method works is you remove the constructor from the sub class and move the sub class specific constructor code into a separate method of the sub class called <code>post_initialise</code> (or whatever you want to call it). The base class&#39; own constructor will be run when a new instance of the sub class is created but now the base class constructor will be updated so it calls the <code>post_initialise</code> method at the end of its constructor (this means the base class needs to implement an empty <code>post_initialise</code> method which the sub class then overwrites). </p>
+
+<p>Now the sub class doesn&#39;t know about the base class other than it inherits from it and the interface contract between them states the base class will at some point call <code>post_initialise</code> whenever it&#39;s ready to do so and the sub class takes over from there. It&#39;s now clear that the sub class is just a specialised version of the base class.</p>
+
+<p>This works with other methods not just the constructor. The base class could have...</p>
+
+<p><code>ruby
+def spares
+    { tyre_size:tyre_size }.merge(local_spares)
+end
+</code></p>
+
+<p>...the sub class can then implement its own <code>local_spares</code> method which returns a hash. So when a user creates a new instance of the sub class and calls the <code>spares</code> method, the base class handles the functionality. The sub class can insert its own specialised data without knowing how the base class works (other than the interface design dictates the sub class should implement a method called <code>local_spares</code>). </p>
+
+<h3>Modules</h3>
+
+<p>Not all objects are specialised versions of another object and so they shouldn&#39;t always inherit functionality via the inheritance pattern. </p>
+
+<p>Objects have a tendency to play a role, and some objects play a similar role to other objects.</p>
+
+<p>Instead of the inheritance pattern we can use modules as &#39;mixins&#39; which will let these objects (those with similar roles) share behaviour. </p>
+
+<p>Modules are placed inside the same lookup path as methods acquired through inheritance, so the principles for developing modules should follow those of writing classes: use the Template Method Pattern (e.g. have stub methods which the sub classes overwrite). </p>
+
+<p>For example, any object which includes the module needs to provide their own specialisation of a hook method implemented in the module. This means an object which includes the module doesn&#39;t have to create a dependency by calling <code>super</code>, thus avoiding needing to know anything about the included module (other than its implied interface contract) and ultimately reducing its context (i.e. what it knows - a dumb object is a reusable object). </p>
+
+<h3>Composition</h3>
+
+<p>The composition pattern is effectively the same as using modules (where you copy in functionality rather than inheriting it - thus creating a &#39;<em>has-a</em>&#39; relationship rather than a &#39;<em>is-a</em>&#39; relationship). </p>
+
+<p>But composition from a design perspective is more about the resulting &#39;whole&#39;, than the subsequent parts that make up the whole. </p>
+
+<h2>Inheritance vs Composition</h2>
+
+<p>Inheritance is the more appropriate solution if your design dictates that the objects have a well defined concrete class of functionality and that most of that base functionality is the same for all other objects. With inheritance you would write only small amounts of new code to extend the base functionality so the extending objects become more specialised.</p>
+
+<blockquote>
+<p>Inheritance is specialisation<br>
+<em>Bertrand Meyer, Touch of Class</em></p>
+</blockquote>
+
+<p>If on the other hand your objects are all different and the design of the objects dictates there could be multiple reusable &#39;parts&#39;, then composition would be the better solution.</p>
+
+<blockquote>
+<p>Use composition when the behaviour is more than the sum of it&#39;s parts<br>
+<em>Grady Booch, Object-Oriented Analysis and Design</em></p>
+</blockquote>
+
+<h2>Further good rules of development from Sandi Metz</h2>
+
+<ol>
+<li>Your class can be no longer than a hundred lines of code.</li>
+<li>Your methods can be no longer than five lines of code</li>
+<li>You can pass no more than four parameters (do not make it one big hash either).</li>
+<li>In your controller, you can only instantiate one object, to do whatever it is that needs to be done.</li>
+<li>Your view can only know about one instance variable.</li>
+<li>Rules are meant to be broken if by breaking them you produce better code. [ ...where &quot;better code&quot; is validated by explaining why you want to break the rule to someone else. ]</li>
+</ol>
+
+<h2>Summary</h2>
+
+<p>So just to quickly recap on some of the important points covered... </p>
+
+<ul>
+<li>Decouple your code</li>
+<li>Describe your class to see if it does too much<br>
+e.g. for each class write down a single line description and try to avoid the words &#39;and&#39;, &#39;or&#39; from occuring</li>
+<li>Review each method thoroughly (you may find some methods don&#39;t belong in your class and deserve their own interface)</li>
+<li>Manage your dependencies:
+
+<ul>
+<li>Check the method arguments you&#39;re passing around</li>
+<li>Use dependency injection (don&#39;t hard code class names)</li>
+<li>Avoid direct references to complex data structures (transform your data into a more appropriate form)</li>
+<li>Abide by the Single Responsibility Principle (SRP)</li>
+<li>Review comments to ensure their purpose and usefulness
+
+<ul>
+<li>Your commented coded could be better handled by moving into a separate method with a descriptive name</li>
+</ul></li>
+</ul></li>
+<li>Write more flexible interfaces:
+
+<ul>
+<li>Object-Oriented code is more about the &#39;messages&#39; sent between objects than the objects themselves</li>
+<li>Think about the messages you want to send and create objects/interfaces to handle them</li>
+<li>Ask for what you <em>want</em> and don&#39;t include <em>how</em> to do what you want</li>
+<li>Ensure messages you send (e.g. method calls you make) don&#39;t rely on knowledge of the object that implements the method</li>
+<li>Reduce your object&#39;s context (i.e. how much it knows about other objects). Dependency Injection can help here</li>
+</ul></li>
+<li>Trust your objects (e.g. Duck Typing design principles)</li>
+<li>If using the inheritance pattern:
+
+<ul>
+<li>Abstract your shared functionality into the base class</li>
+<li>Make sure sub classes inherit only what they need</li>
+<li>Avoid calling <code>super</code> as it&#39;s a code smell</li>
+</ul></li>
+</ul>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

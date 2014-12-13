@@ -1,0 +1,289 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>NodeJS as a tool</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>NodeJS as a tool</h1>
+
+<ul>
+<li>Introduction</li>
+<li>Prerequisite</li>
+<li>CSSLint</li>
+<li>JsHint</li>
+<li>RequireJS/r.js</li>
+<li>gh-markdown-cli</li>
+</ul>
+
+<h2>Introduction</h2>
+
+<p>NodeJs is best known for running server-side JavaScript, but it can also be used for other processes that run on your local machine: See: <a href="http://blog.millermedeiros.com/node-js-as-a-build-script/">Node.js as a build script</a> (by <a href="https://github.com/millermedeiros/">@millermedeiros</a>) for lots of examples of this.</p>
+
+<p>With the help of <a href="http://mxcl.github.com/homebrew/">Homebrew</a> (yes I know I&#39;m only catering for Mac users here - what a scum bag I am - but the principles are the same I&#39;m just using <code>Homebrew</code> to get these packages installed) we can get our prerequisite installed.</p>
+
+<h2>Prerequisite</h2>
+
+<p>I have to assume you&#39;ve already got Homebrewm, Node and NPM installed? If not then open up your terminal/command line tool of choice and follow these steps:</p>
+
+<ol>
+<li><p>Install Homebrew by executing this command:<br>
+<code>/usr/bin/ruby -e &quot;$(curl -fsSL https://raw.github.com/gist/323731)&quot;</code></p></li>
+<li><p>Install Node by executing this command:<br>
+<code>brew install node</code></p></li>
+<li><p>Install NPM by executing this command:<br>
+<code>curl http://npmjs.org/install.sh | sh</code></p></li>
+</ol>
+
+<p>After that you should be able to execute <code>brew --version</code>, <code>node --version</code> and <code>npm --version</code> and get version numbers back to show that they&#39;ve installed.</p>
+
+<h2>CSSLint</h2>
+
+<p>&quot;<em>Automated linting of Cascading Stylesheets</em>&quot;</p>
+
+<p><a href="https://github.com/stubbornella/csslint">https://github.com/stubbornella/csslint</a></p>
+
+<p><strong>Installation</strong>:<br>
+<code>npm install -g csslint</code></p>
+
+<p><strong>Example usage:</strong></p>
+
+<p><code>sh
+csslint [options] [file|dir]*
+csslint file1.css file2.css  
+csslint ./  
+csslint --errors=box-model,ids test.css // =&gt; decide what should be errors  
+csslint --warnings=box-model,ids test.css // =&gt; decide what should be warnings
+</code></p>
+
+<p><strong>Configuration:</strong><br>
+You can view the options by running <code>csslint --help</code><br>
+All &#39;rules&#39; can be viewed using: <code>csslint --list-rules</code><br>
+The rules have #ID&#39;s that you can specify as errors|warnings</p>
+
+<p><strong>Generic usage:</strong><br>
+<code>csslint --errors=import,compatible-vendor-prefixes,display-property-grouping,overqualified-elements,fallback-colors,duplicate-properties,empty-rules,gradients,universal-selector,vendor-prefix,zero-units --warnings=important,known-properties,font-sizes,outline-none,shorthand,unqualified-attributes</code></p>
+
+<p><strong>Prettier Syntax:</strong><br>
+It&#39;s recommended to create a shell script to wrap the CSS Lint functionality so you can use the same syntax as the Node.js CLI. </p>
+
+<p>For Linux/Mac, create a file named <code>csslint</code> and add the following to the file:  </p>
+
+<p>```sh</p>
+
+<h1>!/bin/bash</h1>
+
+<p>java -jar js.jar csslint-rhino.js $@
+```</p>
+
+<p>After creating the file, you need to ensure it can be executed, so go to the command line and type:<br>
+<code>chmod +x csslint</code></p>
+
+<h2>JsHint</h2>
+
+<p>&quot;<em>CLI and NPM package for JSHint</em>&quot;</p>
+
+<p><a href="https://github.com/jshint/node-jshint">https://github.com/jshint/node-jshint</a></p>
+
+<p><strong>Installation:</strong><br>
+npm install jshint</p>
+
+<p><strong>Example usage:</strong>  </p>
+
+<p><code>sh
+jshint path path2 [options] // =&gt; run against specific scripts
+jshint *.js // =&gt; run against all scripts
+jshint main.js --show-non-errors // =&gt; show non-errors (e.g. Implied globals etc)
+jshint main.js --config ./Lint/config.json // =&gt; use specific configuration options
+jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of showing non-errors against specific configuration settings
+</code></p>
+
+<p>If you get no errors then that means the script ran fine</p>
+
+<p><strong>Generic usage:</strong><br>
+<code>jshint **/*.js --config ./Lint/config.json</code></p>
+
+<p><strong>Configuration:</strong><br>
+Your <code>config.json</code> file could look like the following…</p>
+
+<p>```js
+{
+    // Settings
+    &quot;passfail&quot;      : false,  // Stop on first error.
+    &quot;maxerr&quot;        : 200,    // Maximum error before stopping.</p>
+
+<pre><code>// Predefined globals whom JSHint will ignore.
+&quot;browser&quot;       : true,   // Standard browser globals e.g. `window`, `document`.
+
+&quot;node&quot;          : false,
+&quot;rhino&quot;         : false,
+&quot;couch&quot;         : false,
+&quot;wsh&quot;           : false,   // Windows Scripting Host.
+
+&quot;jquery&quot;        : true,
+&quot;prototypejs&quot;   : false,
+&quot;mootools&quot;      : false,
+&quot;dojo&quot;          : false,
+
+&quot;predef&quot;        : [  // Custom globals.
+    // this is because we use require() from RequireJS library
+    &quot;require&quot;,
+    &quot;define&quot;,
+
+    // this is because we use Jasmine BDD for unit-testing
+    &quot;jasmine&quot;,
+    &quot;describe&quot;,
+    &quot;beforeEach&quot;,
+    &quot;afterEach&quot;,
+    &quot;it&quot;,
+    &quot;expect&quot;
+],
+
+
+// Development.
+&quot;debug&quot;         : false,  // Allow debugger statements e.g. browser breakpoints.
+&quot;devel&quot;         : false,  // Allow developments statements e.g. `console.log();`.
+
+
+// ECMAScript 5.
+&quot;es5&quot;           : true,   // Allow ECMAScript 5 syntax.
+&quot;strict&quot;        : false,  // Require `use strict` pragma  in every file.
+&quot;globalstrict&quot;  : false,  // Allow global &quot;use strict&quot; (also enables &#39;strict&#39;).
+
+
+// The Good Parts.
+&quot;asi&quot;           : false,  // Tolerate Automatic Semicolon Insertion (no semicolons).
+&quot;laxbreak&quot;      : true,   // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
+&quot;bitwise&quot;       : true,   // Prohibit bitwise operators (&amp;, |, ^, etc.).
+&quot;boss&quot;          : true,   // Tolerate assignments inside if, for &amp; while. Usually conditions &amp; loops are for comparison, not assignments.
+&quot;curly&quot;         : true,   // Require {} for every new block or scope.
+&quot;eqeqeq&quot;        : true,   // Require triple equals i.e. `===`.
+&quot;eqnull&quot;        : false,  // Tolerate use of `== null`.
+&quot;evil&quot;          : false,  // Tolerate use of `eval`.
+&quot;expr&quot;          : false,  // Tolerate `ExpressionStatement` as Programs.
+&quot;forin&quot;         : false,  // Tolerate `for in` loops without `hasOwnPrototype`.
+&quot;immed&quot;         : true,   // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
+&quot;latedef&quot;       : true,   // Prohipit variable use before definition.
+&quot;loopfunc&quot;      : false,  // Allow functions to be defined within loops.
+&quot;noarg&quot;         : true,   // Prohibit use of `arguments.caller` and `arguments.callee`.
+&quot;regexp&quot;        : false,  // Prohibit `.` and `[^...]` in regular expressions.
+&quot;regexdash&quot;     : false,  // Tolerate unescaped last dash i.e. `[-...]`.
+&quot;scripturl&quot;     : true,   // Tolerate script-targeted URLs.
+&quot;shadow&quot;        : true,   // Allows re-define variables later in code e.g. `var x=1; x=2;`.
+&quot;supernew&quot;      : false,  // Tolerate `new function () { ... };` and `new Object;`.
+&quot;undef&quot;         : true,   // Require all non-global variables be declared before they are used.
+
+
+// Personal styling preferences.
+&quot;newcap&quot;        : true,   // Require capitalization of all constructor functions e.g. `new F()`.
+&quot;noempty&quot;       : true,   // Prohibit use of empty blocks.
+&quot;nonew&quot;         : true,   // Prohibit use of constructors for side-effects.
+&quot;nomen&quot;         : true,   // Prohibit use of initial or trailing underbars in names.
+&quot;onevar&quot;        : false,  // Allow only one `var` statement per function.
+&quot;plusplus&quot;      : false,  // Prohibit use of `++` &amp; `--`.
+&quot;sub&quot;           : false,  // Tolerate all forms of subscript notation besides dot notation e.g. `dict[&#39;key&#39;]` instead of `dict.key`.
+&quot;trailing&quot;      : false,  // Prohibit trailing whitespaces.
+&quot;white&quot;         : true,   // Check against strict whitespace and indentation rules.
+&quot;indent&quot;        : 4,      // Specify indentation spacing
+&quot;smarttabs&quot;     : true    // Suppress warnings about mixed tabs and spaces
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>RequireJS/r.js</h2>
+
+<p>&quot;<em>Runs RequireJS in Node and used to run the RequireJS optimizer</em>&quot;</p>
+
+<p><a href="https://github.com/jrburke/r.js">https://github.com/jrburke/r.js</a></p>
+
+<p><strong>Generic usage:</strong><br>
+<code>node r.js -o app.build.js</code></p>
+
+<p><strong>Configuration:</strong><br>
+You create a &#39;build&#39; script file (see below for an example) and then you use NodeJs to execute the <code>r.js</code> optimization script and pass through your build script as an argument</p>
+
+<p><code>js
+/*
+ * http://requirejs.org/docs/optimization.html
+ *
+ * See: https://github.com/jrburke/r.js/blob/master/build/example.build.js for an example build script
+ *
+ * If you specify just the name (with no includes/excludes) then all modules are combined into the &quot;main&quot; file.
+ * You can include/exclude specific modules though if needed (this helps with &#39;lazy loading&#39; scripts)
+ *
+ * You can also set optimize: &quot;none&quot; (or more specific uglifyjs settings) if you need to.
+ *
+ * Node: if you set relative paths then do them relative to the baseUrl
+ */
+({  
+    appDir: &#39;../../../&#39;,
+    baseUrl: &#39;Assets/Scripts&#39;,
+    dir: &#39;../../../project-build&#39;,
+    /*
+     * The below &#39;paths&#39; object is useful for when using plugins/named module paths.
+     * If you use plugins or named modules in your code then don&#39;t forget to specify the same paths again in your build script.
+     * Otherwise your build script wont be able to find your plugins/named modules and will generate an error when building.
+     */
+    paths: {
+        async: &#39;Plugins/async&#39;,
+        jquery: &#39;Utils/jquery&#39;,
+        tpl: &#39;Plugins/tpl&#39;
+    },
+    optimize: &#39;none&#39;,
+    modules: [
+        {
+            name: &#39;main&#39;
+            /*
+            include: [&#39;module&#39;],
+            exclude: [&#39;module&#39;]
+            */
+        }
+    ]
+})
+</code></p>
+
+<h2>gh-markdown-cli</h2>
+
+<p>&quot;<em>Node.js command-line tool to batch convert Markdown files into HTML</em>&quot;</p>
+
+<p><a href="https://github.com/millermedeiros/gh-markdown-cli">https://github.com/millermedeiros/gh-markdown-cli</a></p>
+
+<p><strong>Installation:</strong><br>
+<code>sudo npm install gh-markdown-cli -g</code></p>
+
+<p><strong>Example usage (cd into directory where your md files are):</strong><br>
+<code>mdown -o &quot;./&quot; --include &quot;*.md&quot; --header &quot;header.html&quot; --footer &quot;footer.html&quot;</code></p>
+
+<p>Once installed, use the terminal to locate your .md files and then run the above command (you don&#39;t have to use the --header and --footer flags as these are optional)</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

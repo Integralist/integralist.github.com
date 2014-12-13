@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>MVCP: Model, View, Controller, Presenter</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>MVCP: Model, View, Controller, Presenter</h1>
+
+<ul>
+<li>Introduction
+
+<ul>
+<li>Model</li>
+<li>View</li>
+<li>Controller</li>
+</ul></li>
+<li>Mixed definitions
+
+<ul>
+<li>God Controller</li>
+<li>Problems</li>
+<li>Skinny Controller</li>
+</ul></li>
+<li>Presenters?
+
+<ul>
+<li>What problem are Presenters trying to solve?</li>
+<li>How do they work?</li>
+</ul></li>
+<li>Code Example
+
+<ul>
+<li>Controller</li>
+<li>View</li>
+<li>Presenter</li>
+</ul></li>
+<li>Conclusion</li>
+</ul>
+
+<h2>Introduction</h2>
+
+<p>Model, View, Controller (MVC). This is a pretty standard architectural pattern and has been in use when developing software since the early 1970&#39;s.</p>
+
+<p>The basic principle of the pattern is to separate the different areas of logic from your application into distinct compartments.</p>
+
+<h3>Model</h3>
+
+<p>The model holds your business data. Typically this will be data that is pulled in from a database or external data service of some kind.</p>
+
+<h3>View</h3>
+
+<p>The view is your user interface. This is what the client will interact with when using your application.</p>
+
+<h3>Controller</h3>
+
+<p>The controller is the boss. He sits at the top and delegates responsibilities to either the view or the model.</p>
+
+<h2>Mixed definitions</h2>
+
+<p>There seems to be a dispute in the dev community regarding how the responsibilities should be divided.</p>
+
+<p>Some feel a &#39;fat controller&#39; principle is best (where by the controller tells the model not only <em>when</em> but <em>where</em> and <em>how</em> it should get its data).</p>
+
+<p>My understanding of the pattern is that it was designed so that the Controller stays &#39;skinny&#39;. It may be the boss, but like most good bosses it doesn&#39;t try and stay in control. It knows the best team member for the job at hand and delegates accordingly.</p>
+
+<p>This is also good code design because the Controller doesn&#39;t have too much <em>context</em> (i.e. it doesn&#39;t know everything, which means it&#39;ll be easier to maintain and scale).</p>
+
+<h3>God Controller</h3>
+
+<p>There are a few ways we can implement an MVC pattern, one is known as the &#39;God Controller&#39;. </p>
+
+<p>This is where a single Controller exists and it oversees everything no matter what was requested by the client. </p>
+
+<p>For example, the single Controller would be passed the request from the client (usually handled by a custom routing application, and most frameworks will provide their own).</p>
+
+<p>The Controller would determine what type of request was made (if the request was for a &#39;contact&#39; page then it&#39;ll make a request for the Contact model, or if the request was for the &#39;about&#39; page then it&#39;ll make a request for the About model).</p>
+
+<p>Once it knows the type of request it&#39;ll proceed to get the relevant model data and assign it to some View variables and render the required View.</p>
+
+<h3>Problems</h3>
+
+<p>Now there are two problems with this implementation:</p>
+
+<ol>
+<li>maintainability</li>
+<li>scalability</li>
+</ol>
+
+<p>As mentioned before, this comes down to bad code design. The &#39;God Controller&#39; knows too much and tries to do too much. Once you start getting above a few different types of requests you&#39;ll start to understand what a mess the code can become by having multiple branches for different routing scenarios.</p>
+
+<p>I work as an engineer for the BBC News team in London and we had suffered from this exact set-up (hence the lessons the team has learnt and improved upon are the reason why I&#39;m able to write this post for you now).</p>
+
+<h3>Skinny Controller</h3>
+
+<p>There is another approach we can take which is known as the &#39;skinny controller&#39; approach.</p>
+
+<p>The way it works is that a request will come into the application and will get passed to a page specific Controller.</p>
+
+<p>The page specific Controller will call the relevant Model and will assign the returned data to a few View variables.</p>
+
+<p>The Controller will then render a View and pass through the variables into the View for it to use.</p>
+
+<p>As you can see, this isn&#39;t that different from the &#39;God Controller&#39; with the exception that the Routing part of the application now will have extra logic which determines which specific Controller should be loaded. This is a better situation to be in because you&#39;re making your code base both more maintainable and scalable.</p>
+
+<p>Note: as I mentioned in the previous section, BBC News had a sort of &#39;God Controller&#39; issue and our first step to resolving the problem was to take a similar approach as described above (i.e. to start creating page specific Controllers). That was a good first step. </p>
+
+<p>The next step from here was to separate out our logic even further by implementing Presenters, and it was our tech lead at BBC News (<a href="http://twitter.com/jcleveley">John Cleveley</a>) who made that decision which resulted in a much more efficient, maintainable and scalable code base.</p>
+
+<h2>Presenters</h2>
+
+<h3>What problem are Presenters trying to solve?</h3>
+
+<p>Let&#39;s imagine we&#39;ve gone for the &#39;Skinny Controller&#39; approach. There are still some inherent issues… </p>
+
+<p>First of all, our Controller can still have too much context and be handling more information than it should. </p>
+
+<p>But also, and more importantly, you may find there is still a lot of duplication of code across your Controllers.</p>
+
+<p>The reasoning for this is that if you consider the structure of a web page/application you&#39;ll notice that it is typically made up of unique &#39;features&#39;. For example, if you&#39;re displaying your tweets on a page then that&#39;s a unique feature.</p>
+
+<p>Each feature must be able to stand on its own. We normally describe these features as being &#39;components&#39;. Each component can be loaded whenever and wherever needed. Having a component based architecture allows your code base to become more modular and reusable.</p>
+
+<p>For example the navigation menu on a page could be considered a &#39;component&#39;. Also, the navigation menu component is likely going to need to appear on every single page of the application.</p>
+
+<p>So, if you&#39;re splitting up your logic into page specific Controllers then it&#39;s possible that you&#39;re still repeating code across the Controllers to handle the loading of re-occurring components such as the navigation (e.g. pulling its data from a navigation Model and setting View variables etc).</p>
+
+<p>Now there are ways that this code repetition can be avoided, and one such way is to use the concept of Presenters.</p>
+
+<h3>How do they work?</h3>
+
+<p>Presenters (like everything in software engineering) can be implemented in many different ways. </p>
+
+<p>For example, at BBC News we initially were manually creating new Presenter instances within our page Controllers. But the team here are quite clever chaps (especially <a href="http://twitter.com/kenturamon">Robert Kenny</a> and <a href="http://twitter.com/sthulb">Simon Thulbourn</a>) and they realised that this process could be greatly improved by using configuration files instead (specifically <a href="http://yaml.org/">YAML</a>). As we have multiple teams working on the BBC News code base and in multiple languages, using configuration files is a much easier and maintainable solution.</p>
+
+<p>I&#39;m not going to go into the configuration set-up we use at BBC News. Instead I&#39;ll focus on the basic principles of how Presenters work, which is quite simply a case of moving the logic (getting component specific Model data and assigning it to to component specific variables) into separate files called Presenters which you can instantiate within your controller.</p>
+
+<h2>Code Example</h2>
+
+<h3>Controller</h3>
+
+<p>Here is a basic example in Ruby…</p>
+
+<p>```ruby
+require &#39;app/presenters/a&#39;
+require &#39;app/presenters/b&#39;</p>
+
+<p>class AboutController &lt; ApplicationController
+  get &#39;/&#39; do
+    @a = Presenters::A.new
+    @b = Presenters::B.new</p>
+
+<pre><code>title &#39;About&#39;
+erb :about
+</code></pre>
+
+<p>end
+end
+```</p>
+
+<p>…in this example we have an &#39;About&#39; page which is made up of two components <code>a</code> and <code>b</code>. As you can see we <code>require</code> the presenters which handle those two components and within our Controller we instantiate the Presenters.</p>
+
+<p>Notice that&#39;s all we do. Each Presenter encapsulates the logic needed to prepare the data to be passed to the <code>:about</code> view template.</p>
+
+<h3>View</h3>
+
+<p>Before I show you the Presenter code itself, I&#39;ll show you the View template file… </p>
+
+<p>```erb
+<h1>&lt;%= @title %&gt;</h1></p>
+
+<p>&lt;% if @a.run %&gt;
+  &lt;%= partial :&quot;components/a&quot;, { :title =&gt; @a.title, :summary =&gt; @a.summary, :data =&gt; @a.data } %&gt;
+&lt;% end %&gt;</p>
+
+<p>&lt;% if @b.run %&gt;
+  &lt;%= partial :&quot;components/b&quot;, { :name =&gt; @b.name, :age =&gt; @b.age } %&gt;
+&lt;% end %&gt;
+```</p>
+
+<p>…as you can see we have very minimal logic in place. If anything I have too much logic in the View as I initially was re-using the same View template over and over and so I wanted to protect again errors appearing when loading a template which referenced a component I wasn&#39;t loading, but I&#39;ve since changed how my application was working but left the conditional checks in as an example of how code can evolve over time.</p>
+
+<p>We literally just check to see if the component has been initialised (in this case we created a <code>run</code> property we set to <code>true</code> when the component&#39;s Presenter is first initialised).</p>
+
+<p>We then render the View for the component and pass through the variables that were set-up from within the Presenter.</p>
+
+<p>Now I can also open up my <code>:home</code> View file and add in the <code>a</code> component there as well just as easily. It would be even easier if I didn&#39;t have to manually add the <code>a</code> component to the <code>:home</code> View file but that&#39;s where running from configuration files like we do at BBC News would come in handy (but that would have been too complicated an implementation for the sake of such a basic example as required for this post).</p>
+
+<h3>Presenter</h3>
+
+<p>Now let&#39;s take a look at one of our Presenters, in this case the Presenter for our <code>b</code> component… </p>
+
+<p>```ruby
+require &#39;app/presenters/base&#39;
+require &#39;app/models/b&#39;</p>
+
+<p>class Presenters::B &lt; Presenters::Base
+  attr_reader :run, :name, :age</p>
+
+<p>def initialize
+    @run = true</p>
+
+<pre><code>model = B.new(&#39;Mark&#39;, &#39;99&#39;)
+prepare_view_data({ :name =&gt; model.name, :age =&gt; model.age })
+</code></pre>
+
+<p>end
+end
+```</p>
+
+<p>…as you can see we load a specific Model for this component and then generate our View data by passing the Model information through to a <code>prepare_view_data</code> method (see below for the implementation details).</p>
+
+<p>The <code>Base</code> Presenter which our component Presenters inherit from is very straight forward as you can see from the following example… </p>
+
+<p>```ruby
+module Presenters
+  class Base
+    attr_accessor :model</p>
+
+<pre><code>def prepare_view_data hash
+  hash.each do |name, value|
+    instance_variable_set(&quot;@#{name}&quot;, value)
+  end
+end
+</code></pre>
+
+<p>end
+end
+```</p>
+
+<p>…it&#39;s just a module namespace with a base class that has a single method <code>prepare_view_data</code> which dynamically generates instance variables based on the data we passed through from the inheriting Presenter class and which then are usable within the View.</p>
+
+<h2>Conclusion</h2>
+
+<p>That&#39;s all there is to it as far as understanding the Presenter pattern. It&#39;s a nice clean solution for componentising your different page features and keeping your code more easily maintainable.</p>
+
+<p>I&#39;ve created a repo on GitHub called <a href="https://github.com/Integralist/MVCP">MVCP</a> which is written in <a href="https://www.ruby-lang.org/">Ruby</a> and uses the <a href="http://www.sinatrarb.com/">Sinatra</a> web framework. Note: I had some help from my colleague <a href="http://twitter.com/sthulb">Simon</a> in cleaning up and refactoring some of the code (it may only have been minor changes but as with all good refactorings it made a massive difference to the quality of the code, so thanks to him for helping out).</p>
+
+<p>If you have any questions then feel free to contact me either here on <a href="http://twitter.com/integralist">twitter</a> and let me know your thoughts.</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

@@ -1,0 +1,371 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Using Grunts Config API</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>Using Grunts Config API</h1>
+
+<ul>
+<li>What was the problem again?</li>
+<li>How were we solving this originally?</li>
+<li>So what now?</li>
+<li>How are we solving this now?</li>
+<li>Let&#39;s review the solution</li>
+<li>The Grunt API</li>
+<li>Example code</li>
+<li>Conclusion</li>
+<li>Update</li>
+</ul>
+
+<h2>What was the problem again?</h2>
+
+<p>If you <a href="Dynamically-Generated-Grunt-Tasks.html">look at my previous post</a> you&#39;ll see the Sass architecture/structure we&#39;re currently using on the BBC News responsive website means that Sass is unable to watch changes in files outside of the specific language folders we&#39;ve asked Sass to watch (e.g. we tell Sass to watch the Arabic Sass files for changes, which it does that fine, but the Arabic files themselves import Sass files from a &#39;partials&#39; directory outside of the language directory and those files Sass cannot detect changes for).</p>
+
+<h2>How were we solving this originally?</h2>
+
+<p>We use Grunt to handle our front-end tooling tasks (such as running Sass, linting CSS/JS, running JS unit-tests, running our AMD build script and a host of other things) and so we initially were just hard coding in the relevant <code>watch</code> and <code>sass</code> Grunt task commands to work around the issue.</p>
+
+<p>Next (as per my previous Grunt post) we then tried dynamically updating the Grunt file by inserting hooks into the file which at runtime we would use to insert our dynamically generated stack of sub tasks. Although this works fine and didn&#39;t cause us any problems, it just felt… wrong?</p>
+
+<h2>So what now?</h2>
+
+<p>Since publishing that Grunt post, the creator of Grunt (<a href="https://twitter.com/cowboy">Ben Alman</a>) suggested there was a better way using the Grunt API itself.</p>
+
+<h2>How are we solving this now then?</h2>
+
+<p>Exactly as Ben suggested, by using the Grunt API. Specifically: <code>grunt.config.set</code> (there are other Grunt API&#39;s involved but this one is the fundamental solution).</p>
+
+<h2>Let&#39;s review the solution</h2>
+
+<h3>We have three files…</h3>
+
+<ul>
+<li>Gruntfile.js</li>
+<li>grunt-customtasks.js</li>
+<li>grunt-helpers.js</li>
+</ul>
+
+<p>The first file you should all know (if you don&#39;t then have a read back over my original <a href="Grunt-Boilerplate.html">Grunt Boilerplate</a> post).</p>
+
+<p>The second file is a generic file we&#39;re using to store our custom Grunt tasks (and ultimately is what does most of the work for this particular problem).</p>
+
+<p>The third file is again another generic file but this time we use it to store any additional utility helper methods.</p>
+
+<h3>Here&#39;s how they&#39;re used…</h3>
+
+<p>Our Gruntfile.js pulls in the grunt-customtasks.js file like so: <code>require(&#39;./grunt-customtasks.js&#39;)(grunt);</code>. You&#39;ll notice that the module we&#39;re pulling in is actually a function which we execute immediately and pass it a reference to Grunt (which means our custom tasks module can access Grunt and use its API).</p>
+
+<p>The grunt-customtasks.js module itself pulls in the grunt-helpers.js file like so: <code>var util = require(&#39;./grunt-helpers.js&#39;)(grunt);</code>. Again you&#39;ll notice that the module we&#39;re pulling in is actually a function, we execute it and pass in a reference to Grunt, but this module (although a function) once executed then returns an object which we assign to the variable <code>util</code>. The returned object has some useful methods we can use to implement our solution.</p>
+
+<p>Looking again at grunt-customtasks.js we have the following custom Grunt tasks… </p>
+
+<ul>
+<li><code>sass_compile</code></li>
+<li><code>config</code></li>
+<li><code>watch_service</code></li>
+</ul>
+
+<p>…now normally when using a pre-built Grunt task such as a the Sass task, the user would execute something like <code>sass:my_sub_task</code>, but our users won&#39;t ever directly interact with the Sass task. This is because there are no Sass sub tasks in our Grunt file to use! Instead they&#39;ll use our facade <code>sass_compile</code> which at run time will dynamically generate the Sass sub task they have requested.</p>
+
+<p>Same for the pre-built Watch task. The user will use our <code>watch_service</code> custom task which is a facade that dynamically generates the requested watch task at run time.</p>
+
+<h3>sass_compile</h3>
+
+<p>This task dynamically generates our Sass sub tasks (e.g. <code>sass:arabic</code>). It uses the Grunt Config API to dynamically set this up (we&#39;ll look at this in more detail later on).</p>
+
+<p>In this task we have to carry out some checks on the sub task that we are going to create. The reason being: we want to let the user know whether they&#39;ve requested a service that doesn&#39;t exist. </p>
+
+<p>If the user executes <code>sass:something_that_does_not_exist</code> we don&#39;t want to just create that Sass sub task because ultimately it&#39;ll not do anything and that would be very confusing to the user who expects it to work (or maybe they entered a typo and haven&#39;t realised) - so we need to give the user feedback to let them know the command they entered isn&#39;t recognised.</p>
+
+<p>So we use our own utility/helper method <code>util.serviceExists</code> to check whether the requested service actually exists or not. If it does then we go ahead and dynamically generate the sub task, otherwise we display a message to the user to let them know the service doesn&#39;t exist.</p>
+
+<p>We also have slightly different settings for the sub task depending on what service was requested. If the user enters a language as the service <code>sass_compile:arabic</code> then we&#39;ll use development settings such as enabling <code>debugInfo</code> and turning on <code>lineNumbers</code> and making sure the code is <code>expanded</code> and not <code>compressed</code>, but if they enter <code>sass_compile:dist</code> we&#39;ll make sure the compiled code is ready for distribution.</p>
+
+<h3>watch_service</h3>
+
+<p>This custom task is much like <code>sass_compile</code> in that it first checks that the service being requested is valid and if so will continue to dynamically generate a watch sub task.</p>
+
+<p>But there is additional work required in this task. Let&#39;s just take a moment to remember the purpose of the <code>watch</code> task which is to tell Grunt to execute another Grunt task (pre-built or custom) when the files being watched are changed. </p>
+
+<p>We hit a problem when first implementing this solution which was that when the Watch sub task was generated we had set it to execute a Sass sub task matching the service requested. </p>
+
+<p>So for example if the user ran <code>watch_service:arabic</code> we would tell Grunt that when those files changed then it should execute the Sass sub task <code>sass:arabic</code>. But that Sass sub task didn&#39;t exist at that point because the user hadn&#39;t previously run <code>sass_compile:arabic</code> (remember, our Sass task inside our Gruntfile.js is empty).</p>
+
+<p>To work around this we told the Watch sub task to execute two tasks when the watched files changed. The first task to execute was <code>config</code> and that would be passed the service name that was passed to the <code>watch_service</code> task. For example, <code>config:arabic</code> and <em>then</em> after that we would execute <code>sass:arabic</code> (or whatever service was requested).</p>
+
+<p>Let&#39;s have a look now at the <code>config</code> task to see what that does… </p>
+
+<h3>config</h3>
+
+<p>So as explained above, we needed to call this task before calling the Sass sub task (because at that point the sub task that needed to be executed didn&#39;t exist).</p>
+
+<p>In this custom task all we do is literally call our <code>sass_compile</code> custom task, pass through the requested service but also pass through an additional parameter which lets the <code>sass_compile</code> task know that it should just create the Sass sub task and not execute it.</p>
+
+<p>To explain, if the user runs <code>sass_compile:arabic</code> that task will not only dynamically generate a Sass sub task (e.g. <code>sass:arabic</code>), but once created will actually execute that task  now it exists. But if the user has run the <code>watch_service</code> task, we call this <code>config</code> task which delegates onto <code>sass_compile</code>, but we don&#39;t want the Sass sub task we&#39;ve just generated to be executed because the files being watched haven&#39;t necessarily been changed! So we wrote <code>sass_compile</code> in a way that said &quot;if this particular parameter is passed through, then just create the Sass sub task but don&#39;t execute it&quot;.</p>
+
+<h2>The Grunt API</h2>
+
+<p>Before we get to see our finished code let&#39;s first take a look at the Grunt API we&#39;re using to implement this solution (sorry, I know there has been a lot of talk up until this point, but we&#39;re almost done explaining how everything has been put together, I promise!)</p>
+
+<p>So the API&#39;s we&#39;re using are… </p>
+
+<ul>
+<li><code>grunt.config.get</code></li>
+<li><code>grunt.config.set</code></li>
+<li><code>grunt.task.run</code></li>
+<li><code>grunt.file.expand</code></li>
+</ul>
+
+<h3>grunt.config.get</h3>
+
+<p>If you call <code>grunt.config.get()</code> then you&#39;ll get a copy of the entire <code>grunt.initConfig</code> object back. If you pass in a property like <code>grunt.config.get(&#39;sass&#39;)</code> you get the value of that specific property.</p>
+
+<h3>grunt.config.set</h3>
+
+<p>If you call <code>grunt.config.set(property, value)</code> then you&#39;ll set that property and its corresponding value on the <code>grunt.initConfig</code> object.</p>
+
+<p>Be aware you can only set a single value onto a property, so if you wanted to create multiple sub tasks for a property (such as creating multiple sub tasks for the Sass task) then you would have to first construct an object containing the sub tasks and then assign that whole object as the property value.</p>
+
+<h3>grunt.task.run</h3>
+
+<p>This method simply lets you run any task (custom, pre-built, sub task) from within your code.</p>
+
+<p>So if I had a variable called <code>service</code> and it had a value of &#39;arabic&#39; then running <code>grunt.task.run(&#39;watch:&#39; + service)</code> would run <code>watch:arabic</code>.</p>
+
+<p>We use this API method inside our <code>watch_service</code>, <code>config</code> and <code>sass_compile</code> custom tasks.</p>
+
+<h3>grunt.file.expand</h3>
+
+<p>This API method is used indirectly via our <code>util</code> helper object. We have a method called <code>serviceExists</code> which takes in a service and checks whether it exists or not. That method checks a <code>service</code> property on our <code>util</code> object which is an Array holding the services we have available.</p>
+
+<p>The way that <code>service</code> Array is populated is via the <code>grunt.file.expand</code> API call. We pass the method a file glob and it returns an Array of all directories/files that match the glob provided. </p>
+
+<p>So for example, <code>grunt.file.expand(&#39;sass/services/*&#39;)</code> returns an Array of all folders within our Sass/Services directory. As you&#39;ll see in the example code below we actually filter out some folders that we know aren&#39;t valid.</p>
+
+<h2>Example code</h2>
+
+<p>OK, finally we get to see some code! Hopefully by now it should be much clearer as to what it&#39;s doing and why… </p>
+
+<h3>grunt-customtasks.js</h3>
+
+<p>```js
+module.exports = function (grunt) {</p>
+
+<pre><code>var util = require(&#39;./grunt-helpers.js&#39;)(grunt);
+
+grunt.registerTask(&#39;sass_compile&#39;, &#39;Dynamically generate Sass sub task&#39;, function(service, calledFromConfigTask) {
+    if (!util.serviceExists(service)) {
+        console.log(&#39;Sorry, that service does not exist&#39;);
+        return;
+    }
+
+    var _          = require(&#39;lodash&#39;),
+        src        = [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
+        debug      = { debugInfo: true, lineNumbers: true },
+        style      = &#39;expanded&#39;,
+        requested  = service,
+        cwd = dest = &#39;&#39;,
+        service    = {},
+        config;
+
+    service[requested] = {};
+
+    switch (requested) {
+        case &#39;dist&#39;:
+            style = &#39;compressed&#39;;
+            debug = {};
+            break;
+        case &#39;dev&#39;:
+            // Want to prevent setting cwd/dest to the service name
+            break;
+        default:
+            src = [&#39;*.scss&#39;, &#39;!_*.scss&#39;];
+            cwd = dest = &#39;services/&#39; + requested;
+    }
+
+    config = {
+        options: {
+            style: style,
+            require: [&#39;&lt;%= dir.static_sass %&gt;partials/helpers/url64.rb&#39;]
+        },
+        expand: true,
+        cwd: &#39;&lt;%= dir.static_sass %&gt;&#39; + cwd,
+        src: src,
+        dest: &#39;&lt;%= dir.static_css %&gt;&#39; + dest,
+        ext: &#39;.css&#39;
+    }
+
+    _.merge(config.options, debug);
+    _.merge(service[requested], config);
+
+    grunt.config.set(&#39;sass&#39;, service);
+
+    if (!calledFromConfigTask) {
+        grunt.task.run(&#39;sass:&#39; + requested);
+    }
+});
+
+grunt.registerTask(&#39;config&#39;, &#39;Add dynamically generated Sass sub task into config object but does not run the sub task&#39;, function(service) {
+    grunt.task.run(&#39;sass_compile:&#39; + service + &#39;:watch&#39;); // ensure sub task exists before running the dynamically created watch sub task
+});
+
+grunt.registerTask(&#39;watch_service&#39;, &#39;Dynamically generate Watch (and Sass) sub tasks and then run the relevant watch task&#39;, function(service) {
+    if (!util.serviceExists(service)) {
+        console.log(&#39;Sorry, that service does not exist&#39;);
+        return;
+    }
+
+    var content = {};
+
+    if (service === &#39;all&#39;) {
+        content.all = {
+            files: [&#39;&lt;%= jshint.files %&gt;&#39;, &#39;&lt;%= dir.static_sass %&gt;**/*.scss&#39;],
+            tasks: [&#39;config:dev&#39;, &#39;default&#39;]
+        }
+    } else {
+        content[service] = {
+            files: [&#39;&lt;%= dir.static_sass %&gt;partials/**/*.scss&#39;,
+                    &#39;&lt;%= dir.static_sass %&gt;services/&#39; + service + &#39;/*.scss&#39;],
+            tasks: [&#39;config:&#39; + service, &#39;sass:&#39; + service]
+        }
+    }
+
+    grunt.config.set(&#39;watch&#39;, content);
+    grunt.task.run(&#39;watch:&#39; + service);
+});
+</code></pre>
+
+<p>};
+```</p>
+
+<h3>grunt-helpers.js</h3>
+
+<p>```js
+module.exports = function (grunt) {
+    function removePath(element) {
+        return element.split(&#39;/&#39;).pop();
+    }</p>
+
+<pre><code>function removeBlacklistedDirectories(element) {
+    if (element.indexOf(&#39;journalism&#39;) !== -1) {
+        return false
+    }
+
+    return true;
+}
+
+return {
+    services: grunt.file.expand(&#39;tabloid/webapp/static/sass/services/*&#39;).map(removePath).filter(removeBlacklistedDirectories),
+    serviceExists: function(service) {
+        if (this.services.indexOf(service) !== -1) {
+            return true;
+        }
+
+        return false;
+    },
+    isBlacklistedTask: function(task) {
+        var tasks = [&#39;pkg&#39;, &#39;dir&#39;, &#39;noop&#39;, &#39;config&#39;];
+
+        if (tasks.indexOf(task) !== -1) {
+            return true
+        }
+
+        return false;
+    }
+}
+</code></pre>
+
+<p>};
+```</p>
+
+<h2>Conclusion</h2>
+
+<p>So there you have it. A real-world look at using the Grunt API to do something a little bit more involved with Grunt. Hopefully you found it useful and will give you a better idea of how you can integrate Grunt with your own work flow and solve your own specific domain problems.</p>
+
+<h2>Update</h2>
+
+<p>A quick update to say we found a much simpler route to handle the dynamic generation of Sass content and this came from recognising Grunt&#39;s ability to access arguments passed through the command line: <code>&lt;%= grunt.task.current.args[0] %&gt;</code>.</p>
+
+<p>With this knowledge we then call the task like so: <code>&#39;sass:service:&lt;%= grunt.task.current.args[0] %&gt;&#39;</code>.</p>
+
+<p>Goes to show it&#39;s always worth your time reading through all of the API documentation for the tools you use to discover these little gems :-)</p>
+
+<p>So here is a more realistic example...</p>
+
+<p>```js
+sass: {
+    /*
+        Example usage...</p>
+
+<pre><code>    grunt sass:service:afrique
+    grunt sass:service:news
+ */
+service: {
+    expand: true,
+    cwd: &#39;/sass/&#39;,
+    src: [&#39;services/&lt;%= grunt.task.current.args[0] %&gt;/*.scss&#39;, &#39;!**_*.scss&#39;],
+    dest: &#39;/stylesheets/&#39;,
+    ext: &#39;.css&#39;
+},
+dist: {
+    expand: true,
+    cwd: &#39;/sass/&#39;,
+    src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
+    dest: &#39;/stylesheets/&#39;,
+    ext: &#39;.css&#39;,
+    options: {
+        style: &quot;compressed&quot;
+    }
+},
+dev: {
+    expand: true,
+    cwd: &#39;/sass/&#39;,
+    src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
+    dest: &#39;/stylesheets/&#39;,
+    ext: &#39;.css&#39;,
+    options: {
+        debugInfo: true,
+        lineNumbers: true
+    }
+},
+options: {
+    style: &#39;expanded&#39;,
+    require: [&#39;/sass/partials/helpers/url64.rb&#39;]
+}
+</code></pre>
+
+<p>}
+```</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

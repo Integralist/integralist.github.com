@@ -1,0 +1,875 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>A guide to getting started with Vim</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>A guide to getting started with Vim</h1>
+
+<ul>
+<li>Introduction</li>
+<li>Here comes the old man</li>
+<li>The focus of this post</li>
+<li>Step 1: Installation</li>
+<li>TMUX</li>
+<li>TMUXinator</li>
+<li>Vundle
+
+<ul>
+<li>Set-up some bundles</li>
+<li>Where can I find bundles?</li>
+</ul></li>
+<li>NERDTree</li>
+<li>Ctrl+P</li>
+<li>Vim
+
+<ul>
+<li>Vim Basics</li>
+<li>Using Ctrl+p to do fuzzy file searching</li>
+<li>Updating Ctrl+P&#39;s list</li>
+<li>Using NERDTree to search our file system</li>
+<li>Command Structure</li>
+<li>More Commands</li>
+<li>Cursor Movement</li>
+<li>Page Movement</li>
+<li>Motions</li>
+<li>Operators</li>
+<li>Deleting</li>
+<li>Deleting a tag</li>
+<li>Search within a file</li>
+<li>Search and Replace</li>
+<li>Viewing different buffers</li>
+<li>Change list</li>
+<li>Jump list</li>
+<li>Diff Tool</li>
+<li>Code Comments</li>
+<li>Syntax Formatting</li>
+<li>Auto Indenting</li>
+<li>Run terminal commands within Vim</li>
+<li>Suspend Vim</li>
+<li>Visual Block Mode</li>
+<li>Vim Windows</li>
+<li>Repeating Yourself</li>
+<li>Making life easier (changing case)</li>
+<li>Keep to the basics</li>
+</ul></li>
+<li>Vim Configuration</li>
+<li>Other plugins</li>
+<li>Conclusion</li>
+</ul>
+
+<h2>Introduction</h2>
+
+<p>So, what editor do you use for programming?</p>
+
+<p>In case you&#39;re wondering, here is the list of editors I&#39;ve tried at one point or another…</p>
+
+<ul>
+<li>Homesite</li>
+<li>DreamWeaver</li>
+<li>NetBeans</li>
+<li>Aptana</li>
+<li>Coda</li>
+<li>Chocolat</li>
+<li>Sublime Text</li>
+</ul>
+
+<p>…and that&#39;s not including some of the real <em>random</em> editors that have cropped up over the years.</p>
+
+<p>It seems popular editors nowadays are becoming more minimalist (oxymoron?)</p>
+
+<p>The UI appears to be reducing in favour of keyboard short-cuts, with the intention of improving developer productivity.</p>
+
+<p>One example of this is the use of a &#39;fuzzy keyword search&#39;. The principle idea being that you press a short-cut key and you&#39;re presented with a field where you can type whatever you like and the editor will attempt to list out a group of files that match (in some way) what you&#39;ve typed.</p>
+
+<p>The reason this is a good thing is that it makes finding and opening files a lot quicker.</p>
+
+<p>Imagine you don&#39;t know where a file lives (easily done in a cross team environment where other devs are working on code for a feature you&#39;re not). Fuzzy file searching makes life a lot easier.</p>
+
+<p>Even if you <em>do</em> know where a file lives, fuzzy file searching is still quicker than reaching for your mouse, moving over to the file system and clicking on folders until you find the file and then double click to open it.</p>
+
+<p>A lot of editors have a feature like this nowadays (Sublime Text is one such popular example).</p>
+
+<div class="delayed-image-load" data-src="/images/generated/sublime-text-fuzzy-1024.png" data-width="1024"></div>
+
+<p>The problem is that most editors don&#39;t normally have a long shelf life (none that any serious developer would consider using  nowadays -&gt; I&#39;m looking at Dreamweaver here**).</p>
+
+<p>**yes I&#39;m sure they&#39;ll be some people who still use Dreamweaver and will not like that sentence, but I think it&#39;s safe to say that the developer community has grown up considerably since those early Macromedia days and developers have long since moved away to other more advanced and efficient development environments.</p>
+
+<p>For example, the current hotness (as of 2013) is to use Sublime Text (a nice editor with good keyboard based features but also allows users to interact with it using a mouse). But what happens when Sublime Text stops getting updates (TextMate? Don&#39;t think it can&#39;t happen), or gets bought out by a competitor and then is dumped (this happens <em>all</em> the time in the software industry)?</p>
+
+<p>Where do developers go next?
+Typically developers find another editor.</p>
+
+<h2>Here comes the old man</h2>
+
+<p>Well, there is an editor that has been around for a <em>very</em> long time and is available everywhere (and in most cases is installed by default) but also has tons of plug-ins and is pretty much the Perl of keyboard short-cuts.</p>
+
+<p>That editor is <a href="http://en.wikipedia.org/wiki/Vi">VI</a> (well, as you&#39;ll see, more specifically Vim) and it was originally created back in 1976!</p>
+
+<p>Since then there has been improvements to the editor which nowadays (~1981 onwards) is more commonly known as Vim (meaning: VI Improved) and you can find more information on Vim at its website <a href="http://www.vim.org/">http://www.vim.org/</a>.</p>
+
+<h2>The focus of this post</h2>
+
+<p>OK, so the problem with Vim is that although it&#39;s a great program to use, it unfortunately has a <em>very</em> steep learning curve which puts off new comers.</p>
+
+<p>Also, Vim by itself isn&#39;t as useful (as a development environment) without a few plug-ins that help give it a bit of jazz. That also trips up new comers to Vim as they assume what they see other developers using is <em>just</em> Vim but it&#39;s not. Vim by itself is very nondescript, it&#39;s the plug-ins and custom Vim configurations that make all the difference to the look and feel of Vim.</p>
+
+<p>So, the key to using Vim (for the first time) as a developer tool is:</p>
+
+<ul>
+<li>Get a nice clean command line shell</li>
+<li>Get ourselves a set of primary plugins installed first</li>
+<li>Then focus on basic Vim commands last (typically this is considered the first step, but I think that&#39;s a mistake)</li>
+</ul>
+
+<p>I want to get the primary tools set-up first, and to show you those BEFORE we get ourselves bogged down with Vim commands.</p>
+
+<h2>Step 1: Installation</h2>
+
+<p>I&#39;m not going to cover the installation of Vim because chances are it&#39;s already installed! Also, I&#39;m running a Mac and so this tutorial is aimed at that environment (i.e. your mileage may vary otherwise if you&#39;re on Windows or a non Unix system).</p>
+
+<h3>Updating your Vim version?</h3>
+
+<p>If you decide you want to update your version of Vim (which when using a Mac is probably something you&#39;ll want to do as the included version is quite old).</p>
+
+<p>You can do this by installing the latest version of Vim using <a href="http://brew.sh/">Homebrew</a>: <code>brew install vim</code>.</p>
+
+<p>The problem you&#39;ll likely hit is that the Mac will still be using the original version of Vim.</p>
+
+<p>Run <code>which vim</code> to see where the system is looking for Vim and if it&#39;s not running from a local user directory then you&#39;ll know it&#39;s not using the Homebrew install version. </p>
+
+<p>So go to that directory specified by <code>which vim</code> and then rename the Vim folder (e.g. VimVersionXXXX) and then run <code>which vim</code> again and you should find that your system tries looking elsewhere for Vim and it will find the Homebrew install.</p>
+
+<h3>Things we&#39;re going to install to go along with Vim</h3>
+
+<p>But here are the things we&#39;re going to install…</p>
+
+<ul>
+<li>Pure Zsh</li>
+<li>TMUX</li>
+<li>Vundle</li>
+<li>NERDTree</li>
+<li>Ctrl+p</li>
+</ul>
+
+<p>…now there are loads of plugins you could install but the above are the fundamental ones that you&#39;ll require (you might decide that&#39;s all you need, I&#39;ll leave it up to you to decide).</p>
+
+<h2>Zsh</h2>
+
+<p>To use Vim we&#39;ll need to use a terminal shell. So let&#39;s get that open now (if you&#39;re on a Mac you&#39;ll have a Terminal.app you can run).</p>
+
+<p>The default terminal shell for the GNU operating system, Linux and Mac OS X is &#39;Bash&#39; but we want to use &#39;Zsh&#39; instead.</p>
+
+<p>I won&#39;t delve into the reasons why but effectively Zsh is a more efficient shell and offers better features than Bash and in general is more enjoyable to use.</p>
+
+<p>To see what shells are available on your system you can run the command <code>cat /etc/shells</code> (hopefully you&#39;ll see <code>/bin/zsh</code> in the list).</p>
+
+<p>To change shells run the command <code>chsh -s /bin/zsh</code>.</p>
+
+<p>Terminal shells can be configured using (what&#39;s typically referred to as) a &#39;dot file&#39;. These are files that are prefixed with a period character and so are hidden from standard users.</p>
+
+<p>To see the hidden files in a directory just run the command <code>ls -la</code> and you should see a whole host of hidden dot files and folders.</p>
+
+<p>For Zsh there should be a <code>.zshrc</code> file in your home directory (if there isn&#39;t then create one, as we&#39;ll need it shortly). You can do this very simply using the command <code>touch .zshrc</code>.</p>
+
+<p>As we&#39;ll be using Vim there should also be in the home directory a <code>.vimrc</code> file for configuring Vim. If there isn&#39;t then create one (again, we&#39;ll be needing it shortly).</p>
+
+<h2>Pure Zsh</h2>
+
+<p>Now that we have Zsh running let&#39;s make it look a bit nicer by using &#39;Pure Zsh&#39;. I&#39;m going to let the author have the pleasure of describing it…</p>
+
+<blockquote>
+<p>Most prompts are cluttered, ugly and slow. I wanted something visually pleasing that stayed out of my way. Pretty, minimal and fast.</p>
+</blockquote>
+
+<p>So let&#39;s get it installed. Go to <a href="https://github.com/sindresorhus/pure">https://github.com/sindresorhus/pure</a> and download the file <code>pure.zsh</code> to your home directory (or wherever you want, just remember where you save it).</p>
+
+<p>You can import the <code>pure.zsh</code> file by adding the following line into the <code>.zshrc</code> file: <code>. /path/to/pure.zsh</code></p>
+
+<div class="delayed-image-load" data-src="/images/generated/pure-zsh-1024.png" data-width="1024"></div>
+
+<h2>TMUX</h2>
+
+<p>So what is tmux? The authors definition is…</p>
+
+<blockquote>
+<p>It lets you switch easily between several programs in one terminal, detach them (they keep running in the background) and reattach them to a different terminal. And do a lot more.</p>
+</blockquote>
+
+<p>OK, so in short tmux makes it easy for you to create new terminal windows with panes and complex layouts (stuff you can do with raw Vim but tmux makes easier).</p>
+
+<p>There are a couple of ways to install <a href="http://tmux.sourceforge.net/">TMUX</a> the easiest is with <a href="http://brew.sh/">Homebrew</a>: <code>brew install tmux</code></p>
+
+<p>Once you have tmux installed you can start it by simply running the command <code>tmux</code> in your terminal.</p>
+
+<p>You may wonder if anything has actually happened because tmux doesn&#39;t look any different from what your normal terminal shell looks like, but what you don&#39;t realise is that you now have quite a few new keyboard shortcuts you can use to split your terminal into &#39;panes&#39;, &#39;windows&#39; or &#39;tabs&#39;.</p>
+
+<div class="delayed-image-load" data-src="/images/generated/tmux-1024.png" data-width="1024"></div>
+
+<h3>Prefix?</h3>
+
+<p>In tmux whenever you want to run a command you first run a opening command called &#39;the prefix&#39;. The prefix is typically <code>Ctrl+b</code> (i.e. press the <code>Ctrl</code> button and then the <code>b</code> key). </p>
+
+<p>In my case I&#39;ve updated the prefix to be <code>Ctrl+a</code> instead of <code>Ctrl+b</code> via a <code>tmux.conf</code> configuration file (you&#39;ll find out more about this file in the next section &quot;tmuxinator&quot;).</p>
+
+<h3>Creating windows</h3>
+
+<p>To create a new window just run the prefix command and then press the <code>c</code> key (e.g. <code>Ctrl+b</code> then <code>c</code>)</p>
+
+<p>To close a window either run <code>exit</code> or press <code>Ctrl+d</code></p>
+
+<h3>Renaming windows</h3>
+
+<p>You can rename a window by running the prefix command and then pressing the <code>,</code> key.</p>
+
+<h3>Changing windows</h3>
+
+<p>You can move around your tmux windows using the prefix command and either <code>n</code> (for next) or <code>p</code> (for previous) or specifying a number that correlates with the window number.</p>
+
+<h3>Creating panes</h3>
+
+<p>To create a new horizontal pane run the prefix command and then press <code>Shift+5</code> (the <code>%</code> key).</p>
+
+<div class="delayed-image-load" data-src="/images/generated/tmux-horizontal-1024.png" data-width="1024"></div>
+
+<p>To create a new vertical pane run the prefix command and then press <code>Shift+&#39;</code> (the <code>&quot;</code> key).</p>
+
+<div class="delayed-image-load" data-src="/images/generated/tmux-vertical-1024.png" data-width="1024"></div>
+
+<h3>Full screen a pane</h3>
+
+<p>At any time you can turn a pane into a full screen view (and back again) by running the prefix command followed by <code>z</code>. Run that again to toggle back to the pane view.</p>
+
+<h3>Move a pane into a different pane space</h3>
+
+<p>You can actually shift the panes around so that if a pane is in one position (let&#39;s say top left), you can move it to a different location (let&#39;s say bottom right) simply by running the prefix command followed by <code>Shift+{</code>, every time you press that combination all the panes will shift around.</p>
+
+<h3>Renaming a session</h3>
+
+<p>When you create a new tmux session (i.e. run <code>tmux</code>). You can opt to give it a name using <code>tmux new -s session_name</code>, but if you forget to do that and want to give the session a name later on (I do this all the time) then from within the session just run the prefix command followed by <code>Shift+4</code> (which is the <code>$</code> key) or alternatively run the prefix command followed by a <code>:</code> and then <code>rename-session -t [current-name] [new-name]</code> (if it has no current name then you&#39;ll just use the number assigned).</p>
+
+<h2>TMUXinator</h2>
+
+<p>We&#39;re now going to set-up a tool associated with tmux called &#39;<a href="https://github.com/aziz/tmuxinator">tmuxinator</a>&#39; and this will help us manage complex tmux sessions.</p>
+
+<p>Basically, rather than you (every day) opening up the terminal and manually creating the same set of panes and windows and opening files in tmux, we can just store these preferences as a template. We do this by creating a text file that holds this configuration information.</p>
+
+<p>First thing to do is to install TMUXinator.</p>
+
+<p>Sorry, but we need more technologies and this time it&#39;s Ruby.</p>
+
+<p>To install it we need to run the command <code>gem install tmuxinator</code>.</p>
+
+<p>Once installed we can create a new instance by running the command <code>tmuxinator new [project]</code>. You can call your project whatever you like (I went with <code>tmuxinator new work</code>).</p>
+
+<p>Running this command is going to create a dot file <code>.tmux.conf</code> and also a dot folder called <code>.tmuxinator</code> which holds a <code>project.yml</code> (where the name of the file matches the name of the project, so for me it created a <code>work.yml</code> file).</p>
+
+<p>If you open the yaml file you&#39;ll see it has a basic example set-up ready for you to configure…</p>
+
+<p>```yaml
+name: test-project
+root: ~/Code/news/workspace/</p>
+
+<p>windows:
+  - editor:
+      layout: main-vertical
+      panes:
+        - vim
+        - git status
+        - cd path/to/my/cheatsheet &amp;&amp; vim cheat-sheet.txt
+  - sandbox: vagrant ssh
+  - sass: grunt watch:service:news
+```</p>
+
+<p>…above is an example of my <code>work.yml</code>.</p>
+
+<p>You can see I specify that I want to have three tabs created:</p>
+
+<ul>
+<li>editor</li>
+<li>sandbox</li>
+<li>sass</li>
+</ul>
+
+<p>Within the first tab <code>editor</code> I have a specific layout used called <code>main-vertical</code> (tmux comes with many different pre-built layouts, this is just one of them).</p>
+
+<p>The layout I&#39;m using splits the screen into two columns. In the left column I have <code>vim</code> running and in the right column I have two rows. The top row checks the status of my git repository, and the bottom row opens up a Vim cheat sheet.</p>
+
+<p>In the second tab <code>sandbox</code> I&#39;ve told tmux I want to connect to our local development sandbox (via ssh).</p>
+
+<p>In the third tab <code>sass</code> I&#39;ve told tmux I want to run a task that watches our Sass development files for any changes (and then compiles the files when a change is detected).</p>
+
+<div class="delayed-image-load" data-src="/images/generated/tmuxinator-1024.png" data-width="1024"></div>
+
+<h3>Starting tmuxinator</h3>
+
+<p>Now we have a template set-up, to use it we just run <code>tmuxinator start project</code> (or in my case <code>tmuxinator start work</code>).</p>
+
+<h3>Closing tmux</h3>
+
+<p>Chances are you&#39;ll just leave the tmux session open, but if you want a quick way to detach from the tmux session (but leave the session open in the background so you can come back to it) then just run <code>Ctrl+a d</code></p>
+
+<p>You can see what tmux sessions are still open by running <code>tmux ls</code> which will show a number and a associated session.</p>
+
+<p>You can re-attach to an existing session by running <code>tmux attach -t {number|name}</code> where <code>{number|name}</code> is either the number or the name of the session.</p>
+
+<p>If there is only one session then you can just run <code>tmux attach</code>.</p>
+
+<p>To totally kill a session just run <code>tmux kill-session -t {number|name}</code>.</p>
+
+<h2>Vundle</h2>
+
+<p>This is a plug-in manager for Vim.</p>
+
+<p>To install Vundle run <code>git clone  
+https://github.com/gmarik/  
+vundle.git  
+~/.vim/bundle/vundle</code></p>
+
+<p>Now you have it installed, you can add plug-ins to your <code>.vimrc</code> configuration file and install them by running a <code>:BundleInstall</code> command from within Vim.</p>
+
+<p>You can also just run <code>vim +BundleInstall</code> from the command line.</p>
+
+<h3>Set-up some bundles</h3>
+
+<p>We&#39;re jumping ahead a little bit (because at the end of this section you&#39;ll see we&#39;ll be using Vim to type one command, but it&#39;s OK we won&#39;t do any more than that until later).</p>
+
+<p>Let&#39;s open our <code>.vimrc</code> file and add some plug-ins we&#39;re going to need (code comments start with &quot;)…</p>
+
+<p>```sh
+set rtp+=$HOME/.vim/bundle/vundle
+call vundle#rc()
+Bundle &#39;gmarik/vundle&#39;
+filetype plugin indent on</p>
+
+<p>&quot; ALL OF THE ABOVE IS ALSO REQUIRED
+&quot; FOR SUCCESSFUL VUNDLE INSTALL
+&quot; THE FOLLOWING IS NEW FOR US…</p>
+
+<p>Bundle &#39;kien/ctrlp.vim&#39;
+Bundle &#39;vim-scripts/The-NERD-tree&#39;
+```</p>
+
+<p>…so you may have noticed we&#39;ve specified two plug-ins:</p>
+
+<ol>
+<li>NERDTree</li>
+<li>Ctrl+p</li>
+</ol>
+
+<p>If you check the Vundle README on GitHub you&#39;ll see there are multiple ways to specify a &#39;bundle&#39;, in our case we&#39;re installing two bundles that are available on GitHub so you&#39;ll notice that the paths specified are actually the GitHub username/repo-name.</p>
+
+<p>To actually get these two bundles installed (using the Vundle plug-in) means we need to first open Vim so we can run the relevant install command.</p>
+
+<p>So to open Vim literally just run: <code>vim</code> and then to run the install command press ESC (just to make sure you&#39;re in the right mode, don&#39;t worry we&#39;ll cover this later) then type <code>:BundleInstall</code> and press ENTER.</p>
+
+<h3>Where can I find bundles?</h3>
+
+<p>Bundles are just pointers to Vim scripts.</p>
+
+<p>The two bundles we&#39;ve pointed to are references to their GitHub repositories.</p>
+
+<p>But you can also point to non-github repos, local git repos, or direct to Vim scripts. See the Vundle README for more information.</p>
+
+<h2>NERDTree</h2>
+
+<p>NERDTree is a tree explorer plugin for navigating the filesystem. This is the closest thing you&#39;re going to get to a standard editor feature.</p>
+
+<p>We&#39;ll cover how to use it in the following Vim Basics section. Suffice to say, with the <code>Ctrl+p</code> plug-in we shouldn&#39;t need to use the NERDTree very often (but sometimes it can come in handy)</p>
+
+<h2>Ctrl+p</h2>
+
+<p>This is a fuzzy file finder so it makes it easy for you to locate files within your project by just typing a couple of characters of the files name.</p>
+
+<p>Again, we&#39;ll cover how to use it in the following Vim Basics section.</p>
+
+<h2>Vim</h2>
+
+<p>So here we are! We made it to the part where we can actually use Vim! So let&#39;s get stuck in...</p>
+
+<h3>Vim Basics</h3>
+
+<p>Vim is all about not using the mouse, just the keyboard.</p>
+
+<p>One of the first things to know about Vim are that it has 3 modes:</p>
+
+<ol>
+<li>NORMAL (you run the majority of your commands from this mode)</li>
+<li>INSERT (you spend the least amount of time in this mode)</li>
+<li>VISUAL (you select text in this mode)</li>
+</ol>
+
+<p>To switch modes you first press the <code>ESC</code> key and then either <code>i</code> to go into INSERT mode and <code>v</code> to go into VISUAL mode. The act of pressing <code>ESC</code> automatically puts you into NORMAL mode.</p>
+
+<p>Once you&#39;re in NORMAL or VISUAL mode, to actually run a command (let&#39;s say the command we want is <code>d$</code>, don&#39;t worry what that means for now) you first press <code>:</code> followed by <code>d$</code>.</p>
+
+<h3>Using Ctrl+p to do fuzzy file searching</h3>
+
+<p>Get ourselves into NORMAL mode by pressing <code>ESC</code>, followed by <code>:</code>, followed by <code>CtrlP</code> (note: for this particular plug-in, if you&#39;re already in NORMAL mode, you can just press the <code>Ctrl</code> and <code>p</code> keys together to trigger the fuzzy search to open, but to not confuse ourselves let&#39;s keep to the standard <code>:some-command</code> format).</p>
+
+<p>Once the plug-in is open we can just start typing the name of the file we&#39;re looking for, and you&#39;ll see that it lists all the files it thinks matches what we&#39;re looking for.</p>
+
+<p>Simply use the arrow keys to select the relevant file you want to open and press ENTER.</p>
+
+<div class="delayed-image-load" data-src="/images/generated/ctrlp-1024.png" data-width="1024"></div>
+
+<h3>Updating Ctrl+P&#39;s list</h3>
+
+<p>If you have Vim open and you add a new file then the list that Ctrl+P uses (which is cached) will be out of date. To fix this, open Ctrl+P and then press <code>F5</code> to refresh the list of files it can search for.</p>
+
+<h3>Using NERDTree to search our file system</h3>
+
+<p>When Vim is open and in NORMAL mode press <code>:</code> followed by <code>NERDTreeToggle</code> this will open NERDTree at the current location. You can then use your arrow keys to move up and down the file system and press <code>ENTER</code> to open folders. Once you find a file you want to open press <code>ENTER</code> once you&#39;re cursor is on the item of interest.</p>
+
+<div class="delayed-image-load" data-src="/images/generated/nerdtree-1024.png" data-width="1024"></div>
+
+<h3>Command Structure</h3>
+
+<p>It&#39;s worth remembering that most commands follow the format: <code>operator [number] motion</code> (not all the time, but enough of the time - you&#39;ll soon get used to the order you do things).</p>
+
+<p>What follows is a super short list of commands and what they do.</p>
+
+<h3>Cursor Movement</h3>
+
+<p><code>h</code> : left<br>
+<code>l</code> : right<br>
+<code>k</code> : up<br>
+<code>j</code> : down</p>
+
+<p>Note: you can use your arrow keys still, but it&#39;s considered best practice by the Vim community to get used to using the above keys rather than the arrow keys.</p>
+
+<h3>Page Movement</h3>
+
+<p>Rather than moving up and down a file line by line, we can instead just move up and down the file in sections.</p>
+
+<p><code>Ctrl+u</code> : move one page up<br>
+<code>Ctrl+d</code> : move one page down<br>
+<code>Ctrl+b</code> : move half page up<br>
+<code>Ctrl+f</code> : move half page down</p>
+
+<h3>Motions</h3>
+
+<p>With some commands we need to indicate what direction or motion we want to take.</p>
+
+<p><code>e</code> : move to the end of a word<br>
+<code>w</code> : move to the start of next word (use with a counter -&gt; a counter meaning &quot;a number&quot;)</p>
+
+<p><strong>Examples</strong>:</p>
+
+<p><code>5e</code> = move to the end of the 5th word in the sentence<br>
+<code>5w</code> = move to the start of the word after the 5th (so actually move to the start of the 6th word)</p>
+
+<h3>Operators</h3>
+
+<p>Here are some common operators available to use:</p>
+
+<ul>
+<li><code>0</code> : moves cursor to the start of the line</li>
+<li><code>$</code> : moves cursor to the end of the line</li>
+<li><code>d</code> : delete (e.g. <code>d$</code> deletes the entire line)</li>
+<li><code>G</code> : go to line (e.g. <code>5G</code> takes you to the 5th line of the file)</li>
+<li><code>v</code>   : select (e.g. <code>v1e</code> selects one word, the act of pressing <code>v</code> automatically sticks you in VISUAL mode)</li>
+<li><code>V</code>   : select entire line (e.g. <code>V</code> selects the entire line, the act of pressing <code>v</code> automatically sticks you in VISUAL mode)</li>
+<li><code>j</code>   : move down one line (e.g. <code>d5j</code> deletes 5 lines)</li>
+<li><code>y</code> : copy selected text (e.g. select text and then press <code>y</code>)</li>
+<li><code>yy</code>  : copy line (e.g. <code>yy</code> copies line to buffer ready to be pasted)</li>
+<li><code>p</code>   : paste after cursor (e.g. <code>p</code> pastes content, but obviously requires content to have been copied previously)</li>
+<li><code>P</code>   : paste before cursor (e.g. <code>P</code> pastes content, but obviously requires content to have been copied previously)</li>
+<li><code>c</code>   : change (the change command deletes the selection and then puts user into INSERT mode so e.g. <code>cw</code> deletes the current word ready to have a new word entered)</li>
+<li><code>i</code>   : inside of (e.g. <code>yi&quot;</code> this will (y)ank all content (i)nside of the next set of quotation marks)</li>
+<li><code>a</code> : same as <code>i</code> but content comes after the cursor rather than before</li>
+<li><code>b</code> : moves backwards through words</li>
+<li><code>o</code> : moves cursor to the next line and jumps into insert mode</li>
+<li><code>f</code>   : forward (e.g. <code>f,</code> moves to first comma. if you then press <code>;</code> you&#39;ll move to the next instance of the specified character. You can also move a set number of characters, so <code>2f,</code> will move the cursor to the second instance of a comma)</li>
+<li><code>x</code>   : cut after cursor (e.g. place cursor where you want to cut a character and press <code>x</code> to cut it, ready for pasting elsewhere)</li>
+<li><code>u</code>   : undo (e.g. just pressing <code>u</code> will undo the last change made)</li>
+<li><code>=</code> : auto indent (e.g. pressing == will indent the current line to the correct space, corresponding to the programming language being used in the current buffer)</li>
+<li><code>~</code> : replaces the case of a character (e.g. converts a to A and then back again)</li>
+</ul>
+
+<h3>Deleting</h3>
+
+<p>You can select multiple lines and just press <code>d</code> to delete.</p>
+
+<p>When selecting multiple lines for deletion (e.g. <code>d5j</code>) it is better to use <code>d5d</code> as it deletes the expected number of lines.</p>
+
+<p>For example…</p>
+
+<p><code>
+Line 1  
+Line 2  
+Line 3  
+Line 4  
+Line 5  
+Line 6  
+Line 7  
+Line 8  
+Line 9  
+Line 10
+</code></p>
+
+<p>…if the cursor is on line 3 and you run <code>d4j</code> you&#39;ll end up deleting lines 3-7 but if you run <code>d4d</code> you&#39;ll delete 3-6 which visually is more likely what you intended (this is because <code>j</code> includes the current line on top of the specified number of lines to delete).</p>
+
+<h3>Deleting a tag</h3>
+
+<p>You can also delete a piece of text and its corresponding tag: <code>dat</code> which means to [d]elete [a]round [t]ag.</p>
+
+<p>So if you had <code>&lt;div&gt;&lt;p&gt;Some text&lt;/p&gt;&lt;/div&gt;</code> and your cursor was inside the <code>&lt;p&gt;</code> then you could delete the paragraph as well as the text &quot;Some text&quot;.</p>
+
+<h3>Search within a file</h3>
+
+<p>In NORMAL mode type a forward slash <code>/</code> followed by your search term.</p>
+
+<p>e.g. <code>/theThingImLookingFor</code> -&gt; this will automatically highlight any matches of the phrase <code>theThingImLookingFor</code> inside of the current file.</p>
+
+<p>If you press the <code>enter</code> key the matches will stay highlighted and you can press <code>n</code> to navigate through each match (or <code>Shift+n</code> to move backwards through each match).</p>
+
+<p>You&#39;ll notice that the search is case sensitive (which is annoying). To fix this you can put <code>\c</code> at the end of the search term to make the search case insensitive.</p>
+
+<p>e.g. <code>/tHEeThingIMLookingFor\c</code> will still find <code>theThingImLookingFor</code></p>
+
+<p>You can add <code>set smartcase</code> and <code>set ignorecase</code> to your <code>.vimrc</code> file which can help also.</p>
+
+<p>Also, if you press <code>Shift+8</code> any where inside of a word then that word is selected and automatically searched within the document (note: <code>Shift+3</code> does the same but searches backwards).</p>
+
+<h3>Search and Replace</h3>
+
+<p>You can search and replace within a file by first moving into NORMAL mode and then after pressing <code>:</code> and entering the following…</p>
+
+<p><code>50,100s/search/replace/gc</code></p>
+
+<p>…what this means is we limit the search range from line 50 up to line 100, we then look for the phrase <code>search</code> and we replace it with the phrase <code>replace</code>. We then use the <code>g</code> global flag which means don&#39;t stop after finding the first match. The <code>c</code> flag means don&#39;t just replace the instance, check with us first by asking us if we definitely want to carry out the replace.</p>
+
+<p>You don&#39;t have to use the range numbers, you can just use: <code>:%s/search/replace/gc</code> (but notice, now we don&#39;t have the range we need to include a <code>%</code> at the start).</p>
+
+<p>You can also use regular expressions which is awesome. But be aware that they don&#39;t quite match the standard regex syntax (you have to escape capture groups and word boundaries are no longer <code>\b</code> they are <code>\&lt;</code> and <code>\&gt;</code> +<a href="http://vimregex.com/">many other differences</a>). BUT you can work around this by specifying a <code>\v</code> flag before the regex.</p>
+
+<p>So for example, if you had the string <code>foo.add(&#39;bar&#39;)</code> then you could find it with something like…</p>
+
+<p><code>:%s/\v(\.add\(&#39;.*&#39;\))/\1/gc</code></p>
+
+<p>…notice we&#39;re not having to escape the outer parenthesis which are capturing the entire match (you&#39;ll also notice this find and replace search doesn&#39;t actually do anything because we capture the entire match and then replace it with itself <code>\1</code>, but it gives you an example of how to use the &#39;Very Magic&#39; mode).</p>
+
+<p>Note: You can also do a site wide search and replace using the <code>Ack</code> plug-in (e.g. add <code>Bundle &#39;mileszs/ack.vim&#39;</code> to our <code>.vimrc</code> file and run the <code>:BundleInstall</code> again). Checkout the Ack repo on GitHub to see how it works.</p>
+
+<h3>Viewing different buffers</h3>
+
+<p>Our <code>.vimrc</code> maps <code>\y</code>…</p>
+
+<p><code>map &lt;leader&gt;y :CtrlPBuffer&lt;cr&gt;</code></p>
+
+<p>…so it shows us what the current buffer is (this allows us to jump between files within Vim).</p>
+
+<p>Note: in Vim the <code>&lt;leader&gt;</code> key is a backslash <code>\</code></p>
+
+<h3>Change list</h3>
+
+<p>Vim remembers all points where an edit was made when within INSERT mode and stores them in a &#39;change list&#39;.</p>
+
+<p>To view the change list run the command <code>:changes</code>. This will display a list of edits you made along with the number of its place in the list.</p>
+
+<p>To access a specific change position run <code>:changes n</code> (where <code>n</code> is the number of the change position you&#39;re interested in). Moving to a previous change position doesn&#39;t undo the changes but instead just moves the cursor to that position. The reason why this is a good feature to have in Vim is because it allows you to jump around your file a lot more quickly and easily and can help to speed up your editing.</p>
+
+<p>To sequentially move back and forth between the change list points use the commands:</p>
+
+<p><code>g;</code> - prev<br>
+<code>g,</code> - next</p>
+
+<h3>Jump list</h3>
+
+<p>Similar to the &#39;change list&#39; feature, there is also a &#39;jump list&#39; which allows you to move back and forth between all cursor positions.</p>
+
+<p>You can view all cursor positions by running the command <code>:jumps</code>.</p>
+
+<p>To move to a previous cursor position use <code>ctrl-o</code> and to move forward use <code>ctrl-i</code>.</p>
+
+<h3>Diff Tool</h3>
+
+<p>Vim comes with a built-in diff tool (useful for comparing the same file for changes).</p>
+
+<p>Open two Vim windows in a split (so you see them both on screen at the same time).</p>
+
+<p>Then within each window run the command <code>:diffthis</code>. You&#39;ll see any differences between the files highlighted for you along with their line number.</p>
+
+<p>When you scroll the file then Vim will keep the scrolling in sync across both files.</p>
+
+<p>To turn off the diff tool then run <code>:diffoff</code> in any one of the windows.</p>
+
+<h3>Code Comments</h3>
+
+<p>The following commands use the <code>vim-commentary.git</code> plugin…</p>
+
+<p><code>gcc</code> = comment out a line (or <code>\\\</code>)<br>
+<code>gcu</code> = uncomment the commented line (you can do <code>gcc</code> as a toggle)</p>
+
+<p>When you select multiple lines to comment out you can just use <code>gc</code> (rather than <code>gcc</code>)</p>
+
+<h3>Syntax Formatting</h3>
+
+<p>You can set the formatting of a file using <code>:setf</code></p>
+
+<p>e.g. <code>:setf cucumber</code> (where <code>cucumber</code> is a syntax format installed)</p>
+
+<h3>Auto Indenting</h3>
+
+<p>You can use the auto indent feature <code>=</code> to help you while programming.</p>
+
+<p>To indent the entire file you can use <code>gg=G</code> which breaks down to: <code>gg</code> move to the start of the file, <code>=</code> auto indent, <code>G</code> to the end of the file.</p>
+
+<p>You can auto indent a single line: <code>==</code></p>
+
+<p>You can auto indent a code block (while inside of it): <code>=i{</code></p>
+
+<p>You can auto indent a code block (while outside of it by first moving to either the opening or closing curly bracket): <code>=%</code>. Note: to move to the curly bracket keep pressing <code>%</code> (it&#39;ll move to either curly or parenthesis, which ever is first it&#39;ll stop there and then toggle between the opening/closing bracket, so you may need to manually navigation to the curly bracket and then run <code>=%</code>).</p>
+
+<h3>Run terminal commands within Vim</h3>
+
+<p>Running the prefix command and then typing <code>:!{terminal command}</code> allows you to run terminal commands from within Vim (e.g. <code>:!pwd</code> shows us the current working directory).</p>
+
+<p>Note: doing this takes you out of Vim so you can see the results, but if you just press <code>ENTER</code> you&#39;ll be sent back into Vim.</p>
+
+<h3>Suspend Vim</h3>
+
+<p>Another way to run terminal commands while Vim is running is to actually suspend Vim.</p>
+
+<p>If you run the prefix command this will take us back to the terminal to run whatever commands we like and then in the terminal just type <code>fg</code> to bring Vim back to the (f)ore (g)round.</p>
+
+<h3>Visual Block Mode</h3>
+
+<p><code>Ctrl+v</code> puts us into Visual Block mode which allows us to select single columns and make multiple changes. So for example if you have a long list of items such as…</p>
+
+<p><code>
+_List Item 1  
+_List Item 2  
+_List Item 3  
+_List Item 4  
+_List Item 5
+</code></p>
+
+<p>…if you wanted to remove the opening <code>_</code> underscore then you could enter Visual Block mode, select the underscores by using the direction keys (make sure you&#39;re on the first or last underscore when you enter Visual Block mode) and then after all are selected just press <code>d</code> to delete them.</p>
+
+<p>Note: you might find you have an issue with editing multiple lines using insert mode. To use insert mode inside of Visual Block mode is to use <code>Shift+i</code> to jump into insert mode (just typing <code>i</code> doesn&#39;t work as that would throw you into the standard INSERT mode, so it&#39;ll remove you from Visual Mode).</p>
+
+<p>Also you can press <code>c</code> to change multiple lines, but remember that your change only appears to have been made to one line until you escape Visual Mode, then Vim will kick in and apply the change to all other selected lines.</p>
+
+<h3>Vim Windows</h3>
+
+<p>As well as having panes and windows within tmux you can create Windows within Vim (this is useful for times when you just want to do some quick hacking and tmux is too much effort -&gt; if you could believe such a thing).</p>
+
+<p>To create a new window in Vim (which is the same concept as a &#39;pane&#39; in tmux) you can either <code>Ctrl-s</code> to create a horizontal split screen (or run the command <code>:split</code>, or just <code>:sp</code>). You can also create a vertical split screen using <code>Ctrl-v</code> (or run the command <code>:vsplit</code>, or just <code>:vsp</code>).</p>
+
+<p>Note: if you use the execute command (i.e. <code>:</code> variation) then you can specify a file&#39;s path to be opened, otherwise Vim will automatically open the window pointing to a new buffer that is the same as the currently opened file (useful for viewing different portions of the same, but very long, file).</p>
+
+<p>You can create as many windows as you like (e.g. windows within a window).</p>
+
+<p>To resize a window&#39;s height you can use <code>Ctrl-w</code> then <code>-</code> or <code>+</code>. You can also use the command <code>:resize -N</code> or <code>:resize +N</code> (where <code>N</code> is the number to move by).</p>
+
+<p>To resize a window&#39;s width you can use <code>Ctrl-w</code> then <code>&lt;</code> or <code>&gt;</code>. You can also use the command <code>:vertical resize -N</code> or <code>:vertical resize +N</code> (where <code>N</code> is the number to move by).</p>
+
+<p>To maximise the height of the window then use <code>Ctrl-w</code> then <code>_</code>.</p>
+
+<p>To maximise the width of the window then use <code>Ctrl-w</code> then <code>|</code>.</p>
+
+<p>Finally, to close all windows use <code>:only</code> (which closes all the windows except the current one, where by you can just run <code>:q</code>)</p>
+
+<h3>Repeating Yourself</h3>
+
+<p>Vim is designed to help you be as efficient as possible whilst editing so here is a little tip...</p>
+
+<p>If you need to repeat an edit you just made within INSERT mode then use the <code>.</code> command. </p>
+
+<p>For example, imagine you have the text &quot;this is text&quot; and you wanted to have the first letter of each word capitalised. </p>
+
+<p>You could first move to the start of the line <code>0</code> and then use the &#39;toggle casing&#39; command <code>~</code> and then run the command <code>w.</code> twice which means you would: (<code>w</code>) move the cursor to the next word and then (<code>.</code>) repeat the last edit.</p>
+
+<h3>Making life easier (changing case)</h3>
+
+<p>Now imagine you have the word &quot;THIS&quot; and you wanted to only have the first letter of each word capitalised. </p>
+
+<p>Rather than manually rewrite each word, move your cursor to the start of the line and run <code>lve~</code>. </p>
+
+<p>That will (<code>l</code>) move the cursor to the right, (<code>v</code>) select (<code>e</code>) to the end of the word and then (<code>~</code>) switch that selection&#39;s casing (so in this instance it&#39;ll change to lowercase).</p>
+
+<p>Whenever you need to make repetitive changes try and think of how you can best utilise Vim to your advantage.</p>
+
+<h3>Keep to the basics</h3>
+
+<p>The above commands quite literally do not even scratch the surface of what&#39;s available within Vim.</p>
+
+<p>So the best thing to do is to find a comfortable set of commands from the list above and don&#39;t deviate from them until you&#39;ve got them memorised (it&#39;s ok to Google for something you don&#39;t know, but try to just focus on the basic commands for now).</p>
+
+<h2>Vim Configuration</h2>
+
+<p>Let&#39;s now take a quick look at some configuration options we can add to our <code>.vimrc</code> file…</p>
+
+<p>```sh
+&quot; switch syntax highlighting on, when the terminal has colors
+syntax on</p>
+
+<p>&quot; use vim, not vi api
+set nocompatible</p>
+
+<p>&quot; no backup files
+set nobackup</p>
+
+<p>&quot; no write backup
+set nowritebackup</p>
+
+<p>&quot; no swap file
+set noswapfile</p>
+
+<p>&quot; command history
+set history=100</p>
+
+<p>&quot; always show cursor
+set ruler</p>
+
+<p>&quot; show incomplete commands
+set showcmd</p>
+
+<p>&quot; incremental searching
+set incsearch</p>
+
+<p>&quot; highlight search
+set hlsearch</p>
+
+<p>&quot; ignore case in search
+set smartcase</p>
+
+<p>&quot; clear search buffer
+:nnoremap § :nohlsearch<cr></p>
+
+<p>&quot; make sure undo history is kept for files in buffer.
+set hidden</p>
+
+<p>&quot; turn indentation on
+filetype indent on</p>
+
+<p>&quot; enable filetype plugins
+filetype plugin on</p>
+
+<p>&quot; disable folding because it is evil
+set nofoldenable</p>
+
+<p>&quot; turn word wrap off
+set nowrap</p>
+
+<p>&quot; scroll with more context
+set scrolloff=10</p>
+
+<p>&quot; allow backspace to delete end of line, indent and start of line characters
+set backspace=indent,eol,start</p>
+
+<p>&quot; convert tabs to spaces
+set expandtab</p>
+
+<p>&quot; set tab size
+set tabstop=4</p>
+
+<p>&quot; the number of spaces inserted for a tab
+set shiftwidth=4</p>
+
+<p>&quot; turn on line numbers
+set number</p>
+
+<p>&quot; highlight tailing whitespace
+set list listchars=tab:\ \ ,trail:·</p>
+
+<p>&quot; get rid of the delay when pressing O (for example)
+&quot; http://stackoverflow.com/questions/2158516/vim-delay-before-o-opens-a-new-line
+set timeout timeoutlen=1000 ttimeoutlen=100</p>
+
+<p>&quot; always show status bar
+set laststatus=2</p>
+
+<p>&quot; set the status line to something useful
+set statusline=%f\ %=L:%l/%L\ %c\ (%p%%)</p>
+
+<p>&quot; hide the toolbar
+set guioptions-=T</p>
+
+<p>&quot; utf encoding
+set encoding=utf-8</p>
+
+<p>&quot; autoload files that have changed outside of vim
+set autoread</p>
+
+<p>&quot; jump to last cursor
+autocmd BufReadPost *
+  \ if line(&quot;&#39;\&quot;&quot;) &gt; 0 &amp;&amp; line(&quot;&#39;\&quot;&quot;) &lt;= line(&quot;$&quot;) |
+  \   exe &quot;normal g`\&quot;&quot; |
+  \ endif</p>
+
+<p>&quot; set-up ctrlp to include hidden files in its search
+let g:ctrlp<em>show</em>hidden=1</p>
+
+<p>&quot; disable ctrlp&#39;s feature where it tries to intelligently work out the current working directory to search within
+let g:ctrlp<em>working</em>path_mode=0</p>
+
+<p>&quot; don&#39;t let ctrlp take over the screen!
+let g:ctrlp<em>max</em>height=30</p>
+
+<p>&quot; lets make sure we don&#39;t show these files
+set wildignore+=<em>/.git/</em>,<em>/.hg/</em>,<em>/.svn/</em>.,*/.DS_Store</p>
+
+<p>&quot; allows us to more easily work with markdown files
+Bundle &#39;tpope/vim-markdown&#39;</p>
+
+<p>&quot; allows us to comment/uncomment lines and content
+Bundle &#39;tpope/vim-commentary.git&#39;</p>
+
+<p>&quot; remove whitespace on save
+autocmd BufWritePre * :%s/\s+$//e
+```</p>
+
+<p>…hopefully the comments are self explanatory. There is so much you can configure with Vim that you just need to take the time to look at what set-up works for you, as chances are you&#39;ll be able to change it.</p>
+
+<p>You can find loads of Vim configurations on GitHub where you can pinch ideas and settings from.</p>
+
+<h2>Other plugins</h2>
+
+<p>Here are some other really useful plugins worth your time investigating… </p>
+
+<ul>
+<li>Sparkup (ZenCoding/Emmet) <a href="http://net.tutsplus.com/tutorials/other/vim-essential-plugin-sparkup/">NetTuts Screencast</a> -&gt; uses <code>Ctrl+e</code> to generate the HTML</li>
+<li>Snipmate <a href="http://net.tutsplus.com/tutorials/other/vim-essential-plugin-snipmate/">NetTuts Screencast</a> -&gt; uses a <code>tab</code> to convert the keywords into the relevant snippet of HTML</li>
+</ul>
+
+<h2>Conclusion</h2>
+
+<p>So there you have it. A painfully short introduction to using Vim as your new web development environment. But hopefully enough to get you started.</p>
+
+<p>Vim is so powerful that it would probably take a life time to really cover everything. It just takes dedication.</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

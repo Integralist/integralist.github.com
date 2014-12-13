@@ -1,0 +1,462 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>SQLite and ActiveRecord</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>SQLite and ActiveRecord</h1>
+
+<ul>
+<li>Introduction</li>
+<li>SQLite</li>
+<li>ActiveRecord</li>
+<li>Installation</li>
+<li>Set-up</li>
+<li>Schema</li>
+<li>Creating
+
+<ul>
+<li>Association</li>
+<li>Record Creation</li>
+</ul></li>
+<li>Querying</li>
+<li>Conclusion</li>
+</ul>
+
+<h2>Introduction</h2>
+
+<p>This was intended to be a quick post about how to use the embedded relational database &quot;<a href="http://www.sqlite.org/">SQLite</a>&quot; with a Ruby/Sinatra application but will also include information on incorporating the ActiveRecord pattern as well.</p>
+
+<p>We&#39;ll look at installing and setting up SQLite and incorporating the ActiveRecord pattern using the open-source library of the same name (which is included as part of the <a href="http://rubyonrails.org/">Ruby on Rails Framework</a>).</p>
+
+<h2>SQLite</h2>
+
+<p>Typically if you&#39;re developing an application in Ruby using the <a href="http://rubyonrails.org/">Ruby on Rails framework</a> then you&#39;ll use SQLite in development and then switch over to another database for production (maybe <a href="http://www.mysql.com/">MySQL</a> or <a href="http://www.postgresql.org/">PostgreSQL</a>). </p>
+
+<p>What most people don&#39;t realise is that if you have a low traffic website then SQLite is fine to use. </p>
+
+<p>The only thing to be aware of when using SQLite in production is that it inherently isn&#39;t designed to scale. To help clarify, the author of SQLite had this to say on the subject… </p>
+
+<blockquote>
+<p>SQLite usually will work great as the database engine for low to medium traffic websites. The amount of web traffic that SQLite can handle depends, of course, on how heavily the website uses its database. Generally speaking, any site that gets fewer than 100K hits/day should work fine with SQLite. The 100K hits/day figure is a conservative estimate, not a hard upper bound. SQLite has been demonstrated to work with 10 times that amount of traffic.</p>
+
+<p>SQLite will normally work fine as the database backend to a website. But if your website is so busy that you are thinking of splitting the database component off onto a separate machine, then you should definitely consider using an enterprise-class client/server database engine instead of SQLite.</p>
+</blockquote>
+
+<h2>ActiveRecord</h2>
+
+<p>So most Ruby developers will know of <a href="http://guides.rubyonrails.org/active_record_querying.html">ActiveRecord</a> but may not realise that it&#39;s actually an architectural pattern and the term was originally coined by <a href="http://martinfowler.com/">Martin Fowler</a> (a legend in the field of software engineering and data modeling).</p>
+
+<p>The pattern describes how to provide an Interface that lets the user interact with a relational database in a more user friendly fashion rather than constructing their own SQL queries.</p>
+
+<p>We&#39;ll be using Ruby on Rails&#39; implementation of the pattern which they&#39;ve extracted into an external library/module (so it&#39;s not specifically reliant on the Ruby on Rails framework if you&#39;re using something more lightweight like Sinatra).</p>
+
+<h2>Installation</h2>
+
+<p>There are a couple of things we need to do:</p>
+
+<ol>
+<li>Install the SQLite libraries</li>
+<li>Install the SQLite Ruby module</li>
+<li>Install the ActiveRecord Ruby module</li>
+</ol>
+
+<p>So if you have <a href="http://brew.sh/">Homebrew</a> installed then you can simply run <code>brew install sqlite</code>.</p>
+
+<p>Note: you may need to run <code>brew --force link</code> afterwards, as a much older version of SQLite is already installed on the Mac OS and so the OS will attempt to load that first.</p>
+
+<p>To install the ruby module just run <code>gem install sqlite3</code></p>
+
+<p>To install the ActiveRecord ruby module just run <code>gem install activerecord</code></p>
+
+<h2>Command Line Tool</h2>
+
+<p>Once the SQLite libraries are installed you will have access to a command line tool that lets you directly inspect the contents of a SQLite database file.</p>
+
+<p>For example, if you have a database file called <code>test.db</code> then you can run <code>sqlite3 test.db</code> to open the database.</p>
+
+<p>You can then run SQL commands against the database such as <code>select * from tableName;</code> (notice the semicolon at the end <code>;</code> you&#39;ll need this otherwise the command won&#39;t know when it is considered completed, the plus side is that you can write complex SQL queries across multiple lines).</p>
+
+<h2>Set-up</h2>
+
+<p>Imagine we have a single file <code>sqlite-example.rb</code> with the following content… </p>
+
+<p>```ruby
+require &#39;active_record&#39;</p>
+
+<p>ActiveRecord::Base.logger = Logger.new(File.open(&#39;database.log&#39;, &#39;w&#39;))</p>
+
+<p>ActiveRecord::Base.establish_connection(
+  :adapter  =&gt; &#39;sqlite3&#39;,
+  :database =&gt; &#39;example.db&#39;
+)
+```</p>
+
+<p>…so let&#39;s analyse what this script is doing.</p>
+
+<p>First thing we&#39;re doing is loading the SQLite module.</p>
+
+<p>Second, ActiveRecord allows us to specify a recipient for any log information. In this instance we store any log information into a file called <code>database.log</code>. We could also send the log information directly to the terminal screen using <code>Logger.new(STDERR)</code> instead.</p>
+
+<p>Thirdly, we actually connect to the SQLite database. ActiveRecord has adapters for multiple databases and so here we specify we&#39;re using SQLite and that we want to connect to the <code>example.db</code> database. We could store data all in memory if we wanted (e.g. it wouldn&#39;t persist after the application has finished running), we do this by changing to…</p>
+
+<p><code>ruby
+:database =&gt; &#39;:memory:&#39;
+</code></p>
+
+<h2>Schema</h2>
+
+<p>As you should probably already know, we need to define a Schema for our database. Because although we&#39;re using an ActiveRecord interface we&#39;re still interacting with a relational database underneath that layer.</p>
+
+<p>A Schema helps dictate in code what the structure of the database should be and what the different columns/rows and data types should be used.</p>
+
+<p>To do this we&#39;ll add… </p>
+
+<p>```ruby
+ActiveRecord::Schema.define do
+  unless ActiveRecord::Base.connection.tables.include? &#39;albums&#39;
+    create_table :albums do |table|
+      table.column :title,     :string
+      table.column :performer, :string
+    end
+  end</p>
+
+<p>unless ActiveRecord::Base.connection.tables.include? &#39;tracks&#39;
+    create<em>table :tracks do |table|
+      table.column :album</em>id,     :integer # foreign key <table-name-singular><em>id (i.e. this is the primary key from the &#39;albums&#39; table)
+      table.column :track</em>number, :integer
+      table.column :title,        :string
+    end
+  end
+end
+```</p>
+
+<p>…as you might be able to tell, we&#39;re doing a couple of things.</p>
+
+<p>First we&#39;re defining a new Schema.</p>
+
+<p>Second, we&#39;re creating two tables: <code>albums</code> and <code>tracks</code> (we wrap the creation of the tables in a condition so we make sure we don&#39;t cause any errors by trying to create a table that already exists). Also, the convention is to name the tables as plurals (notice we don&#39;t call it <code>album</code> or <code>track</code> as they&#39;ll be holding multiples of that data).</p>
+
+<p>Thirdly, inside of the table creation we&#39;re specifying specific columns and what their data types should be.</p>
+
+<p>When we create a table a &quot;<a href="http://en.wikipedia.org/wiki/Primary_key">primary key</a>&quot; is automatically created for us and is named after the table. So in this instance we have two primary keys created for us: <code>albums_id</code> and <code>tracks_id</code> (notice the naming convention of <code>tableName_id</code> - singular, not plural).</p>
+
+<p>Inside the <code>tracks</code> table you&#39;ll see the first column we create is actually a &quot;<a href="http://en.wikipedia.org/wiki/Foreign_key">foreign key</a>&quot; because we&#39;re creating a column which is named after the <code>albums</code> table&#39;s primary key (<code>album_id</code>).</p>
+
+<h2>Creating</h2>
+
+<p>The ActiveRecord pattern is based on conventions, so in this instance we&#39;ll create two new classes that inherit from ActiveRecord&#39;s base class and we&#39;ll use these two classes for creating new records for each table… </p>
+
+<p>```ruby
+class Album &lt; ActiveRecord::Base
+  has_many :tracks
+end</p>
+
+<p>class Track &lt; ActiveRecord::Base
+  belongs_to :album
+end</p>
+
+<p>unless Album.find<em>by</em>title(&#39;In Utero&#39;)
+  album = Album.create(
+    :title     =&gt; &#39;In Utero&#39;,
+    :performer =&gt; &#39;Nirvana&#39;
+  )</p>
+
+<p>track_listing = [
+    nil,
+    &#39;Serve the Servants&#39;,
+    &#39;Scentless Apprentice&#39;,
+    &#39;Heart-Shaped Box&#39;,
+    &#39;Rape Me&#39;,
+    &#39;Frances Farmer&#39;,
+    &#39;Dumb&#39;,
+    &#39;Very Ape&#39;,
+    &#39;Milk It&#39;,
+    &#39;Pennyroyal Tea&#39;,
+    &#39;Radio Friendly Unit Shifter&#39;,
+    &#39;Tourettes&#39;,
+    &#39;All Apologies&#39;
+  ]</p>
+
+<p>track<em>listing.each</em>with<em>index do |value, index|
+    album.tracks.create(:track</em>number =&gt; index, :title =&gt; value) unless index === 0 # skip zero index
+  end
+end</p>
+
+<p>unless Album.find<em>by</em>title(&#39;La-te-ra-lus&#39;)
+  album = Album.create(
+    :title     =&gt; &#39;La-te-ra-lus&#39;,
+    :performer =&gt; &#39;Tool&#39;
+  )</p>
+
+<p>track_listing = [
+    nil,
+    &#39;The Grudge&#39;,
+    &#39;Eon Blue Apocalypse&#39;,
+    &#39;The Patient&#39;,
+    &#39;Mantra&#39;,
+    &#39;Schism&#39;,
+    &#39;Parabol&#39;,
+    &#39;Parabola&#39;,
+    &#39;Ticks &amp; Leeches&#39;,
+    &#39;Lateralus&#39;,
+    &#39;Disposition&#39;,
+    &#39;Reflection&#39;,
+    &#39;Triad&#39;,
+    &#39;Faaip de Oiad&#39;
+  ]</p>
+
+<p>track<em>listing.each</em>with<em>index do |value, index|
+    album.tracks.create(:track</em>number =&gt; index, :title =&gt; value) unless index === 0
+  end
+end
+```</p>
+
+<p>…OK, so there are a couple of things worth noting here:</p>
+
+<p>When we inherit from <code>ActiveRecord::Base</code> our class is mapped to a table of the same name. So for example our class <code>Album</code> is mapped to the <code>albums</code> table.</p>
+
+<p>Also, as we&#39;re inheriting from the ActiveRecord Base class, we don&#39;t need to specify attributes (for example, inside our Tracks class) such as <code>:title</code> or <code>:track_number</code> within our class, as they will be indirectly inferred from the Schema we defined earlier and will come from that table which the class is mapped to.</p>
+
+<h3>Association</h3>
+
+<p>You&#39;ll notice within the <code>Album</code> class we call a <code>has_many</code> method (provided through the inheritance chain via <code>ActiveRecord::Base</code>) which sets up the association between &#39;albums&#39; and &#39;tracks&#39;.</p>
+
+<p>Similarly, within the <code>Track</code> class we call <code>belongs_to</code> and tell it that our tracks belong to the &#39;albums&#39; table. We should only do this when the class/table holds the foreign key for the table we&#39;re saying it belongs to. In this case our &#39;Track&#39; class holds the foreign key that points to the &#39;albums&#39; table.</p>
+
+<h3>Record Creation</h3>
+
+<p>Finally we actually create some records to insert into each table.</p>
+
+<p>We call a <code>create</code> method like so…</p>
+
+<p><code>ruby
+album = Album.create(...)
+</code></p>
+
+<p>…which is equivalent to… </p>
+
+<p><code>ruby
+album = Album.new(...);
+album.save
+</code></p>
+
+<p>…so it saves us a little extra typing (which is nice).</p>
+
+<p>You&#39;ll also notice that when we create a new <code>Album</code> instance we can access and create new <code>Tracks</code> as well (via the <code>album</code> instance: <code>album.tracks.create(…)</code>). This is because we&#39;ve made an association within the top level classes between Albums and Tracks.</p>
+
+<p>In my example I&#39;m trying to be a bit smarter by not repeating the same chunk of code over and over. So rather than doing… </p>
+
+<p>```ruby
+album.tracks.create(:track<em>number =&gt; 1, :title =&gt; &#39;a&#39;)
+album.tracks.create(:track</em>number =&gt; 2, :title =&gt; &#39;b&#39;)
+album.tracks.create(:track_number =&gt; 3, :title =&gt; &#39;c&#39;)</p>
+
+<h1>…rinse repeat…</h1>
+
+<p>```</p>
+
+<p>…instead, I create the track listing as an <code>Array</code> and then loop the Array creating new records. </p>
+
+<p>The only additional logic I need is to avoid including the <code>[0]</code> item in the Array which I do using <code>album.tracks.create(…) unless index === 0</code>. </p>
+
+<p>The reason I avoid it is simply because track listings on albums always start at <code>1</code> where as our Array is zero-indexed.</p>
+
+<h2>Querying</h2>
+
+<p>Now in my example code you&#39;ll find me wrapping certain chunks in <code>begin/rescue</code> as my example isn&#39;t made to work when accessed multiple times (<em>it&#39;s just a silly example to demonstrate how to connect, populate and query data using ActiveRecords</em>). So don&#39;t worry about those aspects and instead just focus on the APIs I&#39;m using. Specifically…</p>
+
+<h3><code>find</code></h3>
+
+<p>This allows you to find a record by ID. So <code>Album.find(1)</code> would return the first album in the table. <code>Album.find(1).tracks.length</code> would then tell you the number of tracks that particular album held.</p>
+
+<h3><code>find_by</code></h3>
+
+<p>This is actually a very intelligent method. It is based on conventions again, so <code>find_by_title</code> maps to a standard <code>find_by</code> method but passes through <code>title</code> as the attribute we&#39;re interested in searching within: <code>Album.find_by_title(&#39;La-te-ra-lus&#39;)</code></p>
+
+<h3><code>all</code></h3>
+
+<p>This is an alias for <code>find(:all)</code>. So <code>Album.all</code> would return all records found within the &#39;Album` table.</p>
+
+<h3><code>where</code></h3>
+
+<p>This is a conditional that maps to SQL&#39;s <code>where</code> clause. So <code>Track.where(title: &#39;Triad&#39;)</code> would return the record(s) within the Track database whose <code>title</code> attribute contained the value <code>Triad</code>. You can do more complicated filters such as: <code>Table.where(user_name: user_name, password: password).first</code> which safely sanitises your input and checks two different attributes and then returns the first record found (in case there are multiples).</p>
+
+<h3><code>first</code></h3>
+
+<p>We&#39;ve seen this used already and works in a similar way to how Ruby&#39;s <code>first</code> property works (it returns the first item found).</p>
+
+<h3><code>last</code></h3>
+
+<p>Same as <code>first</code> but returns the last item found.</p>
+
+<h3><code>delete</code></h3>
+
+<p>Once you&#39;ve found a record then you can delete it using this method. So <code>Album.first.delete</code> would find the first record in the <code>Album</code> table and then delete that record.</p>
+
+<h3><code>save</code></h3>
+
+<p>You can modify records by first locating them and simply assigning a new value to them, but you would then use the <code>save</code> method to store that update back to the database: <code>track = Track.where(title: &#39;yolo&#39;).first.title = &#39;Blah&#39;; track.save</code></p>
+
+<h2>Conclusion</h2>
+
+<p>So we&#39;ve not delved too deeply (as there is far too much to cover in one post) but hopefully this has been a good starting point for you.</p>
+
+<p>The complete code I was using looks like this… </p>
+
+<p>```ruby
+require &#39;active_record&#39;</p>
+
+<p>ActiveRecord::Base.logger = Logger.new(File.open(&#39;database.log&#39;, &#39;w&#39;))</p>
+
+<p>ActiveRecord::Base.establish_connection(
+  :adapter  =&gt; &#39;sqlite3&#39;,
+  :database =&gt; &#39;example.db&#39;
+)</p>
+
+<p>ActiveRecord::Schema.define do
+  unless ActiveRecord::Base.connection.tables.include? &#39;albums&#39;
+    create_table :albums do |table|
+      table.column :title,     :string
+      table.column :performer, :string
+    end
+  end</p>
+
+<p>unless ActiveRecord::Base.connection.tables.include? &#39;tracks&#39;
+    create<em>table :tracks do |table|
+      table.column :album</em>id,     :integer
+      table.column :track_number, :integer
+      table.column :title,        :string
+    end
+  end
+end</p>
+
+<p>class Album &lt; ActiveRecord::Base
+  has_many :tracks
+end</p>
+
+<p>class Track &lt; ActiveRecord::Base
+  belongs_to :album
+end</p>
+
+<p>unless Album.find<em>by</em>title(&#39;In Utero&#39;)
+  album = Album.create(
+    :title     =&gt; &#39;In Utero&#39;,
+    :performer =&gt; &#39;Nirvana&#39;
+  )</p>
+
+<p>track_listing = [
+    nil,
+    &#39;Serve the Servants&#39;,
+    &#39;Scentless Apprentice&#39;,
+    &#39;Heart-Shaped Box&#39;,
+    &#39;Rape Me&#39;,
+    &#39;Frances Farmer&#39;,
+    &#39;Dumb&#39;,
+    &#39;Very Ape&#39;,
+    &#39;Milk It&#39;,
+    &#39;Pennyroyal Tea&#39;,
+    &#39;Radio Friendly Unit Shifter&#39;,
+    &#39;Tourettes&#39;,
+    &#39;All Apologies&#39;
+  ]</p>
+
+<p>track<em>listing.each</em>with<em>index do |value, index|
+    album.tracks.create(:track</em>number =&gt; index, :title =&gt; value) unless index === 0
+  end
+end</p>
+
+<p>unless Album.find<em>by</em>title(&#39;La-te-ra-lus&#39;)
+  album = Album.create(
+    :title     =&gt; &#39;La-te-ra-lus&#39;,
+    :performer =&gt; &#39;Tool&#39;
+  )</p>
+
+<p>track_listing = [
+    nil,
+    &#39;The Grudge&#39;,
+    &#39;Eon Blue Apocalypse&#39;,
+    &#39;The Patient&#39;,
+    &#39;Mantra&#39;,
+    &#39;Schism&#39;,
+    &#39;Parabol&#39;,
+    &#39;Parabola&#39;,
+    &#39;Ticks &amp; Leeches&#39;,
+    &#39;Lateralus&#39;,
+    &#39;Disposition&#39;,
+    &#39;Reflection&#39;,
+    &#39;Triad&#39;,
+    &#39;Faaip de Oiad&#39;
+  ]</p>
+
+<p>track<em>listing.each</em>with<em>index do |value, index|
+    album.tracks.create(:track</em>number =&gt; index, :title =&gt; value) unless index === 0
+  end
+end</p>
+
+<p>begin
+  p Album.find(1).tracks.length # 13 (on first run of this script it&#39;s fine, but next run we&#39;ve deleted the record)
+rescue ActiveRecord::RecordNotFound
+  p &#39;We just rescued a &quot;RecordNotFound&quot; error&#39;
+end</p>
+
+<p>p Album.find(2).tracks.length # 14
+p Album.find<em>by</em>title(&#39;La-te-ra-lus&#39;).title # &quot;La-te-ra-lus&quot;
+p Track.find<em>by</em>title(&#39;Very Ape&#39;).album<em>id # 1
+p Album.all # ActiveRecord::Relation =&gt; complete set of database records
+p Album.all.length # 2
+p Track.all # ActiveRecord::Relation =&gt; complete set of database records
+p Track.where(title: &#39;Triad&#39;) # ActiveRecord::Relation =&gt; single record
+p Track.where(track</em>number: 6..8) # returns tracks 6 to 8 from all albums
+p Album.first # returns first record (calling <code>Album.find(:first|:last) is deprecated</code>)
+p Album.last # returns last record</p>
+
+<p>if Album.all.length &gt; 1
+  p Album.first.delete # delete the first record
+end</p>
+
+<p>p Album.all # now we&#39;ll see there is only one record remaining</p>
+
+<p>track<em>to</em>be<em>modified = Track.where(title: &#39;The Grudge&#39;).first
+track</em>to<em>be</em>modified.title = &#39;Grudgeola&#39;
+track<em>to</em>be<em>modified.save
+p track</em>to<em>be</em>modified # displays modified record
+p Track.where(title: &#39;The Grudge&#39;) # empty Array (not found as we&#39;ve overridden the original record)
+p Track.where(title: &#39;Grudgeola&#39;) # displays Array of records found (only one, the modified record)
+```</p>
+
+<p>But remember this was just a quick introduction to the concepts of the ActiveRecord pattern (and using it with a SQLite database). There are <em>many</em> different querying methods available via ActiveRecord so do get stuck into the API documentation to see what other goodies are at your disposal. </p>
+
+<p>If you don&#39;t use/like Ruby then as I said previously: there are many different adaptations of the ActiveRecord pattern so look out for implementations in your language of choice.</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

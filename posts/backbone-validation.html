@@ -1,0 +1,639 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Backbone Validation</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>Backbone Validation</h1>
+
+<ul>
+<li>Introduction</li>
+<li>Dependencies</li>
+<li>HTML set-up</li>
+<li>JavaScript set-up</li>
+<li>Validation Module</li>
+<li>Conclusion</li>
+</ul>
+
+<h2>Introduction</h2>
+
+<p>A while ago I had any issue with validating a form using the Backbone.Model&#39;s <code>validate</code> method and so I went to the official Backbone GitHub issues area to raise a query. The problem I had isn&#39;t necessarily important but the ultimate result I got from the discussion with the maintainers of Backbone was that validating a form using a Model wasn&#39;t really the way you should use a Model.</p>
+
+<p>To me this didn&#39;t make a lot of sense because a form is just data and a Model holds data and so I would have thought using the built-in <code>validate</code> method of the Model would have been the best way to validate the form data. But apparently that&#39;s not considered a best practice using Backbone.</p>
+
+<p>So I decided to create a validation module that would make validating a form (and displaying errors) a little bit easier, because lets face it, validating forms are tedious and boring.</p>
+
+<p>You can download the <a href="https://github.com/Integralist/Backbone-Validation-View">full project code from GitHub</a></p>
+
+<h2>Dependencies</h2>
+
+<ul>
+<li>Backbone (obviously, so this includes the dependencies required by Backbone)</li>
+<li><a href="http://twitter.github.com/hogan.js/">Hogan.js</a> (for loading the error messages)</li>
+</ul>
+
+<p>Now although I&#39;ve used Backbone/Hogan you don&#39;t have to. The code is straight forward enough to port over to use whatever you like. You could rewrite the code to not use a framework at all. The principles are very simple.</p>
+
+<h2>HTML set-up</h2>
+
+<p>OK, so the HTML requires a bit of setting up. Nothing major, but we utilise specific classes and custom data attributes in the HTML to help us validate the form.</p>
+
+<p>For example, we mark-up any mandatory fields with a class of <code>js-mandatory-field</code> - you&#39;ll notice I&#39;ve prefixed the class with &#39;js-&#39; so other developers know that this class has no styles associated with it. It&#39;s literally only used as a JavaScript hook.</p>
+
+<p>We also use a custom data attribute <code>data-message</code> to store specific validation error messages. I prefer having custom messages because otherwise at some point you&#39;ll want to validate a field that doesn&#39;t conform to the known validation methods. So having a custom message for each field gives better feedback to the user.</p>
+
+<p>So as an example here is a form with the mandatory class and the custom data attribute</p>
+
+<p><code>html
+&lt;input name=&quot;card&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid credit card number&quot;&gt;
+</code></p>
+
+<p>Our full form code looks like this…</p>
+
+<p><code>html
+&lt;form action=&quot;http://www.google.com/&quot; method=&quot;post&quot; id=&quot;js-form&quot;&gt;
+    &lt;p&gt;Name: &lt;input name=&quot;fullname&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter your full name&quot;&gt;&lt;/p&gt;
+    &lt;p&gt;Date of Birth: &lt;input name=&quot;dob&quot; placeholder=&quot;dd/mm/yyyy&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid date format&quot;&gt;&lt;/p&gt;
+    &lt;p&gt;Age: &lt;input name=&quot;age&quot; type=&quot;number&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid age&quot;&gt;&lt;/p&gt;
+    &lt;p&gt;Email: &lt;input name=&quot;email&quot; type=&quot;email&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid email&quot;&gt;&lt;/p&gt;
+    &lt;p&gt;Mobile: &lt;input name=&quot;mobile&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid mobile number&quot;&gt;&lt;/p&gt;
+    &lt;p&gt;Password (8 alpha-numerical characters, at least either 1 number or 1 text character): &lt;input name=&quot;password&quot; type=&quot;password&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a password that matches the criteria&quot;&gt;&lt;/p&gt;
+    &lt;p&gt;Credit Card: &lt;input name=&quot;card&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid credit card number&quot;&gt;&lt;/p&gt;
+    &lt;p&gt;To proceed please tick this box: &lt;input name=&quot;proceed&quot; type=&quot;checkbox&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you tick the box to proceed&quot;&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;input type=&quot;submit&quot; value=&quot;Submit Form&quot;&gt;&lt;/p&gt;
+&lt;/form&gt;
+</code></p>
+
+<h2>JavaScript set-up</h2>
+
+<p>Next let&#39;s look at our JavaScript set-up: we&#39;re utilising AMD to help keep our scripts modular and I&#39;m using the <a href="https://github.com/cujojs/curl">Curl.js AMD loader</a>.</p>
+
+<p>So in our HTML file we&#39;ll load up the JavaScript files required…</p>
+
+<p><code>html
+&lt;script src=&quot;Assets/Scripts/curl.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;Assets/Scripts/app.js&quot;&gt;&lt;/script&gt;
+</code></p>
+
+<p>Inside our app.js file we set-up a configuration object which handles the paths to the different dependencies we&#39;ll be using. We then load the &#39;Validation&#39; module (which is a Backbone.View)…</p>
+
+<p>```js
+var config = {
+    baseUrl: &#39;./Assets/Scripts/&#39;,
+    pluginPath: &#39;plugins&#39;,
+    paths: {
+        &#39;jquery&#39;: &#39;Libraries/jquery&#39;,
+        &#39;lodash&#39;: &#39;Libraries/lodash&#39;,
+        &#39;backbone&#39;: &#39;Libraries/backbone&#39;
+    },
+    preloads: [&#39;jquery&#39;, &#39;lodash&#39;]
+};</p>
+
+<p>/*
+    The <code>exports</code> suffix ensures we receive a reference to the global Backbone object
+    It also provides a way to check that the script loaded correctly.
+    Without the <code>exports</code> suffix, there&#39;s no way to tell if IE or Opera 404&#39;ed.
+ */
+curl(config, [&#39;jquery&#39;, &#39;lodash&#39;, &#39;js!backbone!exports=Backbone&#39;], init, error);</p>
+
+<p>function init ($, _, Backbone) {
+    curl(&#39;Views/Validation&#39;);
+}</p>
+
+<p>function error (err) {
+    console.warn(err);
+}
+```</p>
+
+<p>Now we have our JavaScript set-up lets move onto the Backbone.View that will handle the validation of our form.</p>
+
+<h2>Validation Module</h2>
+
+<p>We will go through each of the methods within this module so we can better understand what they&#39;re doing. There are four main methods and the rest are different validation methods.</p>
+
+<p>The four main methods are:</p>
+
+<ul>
+<li><code>get_template</code></li>
+<li><code>validate</code></li>
+<li><code>process_errors</code></li>
+<li><code>display_errors</code></li>
+</ul>
+
+<p>The validation methods are:</p>
+
+<ul>
+<li><code>validate_text</code></li>
+<li><code>validate_number</code></li>
+<li><code>validate_date</code></li>
+<li><code>validate_email</code></li>
+<li><code>validate_mobile</code></li>
+<li><code>validate_password</code></li>
+<li><code>validate_cardnumber</code></li>
+<li><code>validate_checkbox</code></li>
+</ul>
+
+<p>So within the initialisation stage of the View we do a few things…</p>
+
+<p>```js
+initialize: function(){
+    // Self explanatory: stores all mandatory fields
+    this.mandatory_fields = $(&#39;.js-mandatory-field&#39;);</p>
+
+<pre><code>// This holds the template file we&#39;ll compile with data pulled from server
+this.template = null;
+
+// This holds the actual rendered template content
+this.template_content = null;
+
+// We&#39;ll go ahead and grab the error message template file (no point waiting until the last minute and making the user wait).
+this.get_template();
+</code></pre>
+
+<p>}}
+```</p>
+
+<ul>
+<li>Store a reference to all mandatory fields</li>
+<li>Create a <code>template</code> property</li>
+<li>Create a <code>template_content</code> property</li>
+<li>Call the <code>get_template</code> method</li>
+</ul>
+
+<p>The reason we call the <code>get_template</code> method straight away (before the form has been submitted) is because it&#39;s a safe assumption that on a form, the user is likely to make an error in the data they submit so why not just go ahead and grab the template we&#39;ll need to render and display errors with.</p>
+
+<p>The <code>get_template</code> method is called immediately but later on we also check to see if we need to try calling it again (e.g. when the user actually submits the form we check to see if <code>this.template</code> holds any value and if it does then we use it, otherwise we call <code>get_template</code> again to grab the data) so this is why we check within that method for a <code>callback</code> to be provided (when the template is loaded we want to continue on and process the errors found)</p>
+
+<p>```js
+get_template: function (callback) {
+    $.ajax({
+        url: &#39;Assets/Templates/FormErrors.txt&#39;,
+        dataType: &#39;html&#39;,
+        success: _.bind(function (tmp) {
+            this.template = hogan.compile(tmp);</p>
+
+<pre><code>        if (callback) {
+            callback();
+        }
+    }, this)
+});
+</code></pre>
+
+<p>}
+```</p>
+
+<p>We then listen out for the form submission event to happen and call the <code>validate</code> method to handle the event…</p>
+
+<p><code>js
+events: {
+    &#39;submit&#39;: &#39;validate&#39;
+}
+</code></p>
+
+<p>The <code>validate</code> method creates an Array to hold any errors we encounter. The way we determine if there are any errors is to loop through all the mandatory fields and to check the name attribute value to see if we can find a match to known values. If we can&#39;t find a match then we just validate the field to make sure it has a value. If we do find a match (e.g. if the name attribute is &quot;email&quot;) then we know which validation method to pass the field on to validate against.</p>
+
+<p>If the validation method returns <code>true</code> then that means an issue was found and so the field failed the validation and we store the specific error message for that field in the <code>errors</code> Array.</p>
+
+<p>After we&#39;ve been through all the mandatory fields we check to see if the <code>errors</code> Array has any items, if it does then we know we need to process some errors and call <code>this.process_errors</code> and pass the <code>errors</code> Array through to that method.</p>
+
+<p>```js
+validate: function(){
+    var errors = [];
+    var method;</p>
+
+<pre><code>// Loop through all the fields checking for validation errors
+this.mandatory_fields.each(_.bind(function (index, item) {
+    // First we check what the current field is and validate it against a specific method
+    switch (item.name) {
+        case &#39;dob&#39;:
+            method = &#39;validate_date&#39;;
+            break;
+        case &#39;age&#39;:
+            method = &#39;validate_number&#39;;
+            break;
+        case &#39;email&#39;:
+            method = &#39;validate_email&#39;;
+            break;
+        case &#39;mobile&#39;:
+            method = &#39;validate_mobile&#39;;
+            break;
+        case &#39;password&#39;:
+            method = &#39;validate_password&#39;;
+            break;
+        case &#39;card&#39;:
+            method = &#39;validate_cardnumber&#39;;
+            break;
+        case &#39;proceed&#39;:
+            method = &#39;validate_checkbox&#39;;
+            break;
+        default:
+            method = &#39;validate_text&#39;;
+    }
+
+    if (this[method](item)) {
+        // Store just the messages and not the element itself (we only need the list of messages)
+        errors.push(item.getAttribute(&#39;data-message&#39;));
+    }
+}, this));
+
+// If there are any errors then display warning messsage to the user
+if (errors.length) {
+    this.process_errors(errors);
+    return false;
+} else {
+    return true;
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The first thing the <code>process_errors</code> method does is it makes sure we are only dealing with unique error messages. For example if we have a set of &#39;sort code&#39; fields (which are typically three separate fields) they will all have the same error message but we don&#39;t want that error message displayed three times so the <code>_.unique</code> method ensures our errors are unique.</p>
+
+<p>After that we need to make sure that Hogan.js has the error messages in a format it can handle so we use the <code>map</code> method to convert the data to the relevant format required.</p>
+
+<p>Next we need to convert the jQuery collection into an actual Array for Hogan.js to be able to loop through it.</p>
+
+<p>Finally we check if the template file has been loaded already or not. If it hasn&#39;t then we load it via ajax and then call the <code>display_errors</code> method.</p>
+
+<p>```js
+process<em>errors: function (errors) {
+    /*
+        Clean the errors list so we only have unique data.
+        This happens for things like the postcode validation (no point showing the postcode field error message twice)
+     */
+    var clean</em>list = _.unique(errors);</p>
+
+<pre><code>// The list needs to be converted into an Object for Hogan.js to compile the data into its template
+var converted_list = $(clean_list).map(function (index, item) {
+    return {
+        error: item
+    };
+});
+
+// Spent far longer on this than I wanted to, but this is it: jQuery collection is not an Array and so needs to be converted to an Array for Hogan.js to compile it
+var final_list = jQuery.makeArray(converted_list);
+
+// If the template file has been stored already then we&#39;ll just proceed to render the content
+if (this.template) {
+    this.display_errors({ errors: final_list });
+} 
+// Otherwise grab the template file and then render the content
+else {
+    // Have to rebind the `this` value as otherwise it would be equal to the global object (Window)
+    this.get_template(_.bind(function(){
+        this.display_errors({ errors: final_list });
+    }, this));
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The <code>display_errors</code> method takes in the object of errors we&#39;ve created and tries to compile it into the template file using Hogan.js</p>
+
+<p>But the first thing the method does is check if any errors already exist in the page. If it finds an errors element then it removes it.</p>
+
+<p>We then compile the data into the template file and insert it into the page (thus displaying the errors to the user).</p>
+
+<p>We then update the URL hash to include the id value of the form errors element we&#39;ve just inserted into the page. This is because on a long form the errors are displayed at the top of the form, but the user may well not see it because the page only shows the bottom half the form, so we redirect the user back up to the top of the form to see the errors.</p>
+
+<p>I know some people will disagree with doing that and would prefer to display an error next to each field but I find that makes the design of the page a lot more complicated, especially when dealing with multiple screen dimensions. I personally prefer to have a single place to display all errors.</p>
+
+<p>```js
+display<em>errors: function (data) {
+    // First remove any errors that might already be on the page
+    var existing</em>list = $(&#39;#js-formerrors&#39;);
+    if (existing<em>list.length) {
+        existing</em>list.remove();
+    }</p>
+
+<pre><code>// Render the data into the template
+this.template_content = this.template.render(data);
+
+// Insert the error messages into the page
+this.$el.prepend(this.template_content);
+
+/*
+    Focus page to the error message element.
+    Had issue with WebKit where it wouldn&#39;t reposition window to the named anchor unless we reset the hash back to nothing and then set it again to the named anchor
+ */
+window.location.hash = &#39;&#39;;
+window.location.hash = &#39;js-formerrors&#39;;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The full module code is as follows...</p>
+
+<p>```js
+define([&#39;../Utils/Templating/hogan&#39;], function (hogan) {</p>
+
+<pre><code>var Validation = Backbone.View.extend({
+    initialize: function(){
+        // Self explanatory: stores all mandatory fields
+        this.mandatory_fields = $(&#39;.js-mandatory-field&#39;);
+
+        // This holds the template file we&#39;ll compile with data pulled from server
+        this.template = null;
+
+        // This holds the actual rendered template content
+        this.template_content = null;
+
+        // We&#39;ll go ahead and grab the error message template file (no point waiting until the last minute and making the user wait).
+        this.get_template();
+    },
+
+    el: $(&#39;#js-form&#39;),
+
+    events: {
+        &#39;submit&#39;: &#39;validate&#39;
+    },
+
+    get_template: function (callback) {
+        $.ajax({
+            url: &#39;Assets/Templates/FormErrors.txt&#39;,
+            dataType: &#39;html&#39;,
+            success: _.bind(function (tmp) {
+                this.template = hogan.compile(tmp);
+
+                if (callback) {
+                    callback();
+                }
+            }, this)
+        });
+    },
+
+    validate: function(){
+        var errors = [];
+        var method;
+
+        // Loop through all the fields checking for validation errors
+        this.mandatory_fields.each(_.bind(function (index, item) {
+            // First we check what the current field is and validate it against a specific method
+            switch (item.name) {
+                case &#39;dob&#39;:
+                    method = &#39;validate_date&#39;;
+                    break;
+                case &#39;age&#39;:
+                    method = &#39;validate_number&#39;;
+                    break;
+                case &#39;email&#39;:
+                    method = &#39;validate_email&#39;;
+                    break;
+                case &#39;mobile&#39;:
+                    method = &#39;validate_mobile&#39;;
+                    break;
+                case &#39;password&#39;:
+                    method = &#39;validate_password&#39;;
+                    break;
+                case &#39;card&#39;:
+                    method = &#39;validate_cardnumber&#39;;
+                    break;
+                case &#39;proceed&#39;:
+                    method = &#39;validate_checkbox&#39;;
+                    break;
+                default:
+                    method = &#39;validate_text&#39;;
+            }
+
+            if (this[method](item)) {
+                // Store just the messages and not the element itself (we only need the list of messages)
+                errors.push(item.getAttribute(&#39;data-message&#39;));
+            }
+        }, this));
+
+        // If there are any errors then display warning messsage to the user
+        if (errors.length) {
+            this.process_errors(errors);
+            return false;
+        } else {
+            return true;
+        }
+    },
+
+    validate_text: function (field) {
+        /*
+            If the length is zero (meaning the field is empty) then zero will coerce to false 
+            so we return the opposite of that using the ! operator (so the first part of the following condition is met) 
+            and if the length is greater than zero then the regex checks to see if the content isn&#39;t just empty spaces.
+
+            If there was an error then we return true, if there wasn&#39;t an error then undefined will be returned (which coerces to false)
+         */
+        if (/^\s+$/.test(field.value) || !field.value.length) {
+            return true;
+        }
+    },
+
+    validate_number: function (field) {
+        if (/^\D+/.test(field.value) || !field.value.length) {
+            return true;
+        }
+    },
+
+    validate_date: function (field) {
+        /*
+            The regex allows either double figure formats or singular...
+            00/00/00
+            0/0/0
+         */
+        if (!/^\d{1,2}\/\d{1,2}\/\d{1,2}$/.test(field.value) || !field.value.length) {
+            return true;
+        }
+    },
+
+    validate_email: function (field) {
+        if (field.value.indexOf(&quot;@&quot;) === -1 || !field.value.length) {
+            return true;
+        }
+    },
+
+    validate_mobile: function (field) {
+        /*
+            The regex allows the following formats:
+                +44 07000000000
+                07000000000
+                +4407000000000
+
+            So there is an optional +000 country code at the start (wrapped in a non-capturing group)
+            We then allow for an optional space after the optional country code
+            Finally we allow for 11 digits (no spaces - but we also strip out any spaces found before running the regex so the &#39;no spaces&#39; thing doesn&#39;t really matter)
+         */
+        var strip_spaces = field.value.replace(&#39; &#39;, &#39;&#39;); // some people seem to add odd spacing when enterin numbers?
+        if (!/^(?:\+\d{1,3})?\s?\d{11}$/.test(strip_spaces) || !field.value.length) {
+            return true;
+        }
+    },
+
+    validate_password: function (field) {
+        /*
+            The regex makes sure there is at least 8 alpha-numerical characters
+            And that at least one of those values is a number
+            And that at least one of those values is a text character
+            We use a positive lookahead (which checks to see if a sub pattern matches a specific position)
+            The lookahead checks for any character (zero or more times) is followed by a digit (e.g. making sure there is at least one digit)
+            The lookahead then checks for any character (zero or more times) is followed by a text character (e.g. making sure there is at least one text character)
+            Finally after the two lookaheads we have the standard regex which makes sure there is at least 8 alpha-numerical characters
+         */
+        if (!/^(?=.*\d)(?=.*[a-z])\w{8,}/i.test(field.value)) {
+            return true;
+        }
+    },
+
+    validate_cardnumber: function (field) {
+        function luhn (cardnumber) {
+            // Build an array with the digits in the card number
+            var getdigits = /\d/g;
+            var digits = [];
+            var match;
+
+            while (match = getdigits.exec(cardnumber)) {
+                digits.push(parseInt(match[0], 10));
+            }
+
+            // Run the Luhn algorithm on the array
+            var sum = 0;
+            var alt = false;
+
+            for (var i = digits.length - 1; i &gt;= 0; i--) {
+                // On every other number in the card sequence...
+                if (alt) {
+                    digits[i] *= 2; // multiple the number by itself
+
+                    // If the number is now over 9 then we&#39;ll minus 9 from the number
+                    if (digits[i] &gt; 9) {
+                        digits[i] -= 9;
+                    }
+                }
+
+                // Add this digit onto the current total sum
+                sum += digits[i];
+
+                // Alternate
+                alt = !alt;
+            }
+
+            /*
+                The individual card numbers (after the above algorithm is applied and then when added together) 
+                should be possible to divide by 10 with zero left over
+             */
+            if (sum % 10 == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // The following regex was actually borrowed from The Regular Expression Cookbook (co-written by the regex legend @stevenlevithan)
+        if (!/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/g.test(field.value)) {
+            return true;
+        } else {
+            // If the card number appears to be valid we then run the Luhn test
+            if (!luhn(field.value)) {
+                return true;
+            }
+        }
+    },
+
+    validate_checkbox: function (field) {
+        if (!field.checked) {
+            return true;
+        }
+    },
+
+    process_errors: function (errors) {
+        /*
+            Clean the errors list so we only have unique data.
+            This happens for things like the postcode validation (no point showing the postcode field error message twice)
+         */
+        var clean_list = _.unique(errors);
+
+        // The list needs to be converted into an Object for Hogan.js to compile the data into its template
+        var converted_list = $(clean_list).map(function (index, item) {
+            return {
+                error: item
+            };
+        });
+
+        // Spent far longer on this than I wanted to, but this is it: jQuery collection is not an Array and so needs to be converted to an Array for Hogan.js to compile it
+        var final_list = jQuery.makeArray(converted_list);
+
+        // If the template file has been stored already then we&#39;ll just proceed to render the content
+        if (this.template) {
+            this.display_errors({ errors: final_list });
+        } 
+        // Otherwise grab the template file and then render the content
+        else {
+            // Have to rebind the `this` value as otherwise it would be equal to the global object (Window)
+            this.get_template(_.bind(function(){
+                this.display_errors({ errors: final_list });
+            }, this));
+        }
+    },
+
+    display_errors: function (data) {
+        // First remove any errors that might already be on the page
+        var existing_list = $(&#39;#js-formerrors&#39;);
+        if (existing_list.length) {
+            existing_list.remove();
+        }
+
+        // Render the data into the template
+        this.template_content = this.template.render(data);
+
+        // Insert the error messages into the page
+        this.$el.prepend(this.template_content);
+
+        /*
+            Focus page to the error message element.
+            Had issue with WebKit where it wouldn&#39;t reposition window to the named anchor unless we reset the hash back to nothing and then set it again to the named anchor
+         */
+        window.location.hash = &#39;&#39;;
+        window.location.hash = &#39;js-formerrors&#39;;
+    }
+});
+
+new Validation();
+</code></pre>
+
+<p>});
+```</p>
+
+<h2>Conclusion</h2>
+
+<p>OK, so that&#39;s our full validation method! It looks big but when you break it down it&#39;s not actually that complicated.</p>
+
+<p>It works for me and has made my life a hell of a lot easier whenever I&#39;ve needed to validate a form. Hopefully it helps someone else, or inspires some one to take the principles shown here and to build their own variation so their life is a little easier when dealing with forms.</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Maintainable CSS with BEM</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>Maintainable CSS with BEM</h1>
+
+<ul>
+<li>Introduction</li>
+<li>BEM: Block, Element, Modifier</li>
+<li>Example</li>
+<li>Why BEM over the others?</li>
+<li>Conclusion</li>
+</ul>
+
+<h2>Introduction</h2>
+
+<p>This is a super quick post to introduce you to a method of writing more maintainable CSS by using what&#39;s called &quot;<a href="http://bem.info">BEM</a>&quot;.</p>
+
+<p>Update: <a href="http://twitter.com/necolas">@necolas</a> made a comment worth noting, that I&#39;m using a modified version of the BEM naming conventions (BEM is a total framework that goes beyond just naming of classes and writing maintainable CSS). So I thought it best to make note of that here so as to not cause any confusion.</p>
+
+<h2>BEM: Block, Element, Modifier</h2>
+
+<p>BEM stands for &quot;Block, Element, Modifier&quot; and is a simple but effective way to group together different components/widgets (as shown by the following visual aid).</p>
+
+<div class="delayed-image-load" data-src="/images/generated/BEM-1024.png" data-width="1024"></div>
+
+<p>Within each defined &#39;Block&#39; you can have multiple &#39;elements&#39; that make up the object, and for each element (depending on where it appears within the block) you might need to &#39;modify&#39; the state of the element.</p>
+
+<p>The principles are similar to other methods of structuring CSS (<a href="https://github.com/stubbornella/oocss/wiki">OOCSS</a>/<a href="http://smacss.com">SMACSS</a>) but they are greatly simplified in comparison without giving up any of the architectural benefits.</p>
+
+<p>The best way to understand BEM is to see an example of how it&#39;s used (see next section). But if you want the full details of its history and some more detailed/visual break down of the concepts then please see the <a href="http://bem.info">BEM</a> website.</p>
+
+<h2>Example</h2>
+
+<p>Below we have a money calculator widget. You enter an amount of money (e.g. £2.12p) and when you press on &#39;calculate&#39; it&#39;ll return to you a list of coins required to make up the amount specified.</p>
+
+<p>The HTML is very simple...</p>
+
+<p><code>html
+&lt;section&gt;
+    &lt;h1&gt;Sterling Calculator&lt;/h1&gt;
+    &lt;form action=&quot;process.php&quot; method=&quot;post&quot;&gt;
+        &lt;p&gt;Please enter an amount: (e.g. 92p, &amp;pound;2.12)&lt;/p&gt;
+        &lt;p&gt;
+            &lt;input name=&quot;amount&quot;&gt; 
+            &lt;input type=&quot;submit&quot; value=&quot;Calculate&quot;&gt;
+        &lt;/p&gt;
+    &lt;/form&gt;
+&lt;/section&gt;
+</code></p>
+
+<p>So lets add in our classes for styling this widget and lets go on to break down what we&#39;ve added and why...</p>
+
+<p><code>html
+&lt;section class=&quot;widget&quot;&gt;
+    &lt;h1 class=&quot;widget__header&quot;&gt;Sterling Calculator&lt;/h1&gt;
+    &lt;form class=&quot;widget__form&quot; action=&quot;process.php&quot; method=&quot;post&quot;&gt;
+        &lt;p&gt;Please enter an amount: (e.g. 92p, &amp;pound;2.12)&lt;/p&gt;
+        &lt;p&gt;
+            &lt;input name=&quot;amount&quot; class=&quot;widget__input widget__input--amount&quot;&gt; 
+            &lt;input type=&quot;submit&quot; value=&quot;Calculate&quot; class=&quot;widget__input widget__input--submit&quot;&gt;
+        &lt;/p&gt;
+    &lt;/form&gt;
+&lt;/section&gt;
+</code></p>
+
+<p>First thing to notice is that we&#39;ve determined the top level <code>&lt;section&gt;</code> element to be our &#39;block&#39;. This is the top level containing element. We&#39;ve added a class of <code>widget</code> and this will be our namespace for this object/widget (whatever you prefer to call it).</p>
+
+<p>From here on all elements that we added classes to within this &#39;block&#39; will be namespaced to the top level name of <code>widget</code>.</p>
+
+<p>I wanted to style the <code>&lt;form&gt;</code> element so I added the class <code>widget__form</code>. The double underscores allow us to easily recognise a class as being part of the <code>widget</code> block. We see this used on the <code>&lt;input&gt;</code> elements as well: <code>widget__input</code>.</p>
+
+<p>Here is a list of the elements styled…</p>
+
+<ul>
+<li><code>widget</code></li>
+<li><code>widget__header</code></li>
+<li><code>widget__form</code></li>
+<li><code>widget__input</code></li>
+</ul>
+
+<p>Notice that there are two other classes used: <code>widget__input--amount</code> and <code>widget__input--submit</code>. These are our &#39;modifiers&#39;. They modify the state of our elements.</p>
+
+<p>Let&#39;s look at where these have been used. I&#39;ve applied the same class of <code>widget__input</code> on both <code>&lt;input&gt;</code> elements (because they both have the same base structure/styling). But both elements do have slight differences in their appearance, hence the use of a &#39;modifier&#39; to apply the additional unique styles. </p>
+
+<p>Modifiers are written with two hyphens(dashes) like so: <code>block__element--modifier</code>.</p>
+
+<p>This means that our CSS code for this widget ends up looking like this…</p>
+
+<p>```css
+.widget {
+    background-color: #FC3;
+}</p>
+
+<p>.widget__header {
+    color: #930;
+    font-size: 3em;
+    margin-bottom: 0.3em;
+    text-shadow: #FFF 1px 1px 2px;
+}</p>
+
+<p>.widget__input {
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+         -o-border-radius: 5px;
+            border-radius: 5px;</p>
+
+<pre><code>font-size: 0.9em;
+line-height: 1.3;
+padding: 0.4em 0.7em;
+</code></pre>
+
+<p>}</p>
+
+<p>.widget__input--amount {
+    border: 1px solid #930;
+}</p>
+
+<p>.widget__input--submit {
+    background-color: #EEE;
+    border: 0;
+}
+```</p>
+
+<h2>Why BEM over the others?</h2>
+
+<p>I&#39;ve tried a lot of different ways of writing CSS over the years. It went something like this…</p>
+
+<ul>
+<li>No structure, everything in one file loaded on every page of a site.</li>
+<li>Separate files to try and keep page specific content together, but still no real structure.</li>
+<li>Standard <a href="https://github.com/stubbornella/oocss/wiki">OOCSS (Object-Oriented CSS)</a></li>
+<li><a href="http://smacss.com">SMACSS (Scalable and Modular Architecture for CSS)</a></li>
+</ul>
+
+<p>…and now BEM.</p>
+
+<p><strong>The reason I choose BEM over other methodologies comes down to this: it&#39;s less confusing than the other methods (i.e. SMACSS) but still provides us the good architecture we want (i.e. OOCSS) and with a recognisable terminology.</strong></p>
+
+<p>For me OOCSS isn&#39;t strict enough. It let&#39;s developers go wild with how they name their objects. But I&#39;ve seen that get really messy on larger projects, or projects with more than one developer and because of the lack of strictness in naming conventions developers become confused on what classes are supposed to be doing.</p>
+
+<p>With regards to SMACSS: it&#39;s almost too strict in the sense that I think it&#39;s <em>over structured</em>. When I first started using it I thought this was the solution I had been searching for but all that ended up happening was that I had so many fragmented areas of CSS that I didn&#39;t know where to go first. It was too over whelming.</p>
+
+<p>This might not be the case for some people, but for me these are all instances of the old adage: &quot;<em>don&#39;t make me think</em>&quot;. If I have to think too hard about how something works, or where I need to find the code for something then (in my opinion) that methodology has failed.</p>
+
+<p>BEM succeeds because it provides a good object oriented structure with a familiar terminology and is simple enough to not get in your way.</p>
+
+<p>But like with any tool, it can be misused. In the end it comes down to the overall skill and understanding of the developer.</p>
+
+<h3>Simplicity</h3>
+
+<p>As I said before, the reason I find BEM a better option is the simplicity. </p>
+
+<p>Even down to the terminology used is simplified compared to other methodologies. For example, depending on who you talk to about structured CSS you may hear the words: </p>
+
+<ul>
+<li>objects</li>
+<li>modules</li>
+<li>widgets</li>
+<li>components</li>
+</ul>
+
+<p>…notice the terminology is different but what they refer to are effectively the same thing. No wonder it can become confusing to some people.</p>
+
+<p>BEM is different in that its terminology is based around the environment it works for: HTML and CSS. We all know when working in CSS what a &#39;block&#39; is, it&#39;s the fundamental building block (no pun intended) of how elements on the page are rendered, but that term can also be understood when used like so… </p>
+
+<blockquote>
+<p>I saw this block of code the other day, it was hideous.</p>
+</blockquote>
+
+<p>…you know within the context of that sentence the person speaking is referring to a chunk of code, a grouping of code.</p>
+
+<p>The word &#39;Block&#39; is simple but a very focused term, and more importantly it is a very familiar term. </p>
+
+<p>We also know when working in CSS that ultimately we&#39;re targeting &#39;elements&#39;. No other word better fits the description, because that is exactly what we&#39;re doing.</p>
+
+<p>And lastly, the word &#39;modifier&#39; again is a simple but fully understood and familiar term used by developers… </p>
+
+<blockquote>
+<p>I want to modify this element, how should I do that?</p>
+</blockquote>
+
+<h3>But still structured</h3>
+
+<p>But with this simplified terminology/structure it gives us all the tools we need to write maintainable and easily understandable code. BEM easily scales with the size of a project.</p>
+
+<h2>Conclusion</h2>
+
+<p>I know I&#39;ve said it before about SMACSS (&quot;<em>wow, I think this is it!</em>&quot;) but even when I first started using SMACSS I still had niggling feelings about &quot;<em>hmm, it&#39;s a little complicated getting this all in place, but it seems to work well</em>&quot;. With BEM I&#39;ve not had any of those concerns. The only initial concern I had was with the look of it. I didn&#39;t like the double underscores or the double dashes. But now I actually like them!</p>
+
+<p>If you want to see more good usage of BEM then I&#39;ll refer you to a small CSS abstraction library called <a href="https://github.com/csswizardry/inuit.css">inuit.css</a> by <a href="http://csswizardry.com/">Harry Roberts</a> as well as <a href="https://github.com/Integralist/integralist.github.com">my own website&#39;s source code</a></p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

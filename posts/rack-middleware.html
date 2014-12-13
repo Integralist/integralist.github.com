@@ -1,0 +1,281 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Rack Middleware</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>Rack Middleware</h1>
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#how-middleware-works">How middleware works</a></li>
+<li><a href="#simple-example">Simple example</a></li>
+<li><a href="#custom-cache-middleware">Custom Cache Middleware</a></li>
+</ul>
+
+<div id="introduction"></div>
+
+<h2>Introduction</h2>
+
+<p>I want to quickly cover how Rack Middleware works. It&#39;s actually much simpler than you probably realise to write your own middleware to handle all sorts of functional requirements.</p>
+
+<p>If you&#39;re unsure of what Rack is then this post probably isn&#39;t the best starting point. I&#39;ll give a very brief description of it (along with a basic example), but I want to focus more on Rack middleware. </p>
+
+<p>To quote the official site (<a href="http://rack.github.io/">rack.github.io</a>):</p>
+
+<blockquote>
+<p>Rack provides a minimal interface between webservers supporting Ruby and Ruby frameworks. To use Rack, provide an &quot;app&quot;: an object that responds to the <code>call</code> method, taking the environment hash as a parameter, and returning an Array with three elements: the HTTP response code, a Hash of headers, the response body, which must respond to <code>each</code></p>
+</blockquote>
+
+<p>Typically you&#39;ll have a <code>config.ru</code> file with content like:</p>
+
+<p><code>ruby
+run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]}
+</code></p>
+
+<p>...and to run the webserver (WEBrick by default, but you can use many others) you need to execute <code>rackup</code> via your terminal&#39;s shell/command line interface.</p>
+
+<p>If I wanted to use the <a href="http://puma.io/">Puma</a> webserver, instead of the default WEBrick, then I would run <code>rackup -s Puma</code> (as long as I had run <code>gem install puma</code> prior).</p>
+
+<p>The above example demonstrates the most minimalistic implementation by using a <a href="https://gist.github.com/Integralist/9994331">Lambda</a> function (that link is to a Gist I wrote a while ago demonstrating Lambda shorthand syntax and other concepts such as partial application and currying). </p>
+
+<p>This works because Ruby&#39;s <code>Proc</code> has an internal <code>call</code> method (remember in the above description it stated the object that handles incoming requests must have a <code>call</code> method)</p>
+
+<h2>How middleware works</h2>
+
+<p>Middleware is a Ruby class whose <code>initialize</code> method is passed the web request handler (in this case our Lambda). The class also needs to have a <code>call</code> method. The <code>call</code> method (when executed) takes the Lambda function we&#39;ve stored off inside our middleware class, and executes it. </p>
+
+<p>The Lambda is passed the relevant &quot;environment&quot; details of the request as a Hash. The response that&#39;s returned by our request handler Lambda is then saved in a variable; and the rest of the <code>call</code> function will consist of code that manipulates that content somehow, before returning it to the client who made the request.</p>
+
+<p>To use our middleware class, we pass the name of the class to Rack&#39;s <code>use</code> method like so: <code>use MyMiddleware</code>.</p>
+
+<p>An example will demonstrate this better. The following is a hypothetical <code>config.ru</code> file...</p>
+
+<p><code>ruby
+class A
+  def self.call(env)
+    [200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]
+  end
+end
+use D # pass C into this middleware third  (D runs C and manipulates the response from C)
+use C # pass B into this middleware second (C runs B and manipulates the response from B)
+use B # pass A into this middleware first  (B runs A and manipulates the response from A)
+run A
+</code></p>
+
+<p>...in this example we can see we have three middleware classes: <code>B</code>, <code>C</code> and <code>D</code>.</p>
+
+<p>When we execute <code>rackup</code> the Rack interface passes our request handler <code>A</code> (this time we&#39;re using a Class with a <code>call</code> method rather than the minimalistic Lambda) into the <code>B</code> middleware (remember, middleware is just a Class that stores off the request handler inside the class and has a <code>call</code> method to manipulate the content).</p>
+
+<p>The <code>B</code> middleware will run <code>A</code> from inside its <code>call</code> method, then manipulate the response from <code>A</code> and return that manipulated response; which is then passed into the <code>C</code> middleware and so on up.</p>
+
+<p>We could theorectically inline the <code>use</code> and <code>run</code> calls into the following example...</p>
+
+<p><code>ruby
+D(
+  C(
+    B(A)
+  )
+)
+</code></p>
+
+<p>...the <code>run</code> and <code>use</code> functions work together to create a nested set of calls like seen above.</p>
+
+<p>This means we execute <code>B(A)</code> first and the result is passed to <code>C</code>. From there the result of <code>C</code> is passed into <code>D</code>.</p>
+
+<h3>Rack::Builder</h3>
+
+<p>The reason we have functions such as <code>use</code> is because the built-in <code>rackup</code> command you use to execute the <code>config.ru</code> is a standalone <code>Rack::Builder</code> runner, which provides <code>use</code> and other methods as a custom DSL.</p>
+
+<p>If we didn&#39;t want to use a <code>config.ru</code> file, we could have a Ruby script that uses <code>Rack::Builder</code> directly, like so:</p>
+
+<p>```ruby
+class A
+  def self.call(env)
+    [200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;<h1>Hello World</h1>&quot;]]
+  end
+end</p>
+
+<p>app = Rack::Builder.new do
+  use D
+  use C
+  use B
+  run A
+end
+```</p>
+
+<h2>Simple example</h2>
+
+<p>```ruby
+use Rack::Lint # gives more descriptive error messages when responses aren&#39;t valid</p>
+
+<p>class LogIt
+  def initialize(app)
+    @app = app
+  end
+  def call(env)
+    status, headers, body  = @app.call(env)
+    body.map { |chunk| p &quot;LogIt: #{chunk}&quot; }
+    [status, headers, body]
+  end
+end</p>
+
+<p>class Upper
+  def initialize(app)
+    @app = app
+  end
+  def call(env)
+    # Execute our main application (store off its return value)
+    status, headers, body  = @app.call(env)</p>
+
+<pre><code># Transform the returned value(s)
+# Remember the body is an Array
+upcased_body = body.map { |chunk| chunk.upcase }
+
+# Return the newly filtered response
+[status, headers, upcased_body]
+</code></pre>
+
+<p>end
+end</p>
+
+<p>use LogIt # Does nothing with uppercase&#39;d response, just logs it to stdout
+use Upper # Modifies response to be uppercase</p>
+
+<p>run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;<h1>Hello World</h1>&quot;]]}
+```</p>
+
+<p>In this example, we&#39;re back to using a Lambda, which is passed into our <code>Upper</code> class and the response from that is passed into our <code>LogIt</code> class. </p>
+
+<p>The response from <code>LogIt</code> (which in our example is the same response that came from <code>Upper</code> as we didn&#39;t manipulate it in any way, we simply used the <code>LogIt</code> class as a proxy for logging to <code>stdout</code>) is then passed into the 3rd party Rack middleware <code>Rack::Lint</code> which will let us know if our final response is valid or not.</p>
+
+<p>If we were to run this application using <code>rackup -s Puma -p 9293</code> (or <code>bundle exec puma --port 9293</code> up to you) then we could use Curl to make a request to the locally running server like so: <code>curl 0.0.0.0:9293</code>.</p>
+
+<p>The response we would get back is: <code>&lt;H1&gt;HELLO WORLD&lt;/H1&gt;</code> (and if you were to look at your terminal&#39;s <code>stdout</code> you should also see something like: </p>
+
+<p><code>bash
+&quot;LogIt: &lt;H1&gt;HELLO WORLD&lt;/H1&gt;&quot;
+127.0.0.1 - - [15/Nov/2014 11:21:07] &quot;GET / HTTP/1.1&quot; 200 - 0.0006
+</code></p>
+
+<h2>Custom Cache Middleware</h2>
+
+<p>The inspiration for this section came from <a href="https://twitter.com/vhokstad">@vhokstad</a> who wrote a post about creating your own static asset caching middleware way back in 2008 (<a href="http://www.hokstad.com/rack-middleware-adding-cache-headers">http://www.hokstad.com/rack-middleware-adding-cache-headers</a>). </p>
+
+<p>I cleaned up the code a bit and merged it into some test Rack code I have on <a href="https://github.com/Integralist/Rack/tree/master/Example6">GitHub</a>.</p>
+
+<p>Fundamentally it comes down to registering the use of the Cache middleware (we&#39;ll take a look at that in a moment):</p>
+
+<p>```ruby
+cache<em>headers = {
+  :cache</em>control =&gt; &quot;max-age=2678400, public&quot;, # 86400 seconds == 1 day * 31
+  :expires =&gt; 2678400
+}</p>
+
+<p>use Cache, { :assets =&gt; cache_headers }
+```</p>
+
+<p>In this example we&#39;re passing a Hash into our Middleware class that it&#39;ll use as a pattern for matching resources that should be cached. In this case I only have a single key <code>:assets</code> because all my static assets (images, stylesheets and scripts) are kept within that directory: </p>
+
+<p><code>
+├── Assets
+│   ├── Images
+│   │   └── rack-logo.png
+│   ├── Scripts
+│   │   └── test.js
+│   └── Styles
+│       └── base.css
+</code></p>
+
+<p>But imagine for a moment that you have a different structure (no <code>Assets</code> parent directory):</p>
+
+<p><code>
+├── Images
+│   ├── rack-logo.png
+├── Scripts
+│   ├── test.js
+├── Styles
+│   ├── base.css
+</code></p>
+
+<p>...then you would need to change the Hash to:</p>
+
+<p><code>ruby
+{
+  :images  =&gt; cache_headers,
+  :scripts =&gt; cache_headers,
+  :styles  =&gt; cache_headers
+}
+</code></p>
+
+<p>...admittedly we have duplication here because we&#39;re specifying the <code>cache_headers</code> variable multiple times (hence why I have all my static assets inside an <code>Assets</code> folder) but it does give you the freedom to apply different caching strategies depending on the type of asset being requested.</p>
+
+<blockquote>
+<p>Note: you could modify the key to use the Regular Expression alternator character and then reduce the Hash back down to a single key. Something along the lines of <code>:&quot;images|scripts|styles&quot;</code> (you would need to modify the <code>generated_pattern</code> function slightly)</p>
+</blockquote>
+
+<p>The Cache middleware looks like this...</p>
+
+<p>```ruby
+class Cache
+  attr_reader :app, :pattern</p>
+
+<p>def initialize(app, pattern)
+    @app = app
+    @pattern = pattern
+  end</p>
+
+<p>def call(env)
+    app.call(env).tap do |res|
+      pattern.each do |p, config|
+        if env[&quot;REQUEST<em>PATH&quot;] =~ generated</em>pattern(p)
+          res[1][&quot;Cache-Control&quot;] = config[:cache<em>control] if config.has</em>key? :cache<em>control
+          res[1][&quot;Expires&quot;] = (Time.now + config[:expires]).utc.rfc2822 if config.has</em>key? :expires
+        end
+      end
+    end
+  end</p>
+
+<p>private</p>
+
+<p>def generated<em>pattern(pattern)
+    Regexp.new pattern.to</em>s.capitalize
+  end
+end
+```</p>
+
+<p>It&#39;s the same pattern we&#39;ve seen before: we store off the app (but this time we also store off the Hash as <code>pattern</code>) and then the <code>call</code> method executes the <code>app</code> and returns it.</p>
+
+<p>But we use <code>tap</code> to access the <code>app</code> object and to modify the headers for each asset requested (i.e. for each image, stylesheet and javascript file).</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>

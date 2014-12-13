@@ -1,0 +1,1315 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>MVC in JavaScript with Backbone.js</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>MVC in JavaScript with Backbone.js</h1>
+
+<ul>
+<li>Introduction</li>
+<li>What is MVC?</li>
+<li>Backbone&#39;s interpretation of MVC</li>
+<li>Using AMD Modules and RequireJS</li>
+<li>Scope Access</li>
+<li>Project</li>
+<li>Set-up</li>
+<li>Architecture</li>
+<li>Wrap-up</li>
+<li>Conclusion</li>
+</ul>
+
+<h2>Introduction</h2>
+
+<p>I&#39;ll be honest and tell you that I struggled for quite a while to actually see the point of using <a href="http://backbonejs.org/">Backbone.js</a>. </p>
+
+<p>It seemed like a lot of overhead for very little in return.</p>
+
+<p>I also didn&#39;t like the fact that it tied me into using both Underscore and jQuery as dependencies.</p>
+
+<p>Because of this, and because I knew a lot of these so called MVC frameworks weren&#39;t <em>really</em> MVC (in the traditional sense), I decided to &#39;roll my own&#39; and so started writing <a href="https://github.com/Integralist/MVC-Start-up-Kit/tree/library_agnostic">my own MVC library</a> (please do read the articles listed at the end of this post by <a href="http://twitter.com/addyosmani">Addy Osmani</a> for an in-depth look at the massive MV* culture we have at the moment).</p>
+
+<p>My own library worked fine, and it genuinely followed the MVC principles:</p>
+
+<table>
+  <tr>
+    <th>M (Models)</th>
+    <th>V (Views)</th>
+    <th>C (Controllers)</th>
+  </tr>
+  <tr>
+    <td>Data</td>
+    <td>User Interface</td>
+    <td>Logic</td>
+  </tr>
+</table>
+
+<p>But my own biggest concern was that although my MVC library was <em>structurally</em> equivalent to the proper MVC pattern and the API itself was fairly clean and easy to use, there was a lot of areas where I had too tightly coupled my library to a particular way of working and that made it difficult to re-use on different projects without first spending a lot of time making those tight couplings &#39;loose&#39; again each time.</p>
+
+<p>It was obvious I needed to spend a lot more time on this library of mine for it to be genuinely usable in a production environment, and that&#39;s when I decided to instead take another look into Backbone.js to see what it could offer me, because from all the examples I had looked at in the past the code produced appeared very clean, flexible and well structured. Plus there are <em>lots</em> of agencies/companies implementing Backbone nowadays. So out of all the MVC libraries available (and there are quite a few) it seemed like a pretty safe bet to take another look at it.</p>
+
+<h2>What is MVC?</h2>
+
+<p>For those who&#39;ve not heard of the MVC Design Pattern it is quite simple: each letter of the acronym is a separate area of concern…</p>
+
+<h3>M: Model</h3>
+
+<p>A Model is a piece of data.</p>
+
+<p>If you had a photo album then each photo would be a Model.</p>
+
+<p>If you had a car showroom then each car would be a Model.</p>
+
+<p>If you owned a pet store then each animal would be a Model.</p>
+
+<p>You get the idea.</p>
+
+<h3>V: View</h3>
+
+<p>A View is the user interface.</p>
+
+<p>This could literally be anything the user of your program interacts with. So any HTML element could be made into a &#39;View&#39;.</p>
+
+<h3>C: Controller</h3>
+
+<p>A Controller is the brains of the program and determines what happens and when.</p>
+
+<h3>Communication between them?</h3>
+
+<p>The traditional concept of MVC states that a Model should only handle its own data and should have no other logic bound to it. So for example, a Model can have a method for getting/updating its data but it should have no logic built-in to determine <em>when</em> it should get that data (that&#39;s what the Controller does). </p>
+
+<p>Both the Model and the View can alert the Controller of any changes or interactions and then the Controller can decide what to do with that information (e.g. when the user selects an option from a drop down menu within the View then the Controller might request specific data from the Model, when the Model gives that data to the Controller then it can pass that onto the View to display).</p>
+
+<p>Typically you&#39;ll have one Controller for every View/Model but you could have multiple Views/Models per Controller.</p>
+
+<h2>Backbone&#39;s interpretation of MVC</h2>
+
+<p>Backbone.js is much like all the other JavaScript MVC libraries available today (with the exception of Peter Michaux&#39;s <a href="https://github.com/petermichaux/maria/">Maria</a>) where by it&#39;s not strictly MVC but a variation of the pattern.</p>
+
+<p>Addy Osmani (from Google) has covered this subject in-depth and so I highly recommend you review his work (see the bottom of this post for links).</p>
+
+<p>But the basic premise for most of these libraries is that they implement the Model and the View but the Controller is swapped out for something else. So in Backbone&#39;s case it doesn&#39;t have a Controller, instead the View handles both the traditional View responsibilities as well as the Controller logic.</p>
+
+<h3>Collections?</h3>
+
+<p>Backbone.js also introduces another concept called a &#39;Collection&#39;. A Collection is simply a group of a specific Models. So if you had a Model called &quot;PhotoModel&quot; and you created a few instances of that Model you might want to create a Collection called &quot;PhotoAlbum&quot;. PhotoAlbum would then be a <em>collection</em> of PhotoModels.</p>
+
+<p>Collections trigger events when a Model is added or removed from the Collection and you are able to iterate over the Collection and pull out a specific Model, so they can end up being pretty useful.</p>
+
+<h3>Router/History?</h3>
+
+<p>Backbone.js provides a History object which monitors the <code>hashchange</code> event and also provides an opt-in HTML5 <code>pushState</code> variation (which falls back to standard AJAX style hash bang navigation).</p>
+
+<p>There is also a Router object provided which handles the set-up of simple URL routing.</p>
+
+<p>So far I&#39;ve only lightly interacted with the <code>Backbone.Router</code>/<code>Backbone.History</code> aspects but I&#39;ve provided examples below of how to utilise them.</p>
+
+<h2>Using AMD Modules and RequireJS</h2>
+
+<p>Backbone.js can be used with standard <code>&lt;script&gt;</code> tags, so there is no need for you to use a module system such as AMD (or a module loader such as RequireJS). But my personal preference is to using both AMD with RequireJS, and that&#39;s what the example project I&#39;ll show you will use.</p>
+
+<p>I wont go into the details of what AMD is or how to use RequireJS, I&#39;ll instead point you to <a href="https://github.com/Integralist/Blog-Posts/blob/master/Beginners-guide-to-AMD-and-RequireJS.md">another article I&#39;ve written on the subject</a>.</p>
+
+<h2>Scope Access</h2>
+
+<p>Because we&#39;re using AMD (which keeps our code self-contained so it doesn&#39;t introduce global variables) it can be awkward (in some situations) to share information across modules.</p>
+
+<p>One thing I wanted to do recently was access a View instance from within another View. After reviewing the situation I found there were multiple ways to do this:</p>
+
+<ul>
+<li>Setting an instance property on the other View</li>
+<li>Passing the View through as a property of the argument object when creating the other View</li>
+<li>Adding a property to a global namespace</li>
+</ul>
+
+<p>…which option you go with depends on personal preference more than anything. I went with the second option.</p>
+
+<h2>Project</h2>
+
+<p>The project we&#39;ll build is a basic Contact Manager. </p>
+
+<p>The layout will be a <code>&lt;select&gt;</code> menu that is populated with some Contact names.</p>
+
+<p>Selecting a Contact from the menu will display all details for that contact.</p>
+
+<p>Next to the menu will be a form where we can add a new contact and once added it&#39;ll automatically appear within the menu for the user to select to view.</p>
+
+<p>A finished version of this project can be found <a href="https://github.com/Integralist/Backbone-Playground">on my GitHub</a>.</p>
+
+<h2>Set-up</h2>
+
+<p>Let&#39;s take a top level view of our directory structure…</p>
+
+<ul>
+<li>/Assets/
+
+<ul>
+<li>/Includes/
+
+<ul>
+<li>Contacts.php</li>
+</ul></li>
+<li>/Scripts/
+
+<ul>
+<li>/App/
+
+<ul>
+<li>main.js</li>
+<li>namespace.js</li>
+</ul></li>
+<li>/Collections/
+
+<ul>
+<li>Contacts.js</li>
+</ul></li>
+<li>/Models/
+
+<ul>
+<li>Contact.js</li>
+</ul></li>
+<li>/Routes/
+
+<ul>
+<li>Routing.js</li>
+</ul></li>
+<li>/Utils/
+
+<ul>
+<li>backbone.js</li>
+<li>jquery.js</li>
+<li>lodash.js</li>
+</ul></li>
+<li>/Views/
+
+<ul>
+<li>AddContact.js</li>
+<li>Contact.js</li>
+<li>Contacts.js</li>
+</ul></li>
+<li>require.js</li>
+</ul></li>
+<li>/Styles/
+
+<ul>
+<li>styles.css</li>
+</ul></li>
+</ul></li>
+<li>index.html</li>
+</ul>
+
+<h2>Architecture</h2>
+
+<h3>HTML</h3>
+
+<p>The HTML page <code>index.html</code> consists of a few different elements that we&#39;ll use as &#39;Views&#39;. </p>
+
+<p>We have the <code>&lt;select&gt;</code> menu for displaying the initial list of Contacts, the <code>&lt;form&gt;</code> for allowing us to add more Contacts, and an empty <code>&lt;div&gt;</code> which will be used for displaying the full details of the selected contact.</p>
+
+<p>The full HTML page looks like this...</p>
+
+<p>```html
+&lt;!doctype html&gt;
+<html dir="ltr" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="Mark McDonnell" />
+        <title>Backbone.js</title>
+        <link rel="stylesheet" href="Assets/Styles/styles.css">
+    </head>
+    <body>
+        <div id="view-contacts">
+            <select>
+                <option>Please select a user</option>
+            </select>
+        </div></p>
+
+<pre><code>    &lt;div id=&quot;view-contact&quot;&gt;&lt;/div&gt;
+
+    &lt;form id=&quot;view-add&quot;&gt;
+        &lt;p&gt;&lt;input type=&quot;text&quot; placeholder=&quot;Name&quot; name=&quot;fullname&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;input type=&quot;text&quot; placeholder=&quot;Age&quot; maxlength=&quot;3&quot; name=&quot;age&quot;&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;input type=&quot;text&quot; placeholder=&quot;Address&quot; name=&quot;address&quot;&gt;&lt;/p&gt;
+        &lt;input type=&quot;submit&quot; value=&quot;Add New Record&quot;&gt;
+    &lt;/form&gt;
+
+    &lt;script data-main=&quot;Assets/Scripts/App/main&quot; src=&quot;Assets/Scripts/require.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/template&quot; id=&quot;contact_template&quot;&gt;
+        &lt;dl&gt;
+            &lt;dt&gt;ID&lt;/dt&gt;
+            &lt;dd&gt;&lt;%=id%&gt;&lt;/dd&gt;
+            &lt;dt&gt;Name&lt;/dt&gt;
+            &lt;dd&gt;&lt;%=name%&gt;&lt;/dd&gt;
+            &lt;dt&gt;Age&lt;/dt&gt;
+            &lt;dd&gt;&lt;%=age%&gt;&lt;/dd&gt;
+            &lt;dt&gt;Address&lt;/dt&gt;
+            &lt;dd&gt;&lt;%=address%&gt;&lt;/dd&gt;
+        &lt;/dl&gt;
+    &lt;/script&gt;
+&lt;/body&gt;
+</code></pre>
+
+<p></html>
+```</p>
+
+<h3>Styles</h3>
+
+<p>The styles for this project are just basic - we&#39;re not worrying about design here… </p>
+
+<p>```css
+body {
+    font: normal small Arial, Verdana, sans-serif;
+}</p>
+
+<p>.hide {
+    display: none;
+}</p>
+
+<h1>view-add {</h1>
+
+<pre><code>border: 1px solid #999;
+left: 350px;
+padding-bottom: 10px;
+padding-left: 10px;
+position: absolute;
+top: 10px;
+width: 166px;
+</code></pre>
+
+<p>}</p>
+
+<h1>view-add div {</h1>
+
+<pre><code>background-color: green;
+color: #fff;
+margin-right: 10px;
+margin-top: 10px;
+padding: 10px;
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>JavaScript</h3>
+
+<p>RequireJS allows us to utilise just a single <code>&lt;script&gt;</code> tag which points to our main script file that contains the following structure… </p>
+
+<p>```js
+requirejs.config({
+    shim: {
+        &#39;../Utils/backbone&#39;: {
+            deps: [&#39;../Utils/lodash&#39;, &#39;../Utils/jquery&#39;], // load dependencies
+            exports: &#39;Backbone&#39; // use the global &#39;Backbone&#39; as the module value
+        }
+    }
+});</p>
+
+<p>require([&#39;../Models/Contact&#39;, &#39;../Collections/Contacts&#39;, &#39;../Views/Contacts&#39;, &#39;../Views/AddContact&#39;, &#39;../Views/Contact&#39;, &#39;../Routes/Routing&#39;], function (Contact, Contacts, ContactsView, AddContactView, ContactView, Routing) {</p>
+
+<pre><code>/**
+ * Model Generation Examples
+ */
+
+var manager = new Contact({
+    id: _.uniqueId(),
+    name: &#39;Mark McDonnell&#39;,
+    age: 30
+});
+
+var developer = new Contact({
+    id: _.uniqueId(),
+    name: &#39;Ashley Banks&#39;,
+    age: 23
+});
+
+// The following few lines are used just to demonstrate the Backbone.js API
+var dev_name = developer.get(&#39;name&#39;);
+var dev_age = developer.get(&#39;age&#39;);
+
+developer.birthday();
+
+// The .toJSON() method is a Backbone specific Model/Collection method which returns js object of specified Model
+console.dir(manager.toJSON())
+console.dir(developer.toJSON());
+
+
+/**
+ * Collection Generation Example
+ */
+
+var contacts = new Contacts([manager, developer]);
+
+// The .toJSON() method is a Backbone specific Model/Collection method which returns js object of specified Model
+console.log(contacts.toJSON());
+
+
+/**
+ * View for &lt;select&gt; menu of Contacts
+ */
+
+var contacts_view = new ContactsView({
+    el: $(&#39;#view-contacts&#39;),
+    collection: contacts, // pass in the Collection into this View
+
+    /**
+     * View for displaying the selected Contact
+     *
+     * Originally I had created a global namespace property so I could access this View&#39;s &quot;render()&quot; method from within &#39;contacts_view&#39; (/Views/Contacts.js)
+     * And according to people smarter than I (i.e. Addy Osmani from Google) this was the most appropriate solution.
+     * But I since discovered I could pass in additional data when creating a View instance and so that&#39;s what I&#39;ve done here.
+     */
+
+    associated_view: new ContactView({
+        el: $(&#39;#view-contact&#39;),
+        collection: contacts
+    })
+});
+
+
+/**
+ * View for &lt;form&gt; to add a new Contact
+ */
+
+var add_contact = new AddContactView({
+    el: $(&#39;#view-add&#39;),
+    collection: contacts // pass in the Collection into this View
+});
+
+
+/**
+ * Lazy Load Models into Collection
+ */
+
+contacts.fetch({
+    add: true, // Prevent resetting the Collection (i.e. instead or clearing the Collection first we just add new Models on top of current set of Models),
+    error: function (collection, resp) {
+        // You can do something on error loading
+    },
+    success: function (collection, resp) {
+        // You can do something on successful loading
+    }
+});
+
+
+/**
+ * Router/History API Examples
+ */
+
+// Create new instance of our Routing Class
+var routing = new Routing();
+
+// Initialize the Router
+Backbone.history.start({ pushState: true });
+</code></pre>
+
+<p>});
+```</p>
+
+<p>…this breaks down to the following… </p>
+
+<h3>We set-up configurations for RequireJS</h3>
+
+<p>Such as Backbone&#39;s dependencies - this is done using RequireJS&#39; <code>shim</code> feature for libraries that aren&#39;t AMD compatible.<br>
+&nbsp;<br>
+You&#39;ll also notice we aren&#39;t using the Underscore library, instead we&#39;re using Lo-dash which is a better performing/API compatible utility library.</p>
+
+<p><code>js
+requirejs.config({
+    shim: {
+        &#39;../Utils/backbone&#39;: {
+            deps: [&#39;../Utils/lodash&#39;, &#39;../Utils/jquery&#39;], // load dependencies
+            exports: &#39;Backbone&#39; // use the global &#39;Backbone&#39; as the module value
+        }
+    }
+});
+</code></p>
+
+<h3>Specify dependencies and execute callback function once all are loaded</h3>
+
+<p>The dependencies we&#39;re loading are the relevant Models, Views, Collections required for this application to work - once loaded we can create new instances of them.</p>
+
+<p><code>js
+require([&#39;../Models/Contact&#39;, &#39;../Collections/Contacts&#39;, &#39;../Views/Contacts&#39;, &#39;../Views/AddContact&#39;, &#39;../Views/Contact&#39;, &#39;../Routes/Routing&#39;, &#39;../Utils/backbone&#39;], 
+function (Contact, Contacts, ContactsView, AddContactView, ContactView, Routing) {
+</code></p>
+
+<h3>Generate some data for the initial <code>&lt;select&gt;</code> menu population</h3>
+
+<p>We&#39;ve loaded the <code>Contact</code> Model and we create two new instances of it and pass in the relevant properties for the Model data.</p>
+
+<p>```js
+/**
+ * Model Generation Examples
+ */</p>
+
+<p>var manager = new Contact({
+    id: _.uniqueId(),
+    name: &#39;Mark McDonnell&#39;,
+    age: 30
+});</p>
+
+<p>var developer = new Contact({
+    id: _.uniqueId(),
+    name: &#39;Ashley Banks&#39;,
+    age: 23
+});
+```</p>
+
+<h3>Create a Collection that will hold the Model data we&#39;ve just created</h3>
+
+<p>Backbone lets us pass through an Array of Models to instantiate the Collection with</p>
+
+<p>```js
+/**
+ * Collection Generation Example
+ */</p>
+
+<p>var contacts = new Contacts([manager, developer]);
+```</p>
+
+<h3>Create the View</h3>
+
+<p>You&#39;ll notice that when creating the view Backbone gives us the ability to pass in specific properties such as the HTML element we want to associate our View object with (in this case I&#39;m passing in the <code>&lt;select&gt;</code> element).  </p>
+
+<p>Backbone also lets us specify a Collection for this View to be associated with (this is so we can watch for any events - such as a adding/removing Models - so we can keep the View in sync with any data changes)  </p>
+
+<p>Lastly, we pass in a custom property I&#39;ve called <code>associated_view</code> and the value of this will be a new instance of <code>ContactView</code> (this View is the empty <code>&lt;div&gt;</code> which will be used to display the details of a specific record as selected by the user of our application). The reason I&#39;ve passed in this View into another View is because I want the <code>contacts_view</code> to have access to the <code>associated_view</code> so when the user selects a Contact we can easily tell <code>contacts_view</code> to render the selected Contact data.</p>
+
+<p>```js
+/**
+ * View for <select> menu of Contacts
+ */</p>
+
+<p>var contacts_view = new ContactsView({
+    el: $(&#39;#view-contacts&#39;),
+    collection: contacts, // pass in the Collection into this View</p>
+
+<pre><code>/**
+ * View for displaying the selected Contact
+ */
+
+associated_view: new ContactView({
+    el: $(&#39;#view-contact&#39;),
+    collection: contacts
+})
+</code></pre>
+
+<p>});
+```</p>
+
+<h3>Create a View for the <code>&lt;form&gt;</code> that will create new Model data</h3>
+
+<p>What you&#39;ll probably notice is that out of the three Views we have created instances for, they all use the same <code>contacts</code> Collection.</p>
+
+<p>```js
+/**
+ * View for <form> to add a new Contact
+ */</p>
+
+<p>var add_contact = new AddContactView({
+    el: $(&#39;#view-add&#39;),
+    collection: contacts
+});
+```</p>
+
+<h3>Load more Model data into our Collection</h3>
+
+<p>We initially loaded some Model data into our Collection when starting our application, but now we&#39;re using a Backbone provided method called <code>fetch</code> which lets us grab more data from the server and populate our Collection with that server data.</p>
+
+<p>```js
+/**
+ * Lazy Load Models into Collection
+ */</p>
+
+<p>contacts.fetch({
+    add: true, // Prevent resetting the Collection (i.e. instead or clearing the Collection first we just add new Models on top of current set of Models),
+    error: function (collection, resp) {
+        // You can do something on error loading
+    },
+    success: function (collection, resp) {
+        // You can do something on successful loading
+    }
+});
+```</p>
+
+<h3>Fetching Collection Data</h3>
+
+<p>In the previous section we used <code>contacts.fetch</code> to grab Model data from the server.</p>
+
+<p>To be able to understand how it works we need to look at the Collection module now. </p>
+
+<p>As we know in the main JavaScript file we required a load of dependencies such as Models, Views and Collections and the following is the Collection module we loaded - hopefully the comments will adequately explain what&#39;s going on… </p>
+
+<p>```js
+// This Collection requires the &#39;Contact&#39; Model and (obviously) Backbone
+define([&#39;../Models/Contact&#39;, &#39;../Utils/backbone&#39;], function (Contact) {</p>
+
+<pre><code>// We set-up a collection of Contact Models
+// This is so we can manipulate the group of Models more easily
+var Contacts = Backbone.Collection.extend({
+    // Backbone specific property
+    model: Contact,
+
+    // Backbone specific property
+    url: &#39;/Assets/Includes/Contacts.php&#39;,
+
+    // Backbone specific method
+    initialize: function(){
+        // Collections fire the events &#39;add&#39; and &#39;remove&#39;
+        this.on(&#39;add&#39;, this.model_added, this);
+    },
+
+    model_added: function (model) {
+        // The View listens out for &#39;model:added&#39;
+        // Once it hears it, it updates the &lt;select&gt; menu to include the latest Model
+        // We pass the latest Model through from here...
+        this.trigger(&#39;model:added&#39;, model);
+    },
+
+    // We can&#39;t trigger a custom event from within the &#39;initialize&#39; method
+    // because the View listener wont be ready/set-up yet!
+    // So we have to stick it inside a separate method which I call after I set-up the associated View
+    populate: function(){
+        this.trigger(&#39;contacts:populate&#39;);
+    }
+});
+
+return Contacts;
+</code></pre>
+
+<p>});
+```</p>
+
+<p>You&#39;ll notice this Collection uses the Backbone specific property <code>url</code> which we&#39;ve pointed to a PHP script (you would replace this with whatever back-end you prefer to use: Ruby, Python, ASP.NET etc). </p>
+
+<p>The PHP script we&#39;re using would normally connect to a database and return its data converted into JSON (JSON is the perfect data format for Backbone to process). But in this example we&#39;re simply just manually creating data and converting it to JSON… </p>
+
+<p>```php
+&lt;?php
+    $json = array(
+        array(
+            &quot;id&quot; =&gt; 99,
+            &quot;name&quot; =&gt; &quot;Joe Bloggs&quot;,
+            &quot;age&quot; =&gt; 12, 
+            &quot;address&quot; =&gt; &quot;9 Cables Street, London&quot;,
+            &quot;role&quot; =&gt; &quot;Manager&quot;
+        ),
+        array(
+            &quot;id&quot; =&gt; 98,
+            &quot;name&quot; =&gt; &quot;Dan Smith&quot;,
+            &quot;age&quot; =&gt; 23, 
+            &quot;address&quot; =&gt; &quot;Bambridge Road, Essex&quot;,
+            &quot;role&quot; =&gt; &quot;Developer&quot;
+        ),
+        array(
+            &quot;id&quot; =&gt; 97,
+            &quot;name&quot; =&gt; &quot;Bradley Few&quot;,
+            &quot;age&quot; =&gt; 22, 
+            &quot;address&quot; =&gt; &quot;Meeson Mead, Leads&quot;,
+            &quot;role&quot; =&gt; &quot;Developer&quot;
+        )
+    );</p>
+
+<pre><code>echo json_encode($json);
+</code></pre>
+
+<p>?&gt;
+```</p>
+
+<p>…Backbone.js then populates the Collection with the new data it has &#39;fetched&#39; from the server application.</p>
+
+<p>You may have also noticed that back in our main JavaScript file (when we called the <code>fetch</code> method) we had specified a property called <code>add</code> and set its value to <code>true</code>. The reason we did this was because if we left that property out then when Backbone fetched the data from the server it would have cleared our Collection of all Model data and replaced it with the data from the server. Setting <code>add: true</code> means we don&#39;t overwrite any existing data but instead add the data on top of what&#39;s already there.</p>
+
+<h3>Model Structure</h3>
+
+<p>So far we have a main script file where we have created new instances of some Backbone Views as well as created a Backbone Collection. We&#39;ve populated that Collection with specific Model data, but now lets look at the Model itself that we&#39;ve been using to construct our data from… </p>
+
+<p>```js
+define([&#39;../Utils/backbone&#39;], function(){</p>
+
+<pre><code>var Contact = Backbone.Model.extend({
+    // Backbone specific object
+    defaults: {
+        name: &#39;No name provided&#39;,
+        age: 0,
+        address: &#39;No address provided&#39;
+    },
+
+    // Backbone specific method
+    initialize: function(){
+        // Syntax: .on(type:property)
+        this.on(&#39;change:age&#39;, function(){
+            console.log(this.get(&#39;name&#39;) + &#39;\&#39;s age changed to &#39; + this.get(&#39;age&#39;));
+        });
+
+        this.on(&#39;error&#39;, function (model, error) {
+            console.warn(&#39;Error:&#39;, model, error);
+        });
+    },
+
+    // Backbone specific method
+    validate: function (attributes) {
+        if (!attributes.id || attributes.id &lt;= 0) {
+            return &#39;An error has occurred? There should be an id generated!&#39;;
+        }
+
+        if (typeof attributes.age != &#39;number&#39;) {
+            return &#39;Age needs to be a number&#39;;
+        }
+    },
+
+    birthday: function(){
+        var age = this.get(&#39;age&#39;);
+        this.set({ &#39;age&#39;: ++age });
+    }
+});
+
+return Contact;
+</code></pre>
+
+<p>});
+```</p>
+
+<p>…as you can see the only dependency this module has is Backbone.js itself. Don&#39;t worry about specifying Backbone.js in each module, when we run a build script using RequireJS&#39; optimisation tool it&#39;ll only load one instance of Backbone. </p>
+
+<p>The reason we specify Backbone as a dependency in each of these module files (rather than just specifying it once in the top level main script file) is because if we decided to reuse this specific module in another project then it would be crystal clear what dependencies it has (I know in this example if you saw <code>Backbone.Model</code> then it would seem pretty obvious that Backbone.js would need to be loaded, but doing this is just good practice because some modules can have lots of dependencies and they wont always be that obvious, so it&#39;s best to get into the habit of specifying all dependencies for the sake of helpfulness).</p>
+
+<p>Let&#39;s now break down the specific sections of the Model we&#39;ve created:</p>
+
+<h3>First we specify default values</h3>
+
+<p>This is in case (when creating a new Model instance) we don&#39;t have all the values readily available</p>
+
+<p><code>js
+defaults: {
+    name: &#39;No name provided&#39;,
+    age: 0,
+    address: &#39;No address provided&#39;
+}
+</code></p>
+
+<h3>Carry out some initial set-up stuff when a new instance is created</h3>
+
+<p>In this example we want to set-up some event listeners for when the <code>age</code> property is changed as well as when an error occurs.</p>
+
+<p>```js
+initialize: function(){
+    // Syntax: .on(type:property)
+    this.on(&#39;change:age&#39;, function(){
+        console.log(this.get(&#39;name&#39;) + &#39;\&#39;s age changed to &#39; + this.get(&#39;age&#39;));
+    });</p>
+
+<pre><code>this.on(&#39;error&#39;, function (model, error) {
+    console.warn(&#39;Error:&#39;, model, error);
+});
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Validate data before actually making any changes</h3>
+
+<p>Backbone.js provides a <code>validate</code> method that returns your own specified error message.<br>
+If the function doesn&#39;t return any value then it is assumed the data is valid.<br>
+If the function returns <em>any thing</em> then whatever was returned is used as the error message.</p>
+
+<p>```js
+validate: function (attributes) {
+    if (!attributes.id || attributes.id &lt;= 0) {
+        return &#39;An error has occurred? There should be an id generated!&#39;;
+    }</p>
+
+<pre><code>if (typeof attributes.age != &#39;number&#39;) {
+    return &#39;Age needs to be a number&#39;;
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Create a custom <code>birthday</code> method</h3>
+
+<p>We use two Backbone methods: <code>get</code> and <code>set</code> to increment the age of the user.<br>
+First we <code>get</code> the current age, then we <code>set</code> the age using the prefixed <code>++</code> increment operator</p>
+
+<p><code>js
+birthday: function(){
+    var age = this.get(&#39;age&#39;);
+    this.set({ &#39;age&#39;: ++age });
+}
+</code></p>
+
+<p>So in our main script file you&#39;ll remember we used this custom method like so… </p>
+
+<p>```js
+// Create a new Model instance
+var developer = new Contact({
+    id: _.uniqueId(),
+    name: &#39;Ashley Banks&#39;,
+    age: 23
+});</p>
+
+<p>// Now effectively set the user&#39;s age to 24
+// i.e. the age was 23 and calling <code>birthday()</code> increments the age by one
+developer.birthday();
+```</p>
+
+<h3>View Structures</h3>
+
+<p>So again, in our main script file we have created three new View instances. Lets now take a look at each of the View files so we can see what they&#39;re doing and how they work.</p>
+
+<p>If you remember from our main script file we created the following View (well, this is two Views, one inside another)…</p>
+
+<p>```js
+/**
+ * View for <select> menu of Contacts
+ */</p>
+
+<p>var contacts_view = new ContactsView({
+    el: $(&#39;#view-contacts&#39;),
+    collection: contacts, // pass in the Collection into this View</p>
+
+<pre><code>/**
+ * View for displaying the selected Contact
+ *
+ * Originally I had created a global namespace property so I could access this View&#39;s &quot;render()&quot; method from within &#39;contacts_view&#39; (/Views/Contacts.js)
+ * And according to people smarter than I (i.e. Addy Osmani from Google) this was the most appropriate solution.
+ * But I since discovered I could pass in additional data when creating a View instance and so that&#39;s what I&#39;ve done here.
+ */
+
+associated_view: new ContactView({
+    el: $(&#39;#view-contact&#39;),
+    collection: contacts
+})
+</code></pre>
+
+<p>});
+```</p>
+
+<p>…the <code>contacts_view</code> was the <code>&lt;select&gt;</code> menu that held a list of names. The idea being the user selected a name from the list and the details for the selected user was displayed on the page.</p>
+
+<p>So let&#39;s take a look at that particular View file… </p>
+
+<p>```js
+define([&#39;../Utils/backbone&#39;], function(){</p>
+
+<pre><code>var ContactsView = Backbone.View.extend({
+    // Backbone specific method
+    initialize: function (options) {
+        this.select = this.$el.find(&#39;select&#39;);
+        this.collection.on(&#39;contacts:populate&#39;, this.populate, this);
+        this.collection.on(&#39;model:added&#39;, this.update, this);
+        this.collection.populate(); // when this completes it triggers the custom event &#39;contacts:populate&#39;
+        this.associated_view = options.associated_view;
+    },
+
+    // Backbone specific &#39;events&#39; management only applies to DOM elements (as this is a &#39;View&#39; after all)
+    // other custom events triggered are handled via &#39;this.on&#39; within the initialize method 
+    // because of this we have to use &#39;this.on&#39; within a &#39;Collection&#39;
+    events: {
+        &#39;change select&#39;: &#39;display_selected&#39;
+    },
+
+    populate: function(){
+        var select = this.select; // scope of this changes within &#39;each&#39; (refers to same thing as the &#39;model&#39; argument)
+        var frag = &#39;&#39;;
+        var option;
+
+        this.collection.each(function(model){
+            option = &#39;&lt;option value=&quot;&#39; + model.cid + &#39;&quot;&gt;&#39; + model.attributes.name + &#39;&lt;/option&gt;&#39;;
+            frag += option;
+        }, this);
+
+        // We could of had the &#39;append&#39; calls within the loop
+        // but that would have meant multiple DOM interactions
+        select.append(frag);
+    },
+
+    display_selected: function (event) {
+        var targ = event.target;
+        var selected_option = targ.options[targ.selectedIndex];
+        var model = this.collection.getByCid(selected_option.value);
+
+        // We call the &#39;render&#39; method on the associated View we passed through when creating this View&#39;s instance
+        this.associated_view.render(model);
+    },
+
+    // &#39;model&#39; is passed through from Collection
+    update: function (model) {
+        var select = this.$el.find(&#39;select&#39;);
+        var option = &#39;&lt;option value=&quot;&#39; + model.cid + &#39;&quot;&gt;&#39; + model.attributes.name + &#39;&lt;/option&gt;&#39;;
+        select.append(option);
+    }
+});
+
+return ContactsView;
+</code></pre>
+
+<p>});
+```</p>
+
+<p>…and let&#39;s break down what it&#39;s doing… </p>
+
+<h3>Carry out some initial set-up stuff when a new instance is created</h3>
+
+<p>A few things going on here:  </p>
+
+<p>We first grab the <code>&lt;select&gt;</code> element using Backbone&#39;s <code>$el</code> property (this property references the element we passed through to the View&#39;s <code>extend</code> method when creating a new instance. It&#39;s effectively a jQuery wrapped version of the element - which is why we&#39;re able to use jQuery&#39;s <code>find</code> method.  </p>
+
+<p>Next we set-up a couple of event listeners (for custom events) - you&#39;ll remember the Collection triggers the custom events like so <code>this.trigger(&#39;model:added&#39;, model);</code> and <code>this.trigger(&#39;contacts:populate&#39;);</code>.  </p>
+
+<p>This is where it gets a little weird I&#39;m afraid. We now call the Collection&#39;s custom <code>populate</code> method. That method does literally nothing other than trigger the custom event <code>contacts:populate</code>. The reason that method even exists (and why we&#39;re calling it) is because we only want to populate the <code>&lt;select&gt;</code> menu when we know there is data available! We weren&#39;t able to trigger a custom event from the Collections <code>initialize</code> method (which would have been ideal, because once the Collection instance is created would have been a good time to trigger the custom event) and so we&#39;ve had to create our own method within the Collection which we manually call from this View. It&#39;s a bit &quot;arse about face&quot; but that&#39;s just the way it is.  </p>
+
+<p>Lastly we create a property for this instance that points to another View. The reason we do this is because later on in this View&#39;s <code>display_selected</code> method we need to call the associated View&#39;s <code>render</code> method.  </p>
+
+<p>Because we&#39;re using AMD we&#39;ve made our Views into separate modules/files, but because of this we aren&#39;t able to access code outside of a module (our module&#39;s code is protected) - so we&#39;re unable to access the <code>ContactView</code> View unless we pass around a reference to it like we&#39;ve done here.</p>
+
+<p><code>js
+initialize: function (options) {
+    this.select = this.$el.find(&#39;select&#39;);
+    this.collection.on(&#39;contacts:populate&#39;, this.populate, this);
+    this.collection.on(&#39;model:added&#39;, this.update, this);
+    this.collection.populate(); // when this completes it triggers the custom event &#39;contacts:populate&#39;
+    this.associated_view = options.associated_view;
+}
+</code></p>
+
+<h3>Define some events</h3>
+
+<p>We specify a &#39;change&#39; event for the <code>&lt;select&gt;</code> element<br>
+which when triggered executes the <code>display_selected</code> method we&#39;ve created for this View.</p>
+
+<p><code>js
+events: {
+    &#39;change select&#39;: &#39;display_selected&#39;
+}
+</code></p>
+
+<h3>Custom <code>populate</code> function</h3>
+
+<p>This method builds up the content of the <code>&lt;select&gt;</code> menu.<br>
+It does this by looping through the Collection data and accessing each individual Model stored within it.<br>
+You&#39;ll notice that we set the value of each <code>&lt;option&gt;</code> element to be whatever the <code>cid</code> value for the Model is (the <code>cid</code> value is set automatically by Backbone on each Model)</p>
+
+<p>```js
+populate: function(){
+    var select = this.select; // scope of this changes within &#39;each&#39; (refers to same thing as the &#39;model&#39; argument)
+    var frag = &#39;&#39;;
+    var option;</p>
+
+<p>this.collection.each(function(model){
+        option = &#39;<option value="' + model.cid + '">&#39; + model.attributes.name + &#39;</option>&#39;;
+        frag += option;
+    }, this);</p>
+
+<pre><code>// We could of had the &#39;append&#39; calls within the loop
+// but that would have meant multiple DOM interactions
+select.append(frag);
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Custom <code>display_selected</code> function</h3>
+
+<p>This methods works out which menu item was selected and then<br>
+uses a Backbone specific method <code>getByCid</code> to access the required Model.<br>
+We then call the <code>ContactView</code>&#39;s <code>render</code> method and pass through the Model data that needs to be rendered.</p>
+
+<p>```js
+display<em>selected: function (event) {
+    var targ = event.target;
+    var selected</em>option = targ.options[targ.selectedIndex];
+    var model = this.collection.getByCid(selected_option.value);</p>
+
+<pre><code>// We call the &#39;render&#39; method on the associated View we passed through when creating this View&#39;s instance
+this.associated_view.render(model);
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Custom <code>update</code> function</h3>
+
+<p>Every time a Model is added to the Collection it triggers an <code>model:added</code> event.<br>
+This event causes the View&#39;s <code>update</code> method to be executed, which inserts the new Model directly into the <code>&lt;select&gt;</code> menu.</p>
+
+<p><code>js
+update: function (model) {
+    var select = this.$el.find(&#39;select&#39;);
+    var option = &#39;&lt;option value=&quot;&#39; + model.cid + &#39;&quot;&gt;&#39; + model.attributes.name + &#39;&lt;/option&gt;&#39;;
+    select.append(option);
+}
+</code></p>
+
+<h3>Template for the Associated View</h3>
+
+<p>Let&#39;s take a look at the associated View that we created…</p>
+
+<p>```js
+define([&#39;../Utils/backbone&#39;], function(){</p>
+
+<pre><code>var ContactView = Backbone.View.extend({
+    render: function (model) {
+        var model = model || this.collection.models[0];
+        var attributes = model.attributes;
+        var template = $(&#39;#contact_template&#39;);
+        var compile = _.template(template.html(), {
+            id: attributes.id,
+            name: attributes.name,
+            age: attributes.age,
+            address: attributes.address
+        });
+
+        this.$el.html(compile);
+    }
+});
+
+return ContactView;
+</code></pre>
+
+<p>});
+```</p>
+
+<p>…as you can see: it&#39;s a lot simpler! All it consists of is a <code>render</code> method.</p>
+
+<p>The purpose of this View is to display the selected contact details.</p>
+
+<p>When this method is called we pass it the Model that we want to display and then we use Underscore&#39;s <code>_.template</code> method to render the data in HTML.</p>
+
+<p>If you&#39;ve not used a template library before then it simply is just a text file which contains HTML tags where the dynamic content areas are replaced with specific delimiter tags. You would then pass through an object of data to the template library in which is would use to compile the template&#39;s HTML content so its tags are replaced with content from the data object.</p>
+
+<p>For example, if the template was <code>&lt;p&gt;{{fullname}}&lt;/p&gt;</code> (this assumes the template library you&#39;re using requires the delimiter tags to be double braces <code>{ {</code> <code>}}</code> then you could pass in a data object like <code>{ fullname: &#39;Mark&#39; }</code> and then when the template is compiled it would return the HTML like this: <code>&lt;p&gt;Mark&lt;/p&gt;</code>.</p>
+
+<p>Underscore&#39;s <code>_.template</code> method uses different tags: <code>&lt;%=fullname%&gt;</code> and although the internal workings for each template library can be different (each one trying to out perform the other) the general principle of how they work stays the same.</p>
+
+<p>In this example we&#39;ve gotten the content of the template file from within the HTML page itself. If you remember, the main HTML page we had contained a <code>&lt;script&gt;</code> tag with the <code>type</code> attribute value set to <code>text/template</code>. This odd type value causes the browser to ignore it (a browser wont try to execute the HTML content within that script tag as JavaScript because it doesn&#39;t recognise the type value). </p>
+
+<p>Ideally though you&#39;d have the template content as a separate file and then AJAX in that template file. The reason I recommend keeping your template in a separate file is because relying on the browser to not execute a script just because it has an unknown attribute value is very fragile and likely to break in future, but for the purpose of this example it&#39;ll do.</p>
+
+<h3>Adding a new Model</h3>
+
+<p>We have one more View left to look at, this is the HTML <code>&lt;form&gt;</code> element which lets us add a new contact to the list of contacts…</p>
+
+<p>```js
+define([&#39;../Models/Contact&#39;, &#39;../Utils/backbone&#39;], function (Contact) {</p>
+
+<pre><code>var AddContactView = Backbone.View.extend({
+    // Built-in object for handling DOM events
+    events: {
+        &#39;click input[type=submit]&#39;: &#39;add_contact&#39;
+    },
+
+    add_contact: function (e) {
+        e.preventDefault(); // prevent form from submitting
+
+        var message = document.getElementById(&#39;message-success&#39;);
+        var errors = [];
+        var fullname = this.el.fullname.value;
+        var age = this.el.age.value;
+        var address = this.el.address.value;
+        var contact;
+
+        // This regex tests for a first name with at least two characters, 
+        // followed by an optional middle name with at least two characters (we use a non-capturing group to save the regex engine some work), 
+        // followed by the last name with at least two characters.
+        // This regex allows the first-middle name (and the middle-last) to be joined by a hypen (e.g. Georges St-Pierre or Georges-St Pierre)
+        if (!/[\w-]{2,}(?:\s\w{2,})?[\s-]\w{2,}/.test(fullname)) {
+            errors.push(&#39;Name was invalid&#39;);
+        } 
+
+        // We allow ages from 1-999
+        if (!/\d{1,3}/.test(age)) {
+            errors.push(&#39;Age was invalid (should be numeric value only)&#39;);
+        }
+
+        if (!address.length) {
+            // Provide a default for the address (mainly because it&#39;s awkward to validate this type of field)
+            address = &#39;No address provided&#39;;
+        }
+
+        // If there are any errors then we can&#39;t proceed
+        if (errors.length) {
+            // If the success message (from a previous successful record added) is still visible
+            // then remove it to save from confusing the user.
+            var success;
+            if (success = document.getElementById(&#39;message-success&#39;)) {
+                this.el.removeChild(success); // this.el provided by Backbone
+            }
+
+            // Display errors
+            alert(errors.join(&#39;\n&#39;));
+        } else {
+            // There should be an AJAX function to post data to server-side script (for storing in db)
+            // Backbone.Model.save() might be a built-in handler for this, I&#39;m not sure yet?
+
+            // Create a new Model
+            contact = new Contact({
+                id: _.uniqueId(),
+                name: fullname,
+                age: +age, // ensure data is an Integer
+                address: address
+            });
+
+            // Add the new Model into the Contacts Collection
+            // This should trigger an &#39;add&#39; event which means the record is inserted into the &lt;select&gt;
+            this.collection.add(contact);
+
+            // Display success message and reset the form
+            this.el.reset(); // this.el provided by Backbone
+
+            // Don&#39;t want to see a massive long list of &#39;Record added successfully!&#39; messages
+            // So if one is already there then just remove it first
+            if (message) {
+                message.parentNode.removeChild(message);
+            }
+
+            // Create an element to hold our success message
+            var doc = document;
+            var div = doc.createElement(&#39;div&#39;);
+            var txt = doc.createTextNode(&#39;Record added successfully!&#39;);
+
+            div.id = &#39;message-success&#39;;
+
+            div.appendChild(txt);
+            this.el.appendChild(div); // this.el provided by Backbone
+        }
+    }
+});
+
+return AddContactView;
+</code></pre>
+
+<p>});
+```</p>
+
+<p>…this does a lot of stuff so lets break it down…</p>
+
+<h3>Event listeners</h3>
+
+<p>We set-up a listener for the <code>click</code> event for the form&#39;s submit button which calls the <code>add_contact</code> method.</p>
+
+<p><code>js
+events: {
+    &#39;click input[type=submit]&#39;: &#39;add_contact&#39;
+}
+</code></p>
+
+<h3>Add a new contact and validate the user input</h3>
+
+<p>We call the <code>add_contact</code> method and immediately call <code>e.preventDefault</code> which stops the form from submitting and thus refreshing the page (which we don&#39;t want to have happen as we&#39;ll lose the state of the page).</p>
+
+<p>```js
+add_contact: function (e) {
+    e.preventDefault();</p>
+
+<pre><code>var message = document.getElementById(&#39;message-success&#39;);
+var errors = [];
+var fullname = this.el.fullname.value;
+var age = this.el.age.value;
+var address = this.el.address.value;
+var contact;
+
+// This regex tests for a first name with at least two characters, 
+// followed by an optional middle name with at least two characters (we use a non-capturing group to save the regex engine some work), 
+// followed by the last name with at least two characters.
+// This regex allows the first-middle name (and the middle-last) to be joined by a hypen (e.g. George St-Pierre or Georges-St Pierre)
+if (!/[\w-]{2,}(?:\s\w{2,})?[\s-]\w{2,}/.test(fullname)) {
+    errors.push(&#39;Name was invalid&#39;);
+} 
+
+// We allow ages from 1-999
+if (!/\d{1,3}/.test(age)) {
+    errors.push(&#39;Age was invalid (should be numeric value only)&#39;);
+}
+
+if (!address.length) {
+    address = &#39;No address provided&#39;;
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Handle any invalid data</h3>
+
+<p>If the success message (from a previous successful record added) is still visible then remove it to save from confusing the user.<br>
+Then display any errors found.</p>
+
+<p>```js
+if (errors.length) {
+    var success;
+    if (success = document.getElementById(&#39;message-success&#39;)) {
+        this.el.removeChild(success); // this.el provided by Backbone
+    }</p>
+
+<pre><code>// Display errors
+alert(errors.join(&#39;\n&#39;));
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Add a new contact</h3>
+
+<p>This adds the new Model data, then updates the <code>&lt;select&gt;</code> menu, then inserts a success message to let the user know the details were added without issue.</p>
+
+<p>```js
+else {
+    // Create a new Model
+    contact = new Contact({
+        id: _.uniqueId(),
+        name: fullname,
+        age: +age, // ensure data is an Integer
+        address: address
+    });</p>
+
+<pre><code>// Add the new Model into the Contacts Collection
+// This should trigger an &#39;add&#39; event which means the record is inserted into the &lt;select&gt;
+this.collection.add(contact);
+
+// Display success message and reset the form
+this.el.reset(); // this.el provided by Backbone
+
+// Don&#39;t want to see a massive long list of &#39;Record added successfully!&#39; messages
+// So if one is already there then just remove it first
+if (message) {
+    message.parentNode.removeChild(message);
+}
+
+// Create an element to hold our success message
+var doc = document;
+var div = doc.createElement(&#39;div&#39;);
+var txt = doc.createTextNode(&#39;Record added successfully!&#39;);
+
+div.id = &#39;message-success&#39;;
+
+div.appendChild(txt);
+this.el.appendChild(div); // this.el provided by Backbone
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>URL Routing</h3>
+
+<p>I&#39;ve not built in any real routing logic into this particular example application, but I&#39;ve included below part of the example from the Backbone website so you at least have an idea of how it works...</p>
+
+<p>```js
+define([&#39;../Utils/backbone&#39;], function(){</p>
+
+<pre><code>var Routing = Backbone.Router.extend({
+    routes: {
+        &#39;test&#39;: &#39;test&#39;,
+        &#39;search/:query/:page&#39;: &#39;search&#39;
+    },
+
+    test: function(){
+        console.log(&#39;User has accessed this app from /test/&#39;);
+    },
+
+    search: function (query, page) {
+        console.log(query, page);
+    }
+});
+
+return Routing;
+</code></pre>
+
+<p>});
+```</p>
+
+<p>...what we have here is a new <code>Router</code> instance where we then defines a set of &#39;routes&#39; into your application. The routes we have defined are:</p>
+
+<ul>
+<li><p>http://backbone:8888/#test<br>
+If we access our application with this URL we&#39;ll see a log message of <code>User has accessed this app from /test/</code></p></li>
+<li><p>http://backbone:8888/#search/testing/p7<br>
+If we access our application with this URL we&#39;ll see a log message of <code>testing, p7</code></p></li>
+</ul>
+
+<p>...to initialise this Router system we need to trigger it via the main script file... </p>
+
+<p>```js
+/**
+ * Router/History API Examples
+ */</p>
+
+<p>// Create new instance of our Routing Class
+var routing = new Routing();</p>
+
+<p>// Initialize the Router
+Backbone.history.start({ pushState: true });
+```</p>
+
+<p>Instead of displaying basic log messages we would use this routing feature to load a specific application state.</p>
+
+<p>So for example, if we set-up the relevant route then the user could access the application via a URL like: http://backbone:8888/#contact/99 and that could load the contact details for Model item 99.</p>
+
+<p>You also have the facility to take advantage of HTML5&#39;s <code>pushState</code> which removes the need for URL rewriting but does require extra application logic/work. The default for <code>Backbone.Router</code> is to use hashbangs.</p>
+
+<p>If a user accesses the application with a hashbang URL and the application is set-up to use <code>pushState</code> then Backbone will update the URL from the hashbang to the proper HTML5 variation.</p>
+
+<h2>Wrap-up</h2>
+
+<p>So this is where we end. </p>
+
+<p>We&#39;ve got our three Views set-up, we have our Model defined and contacts created from it and we created a Collection based on that Model type.</p>
+
+<p>The Views and Models/Collection are tied together and the application is functioning as it should be.</p>
+
+<p>There are lots of things we could do to improve this example, but as a basic example of an MVC style application built using Backbone.js I think it does everything it needs to.</p>
+
+<h2>Conclusion</h2>
+
+<p>When you start using Backbone.js the concepts can be a bit confusing, but you quickly learn your way around. </p>
+
+<p>Oddly, trying to <em>explain</em> how to use Backbone.js is harder than actually using it! So I would suggest just start using it.</p>
+
+<p>The main <a href="http://www.backbonejs.org/">Backbone.js website</a> is the best documentation available and is the ideal place to start after here. </p>
+
+<p>Also, the following links are excellent resources to understand the MV* concepts discussed at the start of this post.</p>
+
+<h2>Links**</h2>
+
+<ul>
+<li><a href="http://addyosmani.com/blog/backbone-fundamentals/">Backbone Fundamentals</a></li>
+<li><a href="http://addyosmani.com/blog/short-musings-on-javascript-mv-tech-stacks/">Short Musings On JavaScript MV* Tech Stacks</a></li>
+<li><a href="http://addyosmani.com/blog/understanding-mvc-and-mvp-for-javascript-and-backbone-developers/">Understanding MVC And MVP (For JavaScript And Backbone Developers)</a></li>
+<li><a href="http://addyosmani.com/blog/understanding-mvvm-a-guide-for-javascript-developers/">Understanding MVVM – A Guide For JavaScript Developers</a></li>
+<li><a href="http://addyosmani.com/blog/digesting-javascript-mvc-pattern-abuse-or-evolution/">Digesting JavaScript MVC – Pattern Abuse Or Evolution?</a></li>
+<li><a href="http://addyosmani.com/blog/javascript-mvc-jungle/">Journey Through The JavaScript MVC Jungle</a></li>
+</ul>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
