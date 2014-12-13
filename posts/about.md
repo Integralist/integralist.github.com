@@ -20,3 +20,5 @@ My colleagues at BBC News found me fit to win the following awards:
 - Best Public Relations of 2014
 - Most innovative use of Technology 2014 (team award)
 - Developer of the Year 2013
+
+For more details please refer to my [resume](http://www.integralist.co.uk/Resume/)
