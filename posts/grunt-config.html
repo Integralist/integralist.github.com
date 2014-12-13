@@ -162,135 +162,130 @@
 
 <h3>grunt-customtasks.js</h3>
 
-<p>```js
-module.exports = function (grunt) {</p>
+<pre><code>module.exports = function (grunt) {
 
-<pre><code>var util = require(&#39;./grunt-helpers.js&#39;)(grunt);
+    var util = require(&#39;./grunt-helpers.js&#39;)(grunt);
 
-grunt.registerTask(&#39;sass_compile&#39;, &#39;Dynamically generate Sass sub task&#39;, function(service, calledFromConfigTask) {
-    if (!util.serviceExists(service)) {
-        console.log(&#39;Sorry, that service does not exist&#39;);
-        return;
-    }
-
-    var _          = require(&#39;lodash&#39;),
-        src        = [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
-        debug      = { debugInfo: true, lineNumbers: true },
-        style      = &#39;expanded&#39;,
-        requested  = service,
-        cwd = dest = &#39;&#39;,
-        service    = {},
-        config;
-
-    service[requested] = {};
-
-    switch (requested) {
-        case &#39;dist&#39;:
-            style = &#39;compressed&#39;;
-            debug = {};
-            break;
-        case &#39;dev&#39;:
-            // Want to prevent setting cwd/dest to the service name
-            break;
-        default:
-            src = [&#39;*.scss&#39;, &#39;!_*.scss&#39;];
-            cwd = dest = &#39;services/&#39; + requested;
-    }
-
-    config = {
-        options: {
-            style: style,
-            require: [&#39;&lt;%= dir.static_sass %&gt;partials/helpers/url64.rb&#39;]
-        },
-        expand: true,
-        cwd: &#39;&lt;%= dir.static_sass %&gt;&#39; + cwd,
-        src: src,
-        dest: &#39;&lt;%= dir.static_css %&gt;&#39; + dest,
-        ext: &#39;.css&#39;
-    }
-
-    _.merge(config.options, debug);
-    _.merge(service[requested], config);
-
-    grunt.config.set(&#39;sass&#39;, service);
-
-    if (!calledFromConfigTask) {
-        grunt.task.run(&#39;sass:&#39; + requested);
-    }
-});
-
-grunt.registerTask(&#39;config&#39;, &#39;Add dynamically generated Sass sub task into config object but does not run the sub task&#39;, function(service) {
-    grunt.task.run(&#39;sass_compile:&#39; + service + &#39;:watch&#39;); // ensure sub task exists before running the dynamically created watch sub task
-});
-
-grunt.registerTask(&#39;watch_service&#39;, &#39;Dynamically generate Watch (and Sass) sub tasks and then run the relevant watch task&#39;, function(service) {
-    if (!util.serviceExists(service)) {
-        console.log(&#39;Sorry, that service does not exist&#39;);
-        return;
-    }
-
-    var content = {};
-
-    if (service === &#39;all&#39;) {
-        content.all = {
-            files: [&#39;&lt;%= jshint.files %&gt;&#39;, &#39;&lt;%= dir.static_sass %&gt;**/*.scss&#39;],
-            tasks: [&#39;config:dev&#39;, &#39;default&#39;]
+    grunt.registerTask(&#39;sass_compile&#39;, &#39;Dynamically generate Sass sub task&#39;, function(service, calledFromConfigTask) {
+        if (!util.serviceExists(service)) {
+            console.log(&#39;Sorry, that service does not exist&#39;);
+            return;
         }
-    } else {
-        content[service] = {
-            files: [&#39;&lt;%= dir.static_sass %&gt;partials/**/*.scss&#39;,
-                    &#39;&lt;%= dir.static_sass %&gt;services/&#39; + service + &#39;/*.scss&#39;],
-            tasks: [&#39;config:&#39; + service, &#39;sass:&#39; + service]
-        }
-    }
 
-    grunt.config.set(&#39;watch&#39;, content);
-    grunt.task.run(&#39;watch:&#39; + service);
-});
+        var _          = require(&#39;lodash&#39;),
+            src        = [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
+            debug      = { debugInfo: true, lineNumbers: true },
+            style      = &#39;expanded&#39;,
+            requested  = service,
+            cwd = dest = &#39;&#39;,
+            service    = {},
+            config;
+
+        service[requested] = {};
+
+        switch (requested) {
+            case &#39;dist&#39;:
+                style = &#39;compressed&#39;;
+                debug = {};
+                break;
+            case &#39;dev&#39;:
+                // Want to prevent setting cwd/dest to the service name
+                break;
+            default:
+                src = [&#39;*.scss&#39;, &#39;!_*.scss&#39;];
+                cwd = dest = &#39;services/&#39; + requested;
+        }
+
+        config = {
+            options: {
+                style: style,
+                require: [&#39;&lt;%= dir.static_sass %&gt;partials/helpers/url64.rb&#39;]
+            },
+            expand: true,
+            cwd: &#39;&lt;%= dir.static_sass %&gt;&#39; + cwd,
+            src: src,
+            dest: &#39;&lt;%= dir.static_css %&gt;&#39; + dest,
+            ext: &#39;.css&#39;
+        }
+
+        _.merge(config.options, debug);
+        _.merge(service[requested], config);
+
+        grunt.config.set(&#39;sass&#39;, service);
+
+        if (!calledFromConfigTask) {
+            grunt.task.run(&#39;sass:&#39; + requested);
+        }
+    });
+
+    grunt.registerTask(&#39;config&#39;, &#39;Add dynamically generated Sass sub task into config object but does not run the sub task&#39;, function(service) {
+        grunt.task.run(&#39;sass_compile:&#39; + service + &#39;:watch&#39;); // ensure sub task exists before running the dynamically created watch sub task
+    });
+
+    grunt.registerTask(&#39;watch_service&#39;, &#39;Dynamically generate Watch (and Sass) sub tasks and then run the relevant watch task&#39;, function(service) {
+        if (!util.serviceExists(service)) {
+            console.log(&#39;Sorry, that service does not exist&#39;);
+            return;
+        }
+
+        var content = {};
+
+        if (service === &#39;all&#39;) {
+            content.all = {
+                files: [&#39;&lt;%= jshint.files %&gt;&#39;, &#39;&lt;%= dir.static_sass %&gt;**/*.scss&#39;],
+                tasks: [&#39;config:dev&#39;, &#39;default&#39;]
+            }
+        } else {
+            content[service] = {
+                files: [&#39;&lt;%= dir.static_sass %&gt;partials/**/*.scss&#39;,
+                        &#39;&lt;%= dir.static_sass %&gt;services/&#39; + service + &#39;/*.scss&#39;],
+                tasks: [&#39;config:&#39; + service, &#39;sass:&#39; + service]
+            }
+        }
+
+        grunt.config.set(&#39;watch&#39;, content);
+        grunt.task.run(&#39;watch:&#39; + service);
+    });
+
+};
 </code></pre>
-
-<p>};
-```</p>
 
 <h3>grunt-helpers.js</h3>
 
-<p>```js
-module.exports = function (grunt) {
+<pre><code>module.exports = function (grunt) {
     function removePath(element) {
         return element.split(&#39;/&#39;).pop();
-    }</p>
-
-<pre><code>function removeBlacklistedDirectories(element) {
-    if (element.indexOf(&#39;journalism&#39;) !== -1) {
-        return false
     }
 
-    return true;
-}
-
-return {
-    services: grunt.file.expand(&#39;tabloid/webapp/static/sass/services/*&#39;).map(removePath).filter(removeBlacklistedDirectories),
-    serviceExists: function(service) {
-        if (this.services.indexOf(service) !== -1) {
-            return true;
+    function removeBlacklistedDirectories(element) {
+        if (element.indexOf(&#39;journalism&#39;) !== -1) {
+            return false
         }
 
-        return false;
-    },
-    isBlacklistedTask: function(task) {
-        var tasks = [&#39;pkg&#39;, &#39;dir&#39;, &#39;noop&#39;, &#39;config&#39;];
-
-        if (tasks.indexOf(task) !== -1) {
-            return true
-        }
-
-        return false;
+        return true;
     }
-}
+
+    return {
+        services: grunt.file.expand(&#39;tabloid/webapp/static/sass/services/*&#39;).map(removePath).filter(removeBlacklistedDirectories),
+        serviceExists: function(service) {
+            if (this.services.indexOf(service) !== -1) {
+                return true;
+            }
+
+            return false;
+        },
+        isBlacklistedTask: function(task) {
+            var tasks = [&#39;pkg&#39;, &#39;dir&#39;, &#39;noop&#39;, &#39;config&#39;];
+
+            if (tasks.indexOf(task) !== -1) {
+                return true
+            }
+
+            return false;
+        }
+    }
+};
 </code></pre>
-
-<p>};
-```</p>
 
 <h2>Conclusion</h2>
 
@@ -306,50 +301,47 @@ return {
 
 <p>So here is a more realistic example...</p>
 
-<p>```js
-sass: {
+<pre><code>sass: {
     /*
-        Example usage...</p>
+        Example usage...
 
-<pre><code>    grunt sass:service:afrique
-    grunt sass:service:news
- */
-service: {
-    expand: true,
-    cwd: &#39;/sass/&#39;,
-    src: [&#39;services/&lt;%= grunt.task.current.args[0] %&gt;/*.scss&#39;, &#39;!**_*.scss&#39;],
-    dest: &#39;/stylesheets/&#39;,
-    ext: &#39;.css&#39;
-},
-dist: {
-    expand: true,
-    cwd: &#39;/sass/&#39;,
-    src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
-    dest: &#39;/stylesheets/&#39;,
-    ext: &#39;.css&#39;,
+        grunt sass:service:afrique
+        grunt sass:service:news
+     */
+    service: {
+        expand: true,
+        cwd: &#39;/sass/&#39;,
+        src: [&#39;services/&lt;%= grunt.task.current.args[0] %&gt;/*.scss&#39;, &#39;!**_*.scss&#39;],
+        dest: &#39;/stylesheets/&#39;,
+        ext: &#39;.css&#39;
+    },
+    dist: {
+        expand: true,
+        cwd: &#39;/sass/&#39;,
+        src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
+        dest: &#39;/stylesheets/&#39;,
+        ext: &#39;.css&#39;,
+        options: {
+            style: &quot;compressed&quot;
+        }
+    },
+    dev: {
+        expand: true,
+        cwd: &#39;/sass/&#39;,
+        src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
+        dest: &#39;/stylesheets/&#39;,
+        ext: &#39;.css&#39;,
+        options: {
+            debugInfo: true,
+            lineNumbers: true
+        }
+    },
     options: {
-        style: &quot;compressed&quot;
+        style: &#39;expanded&#39;,
+        require: [&#39;/sass/partials/helpers/url64.rb&#39;]
     }
-},
-dev: {
-    expand: true,
-    cwd: &#39;/sass/&#39;,
-    src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
-    dest: &#39;/stylesheets/&#39;,
-    ext: &#39;.css&#39;,
-    options: {
-        debugInfo: true,
-        lineNumbers: true
-    }
-},
-options: {
-    style: &#39;expanded&#39;,
-    require: [&#39;/sass/partials/helpers/url64.rb&#39;]
 }
 </code></pre>
-
-<p>}
-```</p>
 
             <hr>
             <h2>Links</h2>

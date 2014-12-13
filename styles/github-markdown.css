@@ -412,6 +412,15 @@
   box-sizing: border-box;
 }
 
+@media (min-width: 420px) {
+    .markdown-body .profile {
+        float: right;
+        margin-bottom: 5%;
+        margin-left: 5%;
+        max-width: 50%;
+    }
+}
+
 .markdown-body code {
   padding: 0;
   padding-top: 0.2em;
@@ -420,6 +429,7 @@
   font-size: 85%;
   background-color: rgba(0,0,0,0.04);
   border-radius: 3px;
+  /* color: darkred; */
 }
 
 .markdown-body code:before,
@@ -471,6 +481,7 @@
   word-wrap: normal;
   background-color: transparent;
   border: 0;
+  /* color: darkred; */
 }
 
 .markdown-body pre code:before,

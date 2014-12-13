@@ -46,11 +46,10 @@
 
 <p>To detect a Native method such as Array#forEach you should be able to do the following:</p>
 
-<p><code>js
-if (!Array.prototype.forEach) { 
+<pre><code>if (!Array.prototype.forEach) { 
     /* polyfill for missing forEach method */ 
 }
-</code></p>
+</code></pre>
 
 <p>Note: polyfill is a term that Remy Sharp coined which means ‘a shim that mimics a future API’ (see: <a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">http://remysharp.com/2010/10/08/what-is-a-polyfill/</a>)</p>
 
@@ -70,8 +69,7 @@ if (!Array.prototype.forEach) {
 
 <p>But for testing a host method exists, the following function has become the de-facto standard:</p>
 
-<p>```js
-/*
+<pre><code>/*
  * Feature Testing a Host Method
  * Because a callable host object can legitimately have any typeof result then it can&#39;t be relied upon.
  *
@@ -81,18 +79,16 @@ if (!Array.prototype.forEach) {
  * In future versions (ECMAScript 6+) the typeof result will be &#39;null&#39; (as it should be).
  * 
  * @reference: http://michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
- */</p>
+ */
 
-<p>function isHostMethod(object, property) {
-    var type = typeof object[property];</p>
+function isHostMethod(object, property) {
+    var type = typeof object[property];
 
-<pre><code>return type == &#39;function&#39; || // This is the result we&#39;re expecting (as the test is for a method)
-       (type == &#39;object&#39; &amp;&amp; !!object[property]) || // Protect against ES3 &#39;null&#39; typeof result being &#39;object&#39;
-       type == &#39;unknown&#39;; // For IE &lt; 9 when Microsoft used ActiveX objects for Native Functions (we&#39;re checking property of ActiveX object)
+    return type == &#39;function&#39; || // This is the result we&#39;re expecting (as the test is for a method)
+           (type == &#39;object&#39; &amp;&amp; !!object[property]) || // Protect against ES3 &#39;null&#39; typeof result being &#39;object&#39;
+           type == &#39;unknown&#39;; // For IE &lt; 9 when Microsoft used ActiveX objects for Native Functions (we&#39;re checking property of ActiveX object)
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>So lets take a quick re-cap of what’s going on here:</p>
 

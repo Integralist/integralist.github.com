@@ -146,17 +146,16 @@ and awkward to use.</p>
 spot for my fingers to hit it whenever I need it. So I map a few of the window
 keys to use the leader key instead...</p>
 
-<p>```vim
-&quot; Make handling Vim windows easier
-map <leader>w- <C-W>- &quot; smaller
-map <leader>w+ <C-W>+ &quot; larger
-map <leader>w[ <C-W>= &quot; equal
-map <leader>w] <C-W>_ &quot; fill screen</p>
+<pre><code>&quot; Make handling Vim windows easier
+map &lt;leader&gt;w- &lt;C-W&gt;- &quot; smaller
+map &lt;leader&gt;w+ &lt;C-W&gt;+ &quot; larger
+map &lt;leader&gt;w[ &lt;C-W&gt;= &quot; equal
+map &lt;leader&gt;w] &lt;C-W&gt;_ &quot; fill screen
 
-<p>&quot; Make splitting Vim windows easier
-map <leader>; <C-W>s
-map <leader><code>&lt;C-W&gt;v
-</code>``</p>
+&quot; Make splitting Vim windows easier
+map &lt;leader&gt;; &lt;C-W&gt;s
+map &lt;leader&gt;` &lt;C-W&gt;v
+</code></pre>
 
 <p>...as you can see, if I want to create a horizontal split window then I just
 press: <code>\;</code> and if I want the vertical equivalent I just press: \`</p>
@@ -344,266 +343,262 @@ his dotfile set-up).</p>
 
 <h3>Settings</h3>
 
-<p>```vim
-&quot; switch syntax highlighting on, when the terminal has colors
-syntax on</p>
+<pre><code>&quot; switch syntax highlighting on, when the terminal has colors
+syntax on
 
-<p>&quot; use vim, not vi api
-set nocompatible</p>
+&quot; use vim, not vi api
+set nocompatible
 
-<p>&quot; no backup files
-set nobackup</p>
+&quot; no backup files
+set nobackup
 
-<p>&quot; no write backup
-set nowritebackup</p>
+&quot; no write backup
+set nowritebackup
 
-<p>&quot; no swap file
-set noswapfile</p>
+&quot; no swap file
+set noswapfile
 
-<p>&quot; command history
-set history=100</p>
+&quot; command history
+set history=100
 
-<p>&quot; always show cursor
-set ruler</p>
+&quot; always show cursor
+set ruler
 
-<p>&quot; show incomplete commands
-set showcmd</p>
+&quot; show incomplete commands
+set showcmd
 
-<p>&quot; incremental searching
-set incsearch</p>
+&quot; incremental searching
+set incsearch
 
-<p>&quot; highlight search
-set hlsearch</p>
+&quot; highlight search
+set hlsearch
 
-<p>&quot; ignore case in search
-set smartcase</p>
+&quot; ignore case in search
+set smartcase
 
-<p>&quot; make sure any searches /searchPhrase doesn&#39;t need the \c escape character
-set ignorecase</p>
+&quot; make sure any searches /searchPhrase doesn&#39;t need the \c escape character
+set ignorecase
 
-<p>&quot; a buffer is marked as ‘hidden’ if it has unsaved changes, and it is not
+&quot; a buffer is marked as ‘hidden’ if it has unsaved changes, and it is not
 currently loaded in a window
 &quot; if you try and quit Vim while there are hidden buffers, you will raise an
 error:
 &quot; E162: No write since last change for buffer “a.txt”
-set hidden</p>
+set hidden
 
-<p>&quot; disable folding because it is evil
-set nofoldenable</p>
+&quot; disable folding because it is evil
+set nofoldenable
 
-<p>&quot; turn word wrap off
-set nowrap</p>
+&quot; turn word wrap off
+set nowrap
 
-<p>&quot; scroll with more context
-set scrolloff=10</p>
+&quot; scroll with more context
+set scrolloff=10
 
-<p>&quot; allow backspace to delete end of line, indent and start of line characters
-set backspace=indent,eol,start</p>
+&quot; allow backspace to delete end of line, indent and start of line characters
+set backspace=indent,eol,start
 
-<p>&quot; convert tabs to spaces
-set expandtab</p>
+&quot; convert tabs to spaces
+set expandtab
 
-<p>&quot; set tab size
-set tabstop=4</p>
+&quot; set tab size
+set tabstop=4
 
-<p>&quot; the number of spaces inserted for a tab
-set shiftwidth=4</p>
+&quot; the number of spaces inserted for a tab
+set shiftwidth=4
 
-<p>&quot; turn on line numbers
-set number</p>
+&quot; turn on line numbers
+set number
 
-<p>&quot; highlight tailing whitespace
-set list listchars=tab:\ \ ,trail:·</p>
+&quot; highlight tailing whitespace
+set list listchars=tab:\ \ ,trail:·
 
-<p>&quot; get rid of the delay when pressing O (for example)
+&quot; get rid of the delay when pressing O (for example)
 &quot; http://stackoverflow.com/questions/2158516/vim-delay-before-o-opens-a-new-line
-set timeout timeoutlen=1000 ttimeoutlen=100</p>
+set timeout timeoutlen=1000 ttimeoutlen=100
 
-<p>&quot; always show status bar
-set laststatus=2</p>
+&quot; always show status bar
+set laststatus=2
 
-<p>&quot; set the status line to something useful
-set statusline=%f\ %=L:%l/%L\ %c\ (%p%%)</p>
+&quot; set the status line to something useful
+set statusline=%f\ %=L:%l/%L\ %c\ (%p%%)
 
-<p>&quot; hide the toolbar
-set guioptions-=T</p>
+&quot; hide the toolbar
+set guioptions-=T
 
-<p>&quot; utf encoding
-set encoding=utf-8</p>
+&quot; utf encoding
+set encoding=utf-8
 
-<p>&quot; autoload files that have changed outside of vim
-set autoread</p>
+&quot; autoload files that have changed outside of vim
+set autoread
 
-<p>&quot; use system clipboard
+&quot; use system clipboard
 &quot;
 http://stackoverflow.com/questions/8134647/copy-and-paste-in-vim-via-keyboard-between-different-mac-terminals
-set clipboard+=unnamed</p>
+set clipboard+=unnamed
 
-<p>&quot; don&#39;t show intro
-set shortmess+=I</p>
+&quot; don&#39;t show intro
+set shortmess+=I
 
-<p>&quot; better splits
+&quot; better splits
 set splitbelow
 set splitright
-```</p>
+</code></pre>
 
 <h3>File types</h3>
 
-<p>```vim
-&quot; turn indentation on
-filetype indent on</p>
+<pre><code>&quot; turn indentation on
+filetype indent on
 
-<p>&quot; enable filetype plugins
+&quot; enable filetype plugins
 filetype plugin on
-```</p>
+</code></pre>
 
 <h3>Commands</h3>
 
-<p>``<code>vim
-&quot; jump to last cursor
+<pre><code>&quot; jump to last cursor
 autocmd BufReadPost *
   \ if line(&quot;&#39;\&quot;&quot;) &gt; 0 &amp;&amp; line(&quot;&#39;\&quot;&quot;) &lt;= line(&quot;$&quot;) |
-  \   exe &quot;normal g</code>\&quot;&quot; |
-  \ endif</p>
+  \   exe &quot;normal g`\&quot;&quot; |
+  \ endif
 
-<p>fun! StripTrailingWhitespace()
+fun! StripTrailingWhitespace()
     &quot; don&#39;t strip on these filetypes
     if &amp;ft =~ &#39;markdown&#39;
         return
     endif
-    %s/\s+$//e
+    %s/\s\+$//e
 endfun
-autocmd BufWritePre * call StripTrailingWhitespace()</p>
+autocmd BufWritePre * call StripTrailingWhitespace()
 
-<p>&quot; file formats
+&quot; file formats
 autocmd Filetype gitcommit setlocal spell textwidth=72
 autocmd Filetype markdown setlocal textwidth=80
-autocmd FileType cucumber,ruby,yaml setl sw=2 sts=2 et</p>
+autocmd FileType cucumber,ruby,yaml setl sw=2 sts=2 et
 
-<p>&quot; specify syntax highlighting for specific files
+&quot; specify syntax highlighting for specific files
 au Bufread,BufNewFile *.spv set filetype=php
 au Bufread,BufNewFile *.md set filetype=markdown &quot; Vim interprets .md as
 &#39;modula2&#39; otherwise, see :set filetype?
-```</p>
+</code></pre>
 
 <h3>Plugins</h3>
 
-<p>```vim
-&quot; Declare bundles are handled via Vundle
+<pre><code>&quot; Declare bundles are handled via Vundle
 set rtp+=$HOME/.vim/bundle/vundle
-call vundle#rc()</p>
+call vundle#rc()
 
-<p>&quot; Let Vundle manage Vundle
-Bundle &#39;gmarik/vundle&#39;</p>
+&quot; Let Vundle manage Vundle
+Bundle &#39;gmarik/vundle&#39;
 
-<p>&quot; CtrlP
+&quot; CtrlP
 Bundle &#39;kien/ctrlp.vim&#39;
-map <leader>t <C-p>
-map <leader>y :CtrlPBuffer<cr>
-let g:ctrlp<em>show</em>hidden=1
-let g:ctrlp<em>working</em>path<em>mode=0
-let g:ctrlp</em>max<em>height=30
-set wildignore+=<em>/.git/</em>,<em>/.hg/</em>,<em>/.svn/</em>.,*/.DS</em>Store</p>
+map &lt;leader&gt;t &lt;C-p&gt;
+map &lt;leader&gt;y :CtrlPBuffer&lt;cr&gt;
+let g:ctrlp_show_hidden=1
+let g:ctrlp_working_path_mode=0
+let g:ctrlp_max_height=30
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*.,*/.DS_Store
 
-<p>&quot; Tomorrow Night Theme
+&quot; Tomorrow Night Theme
 Bundle &#39;jlangston/tomorrow-night-vim&#39;
-:silent! :colorscheme tomorrow-night-bright</p>
+:silent! :colorscheme tomorrow-night-bright
 
-<p>&quot; Markdown
-Bundle &#39;tpope/vim-markdown&#39;</p>
+&quot; Markdown
+Bundle &#39;tpope/vim-markdown&#39;
 
-<p>&quot; Markdown (allow piping of markdown files to the browser)
-au BufEnter,BufNew *.md map <enter> :wa|!rbfu rdiscount % | bcat<cr></p>
+&quot; Markdown (allow piping of markdown files to the browser)
+au BufEnter,BufNew *.md map &lt;enter&gt; :wa\|!rbfu rdiscount % \| bcat&lt;cr&gt;
 
-<p>&quot; Cucumber
-Bundle &#39;tpope/vim-cucumber&#39;</p>
+&quot; Cucumber
+Bundle &#39;tpope/vim-cucumber&#39;
 
-<p>&quot; Tags
-&quot; First run <code>ctags -R</code> within the root directory (this is installed via
+&quot; Tags
+&quot; First run `ctags -R` within the root directory (this is installed via
 Homebrew)
-&quot; Second within your file, on a method/class/object (whatever) press <code>Ctrl+]</code>
+&quot; Second within your file, on a method/class/object (whatever) press `Ctrl+]`
 Bundle &#39;xolox/vim-misc&#39;
 Bundle &#39;majutsushi/tagbar&#39;
-let g:tagbar<em>ctags</em>bin=&#39;/usr/local/bin/ctags&#39;</p>
+let g:tagbar_ctags_bin=&#39;/usr/local/bin/ctags&#39;
 
-<p>&quot; Tags
-&quot; Open Tagbar when pressing <leader>b
+&quot; Tags
+&quot; Open Tagbar when pressing &lt;leader&gt;b
 &quot; And automatically close it after selecting something
-:map <leader>b :TagbarOpenAutoClose<cr></p>
+:map &lt;leader&gt;b :TagbarOpenAutoClose&lt;cr&gt;
 
-<p>&quot; Tab completion
-Bundle &#39;ervandew/supertab&#39;</p>
+&quot; Tab completion
+Bundle &#39;ervandew/supertab&#39;
 
-<p>&quot; Enable repeating supported plugin maps with &#39;.&#39;
-Bundle &#39;tpope/vim-repeat&#39;</p>
+&quot; Enable repeating supported plugin maps with &#39;.&#39;
+Bundle &#39;tpope/vim-repeat&#39;
 
-<p>&quot; Comment out stuff
-Bundle &#39;tpope/vim-commentary.git&#39;</p>
+&quot; Comment out stuff
+Bundle &#39;tpope/vim-commentary.git&#39;
 
-<p>&quot; Ack (uses Ag behind the scenes)
+&quot; Ack (uses Ag behind the scenes)
 Bundle &#39;mileszs/ack.vim&#39;
-let g:ackprg = &#39;ag --nogroup --nocolor --column&#39;</p>
+let g:ackprg = &#39;ag --nogroup --nocolor --column&#39;
 
-<p>&quot; Applies <code>end</code> keyword to relevant lines of ruby code
-Bundle &#39;tpope/vim-endwise&#39;</p>
+&quot; Applies `end` keyword to relevant lines of ruby code
+Bundle &#39;tpope/vim-endwise&#39;
 
-<p>&quot; Status line design improvements
+&quot; Status line design improvements
 Bundle &#39;Lokaltog/powerline&#39;
-set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim</p>
+set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
 
-<p>&quot; Gists
+&quot; Gists
 Bundle &#39;mattn/webapi-vim&#39;
 Bundle &#39;vim-scripts/Gist.vim&#39;
-Bundle &#39;tpope/vim-fugitive&#39;</p>
+Bundle &#39;tpope/vim-fugitive&#39;
 
-<p>&quot; Gists (Github settings)
-let g:github<em>user = $GITHUB</em>USER
-let g:github<em>token = $GITHUB</em>TOKEN</p>
+&quot; Gists (Github settings)
+let g:github_user = $GITHUB_USER
+let g:github_token = $GITHUB_TOKEN
 
-<p>&quot; HTML generation (in NORMAL mode Ctrl+y then , <C-y,>)
-Bundle &#39;mattn/emmet-vim&#39;</p>
+&quot; HTML generation (in NORMAL mode Ctrl+y then , &lt;C-y,&gt;)
+Bundle &#39;mattn/emmet-vim&#39;
 
-<p>&quot; Rename variables and files in your code
-Bundle &#39;vim-scripts/rename.vim&#39;</p>
+&quot; Rename variables and files in your code
+Bundle &#39;vim-scripts/rename.vim&#39;
 
-<p>&quot; tmux switcher
+&quot; tmux switcher
 &quot;
 http://robots.thoughtbot.com/post/53022241323/seamlessly-navigate-vim-and-tmux-splits
-Bundle &#39;christoomey/vim-tmux-navigator&#39;</p>
+Bundle &#39;christoomey/vim-tmux-navigator&#39;
 
-<p>&quot; Git gutter
+&quot; Git gutter
 Bundle &#39;airblade/vim-gitgutter&#39;
-let g:gitgutter<em>enabled = 1
-let g:gitgutter</em>eager = 0
-let g:gitgutter<em>sign</em>column_always = 1
-highlight clear SignColumn</p>
+let g:gitgutter_enabled = 1
+let g:gitgutter_eager = 0
+let g:gitgutter_sign_column_always = 1
+highlight clear SignColumn
 
-<p>&quot; File System
+&quot; File System
 Bundle &#39;vim-scripts/The-NERD-tree&#39;
-map <leader>&#39; :NERDTreeToggle<cr></p>
+map &lt;leader&gt;&#39; :NERDTreeToggle&lt;cr&gt;
 
-<p>&quot; Snippets
+&quot; Snippets
 Bundle &#39;MarcWeber/vim-addon-mw-utils&#39;
 Bundle &#39;tomtom/tlib_vim&#39;
-Bundle &#39;garbas/vim-snipmate&#39;</p>
+Bundle &#39;garbas/vim-snipmate&#39;
 
-<p>&quot; SCSS, Sass &amp; Haml Syntax Support
-Bundle &#39;tpope/vim-haml&#39;</p>
+&quot; SCSS, Sass &amp; Haml Syntax Support
+Bundle &#39;tpope/vim-haml&#39;
 
-<p>&quot; Surround text with HTML or punctuation
-Bundle &#39;tpope/vim-surround&#39;</p>
+&quot; Surround text with HTML or punctuation
+Bundle &#39;tpope/vim-surround&#39;
 
-<p>&quot; HTML5 syntax
-Bundle &#39;othree/html5.vim&#39;</p>
+&quot; HTML5 syntax
+Bundle &#39;othree/html5.vim&#39;
 
-<p>&quot; Tabularize
+&quot; Tabularize
 Bundle &#39;godlygeek/tabular&#39;
-map <Leader>e :Tabularize /=<cr>
-map <Leader>c :Tabularize /:<cr></p>
+map &lt;Leader&gt;e :Tabularize /=&lt;cr&gt;
+map &lt;Leader&gt;c :Tabularize /:&lt;cr&gt;
 
-<p>&quot; JS Hint
+&quot; JS Hint
 Bundle &#39;Shutnik/jshint2.vim&#39;
-```</p>
+</code></pre>
 
 <h2>Useful Vim features/commands</h2>
 
@@ -755,14 +750,13 @@ then use: <code>vi(</code> or <code>vi&#39;</code> or <code>vi&quot;</code> (you
 copy and paste to another place in my code. Imagine you have the following
 code...</p>
 
-<p><code>js
-/**
+<pre><code>/**
  * @param abc
  */
 function someThing (def) {
     //
 }
-</code></p>
+</code></pre>
 
 <p>...I want to replace <code>def</code> with <code>abc</code> so the first thing I do is yank/copy the
 <code>abc</code>, then move to the parenthesis, but rather than manually delete <code>def</code> and
@@ -806,13 +800,12 @@ command <code>bd</code> for every buffer currently open. Simple.</p>
 
 <p>Within my .vimrc file I&#39;ve mapped those last two items to more easily accessible keys...</p>
 
-<p>```vim
-&quot; List Buffers
-map <leader>yt :ls<cr></p>
+<pre><code>&quot; List Buffers
+map &lt;leader&gt;yt :ls&lt;cr&gt;
 
-<p>&quot; Delete all Buffers (runs the delete buffer command on all open buffers)
-map <leader>yd :bufdo bd<cr>
-```</p>
+&quot; Delete all Buffers (runs the delete buffer command on all open buffers)
+map &lt;leader&gt;yd :bufdo bd&lt;cr&gt;
+</code></pre>
 
 <h3>Jump List</h3>
 
@@ -895,16 +888,14 @@ end up using a lot.</p>
 
 <p>So it&#39;ll convert...</p>
 
-<p><code>
-Here is some text
+<pre><code>Here is some text
 that is split by a line break
-</code></p>
+</code></pre>
 
 <p>...into...</p>
 
-<p><code>
-Here is some text that is split by a line break
-</code></p>
+<pre><code>Here is some text that is split by a line break
+</code></pre>
 
 <h3>Switching case</h3>
 
@@ -936,9 +927,8 @@ syntax can be a pain to jump through like that.</p>
 <p>Consider (and this is a contrived example, so forgive me, I realise there are
 better ways)...</p>
 
-<p><code>js
-this.handlePrevImageCalculations = _.debounce(function() {
-</code></p>
+<pre><code>this.handlePrevImageCalculations = _.debounce(function() {
+</code></pre>
 
 <p>...if I want to get my cursor to just before <code>=</code> then pressing <code>e</code> would take about
 three presses as it would stop at the end of <code>this</code> and then <code>.</code> and finally at

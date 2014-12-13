@@ -44,48 +44,45 @@
 
 <p>First we need to write a function to insert our script(s):</p>
 
-<p><code>js
-function insertScript(script, container) {
+<pre><code>function insertScript(script, container) {
     var elem = document.createElement(&#39;script&#39;);
     elem.type = &#39;text/javascript&#39;;
     elem.src = &#39;Assets/Scripts/&#39; + script + &#39;.js&#39;;
     container.appendChild(elem);
 }
-</code></p>
+</code></pre>
 
 <p>Next we need to detect the current page (details are in the code comments):</p>
 
-<p>```js
-// The &#39;pagechange&#39; event is triggered after the changePage() request has finished loading the page into the DOM 
+<pre><code>// The &#39;pagechange&#39; event is triggered after the changePage() request has finished loading the page into the DOM 
 // and all page transition animations have completed.
 // See: https://gist.github.com/1336327 for some other page events
-$(document).bind(&#39;pagechange&#39;, function(event){</p>
+$(document).bind(&#39;pagechange&#39;, function(event){
 
-<pre><code>// grab a list of all the divs&#39;s found in the page that have the attribute &quot;role&quot; with a value of &quot;page&quot;
-var pages = $(&#39;div[data-role=&quot;page&quot;]&#39;),
+    // grab a list of all the divs&#39;s found in the page that have the attribute &quot;role&quot; with a value of &quot;page&quot;
+    var pages = $(&#39;div[data-role=&quot;page&quot;]&#39;),
 
-    // the current page is always the last div in the Array, so we store it in a variable
-    currentPage = pages[pages.length-1],
+        // the current page is always the last div in the Array, so we store it in a variable
+        currentPage = pages[pages.length-1],
 
-    // grab the url of the page the  was loaded from (e.g. what page have we just ajax&#39;ed into view)
-    attr = currentPage.getAttribute(&#39;data-url&#39;);
+        // grab the url of the page the  was loaded from (e.g. what page have we just ajax&#39;ed into view)
+        attr = currentPage.getAttribute(&#39;data-url&#39;);
 
-// basic conditional checks for the url we&#39;re expecting
-if (attr.indexOf(&#39;home.html&#39;) !== -1) {
-    // now we know what page we&#39;re on we can insert the required scripts.
-    // In this case i&#39;m inserting a &#39;script.js&#39; file.
-    // I do this by passing through the name of the file and the &#39;currentPage&#39; variable
-    insertScript(&#39;search&#39;, currentPage);
-}
+    // basic conditional checks for the url we&#39;re expecting
+    if (attr.indexOf(&#39;home.html&#39;) !== -1) {
+        // now we know what page we&#39;re on we can insert the required scripts.
+        // In this case i&#39;m inserting a &#39;script.js&#39; file.
+        // I do this by passing through the name of the file and the &#39;currentPage&#39; variable
+        insertScript(&#39;search&#39;, currentPage);
+    }
 
-// rinse and repeat...
-if (attr.indexOf(&#39;profile.html&#39;) !== -1) {
-    insertScript(&#39;profile&#39;, currentPage);
-}
+    // rinse and repeat...
+    if (attr.indexOf(&#39;profile.html&#39;) !== -1) {
+        insertScript(&#39;profile&#39;, currentPage);
+    }
+
+});
 </code></pre>
-
-<p>});
-```</p>
 
 <h2>Conclusion</h2>
 

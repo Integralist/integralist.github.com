@@ -51,8 +51,7 @@
 
 <p>The HTML is very simple...</p>
 
-<p><code>html
-&lt;section&gt;
+<pre><code>&lt;section&gt;
     &lt;h1&gt;Sterling Calculator&lt;/h1&gt;
     &lt;form action=&quot;process.php&quot; method=&quot;post&quot;&gt;
         &lt;p&gt;Please enter an amount: (e.g. 92p, &amp;pound;2.12)&lt;/p&gt;
@@ -62,12 +61,11 @@
         &lt;/p&gt;
     &lt;/form&gt;
 &lt;/section&gt;
-</code></p>
+</code></pre>
 
 <p>So lets add in our classes for styling this widget and lets go on to break down what we&#39;ve added and why...</p>
 
-<p><code>html
-&lt;section class=&quot;widget&quot;&gt;
+<pre><code>&lt;section class=&quot;widget&quot;&gt;
     &lt;h1 class=&quot;widget__header&quot;&gt;Sterling Calculator&lt;/h1&gt;
     &lt;form class=&quot;widget__form&quot; action=&quot;process.php&quot; method=&quot;post&quot;&gt;
         &lt;p&gt;Please enter an amount: (e.g. 92p, &amp;pound;2.12)&lt;/p&gt;
@@ -77,7 +75,7 @@
         &lt;/p&gt;
     &lt;/form&gt;
 &lt;/section&gt;
-</code></p>
+</code></pre>
 
 <p>First thing to notice is that we&#39;ve determined the top level <code>&lt;section&gt;</code> element to be our &#39;block&#39;. This is the top level containing element. We&#39;ve added a class of <code>widget</code> and this will be our namespace for this object/widget (whatever you prefer to call it).</p>
 
@@ -102,40 +100,37 @@
 
 <p>This means that our CSS code for this widget ends up looking like this…</p>
 
-<p>```css
-.widget {
+<pre><code>.widget {
     background-color: #FC3;
-}</p>
+}
 
-<p>.widget__header {
+.widget__header {
     color: #930;
     font-size: 3em;
     margin-bottom: 0.3em;
     text-shadow: #FFF 1px 1px 2px;
-}</p>
+}
 
-<p>.widget__input {
+.widget__input {
     -webkit-border-radius: 5px;
        -moz-border-radius: 5px;
          -o-border-radius: 5px;
-            border-radius: 5px;</p>
+            border-radius: 5px;
 
-<pre><code>font-size: 0.9em;
-line-height: 1.3;
-padding: 0.4em 0.7em;
-</code></pre>
+    font-size: 0.9em;
+    line-height: 1.3;
+    padding: 0.4em 0.7em;
+}
 
-<p>}</p>
-
-<p>.widget__input--amount {
+.widget__input--amount {
     border: 1px solid #930;
-}</p>
+}
 
-<p>.widget__input--submit {
+.widget__input--submit {
     background-color: #EEE;
     border: 0;
 }
-```</p>
+</code></pre>
 
 <h2>Why BEM over the others?</h2>
 

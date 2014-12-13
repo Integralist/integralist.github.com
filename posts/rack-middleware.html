@@ -42,9 +42,8 @@
 
 <p>Typically you&#39;ll have a <code>config.ru</code> file with content like:</p>
 
-<p><code>ruby
-run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]}
-</code></p>
+<pre><code>run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]}
+</code></pre>
 
 <p>...and to run the webserver (WEBrick by default, but you can use many others) you need to execute <code>rackup</code> via your terminal&#39;s shell/command line interface.</p>
 
@@ -64,8 +63,7 @@ run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&q
 
 <p>An example will demonstrate this better. The following is a hypothetical <code>config.ru</code> file...</p>
 
-<p><code>ruby
-class A
+<pre><code>class A
   def self.call(env)
     [200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]
   end
@@ -74,7 +72,7 @@ use D # pass C into this middleware third  (D runs C and manipulates the respons
 use C # pass B into this middleware second (C runs B and manipulates the response from B)
 use B # pass A into this middleware first  (B runs A and manipulates the response from A)
 run A
-</code></p>
+</code></pre>
 
 <p>...in this example we can see we have three middleware classes: <code>B</code>, <code>C</code> and <code>D</code>.</p>
 
@@ -84,13 +82,12 @@ run A
 
 <p>We could theorectically inline the <code>use</code> and <code>run</code> calls into the following example...</p>
 
-<p><code>ruby
-D(
+<pre><code>D(
   C(
     B(A)
   )
 )
-</code></p>
+</code></pre>
 
 <p>...the <code>run</code> and <code>use</code> functions work together to create a nested set of calls like seen above.</p>
 
@@ -102,27 +99,25 @@ D(
 
 <p>If we didn&#39;t want to use a <code>config.ru</code> file, we could have a Ruby script that uses <code>Rack::Builder</code> directly, like so:</p>
 
-<p>```ruby
-class A
+<pre><code>class A
   def self.call(env)
-    [200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;<h1>Hello World</h1>&quot;]]
+    [200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]
   end
-end</p>
+end
 
-<p>app = Rack::Builder.new do
+app = Rack::Builder.new do
   use D
   use C
   use B
   run A
 end
-```</p>
+</code></pre>
 
 <h2>Simple example</h2>
 
-<p>```ruby
-use Rack::Lint # gives more descriptive error messages when responses aren&#39;t valid</p>
+<pre><code>use Rack::Lint # gives more descriptive error messages when responses aren&#39;t valid
 
-<p>class LogIt
+class LogIt
   def initialize(app)
     @app = app
   end
@@ -131,32 +126,30 @@ use Rack::Lint # gives more descriptive error messages when responses aren&#39;t
     body.map { |chunk| p &quot;LogIt: #{chunk}&quot; }
     [status, headers, body]
   end
-end</p>
+end
 
-<p>class Upper
+class Upper
   def initialize(app)
     @app = app
   end
   def call(env)
     # Execute our main application (store off its return value)
-    status, headers, body  = @app.call(env)</p>
+    status, headers, body  = @app.call(env)
 
-<pre><code># Transform the returned value(s)
-# Remember the body is an Array
-upcased_body = body.map { |chunk| chunk.upcase }
+    # Transform the returned value(s)
+    # Remember the body is an Array
+    upcased_body = body.map { |chunk| chunk.upcase }
 
-# Return the newly filtered response
-[status, headers, upcased_body]
+    # Return the newly filtered response
+    [status, headers, upcased_body]
+  end
+end
+
+use LogIt # Does nothing with uppercase&#39;d response, just logs it to stdout
+use Upper # Modifies response to be uppercase
+
+run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]}
 </code></pre>
-
-<p>end
-end</p>
-
-<p>use LogIt # Does nothing with uppercase&#39;d response, just logs it to stdout
-use Upper # Modifies response to be uppercase</p>
-
-<p>run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;<h1>Hello World</h1>&quot;]]}
-```</p>
 
 <p>In this example, we&#39;re back to using a Lambda, which is passed into our <code>Upper</code> class and the response from that is passed into our <code>LogIt</code> class. </p>
 
@@ -166,10 +159,9 @@ use Upper # Modifies response to be uppercase</p>
 
 <p>The response we would get back is: <code>&lt;H1&gt;HELLO WORLD&lt;/H1&gt;</code> (and if you were to look at your terminal&#39;s <code>stdout</code> you should also see something like: </p>
 
-<p><code>bash
-&quot;LogIt: &lt;H1&gt;HELLO WORLD&lt;/H1&gt;&quot;
+<pre><code>&quot;LogIt: &lt;H1&gt;HELLO WORLD&lt;/H1&gt;&quot;
 127.0.0.1 - - [15/Nov/2014 11:21:07] &quot;GET / HTTP/1.1&quot; 200 - 0.0006
-</code></p>
+</code></pre>
 
 <h2>Custom Cache Middleware</h2>
 
@@ -179,47 +171,43 @@ use Upper # Modifies response to be uppercase</p>
 
 <p>Fundamentally it comes down to registering the use of the Cache middleware (we&#39;ll take a look at that in a moment):</p>
 
-<p>```ruby
-cache<em>headers = {
-  :cache</em>control =&gt; &quot;max-age=2678400, public&quot;, # 86400 seconds == 1 day * 31
+<pre><code>cache_headers = {
+  :cache_control =&gt; &quot;max-age=2678400, public&quot;, # 86400 seconds == 1 day * 31
   :expires =&gt; 2678400
-}</p>
+}
 
-<p>use Cache, { :assets =&gt; cache_headers }
-```</p>
+use Cache, { :assets =&gt; cache_headers }
+</code></pre>
 
 <p>In this example we&#39;re passing a Hash into our Middleware class that it&#39;ll use as a pattern for matching resources that should be cached. In this case I only have a single key <code>:assets</code> because all my static assets (images, stylesheets and scripts) are kept within that directory: </p>
 
-<p><code>
-├── Assets
+<pre><code>├── Assets
 │   ├── Images
 │   │   └── rack-logo.png
 │   ├── Scripts
 │   │   └── test.js
 │   └── Styles
 │       └── base.css
-</code></p>
+</code></pre>
 
 <p>But imagine for a moment that you have a different structure (no <code>Assets</code> parent directory):</p>
 
-<p><code>
-├── Images
+<pre><code>├── Images
 │   ├── rack-logo.png
 ├── Scripts
 │   ├── test.js
 ├── Styles
 │   ├── base.css
-</code></p>
+</code></pre>
 
 <p>...then you would need to change the Hash to:</p>
 
-<p><code>ruby
-{
+<pre><code>{
   :images  =&gt; cache_headers,
   :scripts =&gt; cache_headers,
   :styles  =&gt; cache_headers
 }
-</code></p>
+</code></pre>
 
 <p>...admittedly we have duplication here because we&#39;re specifying the <code>cache_headers</code> variable multiple times (hence why I have all my static assets inside an <code>Assets</code> folder) but it does give you the freedom to apply different caching strategies depending on the type of asset being requested.</p>
 
@@ -229,33 +217,32 @@ cache<em>headers = {
 
 <p>The Cache middleware looks like this...</p>
 
-<p>```ruby
-class Cache
-  attr_reader :app, :pattern</p>
+<pre><code>class Cache
+  attr_reader :app, :pattern
 
-<p>def initialize(app, pattern)
+  def initialize(app, pattern)
     @app = app
     @pattern = pattern
-  end</p>
+  end
 
-<p>def call(env)
+  def call(env)
     app.call(env).tap do |res|
       pattern.each do |p, config|
-        if env[&quot;REQUEST<em>PATH&quot;] =~ generated</em>pattern(p)
-          res[1][&quot;Cache-Control&quot;] = config[:cache<em>control] if config.has</em>key? :cache<em>control
-          res[1][&quot;Expires&quot;] = (Time.now + config[:expires]).utc.rfc2822 if config.has</em>key? :expires
+        if env[&quot;REQUEST_PATH&quot;] =~ generated_pattern(p)
+          res[1][&quot;Cache-Control&quot;] = config[:cache_control] if config.has_key? :cache_control
+          res[1][&quot;Expires&quot;] = (Time.now + config[:expires]).utc.rfc2822 if config.has_key? :expires
         end
       end
     end
-  end</p>
+  end
 
-<p>private</p>
+  private
 
-<p>def generated<em>pattern(pattern)
-    Regexp.new pattern.to</em>s.capitalize
+  def generated_pattern(pattern)
+    Regexp.new pattern.to_s.capitalize
   end
 end
-```</p>
+</code></pre>
 
 <p>It&#39;s the same pattern we&#39;ve seen before: we store off the app (but this time we also store off the Hash as <code>pattern</code>) and then the <code>call</code> method executes the <code>app</code> and returns it.</p>
 

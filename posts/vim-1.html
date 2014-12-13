@@ -280,11 +280,10 @@ Typically developers find another editor.</p>
 
 <p>If you open the yaml file you&#39;ll see it has a basic example set-up ready for you to configure…</p>
 
-<p>```yaml
-name: test-project
-root: ~/Code/news/workspace/</p>
+<pre><code>name: test-project
+root: ~/Code/news/workspace/
 
-<p>windows:
+windows:
   - editor:
       layout: main-vertical
       panes:
@@ -293,7 +292,7 @@ root: ~/Code/news/workspace/</p>
         - cd path/to/my/cheatsheet &amp;&amp; vim cheat-sheet.txt
   - sandbox: vagrant ssh
   - sass: grunt watch:service:news
-```</p>
+</code></pre>
 
 <p>…above is an example of my <code>work.yml</code>.</p>
 
@@ -350,19 +349,18 @@ vundle.git
 
 <p>Let&#39;s open our <code>.vimrc</code> file and add some plug-ins we&#39;re going to need (code comments start with &quot;)…</p>
 
-<p>```sh
-set rtp+=$HOME/.vim/bundle/vundle
+<pre><code>set rtp+=$HOME/.vim/bundle/vundle
 call vundle#rc()
 Bundle &#39;gmarik/vundle&#39;
-filetype plugin indent on</p>
+filetype plugin indent on
 
-<p>&quot; ALL OF THE ABOVE IS ALSO REQUIRED
+&quot; ALL OF THE ABOVE IS ALSO REQUIRED
 &quot; FOR SUCCESSFUL VUNDLE INSTALL
-&quot; THE FOLLOWING IS NEW FOR US…</p>
+&quot; THE FOLLOWING IS NEW FOR US…
 
-<p>Bundle &#39;kien/ctrlp.vim&#39;
+Bundle &#39;kien/ctrlp.vim&#39;
 Bundle &#39;vim-scripts/The-NERD-tree&#39;
-```</p>
+</code></pre>
 
 <p>…so you may have noticed we&#39;ve specified two plug-ins:</p>
 
@@ -509,8 +507,7 @@ Bundle &#39;vim-scripts/The-NERD-tree&#39;
 
 <p>For example…</p>
 
-<p><code>
-Line 1  
+<pre><code>Line 1  
 Line 2  
 Line 3  
 Line 4  
@@ -520,7 +517,7 @@ Line 7
 Line 8  
 Line 9  
 Line 10
-</code></p>
+</code></pre>
 
 <p>…if the cursor is on line 3 and you run <code>d4j</code> you&#39;ll end up deleting lines 3-7 but if you run <code>d4d</code> you&#39;ll delete 3-6 which visually is more likely what you intended (this is because <code>j</code> includes the current line on top of the specified number of lines to delete).</p>
 
@@ -652,13 +649,12 @@ Line 10
 
 <p><code>Ctrl+v</code> puts us into Visual Block mode which allows us to select single columns and make multiple changes. So for example if you have a long list of items such as…</p>
 
-<p><code>
-_List Item 1  
+<pre><code>_List Item 1  
 _List Item 2  
 _List Item 3  
 _List Item 4  
 _List Item 5
-</code></p>
+</code></pre>
 
 <p>…if you wanted to remove the opening <code>_</code> underscore then you could enter Visual Block mode, select the underscores by using the direction keys (make sure you&#39;re on the first or last underscore when you enter Visual Block mode) and then after all are selected just press <code>d</code> to delete them.</p>
 
@@ -716,125 +712,124 @@ _List Item 5
 
 <p>Let&#39;s now take a quick look at some configuration options we can add to our <code>.vimrc</code> file…</p>
 
-<p>```sh
-&quot; switch syntax highlighting on, when the terminal has colors
-syntax on</p>
+<pre><code>&quot; switch syntax highlighting on, when the terminal has colors
+syntax on
 
-<p>&quot; use vim, not vi api
-set nocompatible</p>
+&quot; use vim, not vi api
+set nocompatible
 
-<p>&quot; no backup files
-set nobackup</p>
+&quot; no backup files
+set nobackup
 
-<p>&quot; no write backup
-set nowritebackup</p>
+&quot; no write backup
+set nowritebackup
 
-<p>&quot; no swap file
-set noswapfile</p>
+&quot; no swap file
+set noswapfile
 
-<p>&quot; command history
-set history=100</p>
+&quot; command history
+set history=100
 
-<p>&quot; always show cursor
-set ruler</p>
+&quot; always show cursor
+set ruler
 
-<p>&quot; show incomplete commands
-set showcmd</p>
+&quot; show incomplete commands
+set showcmd
 
-<p>&quot; incremental searching
-set incsearch</p>
+&quot; incremental searching
+set incsearch
 
-<p>&quot; highlight search
-set hlsearch</p>
+&quot; highlight search
+set hlsearch
 
-<p>&quot; ignore case in search
-set smartcase</p>
+&quot; ignore case in search
+set smartcase
 
-<p>&quot; clear search buffer
-:nnoremap § :nohlsearch<cr></p>
+&quot; clear search buffer
+:nnoremap § :nohlsearch&lt;cr&gt;
 
-<p>&quot; make sure undo history is kept for files in buffer.
-set hidden</p>
+&quot; make sure undo history is kept for files in buffer.
+set hidden
 
-<p>&quot; turn indentation on
-filetype indent on</p>
+&quot; turn indentation on
+filetype indent on
 
-<p>&quot; enable filetype plugins
-filetype plugin on</p>
+&quot; enable filetype plugins
+filetype plugin on
 
-<p>&quot; disable folding because it is evil
-set nofoldenable</p>
+&quot; disable folding because it is evil
+set nofoldenable
 
-<p>&quot; turn word wrap off
-set nowrap</p>
+&quot; turn word wrap off
+set nowrap
 
-<p>&quot; scroll with more context
-set scrolloff=10</p>
+&quot; scroll with more context
+set scrolloff=10
 
-<p>&quot; allow backspace to delete end of line, indent and start of line characters
-set backspace=indent,eol,start</p>
+&quot; allow backspace to delete end of line, indent and start of line characters
+set backspace=indent,eol,start
 
-<p>&quot; convert tabs to spaces
-set expandtab</p>
+&quot; convert tabs to spaces
+set expandtab
 
-<p>&quot; set tab size
-set tabstop=4</p>
+&quot; set tab size
+set tabstop=4
 
-<p>&quot; the number of spaces inserted for a tab
-set shiftwidth=4</p>
+&quot; the number of spaces inserted for a tab
+set shiftwidth=4
 
-<p>&quot; turn on line numbers
-set number</p>
+&quot; turn on line numbers
+set number
 
-<p>&quot; highlight tailing whitespace
-set list listchars=tab:\ \ ,trail:·</p>
+&quot; highlight tailing whitespace
+set list listchars=tab:\ \ ,trail:·
 
-<p>&quot; get rid of the delay when pressing O (for example)
+&quot; get rid of the delay when pressing O (for example)
 &quot; http://stackoverflow.com/questions/2158516/vim-delay-before-o-opens-a-new-line
-set timeout timeoutlen=1000 ttimeoutlen=100</p>
+set timeout timeoutlen=1000 ttimeoutlen=100
 
-<p>&quot; always show status bar
-set laststatus=2</p>
+&quot; always show status bar
+set laststatus=2
 
-<p>&quot; set the status line to something useful
-set statusline=%f\ %=L:%l/%L\ %c\ (%p%%)</p>
+&quot; set the status line to something useful
+set statusline=%f\ %=L:%l/%L\ %c\ (%p%%)
 
-<p>&quot; hide the toolbar
-set guioptions-=T</p>
+&quot; hide the toolbar
+set guioptions-=T
 
-<p>&quot; utf encoding
-set encoding=utf-8</p>
+&quot; utf encoding
+set encoding=utf-8
 
-<p>&quot; autoload files that have changed outside of vim
-set autoread</p>
+&quot; autoload files that have changed outside of vim
+set autoread
 
-<p>&quot; jump to last cursor
+&quot; jump to last cursor
 autocmd BufReadPost *
   \ if line(&quot;&#39;\&quot;&quot;) &gt; 0 &amp;&amp; line(&quot;&#39;\&quot;&quot;) &lt;= line(&quot;$&quot;) |
   \   exe &quot;normal g`\&quot;&quot; |
-  \ endif</p>
+  \ endif
 
-<p>&quot; set-up ctrlp to include hidden files in its search
-let g:ctrlp<em>show</em>hidden=1</p>
+&quot; set-up ctrlp to include hidden files in its search
+let g:ctrlp_show_hidden=1
 
-<p>&quot; disable ctrlp&#39;s feature where it tries to intelligently work out the current working directory to search within
-let g:ctrlp<em>working</em>path_mode=0</p>
+&quot; disable ctrlp&#39;s feature where it tries to intelligently work out the current working directory to search within
+let g:ctrlp_working_path_mode=0
 
-<p>&quot; don&#39;t let ctrlp take over the screen!
-let g:ctrlp<em>max</em>height=30</p>
+&quot; don&#39;t let ctrlp take over the screen!
+let g:ctrlp_max_height=30
 
-<p>&quot; lets make sure we don&#39;t show these files
-set wildignore+=<em>/.git/</em>,<em>/.hg/</em>,<em>/.svn/</em>.,*/.DS_Store</p>
+&quot; lets make sure we don&#39;t show these files
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*.,*/.DS_Store
 
-<p>&quot; allows us to more easily work with markdown files
-Bundle &#39;tpope/vim-markdown&#39;</p>
+&quot; allows us to more easily work with markdown files
+Bundle &#39;tpope/vim-markdown&#39;
 
-<p>&quot; allows us to comment/uncomment lines and content
-Bundle &#39;tpope/vim-commentary.git&#39;</p>
+&quot; allows us to comment/uncomment lines and content
+Bundle &#39;tpope/vim-commentary.git&#39;
 
-<p>&quot; remove whitespace on save
-autocmd BufWritePre * :%s/\s+$//e
-```</p>
+&quot; remove whitespace on save
+autocmd BufWritePre * :%s/\s\+$//e
+</code></pre>
 
 <p>…hopefully the comments are self explanatory. There is so much you can configure with Vim that you just need to take the time to look at what set-up works for you, as chances are you&#39;ll be able to change it.</p>
 

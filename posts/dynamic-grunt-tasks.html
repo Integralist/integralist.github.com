@@ -108,62 +108,60 @@
 
 <p>Inside that file we have the following code (note: this is a <em>really</em> stripped back version just so it&#39;s a little bit more readable)…</p>
 
-<p>```js
-module.exports = function (grunt) {</p>
+<pre><code>module.exports = function (grunt) {
 
-<pre><code>grunt.initConfig({
+    grunt.initConfig({
 
-    dir: {
-        static: &#39;./tabloid/webapp/static/&#39;,
-        static_sass: &#39;&lt;%= dir.static %&gt;&#39; + &#39;sass/&#39;,
-        static_css: &#39;&lt;%= dir.static %&gt;&#39; + &#39;stylesheets/&#39;,
-    },
-
-    sass: {
-        dist: {
-            options: {
-                style: &#39;compressed&#39;,
-                require: [&#39;&lt;%= dir.static_sass %&gt;partials/helpers/url64.rb&#39;]
-            },
-            expand: true,
-            cwd: &#39;&lt;%= dir.static_sass %&gt;&#39;,
-            src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
-            dest: &#39;&lt;%= dir.static_css %&gt;&#39;,
-            ext: &#39;.css&#39;
+        dir: {
+            static: &#39;./tabloid/webapp/static/&#39;,
+            static_sass: &#39;&lt;%= dir.static %&gt;&#39; + &#39;sass/&#39;,
+            static_css: &#39;&lt;%= dir.static %&gt;&#39; + &#39;stylesheets/&#39;,
         },
-        dev: {
-            options: {
-                style: &#39;expanded&#39;,
-                debugInfo: true,
-                lineNumbers: true,
-                require: [&#39;&lt;%= dir.static_sass %&gt;partials/helpers/url64.rb&#39;]
+
+        sass: {
+            dist: {
+                options: {
+                    style: &#39;compressed&#39;,
+                    require: [&#39;&lt;%= dir.static_sass %&gt;partials/helpers/url64.rb&#39;]
+                },
+                expand: true,
+                cwd: &#39;&lt;%= dir.static_sass %&gt;&#39;,
+                src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
+                dest: &#39;&lt;%= dir.static_css %&gt;&#39;,
+                ext: &#39;.css&#39;
             },
-            expand: true,
-            cwd: &#39;&lt;%= dir.static_sass %&gt;&#39;,
-            src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
-            dest: &#39;&lt;%= dir.static_css %&gt;&#39;,
-            ext: &#39;.css&#39;
+            dev: {
+                options: {
+                    style: &#39;expanded&#39;,
+                    debugInfo: true,
+                    lineNumbers: true,
+                    require: [&#39;&lt;%= dir.static_sass %&gt;partials/helpers/url64.rb&#39;]
+                },
+                expand: true,
+                cwd: &#39;&lt;%= dir.static_sass %&gt;&#39;,
+                src: [&#39;**/*.scss&#39;, &#39;!**/_*.scss&#39;, &#39;!locator/*.scss&#39;],
+                dest: &#39;&lt;%= dir.static_css %&gt;&#39;,
+                ext: &#39;.css&#39;
+            }
+            // Dynamic Sass Content
+            // Dynamic Sass Content Ended
+        },
+
+        watch: {
+            // Dynamic Watch Content
+            // Dynamic Watch Content Ended
         }
-        // Dynamic Sass Content
-        // Dynamic Sass Content Ended
-    },
 
-    watch: {
-        // Dynamic Watch Content
-        // Dynamic Watch Content Ended
-    }
+    });
 
-});
+    grunt.loadNpmTasks(&#39;grunt-contrib-watch&#39;);
+    grunt.loadNpmTasks(&#39;grunt-contrib-sass&#39;);
 
-grunt.loadNpmTasks(&#39;grunt-contrib-watch&#39;);
-grunt.loadNpmTasks(&#39;grunt-contrib-sass&#39;);
+    require(&#39;./grunt-dynamic.js&#39;)(grunt);
+    require(&#39;./grunt-customtasks.js&#39;)(grunt);
 
-require(&#39;./grunt-dynamic.js&#39;)(grunt);
-require(&#39;./grunt-customtasks.js&#39;)(grunt);
+};
 </code></pre>
-
-<p>};
-```</p>
 
 <p>…as you can see we have loaded the relevant Sass and Watch Grunt tasks and we&#39;ve set-up some default configurations for them.</p>
 
@@ -177,26 +175,23 @@ require(&#39;./grunt-customtasks.js&#39;)(grunt);
 
 <p>OK, this isn&#39;t strictly speaking a file that has anything to do with the problem/solution that we&#39;re working on. The reason I&#39;ve included it here is because you&#39;ll see that I&#39;ve written two custom Grunt tasks which I&#39;ve gone ahead and made the assumption that A.) this would be of interest to those of you reading this and B.) one of the custom tasks was quite useful in helping me quickly test my code was working... </p>
 
-<p>```js
-module.exports = function (grunt) {
-    grunt.registerTask(&#39;noop&#39;, &#39;x&#39;, function(){ console.log(&#39;noop run&#39;); });</p>
+<pre><code>module.exports = function (grunt) {
+    grunt.registerTask(&#39;noop&#39;, &#39;x&#39;, function(){ console.log(&#39;noop run&#39;); });
 
-<pre><code>grunt.registerTask(&#39;concat_specjs&#39;, &#39;Concatenate all JS test/spec files into a single file&#39;, function(){
-    var specs = grunt.file.expand(&#39;tabloid/webapp/static/js/jasmine/spec/*.js&#39;),
-        contents;
+    grunt.registerTask(&#39;concat_specjs&#39;, &#39;Concatenate all JS test/spec files into a single file&#39;, function(){
+        var specs = grunt.file.expand(&#39;tabloid/webapp/static/js/jasmine/spec/*.js&#39;),
+            contents;
 
-    specs = specs.map(function(file_path){
-        return &quot;&#39;&quot; + file_path.split(&#39;tabloid/webapp/static/js/&#39;)[1].split(&#39;.js&#39;)[0] + &quot;&#39;&quot;;
+        specs = specs.map(function(file_path){
+            return &quot;&#39;&quot; + file_path.split(&#39;tabloid/webapp/static/js/&#39;)[1].split(&#39;.js&#39;)[0] + &quot;&#39;&quot;;
+        });
+
+        contents = &quot;define([\n&quot; + specs.join(&#39;,\n&#39;) + &quot;], \nfunction(){ return &#39;&#39;; });&quot;;
+
+        grunt.file.write(&#39;tabloid/webapp/static/js/jasmine-runner.js&#39;, contents);
     });
-
-    contents = &quot;define([\n&quot; + specs.join(&#39;,\n&#39;) + &quot;], \nfunction(){ return &#39;&#39;; });&quot;;
-
-    grunt.file.write(&#39;tabloid/webapp/static/js/jasmine-runner.js&#39;, contents);
-});
+};
 </code></pre>
-
-<p>};
-```</p>
 
 <p>The custom task &#39;concat_specjs&#39; is a good look at how you can use Grunt/Node.js to search for files within specific directories and manipulate them by opening them up and writing content into them using the Grunt API. Nothing actually really complicated about it to be honest, the code speaks for itself.</p>
 
@@ -210,81 +205,78 @@ module.exports = function (grunt) {
 
 <p>This is where the actual work comes in… finally!</p>
 
-<p>```js
-module.exports = function (grunt) {
+<pre><code>module.exports = function (grunt) {
     var file = grunt.file.read(&#39;Gruntfile.js&#39;),
         services = grunt.file.expand(&#39;tabloid/webapp/static/sass/services/*&#39;).map(removePath).filter(removeBlacklistedDirectories),
-        watch<em>subtasks = generateWatchSubTasks(), 
-        sass</em>subtasks = generateSassSubTasks();</p>
+        watch_subtasks = generateWatchSubTasks(), 
+        sass_subtasks = generateSassSubTasks();
 
-<pre><code>function removePath(element) {
-    return element.split(&#39;/&#39;).pop();
-}
-
-function removeBlacklistedDirectories(element) {
-    if (element.indexOf(&#39;journalism&#39;) !== -1) {
-        return false
+    function removePath(element) {
+        return element.split(&#39;/&#39;).pop();
     }
 
-    return true;
-}
+    function removeBlacklistedDirectories(element) {
+        if (element.indexOf(&#39;journalism&#39;) !== -1) {
+            return false
+        }
 
-function generateWatchSubTasks() {
-    var generatedContent = &#39;// Dynamic Watch Content\n            &#39;;
+        return true;
+    }
 
-    services.forEach(function(service) {
-        generatedContent += &quot;,\n            &quot; + service + &quot;: {\n\
-            files: [&#39;&lt;%= dir.static_sass %&gt;/partials/**/*.scss&#39;,\n\
-                    &#39;&lt;%= dir.static_sass %&gt;services/&quot; + service + &quot;/*.scss&#39;],\n\
-            tasks: [&#39;sass:&quot; + service + &quot;&#39;]\n            }&quot;;
+    function generateWatchSubTasks() {
+        var generatedContent = &#39;// Dynamic Watch Content\n            &#39;;
+
+        services.forEach(function(service) {
+            generatedContent += &quot;,\n            &quot; + service + &quot;: {\n\
+                files: [&#39;&lt;%= dir.static_sass %&gt;/partials/**/*.scss&#39;,\n\
+                        &#39;&lt;%= dir.static_sass %&gt;services/&quot; + service + &quot;/*.scss&#39;],\n\
+                tasks: [&#39;sass:&quot; + service + &quot;&#39;]\n            }&quot;;
+        });
+
+        return generatedContent += &#39;\n            // Dynamic Watch Content Ended&#39;;
+    }
+
+    function generateSassSubTasks() {
+        var generatedContent = &#39;// Dynamic Sass Content\n            &#39;;
+
+        services.forEach(function(service) {
+            generatedContent += &quot;,\n            &quot; + service + &quot;: {\n\
+                options: {\n\
+                    style: &#39;expanded&#39;,\n\
+                    debugInfo: true,\n\
+                    lineNumbers: true,\n\
+                    require: [&#39;&lt;%= dir.static_sass %&gt;partials/helpers/url64.rb&#39;]\n\
+                },\n\
+                expand: true,\n\
+                cwd: &#39;&lt;%= dir.static_sass %&gt;/services/&quot; + service + &quot;&#39;,\n\
+                src: [&#39;*.scss&#39;, &#39;!_*.scss&#39;],\n\
+                dest: &#39;&lt;%= dir.static_css %&gt;/services/&quot; + service + &quot;&#39;,\n\
+                ext: &#39;.css&#39;\n\
+            }&quot;;
+        });
+
+        return generatedContent += &#39;\n            // Dynamic Sass Content Ended&#39;;
+    }
+
+    /*
+        Following regex searches our Gruntfile.js for either &quot;// Dynamic Sass Content&quot; or &quot;// Dynamic Watch Content&quot;.
+        It then continues to find the associated ending code comment.
+     */
+    file = file.replace(/(\/\/ Dynamic (Sass|Watch) Content)(?:\r|\n(?:.|\r|\n)+?\1 Ended)?/gmi, function(match, cg1, cg2) {
+        if (cg2 === &#39;Sass&#39;) {
+            returnValue = sass_subtasks;
+        }
+
+        if (cg2 === &#39;Watch&#39;) {
+            returnValue = watch_subtasks;
+        }
+
+        return returnValue;
     });
 
-    return generatedContent += &#39;\n            // Dynamic Watch Content Ended&#39;;
-}
-
-function generateSassSubTasks() {
-    var generatedContent = &#39;// Dynamic Sass Content\n            &#39;;
-
-    services.forEach(function(service) {
-        generatedContent += &quot;,\n            &quot; + service + &quot;: {\n\
-            options: {\n\
-                style: &#39;expanded&#39;,\n\
-                debugInfo: true,\n\
-                lineNumbers: true,\n\
-                require: [&#39;&lt;%= dir.static_sass %&gt;partials/helpers/url64.rb&#39;]\n\
-            },\n\
-            expand: true,\n\
-            cwd: &#39;&lt;%= dir.static_sass %&gt;/services/&quot; + service + &quot;&#39;,\n\
-            src: [&#39;*.scss&#39;, &#39;!_*.scss&#39;],\n\
-            dest: &#39;&lt;%= dir.static_css %&gt;/services/&quot; + service + &quot;&#39;,\n\
-            ext: &#39;.css&#39;\n\
-        }&quot;;
-    });
-
-    return generatedContent += &#39;\n            // Dynamic Sass Content Ended&#39;;
-}
-
-/*
-    Following regex searches our Gruntfile.js for either &quot;// Dynamic Sass Content&quot; or &quot;// Dynamic Watch Content&quot;.
-    It then continues to find the associated ending code comment.
- */
-file = file.replace(/(\/\/ Dynamic (Sass|Watch) Content)(?:\r|\n(?:.|\r|\n)+?\1 Ended)?/gmi, function(match, cg1, cg2) {
-    if (cg2 === &#39;Sass&#39;) {
-        returnValue = sass_subtasks;
-    }
-
-    if (cg2 === &#39;Watch&#39;) {
-        returnValue = watch_subtasks;
-    }
-
-    return returnValue;
-});
-
-grunt.file.write(&#39;Gruntfile.js&#39;, file);
+    grunt.file.write(&#39;Gruntfile.js&#39;, file);
+};
 </code></pre>
-
-<p>};
-```</p>
 
 <p>So again, you can see we&#39;re using a mixture of Grunt API&#39;s and Node.js to accomplish what we need. In this case we&#39;re doing the following…</p>
 

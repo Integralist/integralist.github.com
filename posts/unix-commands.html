@@ -169,28 +169,22 @@
 
 <p>The most common pattern is to search for a particular file (or file type) within a project folder. Imagine you want to find a file called <code>package.json</code> within your project directory which is inside your home directory. Here is how we&#39;d use the <code>find</code> command to do that:</p>
 
-<p>```sh</p>
+<pre><code># first we&#39;ll set-up the project directory and some files...
 
-<h1>first we&#39;ll set-up the project directory and some files...</h1>
-
-<p>cd ~/ # move in to the user&#39;s home directory
+cd ~/ # move in to the user&#39;s home directory
 mkdir project-foobar # make our project directory
 cd project-foobar # move inside the project directory
 touch test.txt {package,blah}.json # this creates 3 files inside our project directory
 ls # =&gt; blah.json   package.json    test.txt
-cd ../ # move back into the user&#39;s home directory and we&#39;ll start searching</p>
+cd ../ # move back into the user&#39;s home directory and we&#39;ll start searching
 
-<h1>here is the actual &#39;find&#39; command</h1>
+# here is the actual &#39;find&#39; command
+find ./project-foobar -name &#39;package.json&#39; # =&gt; ./project-foobar/package.json
 
-<p>find ./project-foobar -name &#39;package.json&#39; # =&gt; ./project-foobar/package.json</p>
-
-<p>find ./project-foobar -name &#39;*.json&#39;</p>
-
-<h1>=&gt; ./project-foobar/blah.json</h1>
-
-<h1>=&gt; ./project-foobar/package.json</h1>
-
-<p>```</p>
+find ./project-foobar -name &#39;*.json&#39;
+# =&gt; ./project-foobar/blah.json
+# =&gt; ./project-foobar/package.json
+</code></pre>
 
 <p>As you can see from the above example the <code>find</code> command has three parameters:</p>
 
@@ -210,24 +204,18 @@ cd ../ # move back into the user&#39;s home directory and we&#39;ll start search
 
 <h3>Finding files over a certain size</h3>
 
-<p>```sh</p>
+<pre><code># all files greater than 1mb
+find $HOME/. -size +1024k 
 
-<h1>all files greater than 1mb</h1>
+# all files inside current directory greater than 500k
+find . -name &#39;*.js&#39; -size +500k 
 
-<p>find $HOME/. -size +1024k </p>
+# find all files larger than zero but less than 500bytes
+find . -size +0 -a -size -500c # (-a is AND, -c is bytes) 
 
-<h1>all files inside current directory greater than 500k</h1>
-
-<p>find . -name &#39;*.js&#39; -size +500k </p>
-
-<h1>find all files larger than zero but less than 500bytes</h1>
-
-<p>find . -size +0 -a -size -500c # (-a is AND, -c is bytes) </p>
-
-<h1>find all all files larger than zero OR (-o) any that haven&#39;t been accessed in over a year</h1>
-
-<p>find . -size 0 -o -atime +365
-```</p>
+# find all all files larger than zero OR (-o) any that haven&#39;t been accessed in over a year
+find . -size 0 -o -atime +365
+</code></pre>
 
 <h2>Grep (Searching for patterns)</h2>
 
@@ -257,21 +245,19 @@ cd ../ # move back into the user&#39;s home directory and we&#39;ll start search
 
 <p>So imagine you have the following <code>test.txt</code> file…</p>
 
-<p><code>sh
-This is my first line
+<pre><code>This is my first line
 This is my second line
 This is my third line
-</code></p>
+</code></pre>
 
 <p>…you could print the line number followed by a specific word (in this case the second from last word on each line) using the following awk command: <code>awk &#39;{ print &quot;Line &quot; NR &quot;: &quot; $(NF-1) }&#39; test.txt</code></p>
 
 <p>Which would display the following content on your screen… </p>
 
-<p><code>sh
-Line 1: first
+<pre><code>Line 1: first
 Line 2: second
 Line 3: third
-</code></p>
+</code></pre>
 
 <p>Let&#39;s break this command down a little…</p>
 
@@ -332,9 +318,8 @@ Line 3: third
 
 <p>Here are three real world examples I&#39;ve used recently…</p>
 
-<p><code>sh
-phantomjs 2&gt;&amp;1 network-test.js | tee log.txt
-</code></p>
+<pre><code>phantomjs 2&gt;&amp;1 network-test.js | tee log.txt
+</code></pre>
 
 <p>In this example I&#39;m executing a <a href="http://phantomjs.org/">PhantomJS</a> script <code>network-test.js</code> but I wanted to capture both the results of the script (which just logs out DNS information into the terminal) and any errors that may have occurred into a log text file.</p>
 
@@ -352,9 +337,8 @@ phantomjs 2&gt;&amp;1 network-test.js | tee log.txt
 
 <p>We then pipe the <code>stdout</code> through to the <code>tee</code> command which copies it into a file called <code>log.txt</code>.</p>
 
-<p><code>sh
-ls File-* | sed &#39;s/\(File-[^-]*\)-\(.*\)/mv &amp; \1\2/&#39; | sh
-</code></p>
+<pre><code>ls File-* | sed &#39;s/\(File-[^-]*\)-\(.*\)/mv &amp; \1\2/&#39; | sh
+</code></pre>
 
 <p>In this example I&#39;m trying to remove a hyphen <code>-</code> from some file names.</p>
 
@@ -372,9 +356,8 @@ ls File-* | sed &#39;s/\(File-[^-]*\)-\(.*\)/mv &amp; \1\2/&#39; | sh
 
 <p>Note: whenever you write a shell script, you would store it (for example) inside a file with the extension of <code>sh</code> and then you&#39;d use the terminal command <code>sh</code> to execute that shell script.</p>
 
-<p><code>sh
-tmux ls | cut -d : -f 1 | xargs -I {} tmux kill-session -t {}
-</code></p>
+<pre><code>tmux ls | cut -d : -f 1 | xargs -I {} tmux kill-session -t {}
+</code></pre>
 
 <p>So in this example I wanted an easy way to destroy all my tmux sessions. </p>
 
@@ -486,9 +469,8 @@ tmux ls | cut -d : -f 1 | xargs -I {} tmux kill-session -t {}
 
 <p>The <code>tr</code> command stands for &#39;translate characters&#39; and it allows you to change the characters in a string of text into a different set of characters. For example...</p>
 
-<p><code>
-echo &quot;foo\nbar\nbaz&quot; | tr &quot;bf&quot; &quot;\!&quot;
-</code></p>
+<pre><code>echo &quot;foo\nbar\nbaz&quot; | tr &quot;bf&quot; &quot;\!&quot;
+</code></pre>
 
 <p>...here we&#39;re saying: &quot;any occurance of the letters &#39;b&#39; and &#39;f&#39; that are found in the string &#39;foo\nbar\n\baz&#39;&quot; should be replaced with a <code>!</code>. </p>
 
@@ -496,51 +478,44 @@ echo &quot;foo\nbar\nbaz&quot; | tr &quot;bf&quot; &quot;\!&quot;
 
 <p>The result would be...</p>
 
-<p><code>
-!oo
+<pre><code>!oo
 !ar
 !az
-</code></p>
+</code></pre>
 
 <p>We can also invert the translation; so we can say &quot;any occurance of a letter that ISN&#39;T &#39;b&#39; or &#39;f&#39; then translate them into an &#39;!&#39;&quot;. For example,</p>
 
-<p><code>
-echo &quot;foo\nbar\nbaz&quot; | tr -c &quot;bf&quot; &quot;\!&quot;
-</code></p>
+<pre><code>echo &quot;foo\nbar\nbaz&quot; | tr -c &quot;bf&quot; &quot;\!&quot;
+</code></pre>
 
 <p>This is done using the <code>-c</code> flag/option. But now if we look at the result you&#39;ll find it hasn&#39;t quite done what we&#39;d expect&quot;</p>
 
-<p><code>
-f!!!b!!!b!!!%
-</code></p>
+<pre><code>f!!!b!!!b!!!%
+</code></pre>
 
 <p>As you can see we&#39;ve not catered for our <code>\n</code> new lines that were within our original string. The <code>tr</code> command has seen the new lines and replaced them with an <code>!</code> because as far as it&#39;s concerned a new line isn&#39;t either a &#39;b&#39; or &#39;f&#39; character.</p>
 
 <p>So we&#39;ll need to tweak our command slightly to accommodate our need to keep the new lines:</p>
 
-<p><code>
-echo &quot;foo\nbar\nbaz&quot; | tr -c &quot;bf\n&quot; &quot;\!&quot;
-</code></p>
+<pre><code>echo &quot;foo\nbar\nbaz&quot; | tr -c &quot;bf\n&quot; &quot;\!&quot;
+</code></pre>
 
 <p>Which result in:</p>
 
-<p><code>
-f!!
+<pre><code>f!!
 b!!
 b!!
-</code></p>
+</code></pre>
 
 <p>The last thing I want to show you is the &#39;squeeze&#39; command which you use by adding the <code>-s</code> flag/option. What this does is any consecutive letters (e.g. the &#39;o&#39; in &quot;fooobar&quot; is repeated consecutively) will be reduced to a single replacement. For example,</p>
 
-<p><code>
-echo &quot;fooobar&quot; | tr -s &quot;o&quot; &quot;\!&quot;
-</code></p>
+<pre><code>echo &quot;fooobar&quot; | tr -s &quot;o&quot; &quot;\!&quot;
+</code></pre>
 
 <p>Results in:</p>
 
-<p><code>
-f!bar
-</code></p>
+<pre><code>f!bar
+</code></pre>
 
 <p>Where as if we didn&#39;t use the squeeze command we would&#39;ve seen <code>f!!!bar</code> instead (notice the &#39;o&#39; was translated multiple times)..</p>
 
@@ -548,16 +523,14 @@ f!bar
 
 <p>The <code>du</code> command stands for &quot;disk usage&quot; and it will display the amount of space a directory occupies:</p>
 
-<p><code>sh
-du -s -k ~/*
-</code></p>
+<pre><code>du -s -k ~/*
+</code></pre>
 
 <p>The <code>-s</code> flag displays an entry for each specified file, while the <code>-k</code> flag displays block counts in 1024-byte (1-Kbyte) blocks.</p>
 
 <p>Meaning running the above command will result in the following output (for me anyway):</p>
 
-<p><code>sh
-0/Users/markmcdonnell/Applications
+<pre><code>0/Users/markmcdonnell/Applications
 1355232/Users/markmcdonnell/Box Documents (backup)
 6987864/Users/markmcdonnell/Box Sync
 1931180/Users/markmcdonnell/Code
@@ -576,12 +549,11 @@ du -s -k ~/*
 528/Users/markmcdonnell/lib
 2013/Users/markmcdonnell/man
 818320/Users/markmcdonnell/src
-</code></p>
+</code></pre>
 
 <p>If we modify the command to pipe over to the <code>sort</code> command, like so <code>du -s -k ~/* | sort -k1nr | less</code>, then we can make the feedback a little bit more useful (i.e. the directories are sorted by overall size!):</p>
 
-<p><code>sh
-du: 
+<pre><code>du: 
 38075864        /Users/markmcdonnell/VirtualBox VMs
 17253304        /Users/markmcdonnell/Library
 13070884        /Users/markmcdonnell/Documents
@@ -601,7 +573,7 @@ du:
 0       /Users/markmcdonnell/Applications
 0       /Users/markmcdonnell/Movies
 0       /Users/markmcdonnell/Public
-</code></p>
+</code></pre>
 
 <h3>Double exclamation !!</h3>
 

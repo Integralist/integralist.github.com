@@ -94,16 +94,15 @@
 
 <p>Imagine we have a single file <code>sqlite-example.rb</code> with the following content… </p>
 
-<p>```ruby
-require &#39;active_record&#39;</p>
+<pre><code>require &#39;active_record&#39;
 
-<p>ActiveRecord::Base.logger = Logger.new(File.open(&#39;database.log&#39;, &#39;w&#39;))</p>
+ActiveRecord::Base.logger = Logger.new(File.open(&#39;database.log&#39;, &#39;w&#39;))
 
-<p>ActiveRecord::Base.establish_connection(
+ActiveRecord::Base.establish_connection(
   :adapter  =&gt; &#39;sqlite3&#39;,
   :database =&gt; &#39;example.db&#39;
 )
-```</p>
+</code></pre>
 
 <p>…so let&#39;s analyse what this script is doing.</p>
 
@@ -113,9 +112,8 @@ require &#39;active_record&#39;</p>
 
 <p>Thirdly, we actually connect to the SQLite database. ActiveRecord has adapters for multiple databases and so here we specify we&#39;re using SQLite and that we want to connect to the <code>example.db</code> database. We could store data all in memory if we wanted (e.g. it wouldn&#39;t persist after the application has finished running), we do this by changing to…</p>
 
-<p><code>ruby
-:database =&gt; &#39;:memory:&#39;
-</code></p>
+<pre><code>:database =&gt; &#39;:memory:&#39;
+</code></pre>
 
 <h2>Schema</h2>
 
@@ -125,24 +123,23 @@ require &#39;active_record&#39;</p>
 
 <p>To do this we&#39;ll add… </p>
 
-<p>```ruby
-ActiveRecord::Schema.define do
+<pre><code>ActiveRecord::Schema.define do
   unless ActiveRecord::Base.connection.tables.include? &#39;albums&#39;
     create_table :albums do |table|
       table.column :title,     :string
       table.column :performer, :string
     end
-  end</p>
+  end
 
-<p>unless ActiveRecord::Base.connection.tables.include? &#39;tracks&#39;
-    create<em>table :tracks do |table|
-      table.column :album</em>id,     :integer # foreign key <table-name-singular><em>id (i.e. this is the primary key from the &#39;albums&#39; table)
-      table.column :track</em>number, :integer
+  unless ActiveRecord::Base.connection.tables.include? &#39;tracks&#39;
+    create_table :tracks do |table|
+      table.column :album_id,     :integer # foreign key &lt;table-name-singular&gt;_id (i.e. this is the primary key from the &#39;albums&#39; table)
+      table.column :track_number, :integer
       table.column :title,        :string
     end
   end
 end
-```</p>
+</code></pre>
 
 <p>…as you might be able to tell, we&#39;re doing a couple of things.</p>
 
@@ -160,22 +157,21 @@ end
 
 <p>The ActiveRecord pattern is based on conventions, so in this instance we&#39;ll create two new classes that inherit from ActiveRecord&#39;s base class and we&#39;ll use these two classes for creating new records for each table… </p>
 
-<p>```ruby
-class Album &lt; ActiveRecord::Base
+<pre><code>class Album &lt; ActiveRecord::Base
   has_many :tracks
-end</p>
+end
 
-<p>class Track &lt; ActiveRecord::Base
+class Track &lt; ActiveRecord::Base
   belongs_to :album
-end</p>
+end
 
-<p>unless Album.find<em>by</em>title(&#39;In Utero&#39;)
+unless Album.find_by_title(&#39;In Utero&#39;)
   album = Album.create(
     :title     =&gt; &#39;In Utero&#39;,
     :performer =&gt; &#39;Nirvana&#39;
-  )</p>
+  )
 
-<p>track_listing = [
+  track_listing = [
     nil,
     &#39;Serve the Servants&#39;,
     &#39;Scentless Apprentice&#39;,
@@ -189,20 +185,20 @@ end</p>
     &#39;Radio Friendly Unit Shifter&#39;,
     &#39;Tourettes&#39;,
     &#39;All Apologies&#39;
-  ]</p>
+  ]
 
-<p>track<em>listing.each</em>with<em>index do |value, index|
-    album.tracks.create(:track</em>number =&gt; index, :title =&gt; value) unless index === 0 # skip zero index
+  track_listing.each_with_index do |value, index|
+    album.tracks.create(:track_number =&gt; index, :title =&gt; value) unless index === 0 # skip zero index
   end
-end</p>
+end
 
-<p>unless Album.find<em>by</em>title(&#39;La-te-ra-lus&#39;)
+unless Album.find_by_title(&#39;La-te-ra-lus&#39;)
   album = Album.create(
     :title     =&gt; &#39;La-te-ra-lus&#39;,
     :performer =&gt; &#39;Tool&#39;
-  )</p>
+  )
 
-<p>track_listing = [
+  track_listing = [
     nil,
     &#39;The Grudge&#39;,
     &#39;Eon Blue Apocalypse&#39;,
@@ -217,13 +213,13 @@ end</p>
     &#39;Reflection&#39;,
     &#39;Triad&#39;,
     &#39;Faaip de Oiad&#39;
-  ]</p>
+  ]
 
-<p>track<em>listing.each</em>with<em>index do |value, index|
-    album.tracks.create(:track</em>number =&gt; index, :title =&gt; value) unless index === 0
+  track_listing.each_with_index do |value, index|
+    album.tracks.create(:track_number =&gt; index, :title =&gt; value) unless index === 0
   end
 end
-```</p>
+</code></pre>
 
 <p>…OK, so there are a couple of things worth noting here:</p>
 
@@ -243,16 +239,14 @@ end
 
 <p>We call a <code>create</code> method like so…</p>
 
-<p><code>ruby
-album = Album.create(...)
-</code></p>
+<pre><code>album = Album.create(...)
+</code></pre>
 
 <p>…which is equivalent to… </p>
 
-<p><code>ruby
-album = Album.new(...);
+<pre><code>album = Album.new(...);
 album.save
-</code></p>
+</code></pre>
 
 <p>…so it saves us a little extra typing (which is nice).</p>
 
@@ -260,14 +254,11 @@ album.save
 
 <p>In my example I&#39;m trying to be a bit smarter by not repeating the same chunk of code over and over. So rather than doing… </p>
 
-<p>```ruby
-album.tracks.create(:track<em>number =&gt; 1, :title =&gt; &#39;a&#39;)
-album.tracks.create(:track</em>number =&gt; 2, :title =&gt; &#39;b&#39;)
-album.tracks.create(:track_number =&gt; 3, :title =&gt; &#39;c&#39;)</p>
-
-<h1>…rinse repeat…</h1>
-
-<p>```</p>
+<pre><code>album.tracks.create(:track_number =&gt; 1, :title =&gt; &#39;a&#39;)
+album.tracks.create(:track_number =&gt; 2, :title =&gt; &#39;b&#39;)
+album.tracks.create(:track_number =&gt; 3, :title =&gt; &#39;c&#39;)
+#…rinse repeat…
+</code></pre>
 
 <p>…instead, I create the track listing as an <code>Array</code> and then loop the Array creating new records. </p>
 
@@ -317,48 +308,47 @@ album.tracks.create(:track_number =&gt; 3, :title =&gt; &#39;c&#39;)</p>
 
 <p>The complete code I was using looks like this… </p>
 
-<p>```ruby
-require &#39;active_record&#39;</p>
+<pre><code>require &#39;active_record&#39;
 
-<p>ActiveRecord::Base.logger = Logger.new(File.open(&#39;database.log&#39;, &#39;w&#39;))</p>
+ActiveRecord::Base.logger = Logger.new(File.open(&#39;database.log&#39;, &#39;w&#39;))
 
-<p>ActiveRecord::Base.establish_connection(
+ActiveRecord::Base.establish_connection(
   :adapter  =&gt; &#39;sqlite3&#39;,
   :database =&gt; &#39;example.db&#39;
-)</p>
+)
 
-<p>ActiveRecord::Schema.define do
+ActiveRecord::Schema.define do
   unless ActiveRecord::Base.connection.tables.include? &#39;albums&#39;
     create_table :albums do |table|
       table.column :title,     :string
       table.column :performer, :string
     end
-  end</p>
+  end
 
-<p>unless ActiveRecord::Base.connection.tables.include? &#39;tracks&#39;
-    create<em>table :tracks do |table|
-      table.column :album</em>id,     :integer
+  unless ActiveRecord::Base.connection.tables.include? &#39;tracks&#39;
+    create_table :tracks do |table|
+      table.column :album_id,     :integer
       table.column :track_number, :integer
       table.column :title,        :string
     end
   end
-end</p>
+end
 
-<p>class Album &lt; ActiveRecord::Base
+class Album &lt; ActiveRecord::Base
   has_many :tracks
-end</p>
+end
 
-<p>class Track &lt; ActiveRecord::Base
+class Track &lt; ActiveRecord::Base
   belongs_to :album
-end</p>
+end
 
-<p>unless Album.find<em>by</em>title(&#39;In Utero&#39;)
+unless Album.find_by_title(&#39;In Utero&#39;)
   album = Album.create(
     :title     =&gt; &#39;In Utero&#39;,
     :performer =&gt; &#39;Nirvana&#39;
-  )</p>
+  )
 
-<p>track_listing = [
+  track_listing = [
     nil,
     &#39;Serve the Servants&#39;,
     &#39;Scentless Apprentice&#39;,
@@ -372,20 +362,20 @@ end</p>
     &#39;Radio Friendly Unit Shifter&#39;,
     &#39;Tourettes&#39;,
     &#39;All Apologies&#39;
-  ]</p>
+  ]
 
-<p>track<em>listing.each</em>with<em>index do |value, index|
-    album.tracks.create(:track</em>number =&gt; index, :title =&gt; value) unless index === 0
+  track_listing.each_with_index do |value, index|
+    album.tracks.create(:track_number =&gt; index, :title =&gt; value) unless index === 0
   end
-end</p>
+end
 
-<p>unless Album.find<em>by</em>title(&#39;La-te-ra-lus&#39;)
+unless Album.find_by_title(&#39;La-te-ra-lus&#39;)
   album = Album.create(
     :title     =&gt; &#39;La-te-ra-lus&#39;,
     :performer =&gt; &#39;Tool&#39;
-  )</p>
+  )
 
-<p>track_listing = [
+  track_listing = [
     nil,
     &#39;The Grudge&#39;,
     &#39;Eon Blue Apocalypse&#39;,
@@ -400,43 +390,43 @@ end</p>
     &#39;Reflection&#39;,
     &#39;Triad&#39;,
     &#39;Faaip de Oiad&#39;
-  ]</p>
+  ]
 
-<p>track<em>listing.each</em>with<em>index do |value, index|
-    album.tracks.create(:track</em>number =&gt; index, :title =&gt; value) unless index === 0
+  track_listing.each_with_index do |value, index|
+    album.tracks.create(:track_number =&gt; index, :title =&gt; value) unless index === 0
   end
-end</p>
+end
 
-<p>begin
+begin
   p Album.find(1).tracks.length # 13 (on first run of this script it&#39;s fine, but next run we&#39;ve deleted the record)
 rescue ActiveRecord::RecordNotFound
   p &#39;We just rescued a &quot;RecordNotFound&quot; error&#39;
-end</p>
+end
 
-<p>p Album.find(2).tracks.length # 14
-p Album.find<em>by</em>title(&#39;La-te-ra-lus&#39;).title # &quot;La-te-ra-lus&quot;
-p Track.find<em>by</em>title(&#39;Very Ape&#39;).album<em>id # 1
+p Album.find(2).tracks.length # 14
+p Album.find_by_title(&#39;La-te-ra-lus&#39;).title # &quot;La-te-ra-lus&quot;
+p Track.find_by_title(&#39;Very Ape&#39;).album_id # 1
 p Album.all # ActiveRecord::Relation =&gt; complete set of database records
 p Album.all.length # 2
 p Track.all # ActiveRecord::Relation =&gt; complete set of database records
 p Track.where(title: &#39;Triad&#39;) # ActiveRecord::Relation =&gt; single record
-p Track.where(track</em>number: 6..8) # returns tracks 6 to 8 from all albums
-p Album.first # returns first record (calling <code>Album.find(:first|:last) is deprecated</code>)
-p Album.last # returns last record</p>
+p Track.where(track_number: 6..8) # returns tracks 6 to 8 from all albums
+p Album.first # returns first record (calling `Album.find(:first|:last) is deprecated`)
+p Album.last # returns last record
 
-<p>if Album.all.length &gt; 1
+if Album.all.length &gt; 1
   p Album.first.delete # delete the first record
-end</p>
+end
 
-<p>p Album.all # now we&#39;ll see there is only one record remaining</p>
+p Album.all # now we&#39;ll see there is only one record remaining
 
-<p>track<em>to</em>be<em>modified = Track.where(title: &#39;The Grudge&#39;).first
-track</em>to<em>be</em>modified.title = &#39;Grudgeola&#39;
-track<em>to</em>be<em>modified.save
-p track</em>to<em>be</em>modified # displays modified record
+track_to_be_modified = Track.where(title: &#39;The Grudge&#39;).first
+track_to_be_modified.title = &#39;Grudgeola&#39;
+track_to_be_modified.save
+p track_to_be_modified # displays modified record
 p Track.where(title: &#39;The Grudge&#39;) # empty Array (not found as we&#39;ve overridden the original record)
 p Track.where(title: &#39;Grudgeola&#39;) # displays Array of records found (only one, the modified record)
-```</p>
+</code></pre>
 
 <p>But remember this was just a quick introduction to the concepts of the ActiveRecord pattern (and using it with a SQLite database). There are <em>many</em> different querying methods available via ActiveRecord so do get stuck into the API documentation to see what other goodies are at your disposal. </p>
 

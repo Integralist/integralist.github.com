@@ -71,11 +71,10 @@
 
 <h2>Update your global user details</h2>
 
-<p><code>sh
-git config --global user.name &quot;Your Name&quot;
+<pre><code>git config --global user.name &quot;Your Name&quot;
 git config --global user.email &quot;Your Email&quot;
 git config --global apply.whitespace nowarn # ignore white space changes!
-</code></p>
+</code></pre>
 
 <div id="4"></div>
 
@@ -87,51 +86,47 @@ git config --global apply.whitespace nowarn # ignore white space changes!
 
 <p>Then add the following content to it (<em>this is a standard ignore file but I&#39;ve added some Sass CSS pre-processor files to it</em>)…</p>
 
-<p>```sh</p>
-
-<h1>Compiled source</h1>
-
-<p>*.com
+<pre><code># Compiled source #
+###################
+*.com
 *.class
 *.dll
 *.exe
 *.o
 *.so
 *.sass-cache
-*.scssc</p>
+*.scssc
 
-<h1>Packages</h1>
-
-<h1>it&#39;s better to unpack these files and commit the raw source</h1>
-
-<h1>git has its own built in compression methods</h1>
-
-<p>*.7z
+# Packages #
+############
+# it&#39;s better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
 *.dmg
 *.gz
 *.iso
 *.jar
 *.rar
 *.tar
-*.zip</p>
+*.zip
 
-<h1>Logs and databases</h1>
-
-<p>*.log
+# Logs and databases #
+######################
+*.log
 *.sql
-*.sqlite</p>
+*.sqlite
 
-<h1>OS generated files</h1>
-
-<p>.DS<em>Store
-.DS</em>Store?
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 Icon?
 ehthumbs.db
 Thumbs.db
-```</p>
+</code></pre>
 
 <p>You can let Git know about your global ignore file by editing your global <code>.gitconfig</code> file…</p>
 
@@ -139,10 +134,9 @@ Thumbs.db
 
 <p>…then adding the following to it… </p>
 
-<p><code>sh
-[core]
+<pre><code>[core]
     excludesfile = /Users/&lt;home-directory&gt;/.gitignore_global
-</code></p>
+</code></pre>
 
 <p>…or once the <code>.gitignore_global</code> file is created you can just tell git by using this short-hand command…</p>
 
@@ -170,11 +164,10 @@ Thumbs.db
 
 <p>Press <code>i</code> which puts Vim into &#39;insert&#39; mode (meaning you can actually write)</p>
 
-<p><code>sh
-This is my short description for this commit
+<pre><code>This is my short description for this commit
 - Here is a break down of my changes
 - Another note about a particular change
-</code></p>
+</code></pre>
 
 <p>After I&#39;ve written my commit I just need to save the commit and exit Vim…</p>
 
@@ -203,10 +196,9 @@ This is my short description for this commit
 
 <p>What we need to do is open the <code>~/.gitconfig</code> file and then add the following content… </p>
 
-<p><code>sh
-[alias]
+<pre><code>[alias]
     lg = log --color --graph --pretty=format:&#39;%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset&#39; --abbrev-commit --date=relative
-</code></p>
+</code></pre>
 
 <div id="10"></div>
 
@@ -216,11 +208,10 @@ This is my short description for this commit
 
 <p>What we need to do is open the <code>~/.gitconfig</code> file and then add the following content… </p>
 
-<p><code>sh
-[alias] 
+<pre><code>[alias] 
     st = status
     sts = status -sb
-</code></p>
+</code></pre>
 
 <p>…you don&#39;t need to specify <code>[alias]</code> if it&#39;s already in the file (see previous tip).</p>
 
@@ -312,10 +303,9 @@ This is my short description for this commit
 
 <p>Open up the file <code>~/.gitconfig</code> and then add the following content… </p>
 
-<p><code>sh
-[alias]
+<pre><code>[alias]
     unstage = reset HEAD
-</code></p>
+</code></pre>
 
 <p>Note: you don&#39;t need to specify <code>[alias]</code> if it&#39;s already in the <code>~/.gitconfig</code> file.</p>
 

@@ -46,17 +46,16 @@
 
 <p>The following function <code>sum</code> simply adds two numbers together; but for the purpose of demonstrating recursion (a potentially complex topic) and making it easier to understand, we have written the <code>sum</code> function in a very convoluted way:</p>
 
-<p>```js
-function sum(x, y) {
+<pre><code>function sum(x, y) {
     if (y &gt; 0) {
       return sum(x + 1, y - 1);
     } else {
       return x;
     }
-}</p>
+}
 
-<p>sum(1, 10); // =&gt; 11
-```</p>
+sum(1, 10); // =&gt; 11
+</code></pre>
 
 <p>Let&#39;s quickly explain what the code does:</p>
 
@@ -72,10 +71,9 @@ function sum(x, y) {
 
 <p>As we can see, in the above code the JavaScript engine has to create a new stack for each recursive call. For a small sum of <code>1</code> and <code>10</code> this is fine; but if we try to sum <code>1</code> and <code>100000</code> then that&#39;ll require more stacks than we have memory to allocate. This will cause an error like so:</p>
 
-<p><code>
-sum(1, 100000);
+<pre><code>sum(1, 100000);
 // =&gt; `RangeError: Maximum call stack size exceeded`
-</code></p>
+</code></pre>
 
 <p>Recursion in the form we&#39;ve written it above requires many stacks to be created because of how the function is calling itself. </p>
 
@@ -97,23 +95,20 @@ sum(1, 100000);
 
 <p>The following is an example of a tail optimised version of the previous code...</p>
 
-<p>```js
-function sum(x, y) {
+<pre><code>function sum(x, y) {
     function recur(a, b) {
         if (b &gt; 0) {
             return recur(a + 1, b - 1);
         } else {
             return a;
         }
-    }</p>
+    }
 
-<pre><code>return recur(x, y);
+    return recur(x, y);
+}
+
+sum(1, 10); // =&gt; 11
 </code></pre>
-
-<p>}</p>
-
-<p>sum(1, 10); // =&gt; 11
-```</p>
 
 <p>This works because the <code>recur</code> function ends up being the last invocation of the <code>sum</code> function. Now the engine is able to construct internal code that executes <code>recur</code> inside of a loop instead of via recursion.</p>
 
@@ -135,30 +130,27 @@ function sum(x, y) {
 
 <p>Note: the following code (and my explanation of it) assumes an understanding of the <code>this</code> keyword and changing its context. If you&#39;re unsure about what this means then read more about it <a href="https://github.com/getify/You-Dont-Know-JS/blob/master/this%20&amp;%20object%20prototypes/README.md">here</a>):</p>
 
-<p>```js
-function trampoline(f) {
+<pre><code>function trampoline(f) {
     while (f &amp;&amp; f instanceof Function) {
         f = f();
     }
     return f;
-}</p>
+}
 
-<p>function sum(x, y) {
+function sum(x, y) {
     function recur(x, y) {
         if (y &gt; 0) {
           return recur.bind(null, x + 1, y - 1);
         } else {
           return x;
         }
-    }</p>
+    }
 
-<pre><code>return trampoline(recur.bind(null, x, y));
+    return trampoline(recur.bind(null, x, y));
+}
+
+sum(1, 10); // =&gt; 11
 </code></pre>
-
-<p>}</p>
-
-<p>sum(1, 10); // =&gt; 11
-```</p>
 
 <p>The reason the above code works is because we&#39;ve replaced our functional recursion style with a loop.</p>
 
@@ -188,42 +180,39 @@ function trampoline(f) {
 
 <p>Let&#39;s take a look at the implementation...</p>
 
-<p>```js
-function tco(f) {
+<pre><code>function tco(f) {
     var value;
     var active = false;
-    var accumulated = [];</p>
+    var accumulated = [];
 
-<pre><code>return function accumulator() {
-    accumulated.push(arguments);
+    return function accumulator() {
+        accumulated.push(arguments);
 
-    if (!active) {
-        active = true;
+        if (!active) {
+            active = true;
 
-        while (accumulated.length) {
-            value = f.apply(this, accumulated.shift());
+            while (accumulated.length) {
+                value = f.apply(this, accumulated.shift());
+            }
+
+            active = false;
+
+            return value;
         }
-
-        active = false;
-
-        return value;
     }
 }
-</code></pre>
 
-<p>}</p>
-
-<p>var sum = tco(function(x, y) {
+var sum = tco(function(x, y) {
     if (y &gt; 0) {
       return sum(x + 1, y - 1)
     }
     else {
       return x
     }
-});</p>
+});
 
-<p>sum(1, 100000) // =&gt; 100001
-```</p>
+sum(1, 100000) // =&gt; 100001
+</code></pre>
 
 <p>Here we&#39;ve written a <code>tco</code> function which simply wraps around our original code (so no modification required to our code). </p>
 
@@ -279,58 +268,52 @@ function tco(f) {
 
 <p>The following code is an example that is NOT tail-call optimised:</p>
 
-<p>```js
-function isEvenNaive (num) {
+<pre><code>function isEvenNaive (num) {
     if (num === 0) {
         return true;
-    }</p>
+    }
 
-<pre><code>if (num === 1) {
-    return false;
+    if (num === 1) {
+        return false;
+    }
+
+    return isEvenNaive(Math.abs(num) - 2);
 }
 
-return isEvenNaive(Math.abs(num) - 2);
-</code></pre>
+isEvenNaive(10);
+// =&gt; true
 
-<p>}</p>
+isEvenNaive(9);
+// =&gt; false
 
-<p>isEvenNaive(10);
-// =&gt; true</p>
-
-<p>isEvenNaive(9);
-// =&gt; false</p>
-
-<p>isEvenNaive(99999);
+isEvenNaive(99999);
 // =&gt; InternalError: too much recursion
-```</p>
+</code></pre>
 
 <p>The following code snippet demonstrates the first step towards trampolining, which is to flatten the stack by requiring the user to manually execute the function over and over:</p>
 
-<p>```js
-function isEvenInner (num) {
+<pre><code>function isEvenInner (num) {
     if (num === 0) {
         return true;
-    }</p>
+    }
 
-<pre><code>if (num === 1) {
-    return false;
+    if (num === 1) {
+        return false;
+    }
+
+    return function() {
+        return isEvenInner(Math.abs(num) - 2);
+    };
 }
 
-return function() {
-    return isEvenInner(Math.abs(num) - 2);
-};
-</code></pre>
-
-<p>}</p>
-
-<p>isEvenInner(8);
+isEvenInner(8);
 // =&gt; function() {
 //        return isEvenInner(Math.abs(num) - 2);
-//    };</p>
+//    };
 
-<p>isEvenInner(8)()()()();
+isEvenInner(8)()()()();
 // =&gt; true
-```</p>
+</code></pre>
 
 <p>The first thing to notice about our <code>isEvenInner</code> function is that instead of directly calling itself again, it returns an anonymous function. That means each call to <code>isEvenInner</code> gets resolved immediately, and doesn&#39;t increase the size of the stack. It also means that we need a way to automatically invoke all of those anonymous functions that will get returned along the way. That&#39;s where trampoline comes in.</p>
 
@@ -338,30 +321,27 @@ return function() {
 
 <p>Now, finally, let&#39;s see an example that automates the execution of the flatterned stack:</p>
 
-<p>```js
-function trampoline (func, arg) {
-    var value = func(arg);</p>
+<pre><code>function trampoline (func, arg) {
+    var value = func(arg);
 
-<pre><code>while(typeof value === &quot;function&quot;) {
-    value = value();
+    while(typeof value === &quot;function&quot;) {
+        value = value();
+    }
+
+    return value;
 }
 
-return value;
-</code></pre>
-
-<p>}</p>
-
-<p>trampoline(isEvenInner, 99999);
-// =&gt; false</p>
-
-<p>trampoline(isEvenInner, 99998);
-// =&gt; true</p>
-
-<p>var isEven = trampoline.bind(null, isEvenInner);</p>
-
-<p>isEven(99999);
+trampoline(isEvenInner, 99999);
 // =&gt; false
-```</p>
+
+trampoline(isEvenInner, 99998);
+// =&gt; true
+
+var isEven = trampoline.bind(null, isEvenInner);
+
+isEven(99999);
+// =&gt; false
+</code></pre>
 
             <hr>
             <h2>Links</h2>

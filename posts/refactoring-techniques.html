@@ -152,21 +152,19 @@
 
 <p>For example:</p>
 
-<p><code>ruby
-unless &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?
+<pre><code>unless &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?
   puts &quot;capitalised text was found&quot;
 end
-</code></p>
+</code></pre>
 
 <p>Should be:</p>
 
-<p>```ruby
-caps<em>not</em>found = &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?</p>
+<pre><code>caps_not_found = &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?
 
-<p>unless caps<em>not</em>found
+unless caps_not_found
   puts &quot;capitalised text was found&quot;
 end
-```</p>
+</code></pre>
 
 <p>Note: this is the only technique that finds temps (i.e. local variables) acceptable. This is because temps are deemed to be less reusable than methods (due to their very nature being &#39;local&#39;) and so introducing temps is something that shouldn&#39;t be considered lightly. Maybe consider using the <a href="#extract-method">Extract Method</a> technique instead before using this particular technique. </p>
 
@@ -182,28 +180,26 @@ end
 
 <p>For example:</p>
 
-<p>```ruby
-def add_stuff
+<pre><code>def add_stuff
     1 + 1
-end</p>
-
-<p>def do<em>something
-    temp</em>variable<em>with</em>descriptive<em>name = add</em>stuff
-    puts &quot;Number is #{temp<em>variable</em>with<em>descriptive</em>name}&quot;
 end
-```</p>
+
+def do_something
+    temp_variable_with_descriptive_name = add_stuff
+    puts &quot;Number is #{temp_variable_with_descriptive_name}&quot;
+end
+</code></pre>
 
 <p>Should be:</p>
 
-<p>```ruby
-def add_stuff
+<pre><code>def add_stuff
     1 + 1
-end</p>
-
-<p>def do<em>something
-    puts &quot;Number is #{add</em>stuff}&quot;
 end
-```</p>
+
+def do_something
+    puts &quot;Number is #{add_stuff}&quot;
+end
+</code></pre>
 
 <p>Note: a temp by itself doesn&#39;t do any harm, and in some instances can actually make the code clearer (especially if using a result from a method invocation and the method identifier doesn&#39;t indicate the intent as well as it should).</p>
 
@@ -217,17 +213,15 @@ end
 
 <p><strong>For example</strong>: (this is a daft example, but what the heck)</p>
 
-<p><code>ruby
-temp = 2 * (height + width)
+<pre><code>temp = 2 * (height + width)
 temp = height * width
-</code></p>
+</code></pre>
 
 <p><strong>Becomes</strong>:</p>
 
-<p><code>ruby
-perimeter = 2 * (height + width)
+<pre><code>perimeter = 2 * (height + width)
 area = height * width
-</code></p>
+</code></pre>
 
 <p>As you can see, the temp variable was handling more responsibility than it should be and so by creating two appropriately distinct temps we ensure greater code clarity.</p>
 
@@ -239,46 +233,44 @@ area = height * width
 
 <p>For example:</p>
 
-<p>```ruby
-class Box
-  attr_reader :length, :width, :height</p>
+<pre><code>class Box
+  attr_reader :length, :width, :height
 
-<p>def initialize length, width, height
+  def initialize length, width, height
     @length = length
     @width  = width
     @height = height
-  end</p>
+  end
 
-<p>def volume
-    # <code>area</code> is the temp
+  def volume
+    # `area` is the temp
     area = length * width
     area * height
   end
 end
-```</p>
+</code></pre>
 
 <p>Becomes:</p>
 
-<p>```ruby
-class Box
-  attr_reader :length, :width, :height</p>
+<pre><code>class Box
+  attr_reader :length, :width, :height
 
-<p>def initialize length, width, height
+  def initialize length, width, height
     @length = length
     @width  = width
     @height = height
-  end</p>
+  end
 
-<p>def volume
-    # notice <code>area</code> is now a direct method call
+  def volume
+    # notice `area` is now a direct method call
     area * height
-  end</p>
+  end
 
-<p>def area
+  def area
     length * width
   end
 end
-```</p>
+</code></pre>
 
 <p>This technique can help to shorten a long method by not having to define lots of temp variables just to hold values.</p>
 
@@ -302,50 +294,44 @@ end
 
 <p><strong>For example</strong>:</p>
 
-<p>```ruby
-class College
+<pre><code>class College
     def create_course
         puts &quot;create course&quot;
-    end</p>
+    end
 
-<pre><code>def add_student
-    puts &quot;add student&quot;
+    def add_student
+        puts &quot;add student&quot;
+    end
 end
+
+temp = College.new
+temp.create_course
+temp.add_student
+temp.add_student
+temp.add_student
 </code></pre>
-
-<p>end</p>
-
-<p>temp = College.new
-temp.create<em>course
-temp.add</em>student
-temp.add<em>student
-temp.add</em>student
-```</p>
 
 <p><strong>Becomes</strong>:</p>
 
-<p>```ruby
-class College
+<pre><code>class College
     # static method so can be accessed without creating an instance
     def self.create_course
         college = College.new
         puts &quot;create course&quot;
         college # return new object instance
-    end</p>
+    end
 
-<pre><code>def add_student
-    puts &quot;add student&quot;
-    self # refers to the new object instance
+    def add_student
+        puts &quot;add student&quot;
+        self # refers to the new object instance
+    end
 end
+
+college = College.create_course
+                 .add_student
+                 .add_student
+                 .add_student
 </code></pre>
-
-<p>end</p>
-
-<p>college = College.create<em>course
-                 .add</em>student
-                 .add<em>student
-                 .add</em>student
-```</p>
 
 <h3>Extract Method</h3>
 
@@ -355,53 +341,51 @@ end
 
 <p>For example:</p>
 
-<p>```ruby
-class Foo
-  attr_reader :bar</p>
+<pre><code>class Foo
+  attr_reader :bar
 
-<p>def initialize bar
+  def initialize bar
     @bar = bar
-  end</p>
+  end
 
-<p>def do_something
+  def do_something
     puts &quot;my baz&quot; # notice this is duplication
     puts bar
-  end</p>
+  end
 
-<p>def do<em>something</em>else
+  def do_something_else
     puts &quot;my baz&quot; # notice this is duplication
     puts &quot;Something else&quot;
     puts bar
   end
 end
-```</p>
+</code></pre>
 
 <p>Becomes:</p>
 
-<p>```ruby
-class Foo
-  attr_reader :bar</p>
+<pre><code>class Foo
+  attr_reader :bar
 
-<p>def initialize bar
+  def initialize bar
     @bar = bar
-  end</p>
+  end
 
-<p>def do_something
+  def do_something
     baz
     puts bar
-  end</p>
+  end
 
-<p>def do<em>something</em>else
+  def do_something_else
     baz
     puts &quot;Something else&quot;
     puts bar
-  end</p>
+  end
 
-<p>def baz
+  def baz
     puts &quot;my baz&quot;
   end
 end
-```</p>
+</code></pre>
 
 <p>But be careful with handling local variables as you&#39;ll need to pass them through to the extracted method and that can be difficult if there are lots of temps in use. Sometimes to facility the Extract Method you&#39;ll need to first incorporate other techniques such as <a href="#replace-temp-with-query">Replace Temp With Query</a> and <a href="#inline-temp">Inline Temp</a>.</p>
 
@@ -421,65 +405,59 @@ end
 
 <p>For example:</p>
 
-<p>```ruby
-class Gear
-    attr_reader :chainring, :cog, :rim, :tire</p>
+<pre><code>class Gear
+    attr_reader :chainring, :cog, :rim, :tire
 
-<pre><code>def initialize (chainring, cog, rim, tire)
-  @chainring = chainring
-  @cog       = cog
-  @rim       = rim
-  @tire      = tire
+    def initialize (chainring, cog, rim, tire)
+      @chainring = chainring
+      @cog       = cog
+      @rim       = rim
+      @tire      = tire
 
-  # let&#39;s asked the question:
-  # &quot;Please Mr. Gear what is your tire size?&quot;
-  # hmm? notice this doesn&#39;t sound like it quite fits the purpose of a &#39;Gears&#39; class
-end
+      # let&#39;s asked the question:
+      # &quot;Please Mr. Gear what is your tire size?&quot;
+      # hmm? notice this doesn&#39;t sound like it quite fits the purpose of a &#39;Gears&#39; class
+    end
 
-def ratio
-  chainring / cog.to_f
-end
+    def ratio
+      chainring / cog.to_f
+    end
 
-def gear_inches
-    # tire goes around rim twice for diameter
-    ratio * (rim + (tire * 2))
+    def gear_inches
+        # tire goes around rim twice for diameter
+        ratio * (rim + (tire * 2))
+    end
 end
 </code></pre>
-
-<p>end
-```</p>
 
 <p>Becomes:</p>
 
-<p>```ruby
-class Gear
-    attr_reader :chainring, :cog, :rim, :tire</p>
+<pre><code>class Gear
+    attr_reader :chainring, :cog, :rim, :tire
 
-<pre><code>def initialize (chainring, cog, rim, tire)
-  @chainring = chainring
-  @cog       = cog
-  @rim       = rim
-  @tire      = tire.size
+    def initialize (chainring, cog, rim, tire)
+      @chainring = chainring
+      @cog       = cog
+      @rim       = rim
+      @tire      = tire.size
+    end
+
+    def ratio
+      chainring / cog.to_f
+    end
+
+    def gear_inches
+        # tire goes around rim twice for diameter
+        ratio * (rim + (tire * 2))
+    end
 end
 
-def ratio
-  chainring / cog.to_f
-end
-
-def gear_inches
-    # tire goes around rim twice for diameter
-    ratio * (rim + (tire * 2))
-end
-</code></pre>
-
-<p>end</p>
-
-<p>class Tire
+class Tire
   def self.size
     5
   end
 end
-```</p>
+</code></pre>
 
 <p>From the original class/object keep the original method in place while you test and change it so it now delegates to the method on the new object. Then slowly refactor by replacing delegating calls throughout your code base with direct calls to the method via its new host. </p>
 
@@ -499,63 +477,57 @@ end
 
 <p>For example:</p>
 
-<p>```ruby
-class Foo
-  def bar
-    puts &quot;We&#39;re doing some bar stuff&quot;
-  end</p>
-
-<p>def baz(a, b, c)
-    if a == &#39;something&#39;
-      # do something
-    end</p>
-
-<pre><code>if b == &#39;else&#39;
-  # do else
-end
-
-if c == &#39;none&#39;
-  # do none
-end
-</code></pre>
-
-<p>end
-end
-```</p>
-
-<p>Becomes:</p>
-
-<p>```ruby
-class Foo
+<pre><code>class Foo
   def bar
     puts &quot;We&#39;re doing some bar stuff&quot;
   end
-end</p>
 
-<p>class Baz
-  attr_accessor :a, :b, :c</p>
+  def baz(a, b, c)
+    if a == &#39;something&#39;
+      # do something
+    end
 
-<p>def initialize(a, b, c)
-    @a = a
-    @b = b
-    @c = c</p>
+    if b == &#39;else&#39;
+      # do else
+    end
 
-<pre><code>if a == &#39;something&#39;
-  # do something
-end
-
-if b == &#39;else&#39;
-  # do else
-end
-
-if c == &#39;none&#39;
-  # do none
+    if c == &#39;none&#39;
+      # do none
+    end
+  end
 end
 </code></pre>
 
-<p>end
+<p>Becomes:</p>
+
+<pre><code>class Foo
+  def bar
+    puts &quot;We&#39;re doing some bar stuff&quot;
+  end
 end
-```</p>
+
+class Baz
+  attr_accessor :a, :b, :c
+
+  def initialize(a, b, c)
+    @a = a
+    @b = b
+    @c = c
+
+    if a == &#39;something&#39;
+      # do something
+    end
+
+    if b == &#39;else&#39;
+      # do else
+    end
+
+    if c == &#39;none&#39;
+      # do none
+    end
+  end
+end
+</code></pre>
 
 <p>From here we&#39;re now in a better state to use both the <a href="#extract-method">Extract Method</a> and <a href="/posts/even-more-refactoring-techniques/#replace-conditional-with-polymorphism">Replace Conditional with Polymorphism</a> techniques to refactor the <code>Baz</code> class.</p>
 
@@ -567,18 +539,16 @@ end
 
 <p><strong>For example</strong>:</p>
 
-<p><code>ruby
-managers = []
+<pre><code>managers = []
 employees.each do |e|
     managers &lt;&lt; e if e.manager?
 end
-</code></p>
+</code></pre>
 
 <p><strong>Becomes</strong>:</p>
 
-<p><code>ruby
-managers = employees.select { |e| e.manager? }
-</code></p>
+<pre><code>managers = employees.select { |e| e.manager? }
+</code></pre>
 
 <p>Ruby has a few of these types of enumerable methods but other languages such as PHP and JavaScript aren&#39;t so lucky. </p>
 
@@ -592,68 +562,66 @@ managers = employees.select { |e| e.manager? }
 
 <p>For example:</p>
 
-<p>```ruby
-class Person
-  attr<em>reader :first</em>name, :last_name</p>
+<pre><code>class Person
+  attr_reader :first_name, :last_name
 
-<p>def initialize first<em>name, last</em>name
-    @first<em>name = first</em>name
-    @last<em>name = last</em>name
-  end</p>
+  def initialize first_name, last_name
+    @first_name = first_name
+    @last_name = last_name
+  end
 
-<p>end</p>
+end
 
-<p>class MalePerson &lt; Person
-  # This is duplicated in the <code>FemalePerson</code> class
-  def full<em>name
-    first</em>name + &quot; &quot; + last_name
-  end</p>
+class MalePerson &lt; Person
+  # This is duplicated in the `FemalePerson` class
+  def full_name
+    first_name + &quot; &quot; + last_name
+  end
 
-<p>def gender
+  def gender
     &quot;M&quot;
   end
-end</p>
+end
 
-<p>class FemalePerson &lt; Person
-  # This is duplicated in the <code>MalePerson</code> class
-  def full<em>name
-    first</em>name + &quot; &quot; + last_name
-  end</p>
+class FemalePerson &lt; Person
+  # This is duplicated in the `MalePerson` class
+  def full_name
+    first_name + &quot; &quot; + last_name
+  end
 
-<p>def gender
+  def gender
     &quot;F&quot;
   end
 end
-```</p>
+</code></pre>
 
 <p>Becomes:</p>
 
-<p>```ruby
-class Person
-  attr<em>reader :first</em>name, :last_name</p>
+<pre><code>class Person
+  attr_reader :first_name, :last_name
 
-<p>def initialize first<em>name, last</em>name
-    @first<em>name = first</em>name
-    @last<em>name = last</em>name
-  end</p>
-
-<p>def full<em>name
-    first</em>name + &quot; &quot; + last_name
+  def initialize first_name, last_name
+    @first_name = first_name
+    @last_name = last_name
   end
-end</p>
 
-<p>class MalePerson &lt; Person
+  def full_name
+    first_name + &quot; &quot; + last_name
+  end
+end
+
+class MalePerson &lt; Person
   def gender
     &quot;M&quot;
   end
-end</p>
+end
 
-<p>class FemalePerson &lt; Person
+class FemalePerson &lt; Person
   def gender
     &quot;F&quot;
   end
 end
-```</p>
+</code></pre>
 
 <h3>Form Template Method</h3>
 
@@ -668,41 +636,40 @@ the steps.</p>
 <p>Here is a silly example (I’m no good at giving real examples; you may have noticed), here is an
 example of our problematic code…</p>
 
-<p>```ruby
-class Foo; end</p>
+<pre><code>class Foo; end
 
-<p>class Bar &lt; Foo
+class Bar &lt; Foo
   def initialize
     @hey = 1
     @hai = 2
-  end</p>
+  end
 
-<p>def qux
+  def qux
     @a = @hey + @hai
     @b = @a * 10
     @a + @b
   end
-end</p>
+end
 
-<p>class Baz &lt; Foo
+class Baz &lt; Foo
   def initialize
     @hey = 5
     @hai = 7
-  end</p>
+  end
 
-<p>def qux
+  def qux
     @a = @hey + @hai
     @b = @a * 10 * 20
     @a + @b
   end
-end</p>
+end
 
-<p>bar = Bar.new
-baz = Baz.new</p>
+bar = Bar.new
+baz = Baz.new
 
-<p>puts bar.qux
+puts bar.qux
 puts baz.qux
-```</p>
+</code></pre>
 
 <p>…we could try to inject the values each sub class requires but then we still
 have a lot of duplication in this code.</p>
@@ -715,80 +682,77 @@ return a specific calculation</p>
 
 <p>…so we can clean up our code a little by abstracting the commonality...</p>
 
-<p>```ruby
-class Foo
+<pre><code>class Foo
   def initialize(hey=1, hai=1)
     @hey = hey
     @hai = hai
-  end</p>
+  end
 
-<p>def qux
-    determine<em>a
-    determine</em>b
+  def qux
+    determine_a
+    determine_b
     result
-  end</p>
+  end
 
-<p>def determine_a
+  def determine_a
     @a = @hey + @hai
-  end</p>
+  end
 
-<p>def result
+  def result
     @a + @b
   end
-end</p>
+end
 
-<p>class Bar &lt; Foo
-  protected</p>
+class Bar &lt; Foo
+  protected
 
-<p>def determine_b
+  def determine_b
     @b = @a * 10
   end
-end</p>
+end
 
-<p>class Baz &lt; Foo
-  protected</p>
+class Baz &lt; Foo
+  protected
 
-<p>def determine_b
+  def determine_b
     @b = @a * 10 * 20
   end
-end</p>
+end
 
-<p>bar = Bar.new(1, 2)
-baz = Baz.new(5, 7)</p>
+bar = Bar.new(1, 2)
+baz = Baz.new(5, 7)
 
-<p>puts bar.qux
+puts bar.qux
 puts baz.qux
-```</p>
+</code></pre>
 
 <h3>Extract Surrounding Method</h3>
 
 <p>If you find you have different methods which contain almost identical code but with a slight variant in the middle, then pull up the duplicated code into a single method and pass a code block to the newly created method which it yields to in order to execute the unique behaviour...</p>
 
-<p>```ruby
-def do_something
+<pre><code>def do_something
     puts 1
     yield
     puts 3
-end</p>
+end
 
-<p>do_something { puts 2 }
-```</p>
+do_something { puts 2 }
+</code></pre>
 
 <p>This is actually a common pattern in Ruby known as the &#39;wrap around&#39; method. This technique is similar to the <a href="#form-template-method">Form Template Method</a>, but is different in that you can use it without forcing an inheritance model on your code.</p>
 
 <p>Note: JavaScript doesn&#39;t have the ability to pass a code block but it can be replicated by passing a function that acts like a callback...</p>
 
-<p>```js
-function doSomething (callback) {
+<pre><code>function doSomething (callback) {
         console.log(1);
         callback();
         console.log(3);
-}</p>
+}
 
-<p>doSomething(function(){
+doSomething(function(){
         console.log(2);
 });
-```</p>
+</code></pre>
 
 <p>...although in the latest versions of Node (as of November 2013) Generators are implemented and would allow JavaScript code to <code>yield</code> similar to how Ruby works.</p>
 
@@ -802,21 +766,19 @@ function doSomething (callback) {
 
 <p>For example:</p>
 
-<p><code>ruby
-def total
+<pre><code>def total
   @base_price * (1 + @tax_rate)
 end
-</code></p>
+</code></pre>
 
 <p>Becomes:</p>
 
-<p>```ruby
-attr<em>reader :base</em>price, :tax_rate</p>
+<pre><code>attr_reader :base_price, :tax_rate
 
-<p>def total
-  base<em>price * (1 + tax</em>rate)
+def total
+  base_price * (1 + tax_rate)
 end
-```</p>
+</code></pre>
 
 <h3>Introduce Named Parameter</h3>
 
@@ -824,29 +786,26 @@ end
 
 <p>Although Ruby supports named parameters...</p>
 
-<p><code>ruby
-def turnOnTheTV (channel: 1, volume: 1); end
+<pre><code>def turnOnTheTV (channel: 1, volume: 1); end
 turnOnTheTV(channel: 101, volume: 10)
-</code></p>
+</code></pre>
 
 <p>...neither PHP or JavaScript do, so for PHP you can pass an associated Array and with JavaScript you can pass an Object/Hash.</p>
 
 <p><strong>For example (JavaScript)</strong>:</p>
 
-<p><code>ruby
-function turnOnTheTV(c, v){}
+<pre><code>function turnOnTheTV(c, v){}
 turnOnTheTV(101, 10);
-</code></p>
+</code></pre>
 
 <p><strong>Becomes</strong>:</p>
 
-<p><code>ruby
-function turnOnTheTV (config) {
+<pre><code>function turnOnTheTV (config) {
     // config.channel === 101
     // config.volume  === 10
 }
 turnOnTheTV({ channel: 101, volume: 10 });
-</code></p>
+</code></pre>
 
 <p>Note: ECMAScript 6.0 (the latest JavaScript specification - which is still being worked on as of Nov 2013) implements named parameters.</p>
 

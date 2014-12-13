@@ -77,11 +77,10 @@
 
 <p>To create a variable in Sass you simply prefix the name of the variable with a dollar sign: <code>$brand_color: #C00;</code> I can now use <code>$brand_color</code> wherever I like. For example…</p>
 
-<p><code>sass
-.header {
+<pre><code>.header {
     color: $brand_color;
 }
-</code></p>
+</code></pre>
 
 <p>This makes life a lot easier and although I&#39;ve seen people claim that OOCSS can work around this, it can, but not easily and so using Sass for this alone is still extremely useful in my mind.</p>
 
@@ -91,10 +90,9 @@
 
 <p>You can use all standard operators (*, /, +, -) for example:</p>
 
-<p><code>sass
-$width: 10px; 
+<pre><code>$width: 10px; 
 $double_width: $width * 2;
-</code></p>
+</code></pre>
 
 <p>You can do calculations inline (i.e. where the property value is set) and you can also group calculations:</p>
 
@@ -106,59 +104,52 @@ $double_width: $width * 2;
 
 <p><code>lighten(colour, percentage)</code></p>
 
-<p><code>sass
-.txt-light {
+<pre><code>.txt-light {
     color: lighten($brand_color, 30%);
 }
-</code></p>
+</code></pre>
 
 <p><code>darken(colour, percentage)</code></p>
 
-<p><code>sass
-.txt-dark {
+<pre><code>.txt-dark {
     color: darken($brand_color, 10%);
 }
-</code></p>
+</code></pre>
 
 <p><code>saturate(colour, percentage)</code></p>
 
-<p><code>sass
-.txt-sat {
+<pre><code>.txt-sat {
     color: saturate($brand_color, 100%);
 }
-</code></p>
+</code></pre>
 
 <p><code>desaturate(colour, percentage)</code></p>
 
-<p><code>sass
-.txt-desat {
+<pre><code>.txt-desat {
     color: desaturate($brand_color, 20%);
 }
-</code></p>
+</code></pre>
 
 <p><code>adjust-hue(colour, degrees)</code></p>
 
-<p><code>sass
-.txt-hue {
+<pre><code>.txt-hue {
     color: adjust-hue($brand_color, 180);
 }
-</code></p>
+</code></pre>
 
 <p><code>grayscale(colour)</code></p>
 
-<p><code>sass
-.txt-greyscale {
+<pre><code>.txt-greyscale {
     color: grayscale($brand_color);
 }
-</code></p>
+</code></pre>
 
 <p><code>mix(colour, colour)</code></p>
 
-<p><code>sass
-.txt-mix {
+<pre><code>.txt-mix {
     color: mix($brand_color, #C00);
 }
-</code></p>
+</code></pre>
 
 <h2>Importing</h2>
 
@@ -176,36 +167,33 @@ $double_width: $width * 2;
 
 <p>For example:</p>
 
-<p><code>sass
-$brand_color = #0000FF;
+<pre><code>$brand_color = #0000FF;
 .brand { 
     color: $brand_color; 
 }
 // MORE STYLES
 @import &quot;other.scss&quot;;
-</code></p>
+</code></pre>
 
 <p>…generates the following CSS…</p>
 
-<p><code>css
-.brand { 
+<pre><code>.brand { 
     color: blue; 
 }
 // MORE STYLES
 .brand { 
     background-color: red; 
 }
-</code></p>
+</code></pre>
 
 <p>…which obviously isn&#39;t as efficient or clean as…</p>
 
-<p><code>css
-.brand { 
+<pre><code>.brand { 
     color: blue; 
     background-color: red; 
 }
 // MORE STYLES
-</code></p>
+</code></pre>
 
 <p>…but that&#39;s the trade-off between Sass features and the efficiency of the produced code.</p>
 
@@ -221,30 +209,28 @@ $brand_color = #0000FF;
 
 <p>Anywhere you have a CSS class you can re-import that inside another rule:</p>
 
-<p>```sass
-.myClass {
+<pre><code>.myClass {
     border: 1px solid #969;
     color: red;
-}</p>
+}
 
-<p>button {
+button {
     @extend .myClass;
     background-color: orange;
 }
-```</p>
+</code></pre>
 
 <p>…which generates the following CSS…</p>
 
-<p>```css
-.myClass, button {
+<pre><code>.myClass, button {
     border: 1px solid #969;
     color: red;
-}</p>
+}
 
-<p>button {
+button {
     background-color: orange;
 }
-```</p>
+</code></pre>
 
 <p>A couple of last words of caution: <code>extend</code> avoids code duplication but it also causes other problems in that the amount of selectors can become an issue. If you @extend the same base class multiple times you may end up with a rule that has thousands of selectors, which isn&#39;t good for performance and can even make the browser crash (limit its use if you must use it).</p>
 
@@ -258,69 +244,63 @@ $brand_color = #0000FF;
 
 <p>You create a mixing like so:</p>
 
-<p><code>sass
-@mixin .myMixin { 
+<pre><code>@mixin .myMixin { 
     color: blue; 
 }
 .product_title {
     @include .myMixin;
 }
-</code></p>
+</code></pre>
 
 <p>…and you can change the values like so…</p>
 
-<p><code>sass
-@mixin .myMixin($set_colour) { 
+<pre><code>@mixin .myMixin($set_colour) { 
     color: $set_colour; 
 }
 .product_title {
     @include .myMixin(#FF0000);
 }
-</code></p>
+</code></pre>
 
 <p>…you can also define a default value if none is provided…</p>
 
-<p><code>sass
-@mixin .myMixin($set_colour: #0000FF) { 
+<pre><code>@mixin .myMixin($set_colour: #0000FF) { 
     color: $set_colour;
 }
-</code></p>
+</code></pre>
 
 <p>…you can use mixin&#39;s for things like CSS3 properties…</p>
 
-<p>```sass
-@mixin rounded_borders($color, $width: 5px, $rounding: 5px) { 
+<pre><code>@mixin rounded_borders($color, $width: 5px, $rounding: 5px) { 
     -moz-border-radius: $rounding $rounding; 
     -webkit-border-radius: $rounding $rounding; 
     -khtml-border-radius: $rounding $rounding; 
     -o-border-radius: $rounding $rounding;
         border-radius: $rounding $rounding;
         border: $width solid $color;
-}</p>
+}
 
-<p>@mixin opacity($opacity) {
+@mixin opacity($opacity) {
     filter: alpha(opacity=#{$opacity}); // IE 5-9+ 
     opacity: $opacity * 0.01; 
 }
-```</p>
+</code></pre>
 
 <p>…and use the opacity like so…</p>
 
-<p><code>sass
-.h1 { 
+<pre><code>.h1 { 
     // Use the IE numbering style (instead of the W3C&#39;s 0-1 numbering style)
     @include opacity(60);
 }
-</code></p>
+</code></pre>
 
 <p>…or you could use the reverse…</p>
 
-<p><code>sass
-@mixin opacity($opacity) {
+<pre><code>@mixin opacity($opacity) {
     filter: alpha(opacity=#{$opacity*100}); // IE 5-9+ 
     opacity: $opacity; 
 }
-</code></p>
+</code></pre>
 
 <h2>Interpolation</h2>
 
@@ -328,21 +308,20 @@ $brand_color = #0000FF;
 
 <p>One way to work around this issue is to use <code>interpolation</code>. The way it works is that you wrap a variable name with <code>#{}</code> e.g. <code>#{$my_variable}</code> and that will dynamically insert the value at that place in your CSS. Might sound a bit confusing so best to demonstrate this with an example, and the best example I can think of is again the <code>background-image</code> property with multiple different vendor prefixes… </p>
 
-<p>```sass
-// Variable
-$prefixes:-webkit,-moz,-ms,-o;</p>
+<pre><code>// Variable
+$prefixes:-webkit,-moz,-ms,-o;
 
-<p>// Loop over each item in the $prefixes variable
+// Loop over each item in the $prefixes variable
 // using interpolation to insert the relevant value dynamically
 @each $prefix in $prefixes {
     background-image: #{$prefix}-linear-gradient(rgba(255,255,255,0), rgba(0,0,0,0.1));
-}</p>
+}
 
-<p>// The following example might be better placed inside a mixin or extend
+// The following example might be better placed inside a mixin or extend
 @each $prefix in $prefixes {
     #{$prefix}-border-radius: 10px;
 }
-```</p>
+</code></pre>
 
 <p>…most of the time mixins will help you work around CSS3 vendor prefixes but in the above instance <code>interpolation</code> is the way forward.</p>
 

@@ -57,14 +57,12 @@
 
 <p>So as an example here is a form with the mandatory class and the custom data attribute</p>
 
-<p><code>html
-&lt;input name=&quot;card&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid credit card number&quot;&gt;
-</code></p>
+<pre><code>&lt;input name=&quot;card&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid credit card number&quot;&gt;
+</code></pre>
 
 <p>Our full form code looks like this…</p>
 
-<p><code>html
-&lt;form action=&quot;http://www.google.com/&quot; method=&quot;post&quot; id=&quot;js-form&quot;&gt;
+<pre><code>&lt;form action=&quot;http://www.google.com/&quot; method=&quot;post&quot; id=&quot;js-form&quot;&gt;
     &lt;p&gt;Name: &lt;input name=&quot;fullname&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter your full name&quot;&gt;&lt;/p&gt;
     &lt;p&gt;Date of Birth: &lt;input name=&quot;dob&quot; placeholder=&quot;dd/mm/yyyy&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid date format&quot;&gt;&lt;/p&gt;
     &lt;p&gt;Age: &lt;input name=&quot;age&quot; type=&quot;number&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid age&quot;&gt;&lt;/p&gt;
@@ -75,7 +73,7 @@
     &lt;p&gt;To proceed please tick this box: &lt;input name=&quot;proceed&quot; type=&quot;checkbox&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you tick the box to proceed&quot;&gt;&lt;/p&gt;
     &lt;p&gt;&lt;input type=&quot;submit&quot; value=&quot;Submit Form&quot;&gt;&lt;/p&gt;
 &lt;/form&gt;
-</code></p>
+</code></pre>
 
 <h2>JavaScript set-up</h2>
 
@@ -83,15 +81,13 @@
 
 <p>So in our HTML file we&#39;ll load up the JavaScript files required…</p>
 
-<p><code>html
-&lt;script src=&quot;Assets/Scripts/curl.js&quot;&gt;&lt;/script&gt;
+<pre><code>&lt;script src=&quot;Assets/Scripts/curl.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;Assets/Scripts/app.js&quot;&gt;&lt;/script&gt;
-</code></p>
+</code></pre>
 
 <p>Inside our app.js file we set-up a configuration object which handles the paths to the different dependencies we&#39;ll be using. We then load the &#39;Validation&#39; module (which is a Backbone.View)…</p>
 
-<p>```js
-var config = {
+<pre><code>var config = {
     baseUrl: &#39;./Assets/Scripts/&#39;,
     pluginPath: &#39;plugins&#39;,
     paths: {
@@ -100,23 +96,23 @@ var config = {
         &#39;backbone&#39;: &#39;Libraries/backbone&#39;
     },
     preloads: [&#39;jquery&#39;, &#39;lodash&#39;]
-};</p>
+};
 
-<p>/*
-    The <code>exports</code> suffix ensures we receive a reference to the global Backbone object
+/*
+    The `exports` suffix ensures we receive a reference to the global Backbone object
     It also provides a way to check that the script loaded correctly.
-    Without the <code>exports</code> suffix, there&#39;s no way to tell if IE or Opera 404&#39;ed.
+    Without the `exports` suffix, there&#39;s no way to tell if IE or Opera 404&#39;ed.
  */
-curl(config, [&#39;jquery&#39;, &#39;lodash&#39;, &#39;js!backbone!exports=Backbone&#39;], init, error);</p>
+curl(config, [&#39;jquery&#39;, &#39;lodash&#39;, &#39;js!backbone!exports=Backbone&#39;], init, error);
 
-<p>function init ($, _, Backbone) {
+function init ($, _, Backbone) {
     curl(&#39;Views/Validation&#39;);
-}</p>
+}
 
-<p>function error (err) {
+function error (err) {
     console.warn(err);
 }
-```</p>
+</code></pre>
 
 <p>Now we have our JavaScript set-up lets move onto the Backbone.View that will handle the validation of our form.</p>
 
@@ -148,23 +144,20 @@ curl(config, [&#39;jquery&#39;, &#39;lodash&#39;, &#39;js!backbone!exports=Backb
 
 <p>So within the initialisation stage of the View we do a few things…</p>
 
-<p>```js
-initialize: function(){
+<pre><code>initialize: function(){
     // Self explanatory: stores all mandatory fields
-    this.mandatory_fields = $(&#39;.js-mandatory-field&#39;);</p>
+    this.mandatory_fields = $(&#39;.js-mandatory-field&#39;);
 
-<pre><code>// This holds the template file we&#39;ll compile with data pulled from server
-this.template = null;
+    // This holds the template file we&#39;ll compile with data pulled from server
+    this.template = null;
 
-// This holds the actual rendered template content
-this.template_content = null;
+    // This holds the actual rendered template content
+    this.template_content = null;
 
-// We&#39;ll go ahead and grab the error message template file (no point waiting until the last minute and making the user wait).
-this.get_template();
+    // We&#39;ll go ahead and grab the error message template file (no point waiting until the last minute and making the user wait).
+    this.get_template();
+}}
 </code></pre>
-
-<p>}}
-```</p>
 
 <ul>
 <li>Store a reference to all mandatory fields</li>
@@ -177,31 +170,27 @@ this.get_template();
 
 <p>The <code>get_template</code> method is called immediately but later on we also check to see if we need to try calling it again (e.g. when the user actually submits the form we check to see if <code>this.template</code> holds any value and if it does then we use it, otherwise we call <code>get_template</code> again to grab the data) so this is why we check within that method for a <code>callback</code> to be provided (when the template is loaded we want to continue on and process the errors found)</p>
 
-<p>```js
-get_template: function (callback) {
+<pre><code>get_template: function (callback) {
     $.ajax({
         url: &#39;Assets/Templates/FormErrors.txt&#39;,
         dataType: &#39;html&#39;,
         success: _.bind(function (tmp) {
-            this.template = hogan.compile(tmp);</p>
+            this.template = hogan.compile(tmp);
 
-<pre><code>        if (callback) {
-            callback();
-        }
-    }, this)
-});
+            if (callback) {
+                callback();
+            }
+        }, this)
+    });
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>We then listen out for the form submission event to happen and call the <code>validate</code> method to handle the event…</p>
 
-<p><code>js
-events: {
+<pre><code>events: {
     &#39;submit&#39;: &#39;validate&#39;
 }
-</code></p>
+</code></pre>
 
 <p>The <code>validate</code> method creates an Array to hold any errors we encounter. The way we determine if there are any errors is to loop through all the mandatory fields and to check the name attribute value to see if we can find a match to known values. If we can&#39;t find a match then we just validate the field to make sure it has a value. If we do find a match (e.g. if the name attribute is &quot;email&quot;) then we know which validation method to pass the field on to validate against.</p>
 
@@ -209,57 +198,54 @@ events: {
 
 <p>After we&#39;ve been through all the mandatory fields we check to see if the <code>errors</code> Array has any items, if it does then we know we need to process some errors and call <code>this.process_errors</code> and pass the <code>errors</code> Array through to that method.</p>
 
-<p>```js
-validate: function(){
+<pre><code>validate: function(){
     var errors = [];
-    var method;</p>
+    var method;
 
-<pre><code>// Loop through all the fields checking for validation errors
-this.mandatory_fields.each(_.bind(function (index, item) {
-    // First we check what the current field is and validate it against a specific method
-    switch (item.name) {
-        case &#39;dob&#39;:
-            method = &#39;validate_date&#39;;
-            break;
-        case &#39;age&#39;:
-            method = &#39;validate_number&#39;;
-            break;
-        case &#39;email&#39;:
-            method = &#39;validate_email&#39;;
-            break;
-        case &#39;mobile&#39;:
-            method = &#39;validate_mobile&#39;;
-            break;
-        case &#39;password&#39;:
-            method = &#39;validate_password&#39;;
-            break;
-        case &#39;card&#39;:
-            method = &#39;validate_cardnumber&#39;;
-            break;
-        case &#39;proceed&#39;:
-            method = &#39;validate_checkbox&#39;;
-            break;
-        default:
-            method = &#39;validate_text&#39;;
+    // Loop through all the fields checking for validation errors
+    this.mandatory_fields.each(_.bind(function (index, item) {
+        // First we check what the current field is and validate it against a specific method
+        switch (item.name) {
+            case &#39;dob&#39;:
+                method = &#39;validate_date&#39;;
+                break;
+            case &#39;age&#39;:
+                method = &#39;validate_number&#39;;
+                break;
+            case &#39;email&#39;:
+                method = &#39;validate_email&#39;;
+                break;
+            case &#39;mobile&#39;:
+                method = &#39;validate_mobile&#39;;
+                break;
+            case &#39;password&#39;:
+                method = &#39;validate_password&#39;;
+                break;
+            case &#39;card&#39;:
+                method = &#39;validate_cardnumber&#39;;
+                break;
+            case &#39;proceed&#39;:
+                method = &#39;validate_checkbox&#39;;
+                break;
+            default:
+                method = &#39;validate_text&#39;;
+        }
+
+        if (this[method](item)) {
+            // Store just the messages and not the element itself (we only need the list of messages)
+            errors.push(item.getAttribute(&#39;data-message&#39;));
+        }
+    }, this));
+
+    // If there are any errors then display warning messsage to the user
+    if (errors.length) {
+        this.process_errors(errors);
+        return false;
+    } else {
+        return true;
     }
-
-    if (this[method](item)) {
-        // Store just the messages and not the element itself (we only need the list of messages)
-        errors.push(item.getAttribute(&#39;data-message&#39;));
-    }
-}, this));
-
-// If there are any errors then display warning messsage to the user
-if (errors.length) {
-    this.process_errors(errors);
-    return false;
-} else {
-    return true;
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>The first thing the <code>process_errors</code> method does is it makes sure we are only dealing with unique error messages. For example if we have a set of &#39;sort code&#39; fields (which are typically three separate fields) they will all have the same error message but we don&#39;t want that error message displayed three times so the <code>_.unique</code> method ensures our errors are unique.</p>
 
@@ -269,39 +255,36 @@ if (errors.length) {
 
 <p>Finally we check if the template file has been loaded already or not. If it hasn&#39;t then we load it via ajax and then call the <code>display_errors</code> method.</p>
 
-<p>```js
-process<em>errors: function (errors) {
+<pre><code>process_errors: function (errors) {
     /*
         Clean the errors list so we only have unique data.
         This happens for things like the postcode validation (no point showing the postcode field error message twice)
      */
-    var clean</em>list = _.unique(errors);</p>
+    var clean_list = _.unique(errors);
 
-<pre><code>// The list needs to be converted into an Object for Hogan.js to compile the data into its template
-var converted_list = $(clean_list).map(function (index, item) {
-    return {
-        error: item
-    };
-});
+    // The list needs to be converted into an Object for Hogan.js to compile the data into its template
+    var converted_list = $(clean_list).map(function (index, item) {
+        return {
+            error: item
+        };
+    });
 
-// Spent far longer on this than I wanted to, but this is it: jQuery collection is not an Array and so needs to be converted to an Array for Hogan.js to compile it
-var final_list = jQuery.makeArray(converted_list);
+    // Spent far longer on this than I wanted to, but this is it: jQuery collection is not an Array and so needs to be converted to an Array for Hogan.js to compile it
+    var final_list = jQuery.makeArray(converted_list);
 
-// If the template file has been stored already then we&#39;ll just proceed to render the content
-if (this.template) {
-    this.display_errors({ errors: final_list });
-} 
-// Otherwise grab the template file and then render the content
-else {
-    // Have to rebind the `this` value as otherwise it would be equal to the global object (Window)
-    this.get_template(_.bind(function(){
+    // If the template file has been stored already then we&#39;ll just proceed to render the content
+    if (this.template) {
         this.display_errors({ errors: final_list });
-    }, this));
+    } 
+    // Otherwise grab the template file and then render the content
+    else {
+        // Have to rebind the `this` value as otherwise it would be equal to the global object (Window)
+        this.get_template(_.bind(function(){
+            this.display_errors({ errors: final_list });
+        }, this));
+    }
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>The <code>display_errors</code> method takes in the object of errors we&#39;ve created and tries to compile it into the template file using Hogan.js</p>
 
@@ -313,305 +296,300 @@ else {
 
 <p>I know some people will disagree with doing that and would prefer to display an error next to each field but I find that makes the design of the page a lot more complicated, especially when dealing with multiple screen dimensions. I personally prefer to have a single place to display all errors.</p>
 
-<p>```js
-display<em>errors: function (data) {
+<pre><code>display_errors: function (data) {
     // First remove any errors that might already be on the page
-    var existing</em>list = $(&#39;#js-formerrors&#39;);
-    if (existing<em>list.length) {
-        existing</em>list.remove();
-    }</p>
+    var existing_list = $(&#39;#js-formerrors&#39;);
+    if (existing_list.length) {
+        existing_list.remove();
+    }
 
-<pre><code>// Render the data into the template
-this.template_content = this.template.render(data);
+    // Render the data into the template
+    this.template_content = this.template.render(data);
 
-// Insert the error messages into the page
-this.$el.prepend(this.template_content);
+    // Insert the error messages into the page
+    this.$el.prepend(this.template_content);
 
-/*
-    Focus page to the error message element.
-    Had issue with WebKit where it wouldn&#39;t reposition window to the named anchor unless we reset the hash back to nothing and then set it again to the named anchor
- */
-window.location.hash = &#39;&#39;;
-window.location.hash = &#39;js-formerrors&#39;;
+    /*
+        Focus page to the error message element.
+        Had issue with WebKit where it wouldn&#39;t reposition window to the named anchor unless we reset the hash back to nothing and then set it again to the named anchor
+     */
+    window.location.hash = &#39;&#39;;
+    window.location.hash = &#39;js-formerrors&#39;;
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>The full module code is as follows...</p>
 
-<p>```js
-define([&#39;../Utils/Templating/hogan&#39;], function (hogan) {</p>
+<pre><code>define([&#39;../Utils/Templating/hogan&#39;], function (hogan) {
 
-<pre><code>var Validation = Backbone.View.extend({
-    initialize: function(){
-        // Self explanatory: stores all mandatory fields
-        this.mandatory_fields = $(&#39;.js-mandatory-field&#39;);
+    var Validation = Backbone.View.extend({
+        initialize: function(){
+            // Self explanatory: stores all mandatory fields
+            this.mandatory_fields = $(&#39;.js-mandatory-field&#39;);
 
-        // This holds the template file we&#39;ll compile with data pulled from server
-        this.template = null;
+            // This holds the template file we&#39;ll compile with data pulled from server
+            this.template = null;
 
-        // This holds the actual rendered template content
-        this.template_content = null;
+            // This holds the actual rendered template content
+            this.template_content = null;
 
-        // We&#39;ll go ahead and grab the error message template file (no point waiting until the last minute and making the user wait).
-        this.get_template();
-    },
+            // We&#39;ll go ahead and grab the error message template file (no point waiting until the last minute and making the user wait).
+            this.get_template();
+        },
 
-    el: $(&#39;#js-form&#39;),
+        el: $(&#39;#js-form&#39;),
 
-    events: {
-        &#39;submit&#39;: &#39;validate&#39;
-    },
+        events: {
+            &#39;submit&#39;: &#39;validate&#39;
+        },
 
-    get_template: function (callback) {
-        $.ajax({
-            url: &#39;Assets/Templates/FormErrors.txt&#39;,
-            dataType: &#39;html&#39;,
-            success: _.bind(function (tmp) {
-                this.template = hogan.compile(tmp);
+        get_template: function (callback) {
+            $.ajax({
+                url: &#39;Assets/Templates/FormErrors.txt&#39;,
+                dataType: &#39;html&#39;,
+                success: _.bind(function (tmp) {
+                    this.template = hogan.compile(tmp);
 
-                if (callback) {
-                    callback();
-                }
-            }, this)
-        });
-    },
-
-    validate: function(){
-        var errors = [];
-        var method;
-
-        // Loop through all the fields checking for validation errors
-        this.mandatory_fields.each(_.bind(function (index, item) {
-            // First we check what the current field is and validate it against a specific method
-            switch (item.name) {
-                case &#39;dob&#39;:
-                    method = &#39;validate_date&#39;;
-                    break;
-                case &#39;age&#39;:
-                    method = &#39;validate_number&#39;;
-                    break;
-                case &#39;email&#39;:
-                    method = &#39;validate_email&#39;;
-                    break;
-                case &#39;mobile&#39;:
-                    method = &#39;validate_mobile&#39;;
-                    break;
-                case &#39;password&#39;:
-                    method = &#39;validate_password&#39;;
-                    break;
-                case &#39;card&#39;:
-                    method = &#39;validate_cardnumber&#39;;
-                    break;
-                case &#39;proceed&#39;:
-                    method = &#39;validate_checkbox&#39;;
-                    break;
-                default:
-                    method = &#39;validate_text&#39;;
-            }
-
-            if (this[method](item)) {
-                // Store just the messages and not the element itself (we only need the list of messages)
-                errors.push(item.getAttribute(&#39;data-message&#39;));
-            }
-        }, this));
-
-        // If there are any errors then display warning messsage to the user
-        if (errors.length) {
-            this.process_errors(errors);
-            return false;
-        } else {
-            return true;
-        }
-    },
-
-    validate_text: function (field) {
-        /*
-            If the length is zero (meaning the field is empty) then zero will coerce to false 
-            so we return the opposite of that using the ! operator (so the first part of the following condition is met) 
-            and if the length is greater than zero then the regex checks to see if the content isn&#39;t just empty spaces.
-
-            If there was an error then we return true, if there wasn&#39;t an error then undefined will be returned (which coerces to false)
-         */
-        if (/^\s+$/.test(field.value) || !field.value.length) {
-            return true;
-        }
-    },
-
-    validate_number: function (field) {
-        if (/^\D+/.test(field.value) || !field.value.length) {
-            return true;
-        }
-    },
-
-    validate_date: function (field) {
-        /*
-            The regex allows either double figure formats or singular...
-            00/00/00
-            0/0/0
-         */
-        if (!/^\d{1,2}\/\d{1,2}\/\d{1,2}$/.test(field.value) || !field.value.length) {
-            return true;
-        }
-    },
-
-    validate_email: function (field) {
-        if (field.value.indexOf(&quot;@&quot;) === -1 || !field.value.length) {
-            return true;
-        }
-    },
-
-    validate_mobile: function (field) {
-        /*
-            The regex allows the following formats:
-                +44 07000000000
-                07000000000
-                +4407000000000
-
-            So there is an optional +000 country code at the start (wrapped in a non-capturing group)
-            We then allow for an optional space after the optional country code
-            Finally we allow for 11 digits (no spaces - but we also strip out any spaces found before running the regex so the &#39;no spaces&#39; thing doesn&#39;t really matter)
-         */
-        var strip_spaces = field.value.replace(&#39; &#39;, &#39;&#39;); // some people seem to add odd spacing when enterin numbers?
-        if (!/^(?:\+\d{1,3})?\s?\d{11}$/.test(strip_spaces) || !field.value.length) {
-            return true;
-        }
-    },
-
-    validate_password: function (field) {
-        /*
-            The regex makes sure there is at least 8 alpha-numerical characters
-            And that at least one of those values is a number
-            And that at least one of those values is a text character
-            We use a positive lookahead (which checks to see if a sub pattern matches a specific position)
-            The lookahead checks for any character (zero or more times) is followed by a digit (e.g. making sure there is at least one digit)
-            The lookahead then checks for any character (zero or more times) is followed by a text character (e.g. making sure there is at least one text character)
-            Finally after the two lookaheads we have the standard regex which makes sure there is at least 8 alpha-numerical characters
-         */
-        if (!/^(?=.*\d)(?=.*[a-z])\w{8,}/i.test(field.value)) {
-            return true;
-        }
-    },
-
-    validate_cardnumber: function (field) {
-        function luhn (cardnumber) {
-            // Build an array with the digits in the card number
-            var getdigits = /\d/g;
-            var digits = [];
-            var match;
-
-            while (match = getdigits.exec(cardnumber)) {
-                digits.push(parseInt(match[0], 10));
-            }
-
-            // Run the Luhn algorithm on the array
-            var sum = 0;
-            var alt = false;
-
-            for (var i = digits.length - 1; i &gt;= 0; i--) {
-                // On every other number in the card sequence...
-                if (alt) {
-                    digits[i] *= 2; // multiple the number by itself
-
-                    // If the number is now over 9 then we&#39;ll minus 9 from the number
-                    if (digits[i] &gt; 9) {
-                        digits[i] -= 9;
+                    if (callback) {
+                        callback();
                     }
+                }, this)
+            });
+        },
+
+        validate: function(){
+            var errors = [];
+            var method;
+
+            // Loop through all the fields checking for validation errors
+            this.mandatory_fields.each(_.bind(function (index, item) {
+                // First we check what the current field is and validate it against a specific method
+                switch (item.name) {
+                    case &#39;dob&#39;:
+                        method = &#39;validate_date&#39;;
+                        break;
+                    case &#39;age&#39;:
+                        method = &#39;validate_number&#39;;
+                        break;
+                    case &#39;email&#39;:
+                        method = &#39;validate_email&#39;;
+                        break;
+                    case &#39;mobile&#39;:
+                        method = &#39;validate_mobile&#39;;
+                        break;
+                    case &#39;password&#39;:
+                        method = &#39;validate_password&#39;;
+                        break;
+                    case &#39;card&#39;:
+                        method = &#39;validate_cardnumber&#39;;
+                        break;
+                    case &#39;proceed&#39;:
+                        method = &#39;validate_checkbox&#39;;
+                        break;
+                    default:
+                        method = &#39;validate_text&#39;;
                 }
 
-                // Add this digit onto the current total sum
-                sum += digits[i];
+                if (this[method](item)) {
+                    // Store just the messages and not the element itself (we only need the list of messages)
+                    errors.push(item.getAttribute(&#39;data-message&#39;));
+                }
+            }, this));
 
-                // Alternate
-                alt = !alt;
+            // If there are any errors then display warning messsage to the user
+            if (errors.length) {
+                this.process_errors(errors);
+                return false;
+            } else {
+                return true;
+            }
+        },
+
+        validate_text: function (field) {
+            /*
+                If the length is zero (meaning the field is empty) then zero will coerce to false 
+                so we return the opposite of that using the ! operator (so the first part of the following condition is met) 
+                and if the length is greater than zero then the regex checks to see if the content isn&#39;t just empty spaces.
+
+                If there was an error then we return true, if there wasn&#39;t an error then undefined will be returned (which coerces to false)
+             */
+            if (/^\s+$/.test(field.value) || !field.value.length) {
+                return true;
+            }
+        },
+
+        validate_number: function (field) {
+            if (/^\D+/.test(field.value) || !field.value.length) {
+                return true;
+            }
+        },
+
+        validate_date: function (field) {
+            /*
+                The regex allows either double figure formats or singular...
+                00/00/00
+                0/0/0
+             */
+            if (!/^\d{1,2}\/\d{1,2}\/\d{1,2}$/.test(field.value) || !field.value.length) {
+                return true;
+            }
+        },
+
+        validate_email: function (field) {
+            if (field.value.indexOf(&quot;@&quot;) === -1 || !field.value.length) {
+                return true;
+            }
+        },
+
+        validate_mobile: function (field) {
+            /*
+                The regex allows the following formats:
+                    +44 07000000000
+                    07000000000
+                    +4407000000000
+
+                So there is an optional +000 country code at the start (wrapped in a non-capturing group)
+                We then allow for an optional space after the optional country code
+                Finally we allow for 11 digits (no spaces - but we also strip out any spaces found before running the regex so the &#39;no spaces&#39; thing doesn&#39;t really matter)
+             */
+            var strip_spaces = field.value.replace(&#39; &#39;, &#39;&#39;); // some people seem to add odd spacing when enterin numbers?
+            if (!/^(?:\+\d{1,3})?\s?\d{11}$/.test(strip_spaces) || !field.value.length) {
+                return true;
+            }
+        },
+
+        validate_password: function (field) {
+            /*
+                The regex makes sure there is at least 8 alpha-numerical characters
+                And that at least one of those values is a number
+                And that at least one of those values is a text character
+                We use a positive lookahead (which checks to see if a sub pattern matches a specific position)
+                The lookahead checks for any character (zero or more times) is followed by a digit (e.g. making sure there is at least one digit)
+                The lookahead then checks for any character (zero or more times) is followed by a text character (e.g. making sure there is at least one text character)
+                Finally after the two lookaheads we have the standard regex which makes sure there is at least 8 alpha-numerical characters
+             */
+            if (!/^(?=.*\d)(?=.*[a-z])\w{8,}/i.test(field.value)) {
+                return true;
+            }
+        },
+
+        validate_cardnumber: function (field) {
+            function luhn (cardnumber) {
+                // Build an array with the digits in the card number
+                var getdigits = /\d/g;
+                var digits = [];
+                var match;
+
+                while (match = getdigits.exec(cardnumber)) {
+                    digits.push(parseInt(match[0], 10));
+                }
+
+                // Run the Luhn algorithm on the array
+                var sum = 0;
+                var alt = false;
+
+                for (var i = digits.length - 1; i &gt;= 0; i--) {
+                    // On every other number in the card sequence...
+                    if (alt) {
+                        digits[i] *= 2; // multiple the number by itself
+
+                        // If the number is now over 9 then we&#39;ll minus 9 from the number
+                        if (digits[i] &gt; 9) {
+                            digits[i] -= 9;
+                        }
+                    }
+
+                    // Add this digit onto the current total sum
+                    sum += digits[i];
+
+                    // Alternate
+                    alt = !alt;
+                }
+
+                /*
+                    The individual card numbers (after the above algorithm is applied and then when added together) 
+                    should be possible to divide by 10 with zero left over
+                 */
+                if (sum % 10 == 0) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
-            /*
-                The individual card numbers (after the above algorithm is applied and then when added together) 
-                should be possible to divide by 10 with zero left over
-             */
-            if (sum % 10 == 0) {
+            // The following regex was actually borrowed from The Regular Expression Cookbook (co-written by the regex legend @stevenlevithan)
+            if (!/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/g.test(field.value)) {
                 return true;
             } else {
-                return false;
+                // If the card number appears to be valid we then run the Luhn test
+                if (!luhn(field.value)) {
+                    return true;
+                }
             }
-        }
+        },
 
-        // The following regex was actually borrowed from The Regular Expression Cookbook (co-written by the regex legend @stevenlevithan)
-        if (!/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/g.test(field.value)) {
-            return true;
-        } else {
-            // If the card number appears to be valid we then run the Luhn test
-            if (!luhn(field.value)) {
+        validate_checkbox: function (field) {
+            if (!field.checked) {
                 return true;
             }
-        }
-    },
+        },
 
-    validate_checkbox: function (field) {
-        if (!field.checked) {
-            return true;
-        }
-    },
+        process_errors: function (errors) {
+            /*
+                Clean the errors list so we only have unique data.
+                This happens for things like the postcode validation (no point showing the postcode field error message twice)
+             */
+            var clean_list = _.unique(errors);
 
-    process_errors: function (errors) {
-        /*
-            Clean the errors list so we only have unique data.
-            This happens for things like the postcode validation (no point showing the postcode field error message twice)
-         */
-        var clean_list = _.unique(errors);
+            // The list needs to be converted into an Object for Hogan.js to compile the data into its template
+            var converted_list = $(clean_list).map(function (index, item) {
+                return {
+                    error: item
+                };
+            });
 
-        // The list needs to be converted into an Object for Hogan.js to compile the data into its template
-        var converted_list = $(clean_list).map(function (index, item) {
-            return {
-                error: item
-            };
-        });
+            // Spent far longer on this than I wanted to, but this is it: jQuery collection is not an Array and so needs to be converted to an Array for Hogan.js to compile it
+            var final_list = jQuery.makeArray(converted_list);
 
-        // Spent far longer on this than I wanted to, but this is it: jQuery collection is not an Array and so needs to be converted to an Array for Hogan.js to compile it
-        var final_list = jQuery.makeArray(converted_list);
-
-        // If the template file has been stored already then we&#39;ll just proceed to render the content
-        if (this.template) {
-            this.display_errors({ errors: final_list });
-        } 
-        // Otherwise grab the template file and then render the content
-        else {
-            // Have to rebind the `this` value as otherwise it would be equal to the global object (Window)
-            this.get_template(_.bind(function(){
+            // If the template file has been stored already then we&#39;ll just proceed to render the content
+            if (this.template) {
                 this.display_errors({ errors: final_list });
-            }, this));
+            } 
+            // Otherwise grab the template file and then render the content
+            else {
+                // Have to rebind the `this` value as otherwise it would be equal to the global object (Window)
+                this.get_template(_.bind(function(){
+                    this.display_errors({ errors: final_list });
+                }, this));
+            }
+        },
+
+        display_errors: function (data) {
+            // First remove any errors that might already be on the page
+            var existing_list = $(&#39;#js-formerrors&#39;);
+            if (existing_list.length) {
+                existing_list.remove();
+            }
+
+            // Render the data into the template
+            this.template_content = this.template.render(data);
+
+            // Insert the error messages into the page
+            this.$el.prepend(this.template_content);
+
+            /*
+                Focus page to the error message element.
+                Had issue with WebKit where it wouldn&#39;t reposition window to the named anchor unless we reset the hash back to nothing and then set it again to the named anchor
+             */
+            window.location.hash = &#39;&#39;;
+            window.location.hash = &#39;js-formerrors&#39;;
         }
-    },
+    });
 
-    display_errors: function (data) {
-        // First remove any errors that might already be on the page
-        var existing_list = $(&#39;#js-formerrors&#39;);
-        if (existing_list.length) {
-            existing_list.remove();
-        }
+    new Validation();
 
-        // Render the data into the template
-        this.template_content = this.template.render(data);
-
-        // Insert the error messages into the page
-        this.$el.prepend(this.template_content);
-
-        /*
-            Focus page to the error message element.
-            Had issue with WebKit where it wouldn&#39;t reposition window to the named anchor unless we reset the hash back to nothing and then set it again to the named anchor
-         */
-        window.location.hash = &#39;&#39;;
-        window.location.hash = &#39;js-formerrors&#39;;
-    }
 });
-
-new Validation();
 </code></pre>
-
-<p>});
-```</p>
 
 <h2>Conclusion</h2>
 

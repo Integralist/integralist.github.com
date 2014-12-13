@@ -153,22 +153,19 @@
 
 <p>Here is a basic example in Ruby…</p>
 
-<p>```ruby
-require &#39;app/presenters/a&#39;
-require &#39;app/presenters/b&#39;</p>
+<pre><code>require &#39;app/presenters/a&#39;
+require &#39;app/presenters/b&#39;
 
-<p>class AboutController &lt; ApplicationController
+class AboutController &lt; ApplicationController
   get &#39;/&#39; do
     @a = Presenters::A.new
-    @b = Presenters::B.new</p>
+    @b = Presenters::B.new
 
-<pre><code>title &#39;About&#39;
-erb :about
-</code></pre>
-
-<p>end
+    title &#39;About&#39;
+    erb :about
+  end
 end
-```</p>
+</code></pre>
 
 <p>…in this example we have an &#39;About&#39; page which is made up of two components <code>a</code> and <code>b</code>. As you can see we <code>require</code> the presenters which handle those two components and within our Controller we instantiate the Presenters.</p>
 
@@ -178,17 +175,16 @@ end
 
 <p>Before I show you the Presenter code itself, I&#39;ll show you the View template file… </p>
 
-<p>```erb
-<h1>&lt;%= @title %&gt;</h1></p>
+<pre><code>&lt;h1&gt;&lt;%= @title %&gt;&lt;/h1&gt;
 
-<p>&lt;% if @a.run %&gt;
+&lt;% if @a.run %&gt;
   &lt;%= partial :&quot;components/a&quot;, { :title =&gt; @a.title, :summary =&gt; @a.summary, :data =&gt; @a.data } %&gt;
-&lt;% end %&gt;</p>
+&lt;% end %&gt;
 
-<p>&lt;% if @b.run %&gt;
+&lt;% if @b.run %&gt;
   &lt;%= partial :&quot;components/b&quot;, { :name =&gt; @b.name, :age =&gt; @b.age } %&gt;
 &lt;% end %&gt;
-```</p>
+</code></pre>
 
 <p>…as you can see we have very minimal logic in place. If anything I have too much logic in the View as I initially was re-using the same View template over and over and so I wanted to protect again errors appearing when loading a template which referenced a component I wasn&#39;t loading, but I&#39;ve since changed how my application was working but left the conditional checks in as an example of how code can evolve over time.</p>
 
@@ -202,43 +198,37 @@ end
 
 <p>Now let&#39;s take a look at one of our Presenters, in this case the Presenter for our <code>b</code> component… </p>
 
-<p>```ruby
-require &#39;app/presenters/base&#39;
-require &#39;app/models/b&#39;</p>
+<pre><code>require &#39;app/presenters/base&#39;
+require &#39;app/models/b&#39;
 
-<p>class Presenters::B &lt; Presenters::Base
-  attr_reader :run, :name, :age</p>
+class Presenters::B &lt; Presenters::Base
+  attr_reader :run, :name, :age
 
-<p>def initialize
-    @run = true</p>
+  def initialize
+    @run = true
 
-<pre><code>model = B.new(&#39;Mark&#39;, &#39;99&#39;)
-prepare_view_data({ :name =&gt; model.name, :age =&gt; model.age })
-</code></pre>
-
-<p>end
+    model = B.new(&#39;Mark&#39;, &#39;99&#39;)
+    prepare_view_data({ :name =&gt; model.name, :age =&gt; model.age })
+  end
 end
-```</p>
+</code></pre>
 
 <p>…as you can see we load a specific Model for this component and then generate our View data by passing the Model information through to a <code>prepare_view_data</code> method (see below for the implementation details).</p>
 
 <p>The <code>Base</code> Presenter which our component Presenters inherit from is very straight forward as you can see from the following example… </p>
 
-<p>```ruby
-module Presenters
+<pre><code>module Presenters
   class Base
-    attr_accessor :model</p>
+    attr_accessor :model
 
-<pre><code>def prepare_view_data hash
-  hash.each do |name, value|
-    instance_variable_set(&quot;@#{name}&quot;, value)
+    def prepare_view_data hash
+      hash.each do |name, value|
+        instance_variable_set(&quot;@#{name}&quot;, value)
+      end
+    end
   end
 end
 </code></pre>
-
-<p>end
-end
-```</p>
 
 <p>…it&#39;s just a module namespace with a base class that has a single method <code>prepare_view_data</code> which dynamically generates instance variables based on the data we passed through from the inheriting Presenter class and which then are usable within the View.</p>
 

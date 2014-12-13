@@ -82,30 +82,26 @@
 
 <p>So instead of this…</p>
 
-<p>```ruby
-class AccountProxy
-    def initialize(real<em>object)
-        @real</em>object = real_object
-    end</p>
+<pre><code>class AccountProxy
+    def initialize(real_object)
+        @real_object = real_object
+    end
 
-<pre><code>def deposit(amount)
-    @real_object.deposit(amount)
+    def deposit(amount)
+        @real_object.deposit(amount)
+    end
+
+    … ad infinitum … 
 end
 
-… ad infinitum … 
-</code></pre>
-
-<p>end</p>
-
-<p>account = Account.new
+account = Account.new
 proxy = AccountProxy.new(account)
 proxy.deposit(50)
-```</p>
+</code></pre>
 
 <p>…we should really take advantage of the dynamic nature of the Ruby language to avoid having to manually write out these methods by hand, like so… </p>
 
-<p><code>ruby
-class AccountProxy
+<pre><code>class AccountProxy
     def initialize(real_account)
         @subject = real_account
     end
@@ -113,7 +109,7 @@ class AccountProxy
         @subject.send(name, *args)
     end
 end
-</code></p>
+</code></pre>
 
 <p>You can see from the above example that we&#39;re using the <a href="http://ruby-doc.org/core-2.0/Object.html#method-i-send">send</a> method to pass the message (i.e. the method invoked by the user on the proxy object) directly to the real object.</p>
 

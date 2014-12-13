@@ -93,34 +93,33 @@ operator            | <code>+</code>, <code>-</code>, <code>!</code>, <code>++</
 
 <p>To avoid declaring global properties/methods there are certain &#39;patterns&#39; that have been designed to work around this issue, such as the IIFE pattern…</p>
 
-<p>```js
-/*
+<pre><code>/*
  * this pattern is referred to as an IIFE (immediately invoked function expression)
  * the function is immediately executed and all code within it is scoped to the function
  * when executed we pass through &#39;this&#39; which refers to the global object
  * we accept &#39;this&#39; into the function as an argument called &#39;global&#39;
  */
-var app = (function (global) {</p>
+var app = (function (global) {
 
-<pre><code>// private data (private as in: it can&#39;t be accessed from other code outside this function)
-// note: don&#39;t EVER name your functions like this!
-function will_be_made_public_but_cant_be_accessed_directly(){
-    console.log(&#39;Private&#39;);
-}
+    // private data (private as in: it can&#39;t be accessed from other code outside this function)
+    // note: don&#39;t EVER name your functions like this!
+    function will_be_made_public_but_cant_be_accessed_directly(){
+        console.log(&#39;Private&#39;);
+    }
 
-return {
-    // public API (private code we&#39;ve chosen to make public)
-    do_something: will_be_made_public_but_cant_be_accessed_directly
-};
+    return {
+        // public API (private code we&#39;ve chosen to make public)
+        do_something: will_be_made_public_but_cant_be_accessed_directly
+    };
+
+}(this));
+
+app.will_be_made_public_but_cant_be_accessed_directly() // TypeError: Object #&lt;Object&gt; has no method &#39;will_be_made_public_but_cant_be_accessed_directly&#39;
+
+app.do_something(); // =&gt; &#39;Private&#39;
 </code></pre>
 
-<p>}(this));</p>
-
-<p>app.will<em>be</em>made<em>public</em>but<em>cant</em>be<em>accessed</em>directly() // TypeError: Object #<Object> has no method &#39;will<em>be</em>made<em>public</em>but<em>cant</em>be<em>accessed</em>directly&#39;</p>
-
-<p>app.do_something(); // =&gt; &#39;Private&#39;
-```
-Another pattern is to use AMD (Asynchronous Module Definition) which is a module based pattern (see: <a href="https://github.com/Integralist/Blog-Posts/blob/master/Beginners-guide-to-AMD-and-RequireJS.md">Beginners guide to AMD and RequireJS</a>)</p>
+<p>Another pattern is to use AMD (Asynchronous Module Definition) which is a module based pattern (see: <a href="https://github.com/Integralist/Blog-Posts/blob/master/Beginners-guide-to-AMD-and-RequireJS.md">Beginners guide to AMD and RequireJS</a>)</p>
 
 <h2>Variables</h2>
 
@@ -147,10 +146,9 @@ variable becomes a global variable (i.e. is available any where within the JavaS
 
 <p>To see why this is a problem first imagine you have a web page you&#39;re working on and in which you have included a 3rd party JavaScript file (i.e. a script written by another developer). Now imagine the content of that 3rd party script is as follows:</p>
 
-<p><code>js
-// 3rd party script written by another developer...
+<pre><code>// 3rd party script written by another developer...
 var my_name = &#39;Mark&#39;;
-</code></p>
+</code></pre>
 
 <p>…in this instance, the 3rd party script hasn&#39;t wrapped the line <code>var my_name = &#39;Mark&#39;;</code> inside of an IIFE (see above pattern) so the variable <code>my_name</code> will be created as global property (e.g. it is available any where within the JavaScript program as well as explicitly via <code>window.my_name</code>).</p>
 
@@ -158,21 +156,19 @@ var my_name = &#39;Mark&#39;;
 
 <p>So now imagine you&#39;re going to add your own code to the page. You write the following…</p>
 
-<p><code>js
-function do_something(){
+<pre><code>function do_something(){
     my_name = &#39;Bob&#39;;
 }
-</code></p>
+</code></pre>
 
 <p>…this may cause unintended side effects on the 3rd party code. Why? Because you coincidentally defined a variable by the same name of <code>my_name</code> and although you likely intended it to be scoped to the function <code>do_something</code> you&#39;ve accidentally forgotten the <code>var</code> keyword and so your variable is undeclared, so your variable has been assigned to the Global object, thus overwriting the <code>my_name</code> variable that is already available on the Global object (set by the 3rd party code).</p>
 
 <p>To fix this you would simply make sure you properly declared your variable like so…</p>
 
-<p><code>js
-function do_something(){
+<pre><code>function do_something(){
     var my_name = &#39;Bob&#39;;
 }
-</code></p>
+</code></pre>
 
 <p>So now, even though the variable name is the same, the variable is &#39;scoped&#39; to the <code>do_something</code> function.</p>
 
@@ -194,12 +190,11 @@ function do_something(){
 
 <p>What this means is if you have an Array and want to copy it so you can make changes to the copy (e.g. you want to leave the original as it is) then you might think to do something like this…</p>
 
-<p>```js
-var my<em>arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;];
-var new</em>arr = my_arr;</p>
+<pre><code>var my_arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;];
+var new_arr = my_arr;
 
-<p>new_arr.push(&#39;d&#39;);
-```</p>
+new_arr.push(&#39;d&#39;);
+</code></pre>
 
 <p>…you might think that <code>new_arr</code> will be <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;]</code> and <code>my_arr</code> would still be equal to <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</code> but you&#39;d be wrong because Arrays are passed by &#39;reference&#39; and so your change: <code>new_arr.push(&#39;d&#39;);</code> is effectively doing this: <code>my_arr.push(&#39;d&#39;);</code>, hence <code>my_arr</code> now has the value of <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;]</code> and so does <code>new_arr</code> because it really is just referencing (i.e. pointing to) <code>my_arr</code>.</p>
 
@@ -211,12 +206,11 @@ var new</em>arr = my_arr;</p>
 
 <p>For example:</p>
 
-<p><code>js
-var obj = {
+<pre><code>var obj = {
     name: &#39;Mark&#39;,
     location: &#39;London, England&#39;
 };
-</code></p>
+</code></pre>
 
 <p>A variable added to an Object is known as a &#39;property&#39;.<br>
 A function added to an Object is known as a &#39;method&#39;  </p>
@@ -225,8 +219,7 @@ A function added to an Object is known as a &#39;method&#39;  </p>
 
 <p>So for example:</p>
 
-<p><code>js
-var obj = {
+<pre><code>var obj = {
     /* Property */
         name: &#39;Mark&#39;,
     /* Property */
@@ -236,7 +229,7 @@ var obj = {
             return this.name + &#39; is from &#39; + this.location; // =&gt; &quot;Mark is from London, England&quot;
         }
 };
-</code></p>
+</code></pre>
 
 <h3>(Nearly)Everything in JavaScript is an Object</h3>
 
@@ -258,20 +251,18 @@ var obj = {
 
 <p>Using the previous example code, if your program was written by you then to access the &#39;name&#39; property you would simply use: <code>obj.name</code> - but if your application accepted input from the user (where by you asked them what property/method they wanted to access) you obviously don&#39;t know before hand what the user is going to choose. In this instance you would use the bracket notation: </p>
 
-<p><code>js
-var user_input = document.getElementById(&#39;my_form_input&#39;);
+<pre><code>var user_input = document.getElementById(&#39;my_form_input&#39;);
 console.log(obj[user_input]);
-</code></p>
+</code></pre>
 
 <p>The other time you&#39;ll need to use bracket notation is if you want to access a property that has special characters:</p>
 
-<p>```js
-var obj = { 
+<pre><code>var obj = { 
     &#39;my property&#39;: 123 // YOU SHOULD NEVER NEED TO CREATE A PROPERTY NAME LIKE THIS
-};</p>
+};
 
-<p>console.log(obj[&#39;my property&#39;]);
-```</p>
+console.log(obj[&#39;my property&#39;]);
+</code></pre>
 
 <p>So the majority of the time you&#39;ll just use the dot notation, but depending on the dynamic aspect of your program you may need to use bracket notation every once in a while.</p>
 
@@ -283,13 +274,12 @@ var obj = {
 
 <p>But there is a trick to accessing an object&#39;s <em>class</em> attribute and that is to call the <code>toString()</code> method on the top level <code>Object.prototype</code> but using it on the relevant object you want to get the class of. The following example demonstrates the most common use case of accessing the <em>class</em> attribute: trying to work out if an object is actually an <code>Array</code>…</p>
 
-<p>```js
-var arr = [&#39;a&#39;,&#39;b&#39;,&#39;c&#39;];</p>
+<pre><code>var arr = [&#39;a&#39;,&#39;b&#39;,&#39;c&#39;];
 
-<p>console.log(typeof arr); // =&gt; &quot;object&quot; - well that&#39;s not right, it should return the type as &#39;Array&#39;! (note: this is a known JavaScript bug)</p>
+console.log(typeof arr); // =&gt; &quot;object&quot; - well that&#39;s not right, it should return the type as &#39;Array&#39;! (note: this is a known JavaScript bug)
 
-<p>console.log(Object.prototype.toString.call(arr)); // =&gt; &quot;[object Array]&quot; - that&#39;s more like it
-```</p>
+console.log(Object.prototype.toString.call(arr)); // =&gt; &quot;[object Array]&quot; - that&#39;s more like it
+</code></pre>
 
 <p>…what we&#39;ve done here is used a method available to all <code>Function</code>&#39;s called <code>.call()</code>. What this method does is let you call another function (i.e. borrow a function) but use the calling context as the <code>this</code> value.</p>
 
@@ -303,29 +293,26 @@ var arr = [&#39;a&#39;,&#39;b&#39;,&#39;c&#39;];</p>
 
 <p>An Object is effectively a mapping of names (identifiers) to values… </p>
 
-<p><code>js
-var obj = {
+<pre><code>var obj = {
     name: value,
     name: value,
     name: value
 };
-</code></p>
+</code></pre>
 
 <p>…an Array is the same with the exception that the &#39;name&#39; identifiers are automatically incremented numerical values. So an Array like this…</p>
 
-<p><code>js
-var arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;];
-</code></p>
+<pre><code>var arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;];
+</code></pre>
 
 <p>…would effectively be similar to the following object…</p>
 
-<p><code>js
-var obj = {
+<pre><code>var obj = {
     0: &#39;a&#39;,
     1: &#39;b&#39;,
     2: &#39;c&#39;
 };
-</code></p>
+</code></pre>
 
 <p>Note: the above object with numerical keys requires you to use the bracket notation to access the identifiers (e.g. <code>obj[0]</code>) as <code>obj.0</code> would result in a <code>SyntaxError: Unexpected number</code>.</p>
 
@@ -367,42 +354,36 @@ var obj = {
 
 <h3>If Statement</h3>
 
-<p>```js
-if (condition) {</p>
+<pre><code>if (condition) {
 
-<pre><code>// if &#39;condition&#39; evaluated to true then run this code
+    // if &#39;condition&#39; evaluated to true then run this code
+
+} else if (other_condition) {
+
+    // if &#39;other_condition&#39; evaluated to true then run this code
+
+} else {
+
+    // other wise we&#39;ll run this code as a fallback
+
+}
 </code></pre>
-
-<p>} else if (other_condition) {</p>
-
-<pre><code>// if &#39;other_condition&#39; evaluated to true then run this code
-</code></pre>
-
-<p>} else {</p>
-
-<pre><code>// other wise we&#39;ll run this code as a fallback
-</code></pre>
-
-<p>}
-```</p>
 
 <p>So a basic example would be something like this…</p>
 
-<p>```js
-var can_drink = false;
-var age = 18;</p>
+<pre><code>var can_drink = false;
+var age = 18;
 
-<p>if (age &gt;= 18) {
+if (age &gt;= 18) {
     can_drink = true;
 }
-```</p>
+</code></pre>
 
 <h3>Switch Statement</h3>
 
 <p>If you have lots of checks against the same variable/condition then you&#39;re better off using a <code>switch</code> statement… </p>
 
-<p><code>js
-switch (condition) {
+<pre><code>switch (condition) {
     case x:
         // Execute this code block
         break;
@@ -416,14 +397,13 @@ switch (condition) {
         // Execute this code block
         break;
 }
-</code></p>
+</code></pre>
 
 <p>An example of using this statement would be… </p>
 
-<p>```js
-var car = &#39;Porsche&#39;;</p>
+<pre><code>var car = &#39;Porsche&#39;;
 
-<p>switch (car) {
+switch (car) {
     case &#39;Ford&#39;:
         // Execute this code block if car is &#39;Ford&#39;
         break;
@@ -437,25 +417,23 @@ var car = &#39;Porsche&#39;;</p>
         // Execute this code block if car is none of the above
         break;
 }
-```</p>
+</code></pre>
 
 <h3>Ternary Statement</h3>
 
 <p>For very short <code>if</code> statements you can also use a shortened syntax (a conditional operator sometimes referred to as a &#39;ternary&#39; operator because of its three operands). The syntax is like so…</p>
 
-<p><code>js
-condition ? true : false
-</code></p>
+<pre><code>condition ? true : false
+</code></pre>
 
 <p>…and can be used like so…</p>
 
-<p>```js
-var age = 18;
-var can<em>drink = (age &gt;= 18) ? true : false; // can</em>drink will equal a Boolean value of true</p>
+<pre><code>var age = 18;
+var can_drink = (age &gt;= 18) ? true : false; // can_drink will equal a Boolean value of true
 
-<p>var x = &#39;abc&#39;;
+var x = &#39;abc&#39;;
 var y = (x === &#39;abc&#39;) ? &#39;def&#39; : &#39;xyz&#39;; // y will equal a String value of &#39;def&#39;
-```</p>
+</code></pre>
 
 <h2>Coercion</h2>
 
@@ -465,40 +443,35 @@ var y = (x === &#39;abc&#39;) ? &#39;def&#39; : &#39;xyz&#39;; // y will equal a
 
 <p>For example, with an <code>if</code> conditional statement JavaScript will try to coerce the expression into either <code>true</code> or <code>false</code> like so… </p>
 
-<p>```js
-var element = document.getElementById(&#39;js-element&#39;);</p>
+<pre><code>var element = document.getElementById(&#39;js-element&#39;);
 
-<p>if (element) {
+if (element) {
     // if the DOM element is available then this conditional
-    // will coerce <code>element</code> into a Boolean value of true 
-    // and hence the condition will pass.</p>
+    // will coerce `element` into a Boolean value of true 
+    // and hence the condition will pass.
 
-<pre><code>// If the DOM element doesn&#39;t exist then the resulting value will be null
-// and null is converted into a Boolean value of false 
-// and hence the condition will not pass
+    // If the DOM element doesn&#39;t exist then the resulting value will be null
+    // and null is converted into a Boolean value of false 
+    // and hence the condition will not pass
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>In the above example JavaScript automatically converts the condition into a Boolean, but you can manually coerce a value into a Boolean by using the double negation operator <code>!!</code> like so...</p>
 
-<p>```js
-var obj = { age: 0, year: 1980 };</p>
+<pre><code>var obj = { age: 0, year: 1980 };
 
-<p>!!obj.age // =&gt; false (because zero coerces to false)
+!!obj.age // =&gt; false (because zero coerces to false)
 !!obj.year // =&gt; true (any number greater than zero coerces to true)
-```</p>
+</code></pre>
 
 <p>You can also use a single negation operator <code>!</code> to return the opposite Boolean value of an object (this is useful for saying &#39;if NOT x&#39;)…</p>
 
-<p>```js
-var bool = false;</p>
+<pre><code>var bool = false;
 
-<p>if (!bool) {
+if (!bool) {
     // this statement is executed if &#39;bool&#39; is NOT true (i.e. if it&#39;s false)
 }
-```</p>
+</code></pre>
 
 <h3>Some quick notes:</h3>
 
@@ -514,21 +487,19 @@ var bool = false;</p>
 
 <p>An example of the function syntax is as follows…</p>
 
-<p><code>js
-function identifier (parameters) {
+<pre><code>function identifier (parameters) {
     // statements
 }
-</code></p>
+</code></pre>
 
 <p>…which could be used like so…</p>
 
-<p>```js
-function add (a, b) {
+<pre><code>function add (a, b) {
     return a + b;
-}</p>
+}
 
-<p>console.log(add(1, 1)); // =&gt; 2
-```</p>
+console.log(add(1, 1)); // =&gt; 2
+</code></pre>
 
 <h3>Parameters</h3>
 
@@ -536,13 +507,12 @@ function add (a, b) {
 
 <p>Within a function you can access all arguments via a special <code>arguments</code> property…</p>
 
-<p>```js
-function test (a, b, c) { 
+<pre><code>function test (a, b, c) { 
     console.log(arguments); 
-}</p>
+}
 
-<p>test(1, 2, 3) // =&gt; [1, 2, 3]
-```</p>
+test(1, 2, 3) // =&gt; [1, 2, 3]
+</code></pre>
 
 <p>…you&#39;ll notice in the above example it looks like the <code>arguments</code> property is an Array but it&#39;s not. It&#39;s an &#39;array-like&#39; object. So you can access the keys values much like an Array but you don&#39;t have access to the Array methods.</p>
 
@@ -558,25 +528,24 @@ function test (a, b, c) {
 
 <p>The purpose of these methods is to allow you to <em>borrow</em> a function/method from another object. The following code demonstrates its usage and how powerful it can be… </p>
 
-<p>```js
-var obj1 = {
+<pre><code>var obj1 = {
     name: &#39;Bob&#39;
-};</p>
+};
 
-<p>var obj2 = { 
+var obj2 = { 
     name: &#39;Mark&#39;, 
     speak: function(){ 
         return &#39;My name is &#39; + this.name;
     } 
-}</p>
+}
 
-<p>obj2.speak(); // =&gt; &#39;My name is Mark&#39;</p>
+obj2.speak(); // =&gt; &#39;My name is Mark&#39;
 
-<p>// obj1 doesn&#39;t have a speak method and we don&#39;t want to add extra code to that object when 
-// obj2 already has the same method already defined. We want to be able to just borrow obj2&#39;s &#39;speak&#39; method!</p>
+// obj1 doesn&#39;t have a speak method and we don&#39;t want to add extra code to that object when 
+// obj2 already has the same method already defined. We want to be able to just borrow obj2&#39;s &#39;speak&#39; method!
 
-<p>obj2.speak.call(obj1); // =&gt; &#39;My name is Bob&#39;
-```</p>
+obj2.speak.call(obj1); // =&gt; &#39;My name is Bob&#39;
+</code></pre>
 
 <p>…you can see how by using the <code>call</code> method we can make better use of existing functions and so we become more productive as well as have smaller and more efficient code.</p>
 
@@ -590,52 +559,51 @@ var obj1 = {
 
 <p>An example of how to emulate Class style syntax in JavaScript (currently) is by using functions as &#39;Constructors&#39; like so… </p>
 
-<p>```js
-var Person = function (settings) {
+<pre><code>var Person = function (settings) {
    // Instance properties (any new instances of the Person class will have these properties)
    this.name = settings.name || &#39;no name given&#39;;
-   this.age = settings.age || &#39;no age given&#39;;</p>
+   this.age = settings.age || &#39;no age given&#39;;
 
-<p>// Instance method (any new instances of the Person class will have this method)
+   // Instance method (any new instances of the Person class will have this method)
    this.getName = function() {
       return this.name;
    };
-};</p>
+};
 
-<p>// Create a new instance of the Person Class
-var bob = new Person({ name:&#39;Bob&#39;, age:7 });</p>
+// Create a new instance of the Person Class
+var bob = new Person({ name:&#39;Bob&#39;, age:7 });
 
-<p>// Add a method to this instance of the Person Class only (no other instances created will have this method)
+// Add a method to this instance of the Person Class only (no other instances created will have this method)
 bob.getAge = function() {
    return this.age;
-}</p>
+}
 
-<p>// Test the bob instance has access to both methods
+// Test the bob instance has access to both methods
 bob.getName();
-bob.getAge();</p>
+bob.getAge();
 
-<p>// Create another instance of the Person Class
-var user = new Person({ name:&#39;Mark&#39; });</p>
+// Create another instance of the Person Class
+var user = new Person({ name:&#39;Mark&#39; });
 
-<p>// Notice the user has access to a &#39;getName&#39; method but not a &#39;getAge&#39; method
-user.getName();</p>
+// Notice the user has access to a &#39;getName&#39; method but not a &#39;getAge&#39; method
+user.getName();
 
-<p>// I know this will error so I&#39;m wrapping it in a try statement
+// I know this will error so I&#39;m wrapping it in a try statement
 try {
    user.getAge();
 } catch(err) {
    alert(err); // Uncaught TypeError: Object [object Object] has no method &#39;getAge&#39;
-}</p>
+}
 
-<p>// Add a method to the Person Class&#39; prototype chain (all instances of the Person Class will now get this method - even those already defined)
+// Add a method to the Person Class&#39; prototype chain (all instances of the Person Class will now get this method - even those already defined)
 Person.prototype.getNameAndAge = function() {
    return &#39;Hi, my name is &#39; + this.name + &#39;, and I\&#39;m &#39; + this.age + &#39; years old.&#39;;
-}</p>
+}
 
-<p>// Test this new method is accessible to all instances of the Person Class
+// Test this new method is accessible to all instances of the Person Class
 bob.getNameAndAge();
 user.getNameAndAge();
-```</p>
+</code></pre>
 
 <h3>Composition</h3>
 
@@ -643,21 +611,20 @@ user.getNameAndAge();
 
 <p>An example of this is as follows…</p>
 
-<p>```js
-var person = {
+<pre><code>var person = {
         names: [&#39;James&#39;, &#39;Neil&#39;, &#39;Russ&#39;, &#39;Stuart&#39;]
-    };</p>
+    };
 
-<p>var people = {
+var people = {
     names: [&#39;Ash&#39;, &#39;Brad&#39;, &#39;Mark&#39;, &#39;Mike&#39;],
     speak: function(which) {
         return &#39;Hi, my name is &#39; + this.names[which];
     }
-};</p>
+};
 
-<p>// Composition not Inheritance
+// Composition not Inheritance
 people.speak.call(person, 1); // =&gt; &#39;Hi, my name is Neil&#39;
-```</p>
+</code></pre>
 
 <h3>Mixins</h3>
 
@@ -665,8 +632,7 @@ people.speak.call(person, 1); // =&gt; &#39;Hi, my name is Neil&#39;
 
 <p>The following example demonstrates how this works… </p>
 
-<p>```js
-function extend(destination, source, overwrite) {
+<pre><code>function extend(destination, source, overwrite) {
     var overwrite = overwrite || false;
     for (var i in source) {
         if (source.hasOwnProperty(i)) {
@@ -683,24 +649,24 @@ function extend(destination, source, overwrite) {
         }
     }
     return destination; 
-}</p>
+}
 
-<p>var person = {
+var person = {
         names: [&#39;James&#39;, &#39;Neil&#39;, &#39;Russ&#39;, &#39;Stuart&#39;]
-    };</p>
+    };
 
-<p>var people = {
+var people = {
     names: [&#39;Ash&#39;, &#39;Brad&#39;, &#39;Mark&#39;, &#39;Mike&#39;],
     speak: function(which) {
         return &#39;Hi, my name is &#39; + this.names[which];
     }
-};</p>
+};
 
-<p>extend(person, people); // copy properties from <code>people</code> to <code>person</code></p>
+extend(person, people); // copy properties from `people` to `person`
 
-<p>// <code>person</code> now has a <code>speak</code> method it didn&#39;t have originally 
+// `person` now has a `speak` method it didn&#39;t have originally 
 person.speak(1); // =&gt; &#39;Hi, my name is Neil&#39;
-```</p>
+</code></pre>
 
 <h2>Conclusion</h2>
 

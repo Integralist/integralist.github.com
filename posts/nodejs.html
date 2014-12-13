@@ -60,13 +60,12 @@
 
 <p><strong>Example usage:</strong></p>
 
-<p><code>sh
-csslint [options] [file|dir]*
+<pre><code>csslint [options] [file|dir]*
 csslint file1.css file2.css  
 csslint ./  
 csslint --errors=box-model,ids test.css // =&gt; decide what should be errors  
 csslint --warnings=box-model,ids test.css // =&gt; decide what should be warnings
-</code></p>
+</code></pre>
 
 <p><strong>Configuration:</strong><br>
 You can view the options by running <code>csslint --help</code><br>
@@ -81,12 +80,9 @@ It&#39;s recommended to create a shell script to wrap the CSS Lint functionality
 
 <p>For Linux/Mac, create a file named <code>csslint</code> and add the following to the file:  </p>
 
-<p>```sh</p>
-
-<h1>!/bin/bash</h1>
-
-<p>java -jar js.jar csslint-rhino.js $@
-```</p>
+<pre><code>#!/bin/bash
+java -jar js.jar csslint-rhino.js $@
+</code></pre>
 
 <p>After creating the file, you need to ensure it can be executed, so go to the command line and type:<br>
 <code>chmod +x csslint</code></p>
@@ -102,13 +98,12 @@ npm install jshint</p>
 
 <p><strong>Example usage:</strong>  </p>
 
-<p><code>sh
-jshint path path2 [options] // =&gt; run against specific scripts
+<pre><code>jshint path path2 [options] // =&gt; run against specific scripts
 jshint *.js // =&gt; run against all scripts
 jshint main.js --show-non-errors // =&gt; show non-errors (e.g. Implied globals etc)
 jshint main.js --config ./Lint/config.json // =&gt; use specific configuration options
 jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of showing non-errors against specific configuration settings
-</code></p>
+</code></pre>
 
 <p>If you get no errors then that means the script ran fine</p>
 
@@ -118,90 +113,88 @@ jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of
 <p><strong>Configuration:</strong><br>
 Your <code>config.json</code> file could look like the following…</p>
 
-<p>```js
-{
+<pre><code>{
     // Settings
     &quot;passfail&quot;      : false,  // Stop on first error.
-    &quot;maxerr&quot;        : 200,    // Maximum error before stopping.</p>
-
-<pre><code>// Predefined globals whom JSHint will ignore.
-&quot;browser&quot;       : true,   // Standard browser globals e.g. `window`, `document`.
-
-&quot;node&quot;          : false,
-&quot;rhino&quot;         : false,
-&quot;couch&quot;         : false,
-&quot;wsh&quot;           : false,   // Windows Scripting Host.
-
-&quot;jquery&quot;        : true,
-&quot;prototypejs&quot;   : false,
-&quot;mootools&quot;      : false,
-&quot;dojo&quot;          : false,
-
-&quot;predef&quot;        : [  // Custom globals.
-    // this is because we use require() from RequireJS library
-    &quot;require&quot;,
-    &quot;define&quot;,
-
-    // this is because we use Jasmine BDD for unit-testing
-    &quot;jasmine&quot;,
-    &quot;describe&quot;,
-    &quot;beforeEach&quot;,
-    &quot;afterEach&quot;,
-    &quot;it&quot;,
-    &quot;expect&quot;
-],
+    &quot;maxerr&quot;        : 200,    // Maximum error before stopping.
 
 
-// Development.
-&quot;debug&quot;         : false,  // Allow debugger statements e.g. browser breakpoints.
-&quot;devel&quot;         : false,  // Allow developments statements e.g. `console.log();`.
+    // Predefined globals whom JSHint will ignore.
+    &quot;browser&quot;       : true,   // Standard browser globals e.g. `window`, `document`.
+
+    &quot;node&quot;          : false,
+    &quot;rhino&quot;         : false,
+    &quot;couch&quot;         : false,
+    &quot;wsh&quot;           : false,   // Windows Scripting Host.
+
+    &quot;jquery&quot;        : true,
+    &quot;prototypejs&quot;   : false,
+    &quot;mootools&quot;      : false,
+    &quot;dojo&quot;          : false,
+
+    &quot;predef&quot;        : [  // Custom globals.
+        // this is because we use require() from RequireJS library
+        &quot;require&quot;,
+        &quot;define&quot;,
+
+        // this is because we use Jasmine BDD for unit-testing
+        &quot;jasmine&quot;,
+        &quot;describe&quot;,
+        &quot;beforeEach&quot;,
+        &quot;afterEach&quot;,
+        &quot;it&quot;,
+        &quot;expect&quot;
+    ],
 
 
-// ECMAScript 5.
-&quot;es5&quot;           : true,   // Allow ECMAScript 5 syntax.
-&quot;strict&quot;        : false,  // Require `use strict` pragma  in every file.
-&quot;globalstrict&quot;  : false,  // Allow global &quot;use strict&quot; (also enables &#39;strict&#39;).
+    // Development.
+    &quot;debug&quot;         : false,  // Allow debugger statements e.g. browser breakpoints.
+    &quot;devel&quot;         : false,  // Allow developments statements e.g. `console.log();`.
 
 
-// The Good Parts.
-&quot;asi&quot;           : false,  // Tolerate Automatic Semicolon Insertion (no semicolons).
-&quot;laxbreak&quot;      : true,   // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
-&quot;bitwise&quot;       : true,   // Prohibit bitwise operators (&amp;, |, ^, etc.).
-&quot;boss&quot;          : true,   // Tolerate assignments inside if, for &amp; while. Usually conditions &amp; loops are for comparison, not assignments.
-&quot;curly&quot;         : true,   // Require {} for every new block or scope.
-&quot;eqeqeq&quot;        : true,   // Require triple equals i.e. `===`.
-&quot;eqnull&quot;        : false,  // Tolerate use of `== null`.
-&quot;evil&quot;          : false,  // Tolerate use of `eval`.
-&quot;expr&quot;          : false,  // Tolerate `ExpressionStatement` as Programs.
-&quot;forin&quot;         : false,  // Tolerate `for in` loops without `hasOwnPrototype`.
-&quot;immed&quot;         : true,   // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
-&quot;latedef&quot;       : true,   // Prohipit variable use before definition.
-&quot;loopfunc&quot;      : false,  // Allow functions to be defined within loops.
-&quot;noarg&quot;         : true,   // Prohibit use of `arguments.caller` and `arguments.callee`.
-&quot;regexp&quot;        : false,  // Prohibit `.` and `[^...]` in regular expressions.
-&quot;regexdash&quot;     : false,  // Tolerate unescaped last dash i.e. `[-...]`.
-&quot;scripturl&quot;     : true,   // Tolerate script-targeted URLs.
-&quot;shadow&quot;        : true,   // Allows re-define variables later in code e.g. `var x=1; x=2;`.
-&quot;supernew&quot;      : false,  // Tolerate `new function () { ... };` and `new Object;`.
-&quot;undef&quot;         : true,   // Require all non-global variables be declared before they are used.
+    // ECMAScript 5.
+    &quot;es5&quot;           : true,   // Allow ECMAScript 5 syntax.
+    &quot;strict&quot;        : false,  // Require `use strict` pragma  in every file.
+    &quot;globalstrict&quot;  : false,  // Allow global &quot;use strict&quot; (also enables &#39;strict&#39;).
 
 
-// Personal styling preferences.
-&quot;newcap&quot;        : true,   // Require capitalization of all constructor functions e.g. `new F()`.
-&quot;noempty&quot;       : true,   // Prohibit use of empty blocks.
-&quot;nonew&quot;         : true,   // Prohibit use of constructors for side-effects.
-&quot;nomen&quot;         : true,   // Prohibit use of initial or trailing underbars in names.
-&quot;onevar&quot;        : false,  // Allow only one `var` statement per function.
-&quot;plusplus&quot;      : false,  // Prohibit use of `++` &amp; `--`.
-&quot;sub&quot;           : false,  // Tolerate all forms of subscript notation besides dot notation e.g. `dict[&#39;key&#39;]` instead of `dict.key`.
-&quot;trailing&quot;      : false,  // Prohibit trailing whitespaces.
-&quot;white&quot;         : true,   // Check against strict whitespace and indentation rules.
-&quot;indent&quot;        : 4,      // Specify indentation spacing
-&quot;smarttabs&quot;     : true    // Suppress warnings about mixed tabs and spaces
+    // The Good Parts.
+    &quot;asi&quot;           : false,  // Tolerate Automatic Semicolon Insertion (no semicolons).
+    &quot;laxbreak&quot;      : true,   // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
+    &quot;bitwise&quot;       : true,   // Prohibit bitwise operators (&amp;, |, ^, etc.).
+    &quot;boss&quot;          : true,   // Tolerate assignments inside if, for &amp; while. Usually conditions &amp; loops are for comparison, not assignments.
+    &quot;curly&quot;         : true,   // Require {} for every new block or scope.
+    &quot;eqeqeq&quot;        : true,   // Require triple equals i.e. `===`.
+    &quot;eqnull&quot;        : false,  // Tolerate use of `== null`.
+    &quot;evil&quot;          : false,  // Tolerate use of `eval`.
+    &quot;expr&quot;          : false,  // Tolerate `ExpressionStatement` as Programs.
+    &quot;forin&quot;         : false,  // Tolerate `for in` loops without `hasOwnPrototype`.
+    &quot;immed&quot;         : true,   // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
+    &quot;latedef&quot;       : true,   // Prohipit variable use before definition.
+    &quot;loopfunc&quot;      : false,  // Allow functions to be defined within loops.
+    &quot;noarg&quot;         : true,   // Prohibit use of `arguments.caller` and `arguments.callee`.
+    &quot;regexp&quot;        : false,  // Prohibit `.` and `[^...]` in regular expressions.
+    &quot;regexdash&quot;     : false,  // Tolerate unescaped last dash i.e. `[-...]`.
+    &quot;scripturl&quot;     : true,   // Tolerate script-targeted URLs.
+    &quot;shadow&quot;        : true,   // Allows re-define variables later in code e.g. `var x=1; x=2;`.
+    &quot;supernew&quot;      : false,  // Tolerate `new function () { ... };` and `new Object;`.
+    &quot;undef&quot;         : true,   // Require all non-global variables be declared before they are used.
+
+
+    // Personal styling preferences.
+    &quot;newcap&quot;        : true,   // Require capitalization of all constructor functions e.g. `new F()`.
+    &quot;noempty&quot;       : true,   // Prohibit use of empty blocks.
+    &quot;nonew&quot;         : true,   // Prohibit use of constructors for side-effects.
+    &quot;nomen&quot;         : true,   // Prohibit use of initial or trailing underbars in names.
+    &quot;onevar&quot;        : false,  // Allow only one `var` statement per function.
+    &quot;plusplus&quot;      : false,  // Prohibit use of `++` &amp; `--`.
+    &quot;sub&quot;           : false,  // Tolerate all forms of subscript notation besides dot notation e.g. `dict[&#39;key&#39;]` instead of `dict.key`.
+    &quot;trailing&quot;      : false,  // Prohibit trailing whitespaces.
+    &quot;white&quot;         : true,   // Check against strict whitespace and indentation rules.
+    &quot;indent&quot;        : 4,      // Specify indentation spacing
+    &quot;smarttabs&quot;     : true    // Suppress warnings about mixed tabs and spaces
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <h2>RequireJS/r.js</h2>
 
@@ -215,8 +208,7 @@ Your <code>config.json</code> file could look like the following…</p>
 <p><strong>Configuration:</strong><br>
 You create a &#39;build&#39; script file (see below for an example) and then you use NodeJs to execute the <code>r.js</code> optimization script and pass through your build script as an argument</p>
 
-<p><code>js
-/*
+<pre><code>/*
  * http://requirejs.org/docs/optimization.html
  *
  * See: https://github.com/jrburke/r.js/blob/master/build/example.build.js for an example build script
@@ -253,7 +245,7 @@ You create a &#39;build&#39; script file (see below for an example) and then you
         }
     ]
 })
-</code></p>
+</code></pre>
 
 <h2>gh-markdown-cli</h2>
 

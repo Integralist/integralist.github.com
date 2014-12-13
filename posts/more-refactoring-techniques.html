@@ -61,76 +61,68 @@
 
 <p>For example, imagine we had the following code... </p>
 
-<p>```ruby 
-def failure do 
+<pre><code>def failure do 
   self.result = &quot;failure&quot; 
-end </p>
+end 
 
-<p>def success do 
+def success do 
   self.result = &quot;success&quot; 
-end </p>
+end 
 
-<p>def error do 
+def error do 
   self.result = &quot;error&quot; 
 end 
-``` </p>
+</code></pre>
 
 <p>Notice how the functions are structurally identical. They simply set a <code>result</code> property to have a value
 This can be refactored using Ruby&#39;s <code>define_method</code> method (which let&#39;s you create methods dynamically at run time)... </p>
 
-<p><code>ruby 
-[:failure, :success, :error].each do |method| 
+<pre><code>[:failure, :success, :error].each do |method| 
   define_method method do 
     self.result = method.to_s 
   end 
 end 
-</code> </p>
+</code></pre>
 
 <p>Note: you could also abstract this code into a more reusable (and easier to maintain) function like so... </p>
 
-<p><code>ruby 
-def dynamic_methods(*method_names, &amp;block) 
+<pre><code>def dynamic_methods(*method_names, &amp;block) 
   method_names.each do |method_name| 
     define_method method_name do 
       instance_exec(method_name, &amp;block)
     end 
   end 
 end 
-</code> </p>
+</code></pre>
 
 <p>You can also use this technique to help ease creating properties on an object. For example, I used this technique in my <a href="/posts/mvcp-model-view-controller-presenter/">MVCP</a> blog post to dynamically create instance variables... </p>
 
-<p>```ruby 
-require &#39;app/presenters/base&#39; 
-require &#39;app/models/person&#39; </p>
+<pre><code>require &#39;app/presenters/base&#39; 
+require &#39;app/models/person&#39; 
 
-<p>class Presenters::Person &lt; Presenters::Base 
-  attr_reader :run, :name, :age </p>
+class Presenters::Person &lt; Presenters::Base 
+  attr_reader :run, :name, :age 
 
-<p>def initialize 
-    @run = true </p>
+  def initialize 
+    @run = true 
 
-<pre><code>model = Person.new(&#39;Mark&#39;, &#39;99&#39;) 
-prepare_view_data({ :name =&gt; model.name, :age =&gt; model.age }) 
-</code></pre>
+    model = Person.new(&#39;Mark&#39;, &#39;99&#39;) 
+    prepare_view_data({ :name =&gt; model.name, :age =&gt; model.age }) 
+  end 
+end 
 
-<p>end 
-end </p>
-
-<p>module Presenters 
+module Presenters 
   class Base 
-    attr_accessor :model </p>
+    attr_accessor :model 
 
-<pre><code>def prepare_view_data hash 
-  hash.each do |name, value| 
-    instance_variable_set(&quot;@#{name}&quot;, value) 
+    def prepare_view_data hash 
+      hash.each do |name, value| 
+        instance_variable_set(&quot;@#{name}&quot;, value) 
+      end 
+    end 
   end 
 end 
 </code></pre>
-
-<p>end 
-end 
-``` </p>
 
 <h3>Extract Class</h3>
 
@@ -146,30 +138,29 @@ end
 
 <p>The following code demonstrates the idea...</p>
 
-<p>```ruby
-module Bar
+<pre><code>module Bar
   def display
     puts &quot;Bar Stuff&quot;
   end
-end</p>
+end
 
-<p>module Baz
+module Baz
   def display
     puts &quot;Baz Stuff&quot;
   end
-end</p>
+end
 
-<p>class Foo
-  include Bar</p>
+class Foo
+  include Bar
 
-<p>def do_something
+  def do_something
     display
   end
-end</p>
+end
 
-<p>foo = Foo.new
+foo = Foo.new
 foo.do_something
-```</p>
+</code></pre>
 
 <p>...as you can see, the user only needs to rely on the interface having a <code>do_something</code> method. </p>
 
@@ -185,26 +176,25 @@ foo.do_something
 
 <p>Here is an example where we&#39;re violating the principle of a clean data interaction...</p>
 
-<p>```ruby 
-class Foo 
-  attr_reader :data </p>
+<pre><code>class Foo 
+  attr_reader :data 
 
-<p>def initialize(data) 
+  def initialize(data) 
     @data = data 
-  end </p>
+  end 
 
-<p>def do_something 
+  def do_something 
     data.each do |item| 
       puts item[0] 
       puts item[1] 
       puts &#39;---&#39; 
     end 
   end 
-end </p>
+end 
 
-<p>obj = Foo.new([[10, 25],[3, 9],[41, 7]]) 
+obj = Foo.new([[10, 25],[3, 9],[41, 7]]) 
 obj.do_something 
-``` </p>
+</code></pre>
 
 <p>Notice in the first example how our code has far too much knowledge (context) about the object it&#39;s interacting with. It knows that the Array index zero holds an X coordinate and the Array index one holds a Y coordinate. </p>
 
@@ -212,34 +202,33 @@ obj.do_something
 
 <p>But now take a look at the following example which works around this issue by converting our complex data structure into a cleaner data format... </p>
 
-<p>```ruby 
-class Foo 
-  attr<em>reader :new</em>data </p>
+<pre><code>class Foo 
+  attr_reader :new_data 
 
-<p>def initialize(data) 
+  def initialize(data) 
     @new_data = transform(data) 
-  end </p>
+  end 
 
-<p>def do<em>something 
-    new</em>data.each do |item| 
+  def do_something 
+    new_data.each do |item| 
       # now we are able to reference easily understandable 
       # property names (rather than item[0], item[1]) 
-      puts item.coord<em>x 
-      puts item.coord</em>y 
+      puts item.coord_x 
+      puts item.coord_y 
       puts &#39;---&#39; 
     end 
-  end </p>
+  end 
 
-<p>Transform = Struct.new(:coord<em>x, :coord</em>y) </p>
+  Transform = Struct.new(:coord_x, :coord_y) 
 
-<p>def transform(data) 
+  def transform(data) 
     data.collect { |item| Transform.new(item[0], item[1]) } 
   end 
-end </p>
+end 
 
-<p>obj = Foo.new([[10, 25],[3, 9],[41, 7]]) 
+obj = Foo.new([[10, 25],[3, 9],[41, 7]]) 
 obj.do_something 
-``` </p>
+</code></pre>
 
 <p>...here we convert the Array into an object and instead can more easily and safely reference the data we&#39;re interested in via recognisable property identifiers. This doesn&#39;t mean if the data source changes that we&#39;ll totally avoid all problems but it&#39;ll be clearer where the problem is arising.</p>
 
@@ -254,13 +243,12 @@ obj.do_something
 
 <p>The following example shows the typical procedural attempt to handle different scenarios based on the data object type being passed...</p>
 
-<p>```ruby
-class Foo
+<pre><code>class Foo
   def initialize(data)
     @data = data
-  end</p>
+  end
 
-<p>def do_something
+  def do_something
     if @data.class == Bar
       puts &quot;Bar!&quot;
     elsif @data.class == Baz
@@ -269,64 +257,63 @@ class Foo
       puts &quot;Qux!&quot;
     end
   end
-end</p>
+end
 
-<p>class Bar; end
+class Bar; end
 class Baz; end
-class Qux; end</p>
+class Qux; end
 
-<p>foo<em>bar = Foo.new(Bar.new)
-foo</em>bar.do_something</p>
+foo_bar = Foo.new(Bar.new)
+foo_bar.do_something
 
-<p>foo<em>baz = Foo.new(Baz.new)
-foo</em>baz.do_something</p>
+foo_baz = Foo.new(Baz.new)
+foo_baz.do_something
 
-<p>foo<em>qux = Foo.new(Qux.new)
-foo</em>qux.do_something
-```</p>
+foo_qux = Foo.new(Qux.new)
+foo_qux.do_something
+</code></pre>
 
 <p>...as you can see, if we have a new Class type we need to go back and to modify the <code>Foo</code> base class. This violates the OCP (Open/Closed Principle) which states a file should be open for extension but closed for modification.</p>
 
 <p>For us to abide by OCP we can use polymorphism and a trusted interface/duck typing to solve the problem...</p>
 
-<p>```ruby
-class Foo
+<pre><code>class Foo
   def initialize(data)
     @data = data
-  end</p>
+  end
 
-<p>def do_something
+  def do_something
     @data.identifier
   end
-end</p>
+end
 
-<p>class Bar
+class Bar
   def identifier
     puts &quot;#{self.class}!&quot;
   end
-end</p>
+end
 
-<p>class Baz
+class Baz
   def identifier
     puts &quot;#{self.class}!&quot;
   end
-end</p>
+end
 
-<p>class Qux
+class Qux
   def identifier
     puts &quot;#{self.class}!&quot;
   end
-end</p>
+end
 
-<p>foo<em>bar = Foo.new(Bar.new)
-foo</em>bar.do_something</p>
+foo_bar = Foo.new(Bar.new)
+foo_bar.do_something
 
-<p>foo<em>baz = Foo.new(Baz.new)
-foo</em>baz.do_something</p>
+foo_baz = Foo.new(Baz.new)
+foo_baz.do_something
 
-<p>foo<em>qux = Foo.new(Qux.new)
-foo</em>qux.do_something
-```</p>
+foo_qux = Foo.new(Qux.new)
+foo_qux.do_something
+</code></pre>
 
 <p>Notice we have removed the need for a conditional and just sent the message to the relevant object to be handled. Much cleaner and easier to maintain and scale.</p>
 
@@ -336,23 +323,21 @@ foo</em>qux.do_something
 
 <p>Here is a simple example...</p>
 
-<p><code>ruby 
-if date &lt; SUMMER_START || date &gt; SUMMER_END 
+<pre><code>if date &lt; SUMMER_START || date &gt; SUMMER_END 
   charge = # some complex calculation if it&#39;s winter 
 else 
   charge = # some other complex calculation if it&#39;s summer 
 end 
-</code> </p>
+</code></pre>
 
 <p>...which we can refactor like so... </p>
 
-<p><code>ruby 
-if not_summer(date) 
+<pre><code>if not_summer(date) 
   charge = winter_charge 
 else 
   charge = summer_charge 
 end 
-</code></p>
+</code></pre>
 
 <p>...much better.</p>
 
@@ -362,31 +347,30 @@ end
 
 <p>Here is a simple example of what we want to avoid...</p>
 
-<p>```ruby
-class Post
-  attr_reader :id</p>
+<pre><code>class Post
+  attr_reader :id
 
-<p>def initialize id
+  def initialize id
     @id        = id
     @published = false
-  end</p>
+  end
 
-<p>def self.find<em>and</em>publish id
+  def self.find_and_publish id
     # Simulated database operation
     post = Posts.find { |post| post.id == id }
     post.publish unless post.nil?
-  end</p>
+  end
 
-<p>def publish
+  def publish
     puts @published = true
   end
-end</p>
+end
 
-<p>Posts = [Post.new(1), Post.new(2)]</p>
+Posts = [Post.new(1), Post.new(2)]
 
-<p>Post.find<em>and</em>publish(0) # displays nothing
-Post.find<em>and</em>publish(1) # displays true
-```</p>
+Post.find_and_publish(0) # displays nothing
+Post.find_and_publish(1) # displays true
+</code></pre>
 
 <p>...in the above example we check whether <code>post</code> is <code>nil</code> or not. If it isn&#39;t <code>nil</code> then we call the <code>publish</code> method, otherwise we don&#39;t do anything.</p>
 
@@ -394,37 +378,36 @@ Post.find<em>and</em>publish(1) # displays true
 
 <p>The following code demonstrates how we can avoid that problem by introducing the concept of having an object to handle null scenarios (it&#39;s the same principle of using duck typing/trusted interfaces/polymorphism)...</p>
 
-<p>```ruby
-class Post
-  attr_reader :id</p>
+<pre><code>class Post
+  attr_reader :id
 
-<p>def initialize id
+  def initialize id
     @id        = id
     @published = false
-  end</p>
+  end
 
-<p>def self.find<em>and</em>publish id
+  def self.find_and_publish id
     # Simulated database operation
     post = Posts.find { |post| post.id == id } || NullPost.new
     post.publish
-  end</p>
+  end
 
-<p>def publish
+  def publish
     puts @published = true
   end
-end</p>
+end
 
-<p>class NullPost
+class NullPost
   def publish
     # noop
   end
-end</p>
+end
 
-<p>Posts = [Post.new(1), Post.new(2)]</p>
+Posts = [Post.new(1), Post.new(2)]
 
-<p>Post.find<em>and</em>publish(0) # displays nothing
-Post.find<em>and</em>publish(1) # displays true
-```</p>
+Post.find_and_publish(0) # displays nothing
+Post.find_and_publish(1) # displays true
+</code></pre>
 
 <p>...as you can see, effectively we have the same code with the exception that we no longer check for <code>nil?</code> in the second example and instead we rely on another object <code>NullPost</code> implementing the same interface but returns a null related value.</p>
 

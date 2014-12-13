@@ -112,12 +112,11 @@
 
 <p>Take the following example…</p>
 
-<p><code>ruby
-5.times {
+<pre><code>5.times {
     print &quot;This gets written five times&quot;
     sleep 2
 }
-</code></p>
+</code></pre>
 
 <p>…which every two seconds displays the sentence &quot;This gets written five times&quot;…</p>
 
@@ -141,13 +140,12 @@
 
 <p>In Ruby you have single line comments <code># this is a comment</code> and multi-line comments:</p>
 
-<p><code>ruby
-=begin
+<pre><code>=begin
     Lots and lots of
     code that I want
     to comment out all at once
 =end
-</code></p>
+</code></pre>
 
 <p>With multi-line comments there must be no whitespace before the <code>=begin</code> and <code>=end</code> statements otherwise your script will throw an error.</p>
 
@@ -157,11 +155,10 @@
 
 <p>You can assign multiple variables at once like so…</p>
 
-<p><code>ruby
-x, y = 1, 2     # which is effectively the same as x = 1, y = 2
+<pre><code>x, y = 1, 2     # which is effectively the same as x = 1, y = 2
 a, b = b, a     # which switches the values of each variable
 x,y,z = [1,2,3] # assign each array item value to a variable, so x = 1, y = 2, z = 3
-</code></p>
+</code></pre>
 
 <p>Variables in JavaScript typically come in two flavours: Global and Local. In JavaScript if you declare a variable with the <code>var</code> syntax then the variable is added as a property to the global object (which depending on the environment JavaScript is running in) most of the time will be the <code>window</code> object. If you declare a variable inside of a function in JavaScript using the <code>var</code> syntax then that variable is only available within that function (unless it&#39;s accessible via some priviledged object).</p>
 
@@ -171,60 +168,61 @@ x,y,z = [1,2,3] # assign each array item value to a variable, so x = 1, y = 2, z
 
 <p>So for example, if I have a class called &quot;MyClass&quot; and inside of it I set <code>@@my_var</code> to equal 456 instead of 123 then every object created from &quot;MyClass&quot; will have <code>my_var</code> set to 456. Whereas if &quot;MyClass&quot; had <code>@my_var</code> set to 123 and I create a new object from that class and set <code>@my_var</code> to 456 - an &#39;instance variable&#39; - then only that object would see the value of <code>@my_var</code> as 456, all other objects created from the class would still see the value as 123. It sounds tricky but it&#39;s not that bad really. Here is an example of what the above was trying to explain… </p>
 
-<p>```ruby</p>
-
-<h1>Following classes &#39;MyClass&#39; and &#39;MyClass2&#39; demonstrate difference between &#39;class variable&#39; and &#39;instance variable&#39;</h1>
-
-<p>class MyClass
+<pre><code># Following classes &#39;MyClass&#39; and &#39;MyClass2&#39; demonstrate difference between &#39;class variable&#39; and &#39;instance variable&#39;
+class MyClass
     def initialize
-        @@class<em>var = 123
+        @@class_var = 123
     end
     def showValue
-        puts @@class</em>var
+        puts @@class_var
     end
     def setValue
         @@class_var = 456;
     end
-end</p>
+end
 
-<p>class MyClass2
+class MyClass2
     def initialize
-        @class<em>var = 123
+        @class_var = 123
     end
     def showValue
-        puts @class</em>var
+        puts @class_var
     end
     def setValue
         @class_var = 456;
     end
-end</p>
+end
 
-<h1>This is the &#39;class variable&#39;</h1>
+#############################
 
-<p>objA = MyClass.new()
-objB = MyClass.new()</p>
+# This is the &#39;class variable&#39;
 
-<p>objA.showValue # =&gt; 123
-objB.showValue # =&gt; 123</p>
+objA = MyClass.new()
+objB = MyClass.new()
 
-<p>objA.setValue</p>
+objA.showValue # =&gt; 123
+objB.showValue # =&gt; 123
 
-<p>objA.showValue # =&gt; 456
-objB.showValue # =&gt; 456</p>
+objA.setValue
 
-<h1>This is the &#39;instance variable&#39;</h1>
+objA.showValue # =&gt; 456
+objB.showValue # =&gt; 456
 
-<p>objC = MyClass2.new()
-objD = MyClass2.new()</p>
+#############################
 
-<p>objC.showValue # =&gt; 123
-objD.showValue # =&gt; 123</p>
+# This is the &#39;instance variable&#39;
 
-<p>objC.setValue</p>
+objC = MyClass2.new()
+objD = MyClass2.new()
 
-<p>objC.showValue # =&gt; 456
+objC.showValue # =&gt; 123
 objD.showValue # =&gt; 123
-```</p>
+
+objC.setValue
+
+objC.showValue # =&gt; 456
+objD.showValue # =&gt; 123
+</code></pre>
 
 <h2>Magic Variables</h2>
 
@@ -246,21 +244,19 @@ objD.showValue # =&gt; 123
 
 <p>If you had lots of hashes (which we&#39;ll come to later) and you have a key/property called &quot;name&quot; then you could write your hash like so…</p>
 
-<p><code>ruby
-hash1 = { &quot;name&quot; =&gt; &quot;Mark&quot; }
+<pre><code>hash1 = { &quot;name&quot; =&gt; &quot;Mark&quot; }
 hash2 = { &quot;name&quot; =&gt; &quot;Brad&quot; }
 hash3 = { &quot;name&quot; =&gt; &quot;Ash&quot; }
 hash4 = { &quot;name&quot; =&gt; &quot;Neil&quot; }
-</code></p>
+</code></pre>
 
 <p>…but <code>&quot;name&quot;</code> is being re-created in memory every time it&#39;s referenced. It&#39;s much more energy efficient to use a Symbol which looks like a variable but is prefixed with a colon <code>:name</code>…</p>
 
-<p><code>ruby
-hash1 = { :name =&gt; &quot;Mark&quot; }
+<pre><code>hash1 = { :name =&gt; &quot;Mark&quot; }
 hash2 = { :name =&gt; &quot;Brad&quot; }
 hash3 = { :name =&gt; &quot;Ash&quot; }
 hash4 = { :name =&gt; &quot;Neil&quot; }
-</code></p>
+</code></pre>
 
 <p>…as you can see, Symbols don&#39;t have values like variables, they are literally just used as efficient identifiers.</p>
 
@@ -270,23 +266,21 @@ hash4 = { :name =&gt; &quot;Neil&quot; }
 
 <p>To define a method the syntax is:</p>
 
-<p><code>ruby
-def method_name (arguments)
+<pre><code>def method_name (arguments)
     // function code
 end
-</code></p>
+</code></pre>
 
 <p>In JavaScript, if a method doesn&#39;t explicitly specify a return value then it returns <code>undefined</code>. In Ruby a method will return the last expression evaluated in its body, and if there isn&#39;t one then it will return <code>nil</code> (<code>nil</code> is equivalent to <code>null</code> in PHP).</p>
 
 <p>As was noted in the above &#39;Variables&#39; section about variables being able to assigned multiple values, this can come in handy with method returning multiple values as well (which is quite interesting as I&#39;m only used to functions in JavaScript returning a single value)… </p>
 
-<p>```ruby
-def myMethod 
+<pre><code>def myMethod 
     [1, 2] # this being the last expression, this is what&#39;s returned
-end</p>
+end
 
-<p>a, b = myMethod; # =&gt; a = 1, b = 2
-```</p>
+a, b = myMethod; # =&gt; a = 1, b = 2
+</code></pre>
 
 <p>You can call a method without parenthesis, e.g. <code>myMethod</code> apposed to <code>myMethod()</code>. The choice is yours whether you use parenthesis or not - personally there are times where I can see myself not needing them and other times using them so it&#39;s crystal clear that what I&#39;m doing is calling a method (time will tell - but I understand a good practice is to use parenthesis whenever a method expects arguments to be passed otherwise there is no point in using them).</p>
 
@@ -294,11 +288,10 @@ end</p>
 
 <p>So for example, these work…</p>
 
-<p><code>ruby
-welcome(&quot;Mark&quot;, 30)
+<pre><code>welcome(&quot;Mark&quot;, 30)
 welcome&quot;Mark&quot;, 30
 welcome &quot;Mark&quot;, 30
-</code></p>
+</code></pre>
 
 <p>…but this doesn&#39;t <code>welcome (&quot;Mark&quot;, 30)</code>.</p>
 
@@ -308,11 +301,10 @@ welcome &quot;Mark&quot;, 30
 
 <p>You can specify default values for arguments…</p>
 
-<p><code>ruby
-def welcome (name = &quot;World&quot;, age = 1)
+<pre><code>def welcome (name = &quot;World&quot;, age = 1)
     puts &quot;Hello #{name}!, I see you&#39;re #{age} years old.&quot;
 end
-</code></p>
+</code></pre>
 
 <p>…which can be used as follows…</p>
 
@@ -322,23 +314,21 @@ end
 
 <p>You can also add new methods to an existing object just by prefixing the name of the method with the relevant object… </p>
 
-<p>```ruby
-def Math.someNewThing (x) 
+<pre><code>def Math.someNewThing (x) 
     puts &quot;#{x} was here&quot;
-end</p>
+end
 
-<p>Math.respond_to?(&quot;someNewThing&quot;) # =&gt; true</p>
+Math.respond_to?(&quot;someNewThing&quot;) # =&gt; true
 
-<p>Math.someNewThing(123) # =&gt; 123 was here
+Math.someNewThing(123) # =&gt; 123 was here
 Math.someNewThing(&quot;abc&quot;) # =&gt; abc was here
-```</p>
+</code></pre>
 
 <p>…in Ruby these types of method declarations are referred to as &#39;class methods&#39; (or &#39;singleton methods&#39;)</p>
 
 <p>In a similar example of extending already defined Classes:</p>
 
-<p>```ruby
-class Fixnum
+<pre><code>class Fixnum
     def seconds
         self
     end
@@ -351,31 +341,29 @@ class Fixnum
     def days
         self * 60 * 60 * 24
     end 
-end</p>
+end
 
-<p>puts Time.now
+puts Time.now
 puts Time.now + 10.minutes
 puts Time.now + 16.hours
 puts Time.now - 7.days
-```</p>
+</code></pre>
 
 <p>Note: you might see methods that are called using a ? at the end, these indicate that the method will return a Boolean value (e.g. <code>respond_to?</code> which you&#39;ll see below in the &#39;Classes&#39; section)… </p>
 
-<p>```ruby
-x = []
-x.empty? # =&gt; true (…or x.empty?() if you prefer the use of parenthesis)</p>
+<pre><code>x = []
+x.empty? # =&gt; true (…or x.empty?() if you prefer the use of parenthesis)
 
-<p>x = [1, 2, 3]
+x = [1, 2, 3]
 x.empty? # =&gt; false
-```</p>
+</code></pre>
 
 <p>If you want to know what methods are available to an object/class then look at the <code>class</code> of the object and then inspect the methods available… </p>
 
-<p><code>ruby
-my_hash = { :name =&gt; &quot;Mark&quot; }
+<pre><code>my_hash = { :name =&gt; &quot;Mark&quot; }
 my_hash.class # =&gt; Hash
 Hash.instance_methods # =&gt; [:rehash, :to_hash, :to_a, :inspect, :to_s, :==, :[], :hash, :eql?, :fetch, :[]=, :store, :default, :default=, :default_proc, :default_proc=, :key, :index, :size, :length, :empty?, :each_value, :each_key, :each_pair, :each, :keys, :values, :values_at, :shift, :delete, :delete_if, :keep_if, :select, :select!, :reject, :reject!, :clear, :invert, :update, :replace, :merge!, :merge, :assoc, :rassoc, :flatten, :include?, :member?, :has_key?, :has_value?, :key?, :value?, :compare_by_identity, :compare_by_identity?, :entries, :sort, :sort_by, :grep, :count, :find, :detect, :find_index, :find_all, :collect, :map, :flat_map, :collect_concat, :inject, :reduce, :partition, :group_by, :first, :all?, :any?, :one?, :none?, :min, :max, :minmax, :min_by, :max_by, :minmax_by, :each_with_index, :reverse_each, :each_entry, :each_slice, :each_cons, :each_with_object, :zip, :take, :take_while, :drop, :drop_while, :cycle, :chunk, :slice_before, :nil?, :===, :=~, :!~, :&lt;=&gt;, :class, :singleton_class, :clone, :dup, :initialize_dup, :initialize_clone, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :respond_to_missing?, :extend, :display, :method, :public_method, :define_singleton_method, :object_id, :to_enum, :enum_for, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__, :__id__]
-</code></p>
+</code></pre>
 
 <h2>Blocks</h2>
 
@@ -383,29 +371,27 @@ Hash.instance_methods # =&gt; [:rehash, :to_hash, :to_a, :inspect, :to_s, :==, :
 
 <p>When creating a method, if you want to pass a code block in as an argument, you need to prefix the argument name with an ampersand <code>&amp;</code> like so…</p>
 
-<p>```ruby
-def myfn (&amp;code<em>block)
+<pre><code>def myfn (&amp;code_block)
     %w(a e I o u).each do |vowel|
-        code</em>block.call(vowel)
+        code_block.call(vowel)
     end
-end</p>
+end
 
-<p>myfn { |x| puts x }
-```</p>
+myfn { |x| puts x }
+</code></pre>
 
 <p>…what the above code does is create an Array and then iterates over it. Every item in the Array is passed to the code block (the code block which is passed in as an argument to the method).</p>
 
 <p>But the above can be simplified...</p>
 
-<p>```ruby
-def myfn
+<pre><code>def myfn
     %w(a e I o u).each do |vowel|
         yield vowel
     end
-end</p>
+end
 
-<p>myfn { |x| puts x }
-```</p>
+myfn { |x| puts x }
+</code></pre>
 
 <p>...this isn&#39;t as obvious but is less verbose (the <code>yield</code> keyword automatically detects the code block and passes control to it rather than us having to pass through the code block and executing the <code>call</code> method on the code block).</p>
 
@@ -419,17 +405,16 @@ end</p>
 
 <p>The following is an example of how to use a Proc object instead of Block...</p>
 
-<p>```ruby
-my_proc = Proc.new { |x| puts x }</p>
+<pre><code>my_proc = Proc.new { |x| puts x }
 
-<p>def myfn proc<em>obj
+def myfn proc_obj
     %w(a e I o u).each do |vowel|
-        proc</em>obj.call(vowel)
+        proc_obj.call(vowel)
     end
-end</p>
+end
 
-<p>myfn my_proc
-```</p>
+myfn my_proc
+</code></pre>
 
 <p>Notice we use a <code>call</code> method on the Proc object rather than the <code>yield</code> keyword which we use for a Block.</p>
 
@@ -446,24 +431,22 @@ end</p>
 
 <p>The following is an example of how to use a Proc object instead of Block...</p>
 
-<p>```ruby
-my_lambda = lambda { |x| puts x }</p>
+<pre><code>my_lambda = lambda { |x| puts x }
 
-<p>def myfn lambda<em>obj
+def myfn lambda_obj
     %w(a e I o u).each do |vowel|
-        lambda</em>obj.call(vowel)
+        lambda_obj.call(vowel)
     end
-end</p>
+end
 
-<p>myfn my_lambda
-```</p>
+myfn my_lambda
+</code></pre>
 
 <p>Lambdas are very popular in other languages hence it&#39;s inclusion in Ruby (it&#39;s just a nice way to pass around code blocks). </p>
 
 <p>The following example is modified from a test on RubyMonk but is a good example of using lambdas…</p>
 
-<p>```ruby
-def with_names(fn)
+<pre><code>def with_names(fn)
   result = []
   [ [&quot;Christopher&quot;, &quot;Alexander&quot;],
     [&quot;John&quot;, &quot;McCarthy&quot;],
@@ -471,45 +454,41 @@ def with_names(fn)
       result &lt;&lt; fn.call(pair[0], pair[1])
   end
   result
-end</p>
+end
 
-<p>l = lambda { |name1, name2| &quot;#{name1} #{name2}&quot; } </p>
+l = lambda { |name1, name2| &quot;#{name1} #{name2}&quot; } 
 
-<p>with_names(l)
-```</p>
+with_names(l)
+</code></pre>
 
 <h2>Classes</h2>
 
 <p>The Classes syntax is as follows…</p>
 
-<p><code>ruby
-class ClassName
+<pre><code>class ClassName
     def initialize ()
         // code
     end
     // code
 end
-</code></p>
+</code></pre>
 
 <p>Instance variables for classes are defined using <code>@variable_name</code> and are available to all methods of the class.</p>
 
 <p>For example…</p>
 
-<p>```ruby
-class Person
+<pre><code>class Person
     def initialize (name = &quot;Bob&quot;)
         @name = name
-    end</p>
+    end
 
-<pre><code>def speak
-    puts &quot;Hello, my name is #{@name}&quot;
+    def speak
+        puts &quot;Hello, my name is #{@name}&quot;
+    end
 end
+
+employee = Person.new(&quot;Mark&quot;) 
 </code></pre>
-
-<p>end</p>
-
-<p>employee = Person.new(&quot;Mark&quot;) 
-```</p>
 
 <p>…executing this via irb returns <code>#&lt;Person:0x007feb988ce048 @name=&quot;Mark&quot;&gt;</code></p>
 
@@ -530,19 +509,18 @@ end
 
 <p>For example…</p>
 
-<p>```ruby
-class Test
-    attr<em>accessor :user</em>name
+<pre><code>class Test
+    attr_accessor :user_name
     def initialize (name)
-        @user<em>name = name
+        @user_name = name
     end
     def speak
-        puts &quot;hello #{@user</em>name}&quot;
+        puts &quot;hello #{@user_name}&quot;
     end
-end</p>
+end
 
-<p>tester = Test.new(&quot;Mark&quot;)
-```</p>
+tester = Test.new(&quot;Mark&quot;)
+</code></pre>
 
 <p><code>tester.speak</code> =&gt; hello Mark<br>
 <code>tester.user_name</code> =&gt; &quot;Mark&quot;<br>
@@ -555,42 +533,38 @@ end</p>
 
 <p>Loops in Ruby are straight forward…</p>
 
-<p>```ruby
-list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</p>
+<pre><code>list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
 
-<p>list.each do |item|
+list.each do |item|
     puts item
 end
-```</p>
+</code></pre>
 
 <p>The <code>each</code> method executes a block of code for each item in the Array. The <code>do…end</code> section is such a block. The pipes <code>||</code> denotes the parameter <code>|name|</code> and that parameter is bound to each list item.</p>
 
 <p>One thing to be aware of (and you&#39;ll see this later under the &#39;Numbers&#39; section), you can swap out <code>do…end</code> for normal curly brackets… </p>
 
-<p>```ruby
-list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</p>
+<pre><code>list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
 
-<p>list.each { |item|
+list.each { |item|
     puts item
 }
-```</p>
+</code></pre>
 
 <p>…but for an <code>each</code> loop it doesn&#39;t look as nice as <code>do…end</code> so I keep with that style instead. But as you&#39;ll see I still like using curly brackets for other types of loops that don&#39;t have parameters.</p>
 
 <p>There is a standard <code>while</code> loop as well within Ruby… </p>
 
-<p><code>ruby
-count = 0
+<pre><code>count = 0
 while count &lt; 10
     puts &quot;count = #{count}&quot;
     count += 1 # Ruby has neither ++ or -- to increment/decrement a value
 end
-</code></p>
+</code></pre>
 
 <p>Also with a <code>while</code> loop (if you&#39;re using a &#39;switch..case&#39; style statement - like you would see in JavaScript) you can explicitly return a value… </p>
 
-<p><code>ruby
-def myFunction
+<pre><code>def myFunction
     xyz = &quot;def&quot;
     while true
         case xyz
@@ -603,16 +577,15 @@ def myFunction
         end
     end
 end
-</code></p>
+</code></pre>
 
 <p>There are other types of iterator methods such as <code>map</code>… </p>
 
-<p><code>ruby
-myArray = [1, 2, 3, 4]
+<pre><code>myArray = [1, 2, 3, 4]
 newArray = myArray.map do |x|
     x*x
 end
-</code></p>
+</code></pre>
 
 <p>…which returns <code>[1, 4, 9, 16]</code></p>
 
@@ -620,19 +593,17 @@ end
 
 <p>Ruby is slightly different to other programming languages in that even its syntax is very expression-oriented. So where a control structure like <code>if</code> would be called a &#39;statement&#39; in other languages, in Ruby it is actually an expression which means it can be assigned to a variable like so…</p>
 
-<p>```ruby
-x = 5
+<pre><code>x = 5
 y = 10
 result = if x &lt; y then 
     x
 else 
     y
-end</p>
+end
 
-<h1>depending on how complicated your condition is you could put it all on one line like so…</h1>
-
-<p>result = if x &lt; y then x else y end
-```</p>
+# depending on how complicated your condition is you could put it all on one line like so… 
+result = if x &lt; y then x else y end
+</code></pre>
 
 <p>…and so, as we&#39;ve mentioned before with <code>functions</code>, these types of blocks return the last expression evalutated inside the block, so in the above example the last expression is returned and stored in the <code>result</code> variable.</p>
 
@@ -642,27 +613,24 @@ end</p>
 
 <p>For example… </p>
 
-<p>```ruby
-def welcome (name)
+<pre><code>def welcome (name)
     puts &quot;Hello #{name}!&quot;
-end</p>
+end
 
-<p>welcome(&quot;Mark&quot;)
-```</p>
+welcome(&quot;Mark&quot;)
+</code></pre>
 
 <p>Multiple arguments work the same way…</p>
 
-<p><code>ruby
-def welcome (name, age)
+<pre><code>def welcome (name, age)
     puts &quot;Hello #{name}!, I see you&#39;re #{age} years old.&quot;
 end
-</code></p>
+</code></pre>
 
 <p>You could do the same with simple string concatenation… </p>
 
-<p><code>
-puts &quot;Hello&quot; + name + &quot;!, I see you&#39;re &quot; + age + &quot; years old.&quot;
-</code></p>
+<pre><code>puts &quot;Hello&quot; + name + &quot;!, I see you&#39;re &quot; + age + &quot; years old.&quot;
+</code></pre>
 
 <p>…but as you can see it&#39;s not as nice to look at or easy to read and definitely isn&#39;t as maintainable.</p>
 
@@ -677,34 +645,27 @@ puts &quot;Hello&quot; + name + &quot;!, I see you&#39;re &quot; + age + &quot; 
 
 <p>For example…</p>
 
-<p>```ruby
-&quot;foobarfoobar&quot;.sub(&#39;bar&#39;,&#39;foo&#39;)</p>
+<pre><code>&quot;foobarfoobar&quot;.sub(&#39;bar&#39;,&#39;foo&#39;)
+# =&gt; foofoofoobar
 
-<h1>=&gt; foofoofoobar</h1>
+&quot;foobarfoobar&quot;.gsub(&#39;bar&#39;,&#39;foo&#39;)
+# =&gt; foofoofoofoo
 
-<p>&quot;foobarfoobar&quot;.gsub(&#39;bar&#39;,&#39;foo&#39;)</p>
+x = &quot;This is a test&quot;
+x.sub(/^[a-zA-Z]{4}/, &#39;Hello&#39;)
+# =&gt; &quot;Hello is a test&quot;
 
-<h1>=&gt; foofoofoofoo</h1>
+x = &quot;The car cost £2000 in 2012&quot;
+x.scan(/\d+/) { |match| puts match }
+# =&gt; 2000
+# =&gt; 2012
+# scan() without the code block returns an array of matches
 
-<p>x = &quot;This is a test&quot;
-x.sub(/^[a-zA-Z]{4}/, &#39;Hello&#39;)</p>
-
-<h1>=&gt; &quot;Hello is a test&quot;</h1>
-
-<p>x = &quot;The car cost £2000 in 2012&quot;
-x.scan(/\d+/) { |match| puts match }</p>
-
-<h1>=&gt; 2000</h1>
-
-<h1>=&gt; 2012</h1>
-
-<h1>scan() without the code block returns an array of matches</h1>
-
-<p>x = &quot;This is a test&quot;.match(/(\w+) (\w+)/)
+x = &quot;This is a test&quot;.match(/(\w+) (\w+)/)
 puts x[0] # =&gt; This is
 puts x[1] # =&gt; This
 puts x[2] # =&gt; is
-```</p>
+</code></pre>
 
 <h2>Arrays</h2>
 
@@ -712,20 +673,18 @@ puts x[2] # =&gt; is
 
 <p>The bitwise operator <code>&lt;&lt;</code> is used to add a new item to an array:</p>
 
-<p><code>ruby
-x = []
+<pre><code>x = []
 x &lt;&lt; &quot;abc&quot;
-</code></p>
+</code></pre>
 
 <p>…which is equivalent to <code>x.push(&quot;abc&quot;)</code></p>
 
 <p>Note: Strings also use the <code>&lt;&lt;</code> operator to add content to them:</p>
 
-<p><code>ruby
-testString = &quot;this is my string&quot;
+<pre><code>testString = &quot;this is my string&quot;
 testString &lt;&lt; &quot; that has extra stuff added to it&quot;
 testString # =&gt; &quot;this is my string that has extra stuff added to it&quot; 
-</code></p>
+</code></pre>
 
 <p>There are methods for removing the last item in the Array <code>x.pop()</code> as well as joining an array items into a string using the specified character(s) as a separator <code>x.join(&quot;, &quot;)</code>.</p>
 
@@ -733,11 +692,10 @@ testString # =&gt; &quot;this is my string that has extra stuff added to it&quot
 
 <p>If you need to concatenate two Arrays you can use the <code>concat</code> method… </p>
 
-<p><code>ruby
-arr = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+<pre><code>arr = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
 arr.concat([&quot;d&quot;, &quot;e&quot;])
 arr # =&gt; [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;] 
-</code></p>
+</code></pre>
 
 <p>…there is also more basic concatenation using the <code>+</code> operator <code>arr + [&quot;d&quot;, &quot;e&quot;]</code> which returns <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;]</code> but one caveat is that you must remember to set the array to be overwritten. For example, the previous code will return an Array which is a combination of <code>arr</code> and <code>[&quot;d&quot;, &quot;e&quot;]</code> but it doesn&#39;t actually overwrite the original Array (<code>arr</code> will still return <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</code>). If you were expecting <code>arr</code> to be changed to <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;]</code> then you would need to explicitly overwrite <code>arr</code> using: <code>arr += [&quot;d&quot;, &quot;e&quot;]</code> instead.</p>
 
@@ -747,11 +705,10 @@ arr # =&gt; [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e
 
 <p>There are many Array methods for inserting new items into an Array, but you can also use Ranges (which normally work like <code>(&#39;A&#39;..&#39;Z&#39;)</code>):</p>
 
-<p><code>ruby
-arr = [0, 1, 2, 3, 4, 5, 6]
+<pre><code>arr = [0, 1, 2, 3, 4, 5, 6]
 arr[1..3] = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
 arr # =&gt; [0, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, 4, 5, 6]
-</code></p>
+</code></pre>
 
 <h2>Hashes</h2>
 
@@ -759,29 +716,26 @@ arr # =&gt; [0, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, 4, 5, 6]
 
 <p>So for example to create a hash you would use… </p>
 
-<p><code>ruby
-h = { 
+<pre><code>h = { 
     &quot;a&quot; =&gt; 1, 
     &quot;b&quot; =&gt; 2
 }
-</code></p>
+</code></pre>
 
 <p>…then you can access the relevant key/values (and add new key/values) like so… </p>
 
-<p><code>ruby
-h[&quot;a&quot;]     # =&gt; 1
+<pre><code>h[&quot;a&quot;]     # =&gt; 1
 h[&quot;b&quot;]     # =&gt; 2
 h[&quot;c&quot;] = 3 # create a new key/value
 h[&quot;c&quot;]     # =&gt; 3
-</code></p>
+</code></pre>
 
 <p>…and finally you can loop through the hash…</p>
 
-<p><code>ruby
-h.each do |key, value|
+<pre><code>h.each do |key, value|
     puts &quot;The value: #{value} belongs to the key #{key}&quot;
 end
-</code></p>
+</code></pre>
 
 <p>You don&#39;t have to use a String as a hash <code>key</code>. You can use any object or Symbol.</p>
 
@@ -789,10 +743,9 @@ end
 
 <p>To see what keys are available in an object use the <code>keys</code> property:</p>
 
-<p><code>ruby
-hash = { :name =&gt; &quot;Mark&quot;, :age =&gt; 30 }
+<pre><code>hash = { :name =&gt; &quot;Mark&quot;, :age =&gt; 30 }
 hash.keys # =&gt; [:name, :age]
-</code></p>
+</code></pre>
 
 <p>You can delete a key/value from the hash using <code>hash.delete(key)</code></p>
 
@@ -802,35 +755,31 @@ hash.keys # =&gt; [:name, :age]
 
 <p>In Ruby, all values are objects. This includes even simple things like numeric literals. So for example you can use a number to help carry out a certain action &#39;x&#39; amount of times…</p>
 
-<p><code>ruby
-3.times {
+<pre><code>3.times {
     puts &quot;This gets written three times&quot;
 }
-</code></p>
+</code></pre>
 
 <p>And as explained earlier you can swap curly brackets for <code>do…end</code>…</p>
 
-<p><code>ruby
-3.times do
+<pre><code>3.times do
     puts &quot;This gets written three times&quot;
 end
-</code></p>
+</code></pre>
 
 <p>But you can also do…</p>
 
-<p><code>ruby
-1.upto(9) { 
+<pre><code>1.upto(9) { 
     |x| puts x 
 }
-</code></p>
+</code></pre>
 
 <p>…which can be interchanged with… </p>
 
-<p><code>ruby
-1.upto(9) do |x| 
+<pre><code>1.upto(9) do |x| 
     puts x 
 end
-</code></p>
+</code></pre>
 
 <p>I normally find anything that takes parameters <code>|x|</code> looks better with <code>do…end</code> style syntax.</p>
 

@@ -92,35 +92,32 @@
 
 <p>Below is an example of a web page HTML structure…</p>
 
-<p>```html
-&lt;!doctype html&gt;
-&lt;!--[if IE 8]&gt;<html class="ie8" dir="ltr" lang="en">&lt;![endif]--&gt;
-&lt;!--[if IE 9]&gt;<html class="ie9" dir="ltr" lang="en">&lt;![endif]--&gt;
-&lt;!--[if gt IE 9]&gt;&lt;!--&gt; <html dir="ltr" lang="en"> &lt;!--&lt;![endif]--&gt;</p>
+<pre><code>&lt;!doctype html&gt;
+&lt;!--[if IE 8]&gt;&lt;html class=&quot;ie8&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
+&lt;!--[if IE 9]&gt;&lt;html class=&quot;ie9&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
+&lt;!--[if gt IE 9]&gt;&lt;!--&gt; &lt;html dir=&quot;ltr&quot; lang=&quot;en&quot;&gt; &lt;!--&lt;![endif]--&gt;
 
-<pre><code>&lt;head&gt;
-    &lt;meta charset=&quot;utf-8&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
-    &lt;meta name=&quot;author&quot; content=&quot;Mark McDonnell&quot; /&gt;
-    &lt;title&gt;My thoughts on current web development practices&lt;/title&gt;
-    &lt;!--[if lt IE 9]&gt;
-    &lt;script src=&quot;/Assets/Scripts/Utils/Elements/html5.js&quot;&gt;&lt;/script&gt;
-    &lt;![endif]--&gt;
-    &lt;link rel=&quot;author&quot; href=&quot;/humans.txt&quot; type=&quot;text/plain&quot;&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;Assets/Styles/mobile.css&quot;  media=&quot;only screen and (min-width: 320px)&quot;&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;Assets/Styles/tablet.css&quot;  media=&quot;only screen and (min-width: 600px) and (max-width: 959px)&quot;&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;Assets/Styles/desktop.css&quot; media=&quot;only screen and (min-width: 960px)&quot;&gt;
-    &lt;!--[if (lt IE 9) &amp; (!IEMobile)]&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;/Assets/Styles/desktop.css&quot;&gt;
-    &lt;![endif]--&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    Content
-&lt;/body&gt;
+    &lt;head&gt;
+        &lt;meta charset=&quot;utf-8&quot;&gt;
+        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+        &lt;meta name=&quot;author&quot; content=&quot;Mark McDonnell&quot; /&gt;
+        &lt;title&gt;My thoughts on current web development practices&lt;/title&gt;
+        &lt;!--[if lt IE 9]&gt;
+        &lt;script src=&quot;/Assets/Scripts/Utils/Elements/html5.js&quot;&gt;&lt;/script&gt;
+        &lt;![endif]--&gt;
+        &lt;link rel=&quot;author&quot; href=&quot;/humans.txt&quot; type=&quot;text/plain&quot;&gt;
+        &lt;link rel=&quot;stylesheet&quot; href=&quot;Assets/Styles/mobile.css&quot;  media=&quot;only screen and (min-width: 320px)&quot;&gt;
+        &lt;link rel=&quot;stylesheet&quot; href=&quot;Assets/Styles/tablet.css&quot;  media=&quot;only screen and (min-width: 600px) and (max-width: 959px)&quot;&gt;
+        &lt;link rel=&quot;stylesheet&quot; href=&quot;Assets/Styles/desktop.css&quot; media=&quot;only screen and (min-width: 960px)&quot;&gt;
+        &lt;!--[if (lt IE 9) &amp; (!IEMobile)]&gt;
+        &lt;link rel=&quot;stylesheet&quot; href=&quot;/Assets/Styles/desktop.css&quot;&gt;
+        &lt;![endif]--&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        Content
+    &lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
-
-<p></html>
-```</p>
 
 <p>This breaks down into the following basic structure…</p>
 
@@ -185,8 +182,7 @@ Location: Address
 
 <p>It&#39;s important that you use only elements that semantically match the content. There are easy examples and there are slightly more awkward examples. An easy example is a top level navigation menu, I think most of us are aware by now that the most semantically correct element to use here is an un-ordered list <code>&lt;ul&gt;</code>…</p>
 
-<p><code>html
-&lt;ul&gt;
+<pre><code>&lt;ul&gt;
     &lt;li&gt;&lt;a href=&quot;&quot;&gt;Home&lt;/a&gt;&lt;/li&gt;
     &lt;li&gt;&lt;a href=&quot;&quot;&gt;About&lt;/a&gt;&lt;/li&gt;
     &lt;li&gt;&lt;a href=&quot;&quot;&gt;Services&lt;/a&gt;
@@ -198,7 +194,7 @@ Location: Address
     &lt;/li&gt;
     &lt;li&gt;&lt;a href=&quot;&quot;&gt;Contact&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-</code></p>
+</code></pre>
 
 <p>A slightly more awkward example though: imagine we have one of those large &#39;web 2.0&#39; (how old does that sound already!) footer areas where the designer has a massive list of helpful links and contact information. The structure of that might be something like this…</p>
 
@@ -210,26 +206,23 @@ Service C    | Google+       | 22222 222222</p>
 
 <p>…you <em>could</em> use a <code>&lt;dl&gt;</code> element, but is this strictly the correct element to use? An example of what that would look like is…</p>
 
-<p>```html
-<dl>
-    <dt>Services</dt>
-        <dd>Service A<dd>
-        <dd>Service B<dd>
-        <dd>Service C<dd></p>
+<pre><code>&lt;dl&gt;
+    &lt;dt&gt;Services&lt;/dt&gt;
+        &lt;dd&gt;Service A&lt;dd&gt;
+        &lt;dd&gt;Service B&lt;dd&gt;
+        &lt;dd&gt;Service C&lt;dd&gt;
 
-<pre><code>&lt;dt&gt;Social&lt;/dt&gt;
-    &lt;dd&gt;Facebook&lt;dd&gt;
-    &lt;dd&gt;Twitter&lt;dd&gt;
-    &lt;dd&gt;Google+&lt;dd&gt;
+    &lt;dt&gt;Social&lt;/dt&gt;
+        &lt;dd&gt;Facebook&lt;dd&gt;
+        &lt;dd&gt;Twitter&lt;dd&gt;
+        &lt;dd&gt;Google+&lt;dd&gt;
 
-&lt;dt&gt;Contacts&lt;/dt&gt;
-    &lt;dd&gt;00000 000000&lt;dd&gt;
-    &lt;dd&gt;11111 111111&lt;dd&gt;
-    &lt;dd&gt;22222 222222&lt;dd&gt;
+    &lt;dt&gt;Contacts&lt;/dt&gt;
+        &lt;dd&gt;00000 000000&lt;dd&gt;
+        &lt;dd&gt;11111 111111&lt;dd&gt;
+        &lt;dd&gt;22222 222222&lt;dd&gt;
+&lt;/dl&gt;
 </code></pre>
-
-<p></dl>
-```</p>
 
 <p>…if we look at the specification for this element it says… </p>
 
@@ -239,8 +232,7 @@ Service C    | Google+       | 22222 222222</p>
 
 <p>…so this looks to be the right element to use as it is an &quot;association list&quot; (i.e. we&#39;ve associated a list of items with the relevant title) but maybe instead we should have used a <code>&lt;table&gt;</code> element because we are kind of dealing with tabular data. There are defined headers with <em>associated</em> rows of content (similar to the association made with a <code>&lt;dl&gt;</code>). An example of what this would look like is…</p>
 
-<p><code>html
-&lt;table&gt;
+<pre><code>&lt;table&gt;
     &lt;thead&gt;
         &lt;tr&gt;
             &lt;th scope=&quot;col&quot;&gt;Services&lt;/th&gt;
@@ -266,7 +258,7 @@ Service C    | Google+       | 22222 222222</p>
         &lt;/tr&gt;
     &lt;/tbody&gt;
 &lt;/table&gt;
-</code></p>
+</code></pre>
 
 <p>…this is a bit of an anal analysis of &#39;semantic&#39; usage, but the fact is this sort of thing happens all the time. We look at something in a design and try to think of the most semantic element to use and although <code>&lt;dl&gt;</code> seems like the right choice, is it really? I guess it depends on how you interpret the specification. I know I&#39;ve used the <code>&lt;dl&gt;</code> elements many times but I sometimes wonder if I shouldn&#39;t have just gone with the <code>&lt;table&gt;</code> element instead (on a side note: I&#39;d love to hear people&#39;s feedback on this)</p>
 
@@ -383,47 +375,45 @@ Service C    | Google+       | 22222 222222</p>
 
 <p>For example, the home.scss file (which is what generates the home.css file) could contain the following content (note: that this content changes depending on the requirements of your project)…</p>
 
-<p>```sass
-// Configurations/Settings
-@import &quot;Configurations/variables&quot;;</p>
+<pre><code>// Configurations/Settings
+@import &quot;Configurations/variables&quot;;
 
-<p>// Functions
+// Functions
 @import &quot;Functions/calcems&quot;;
 @import &quot;Functions/calcpercentage&quot;;
-@import &quot;Functions/fontsize&quot;;</p>
+@import &quot;Functions/fontsize&quot;;
 
-<p>// Base
+// Base
 @import &quot;Base/normalize&quot;;
 @import &quot;Base/additions&quot;;
-@import &quot;Base/theme&quot;;</p>
+@import &quot;Base/theme&quot;;
 
-<p>// Layouts
+// Layouts
 @import &quot;Layouts/grid&quot;;
-@import &quot;Layouts/container&quot;;</p>
+@import &quot;Layouts/container&quot;;
 
-<p>// Modules</p>
+// Modules
 
-<pre><code>// Mixins
-@import &quot;Modules/Mixins/radius&quot;;
-@import &quot;Modules/Mixins/transition&quot;;
+    // Mixins
+    @import &quot;Modules/Mixins/radius&quot;;
+    @import &quot;Modules/Mixins/transition&quot;;
 
-// Components
-@import &quot;Modules/Components/media&quot;;
+    // Components
+    @import &quot;Modules/Components/media&quot;;
 
-// Helpers
-@import &quot;Modules/Helpers/clearfix&quot;;
-@import &quot;Modules/Helpers/hidetxt&quot;;
-@import &quot;Modules/Helpers/horizontal&quot;;
-</code></pre>
+    // Helpers
+    @import &quot;Modules/Helpers/clearfix&quot;;
+    @import &quot;Modules/Helpers/hidetxt&quot;;
+    @import &quot;Modules/Helpers/horizontal&quot;;
 
-<p>// Generic Styles for Modules that appear across the site (e.g. header/navigation/footer)
+// Generic Styles for Modules that appear across the site (e.g. header/navigation/footer)
 @import &quot;Modules/header&quot;;
 @import &quot;Modules/navigation&quot;;
-@import &quot;Modules/footer&quot;;</p>
+@import &quot;Modules/footer&quot;;
 
-<p>// Page Specific Styles
+// Page Specific Styles
 @import &quot;Modules/Queries/960-home&quot;;
-```</p>
+</code></pre>
 
 <p>…so let&#39;s go over a couple of points about this Sass file.</p>
 
@@ -444,109 +434,96 @@ Service C    | Google+       | 22222 222222</p>
 
 <p>Here is a typical usage of Sass:</p>
 
-<p><code>sass
-.nav{
+<pre><code>.nav{
     li{
         a{}
     }
 }
-</code></p>
+</code></pre>
 
 <p>Which when the pre-processor executes equates to...</p>
 
-<p><code>css
-.nav {}
+<pre><code>.nav {}
 .nav li {}
 .nav li a {}
-</code></p>
+</code></pre>
 
 <p>But this might not have been the result you intended, instead you actually wanted…</p>
 
-<p><code>css
-.nav {}
+<pre><code>.nav {}
 .nav li {}
 .nav a {}
-</code></p>
+</code></pre>
 
 <p>…which would have better performance and be more &#39;specific&#39; to your DOM structure.</p>
 
 <p>To do that you just need to tweak the Sass code slightly…</p>
 
-<p>```sass
-.nav{
-    li{</p>
+<pre><code>.nav{
+    li{
 
-<pre><code>}
-a {
+    }
+    a {
 
+    }
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>So just be careful with Sass and double check its output to ensure it is producing the selectors/rules you actually want. </p>
 
 <p>One tip for using nested selectors is to use the ampersand <code>&amp;</code> character to reference the whole selector, so for example…</p>
 
-<p>```sass
-a {
-    text-decoration: none;</p>
-
-<pre><code>// this will be compiled to 
-// a:hover, a:focus
-&amp;:hover,
-&amp;:focus {
-    color: $brand-color;
-}
-</code></pre>
-
-<p>}</p>
-
-<p>.rate-options {
-    counter-reset: rateoption;
-    list-style: none;
-    margin-top: 2em;</p>
-
-<pre><code>li {
-    margin-right: 1.5em;
+<pre><code>a {
+    text-decoration: none;
 
     // this will be compiled to 
-    // .rate-options li:before
-    &amp;:before {
-        color: $action-color;
-        content: counters(rateoption, &quot;&quot;) &quot; &quot;;
-        counter-increment: rateoption;
+    // a:hover, a:focus
+    &amp;:hover,
+    &amp;:focus {
+        color: $brand-color;
+    }
+}
+
+.rate-options {
+    counter-reset: rateoption;
+    list-style: none;
+    margin-top: 2em;
+
+    li {
+        margin-right: 1.5em;
+
+        // this will be compiled to 
+        // .rate-options li:before
+        &amp;:before {
+            color: $action-color;
+            content: counters(rateoption, &quot;&quot;) &quot; &quot;;
+            counter-increment: rateoption;
+        }
     }
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>Other issues with pre-processors can come from Mixins, which although very useful, are also a waste of time/space if good OOCSS is already in place. Remember that the content of a Mixin is copied into every rule you specify it to be used. </p>
 
 <p>The <code>@extend</code> statement is slightly better in the sense that you can write a class <code>.funky-border</code> which contains a single declaration: <code>border: 10px dashed blue;</code> and then for every element that uses that same styling you can simply do…</p>
 
-<p><code>sass
-.my-box {
+<pre><code>.my-box {
     @extend .funky-border;
     color: red;
 } 
-</code></p>
+</code></pre>
 
 <p>…what this ends up compiling to is something like this…</p>
 
-<p>```css
-.funky-border,
+<pre><code>.funky-border,
 .my-box {
     border: 10px dashed blue;
-}</p>
+}
 
-<p>.my-box {
+.my-box {
     color: red;
 }
-```</p>
+</code></pre>
 
 <p>…again, looks great but you need to be careful because in Internet Explorer there is a limit to the amount of selectors you can specify for a single rule! So if you were using <code>@extend</code> everywhere you might hit an issue (unlikely you&#39;ll reach that limit, but on a application big enough and with bad architecture in place that could still happen).</p>
 
@@ -610,40 +587,37 @@ a {
 
 <p>Example Mixin:</p>
 
-<p><code>sass
-@mixin transition ($transition: all 0.2s linear) {
+<pre><code>@mixin transition ($transition: all 0.2s linear) {
     -webkit-transition: $transition;
        -moz-transition: $transition;
         -ms-transition: $transition;
          -o-transition: $transition;
             transition: $transition;
 }
-</code></p>
+</code></pre>
 
 <h4>Extensions</h4>
 
 <p>Extensions are effectively re-usable classes which you can incorporate into any existing rule. An example of this could be having a class that lets you set a box shadow…</p>
 
-<p><code>sass
-.shadow {
+<pre><code>.shadow {
     @include shadow(0 3px 6px #666);
     border: 3px solid #fff;
 }
-</code></p>
+</code></pre>
 
 <p>…which would be used like so… </p>
 
-<p>```sass
-.profile-photo {
-    @extend .shadow;
-    // other styles
-}</p>
-
-<p>.company-logo {
+<pre><code>.profile-photo {
     @extend .shadow;
     // other styles
 }
-```</p>
+
+.company-logo {
+    @extend .shadow;
+    // other styles
+}
+</code></pre>
 
 <p>…you could argue that this type of class should be incorporated into a &#39;module&#39; - and most of the time that is correct - but this isn&#39;t <em>always</em> appropriate.</p>
 
@@ -659,24 +633,21 @@ a {
 
 <p>The way I keep the IE code within the same file is I stopped having them as separate files like so…</p>
 
-<p>```html
-&lt;!--[if IE 8]&gt;
-<link rel="stylesheet" href="/Assets/Styles/IE8.css">
-&lt;![endif]--&gt;</p>
+<pre><code>&lt;!--[if IE 8]&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;/Assets/Styles/IE8.css&quot;&gt;
+&lt;![endif]--&gt;
 
-<!--[if IE 7]>
-<link rel="stylesheet" href="/Assets/Styles/IE7.css">
-<![endif]-->
-
-<p>```</p>
+&lt;!--[if IE 7]&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;/Assets/Styles/IE7.css&quot;&gt;
+&lt;![endif]--&gt;
+</code></pre>
 
 <p>…and instead went with the <a href="http://paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/">Paul Irish solution</a>…</p>
 
-<p><code>html
-&lt;!--[if IE 8]&gt;&lt;html class=&quot;ie8&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
+<pre><code>&lt;!--[if IE 8]&gt;&lt;html class=&quot;ie8&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
 &lt;!--[if IE 9]&gt;&lt;html class=&quot;ie9&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
 &lt;!--[if gt IE 9]&gt;&lt;!--&gt; &lt;html dir=&quot;ltr&quot; lang=&quot;en&quot;&gt; &lt;!--&lt;![endif]--&gt;
-</code></p>
+</code></pre>
 
 <p>…yes doing it this way <em>can</em> mean the overall file size of your CSS is larger for browsers that aren&#39;t affected by the IE specific code, but to be honest since dropping support for IE7 the amount of IE fixes needed has literally dropped off the radar!</p>
 
@@ -686,12 +657,11 @@ a {
 
 <p>Where you may have <code>ul.menu</code> just use <code>.menu</code>. This is because if you had another element which isn&#39;t a <code>ul</code> but which needed similar stylings to your <code>.menu</code> class you can now reuse that class, where as before you would of had to of either written another class with similar code, or added another element selector to the rule like so…</p>
 
-<p><code>css
-ul.menu,
+<pre><code>ul.menu,
 ol.menu {
     // styles
 }
-</code></p>
+</code></pre>
 
 <p>…both of which are bad situations, so just be specific (where possible/reasonable).</p>
 
@@ -750,11 +720,10 @@ ol.menu {
 
 <p>To help your images scale appropriately along with your responsive design you can set the <code>max-width</code> property to be 100% which means the image will never be larger than its container but can happily resize/scale downwards on smaller screens…</p>
 
-<p><code>css
-img {
+<pre><code>img {
     max-width: 100%;
 }
-</code></p>
+</code></pre>
 
 <h4>What about containing elements with unknown widths?</h4>
 
@@ -770,11 +739,10 @@ img {
 
 <p>We can now set our wrapper element like so…</p>
 
-<p><code>css
-.container {
+<pre><code>.container {
     max-width: 60em;
 }
-</code></p>
+</code></pre>
 
 <h3>Mobile Design: <em>users on the move</em></h3>
 
@@ -782,19 +750,18 @@ img {
 
 <p>The tool for that job are &#39;Media Queries&#39;…</p>
 
-<p>```css
-@media only screen and (min-width: 320px) {
+<pre><code>@media only screen and (min-width: 320px) {
     // Mobile styles
-}</p>
+}
 
-<p>@media only screen and (min-width: 600px) and (max-width: 959px) {
+@media only screen and (min-width: 600px) and (max-width: 959px) {
     // Tablet styles
-}</p>
+}
 
-<p>@media only screen and (min-width: 960px) {
+@media only screen and (min-width: 960px) {
     // Desktop styles
 }
-```</p>
+</code></pre>
 
 <p>…yes I know these examples are <em>conveniently</em> matching the dimensions of an iPhone and iPad - which is a bad thing! What you ideally want to do is target good &#39;break-points&#39; in your design and not screen dimensions because let&#39;s face it: we know better by now that these assumptions will fail us in the future.</p>
 
@@ -830,19 +797,17 @@ img {
 
 <p>There are different options/ways to use the command line interface of CSS Lint, and they are as follows…</p>
 
-<p><code>sh
-csslint [options] [file|dir]*
+<pre><code>csslint [options] [file|dir]*
 csslint file1.css file2.css
 csslint ./
 csslint --errors=box-model,ids test.css // =&gt; decide what should be errors
 csslint --warnings=box-model,ids test.css // =&gt; decide what should be warnings
-</code></p>
+</code></pre>
 
 <p>Below is my general usage command (which I keep in a txt file inside my <code>/Styles/Lint</code> folder for quicker copy/pasting into the command line interface): </p>
 
-<p><code>sh
-csslint --errors=import,compatible-vendor-prefixes,display-property-grouping,overqualified-elements,fallback-colors,duplicate-properties,empty-rules,gradients,universal-selector,vendor-prefix,zero-units --warnings=important,known-properties,font-sizes,outline-none,shorthand,unqualified-attributes ./
-</code></p>
+<pre><code>csslint --errors=import,compatible-vendor-prefixes,display-property-grouping,overqualified-elements,fallback-colors,duplicate-properties,empty-rules,gradients,universal-selector,vendor-prefix,zero-units --warnings=important,known-properties,font-sizes,outline-none,shorthand,unqualified-attributes ./
+</code></pre>
 
 <p>When I run that command I see any bugs/issues with my CSS code that doesn&#39;t appear to abide by the &#39;rules&#39; specified via the command line options.</p>
 
@@ -886,106 +851,102 @@ csslint --errors=import,compatible-vendor-prefixes,display-property-grouping,ove
 
 <p>There are different options/ways to use the command line interface of JS Hint, and they are as follows…</p>
 
-<p><code>sh
-jshint path path2 [options] // =&gt; run against specific scripts
+<pre><code>jshint path path2 [options] // =&gt; run against specific scripts
 jshint *.js // =&gt; run against all scripts
 jshint main.js --show-non-errors // =&gt; show non-errors (e.g. Implied globals etc)
 jshint main.js --config ./Lint/config.json // =&gt; use specific configuration options
 jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of showing non-errors against specific configuration settings
-</code></p>
+</code></pre>
 
 <p>Below is my general usage command (which I keep in a txt file inside my <code>/Scripts/Lint</code> folder for quicker copy/pasting into the command line interface): </p>
 
-<p><code>sh
-jshint **/*.js --config ./Lint/config.json
-</code></p>
+<pre><code>jshint **/*.js --config ./Lint/config.json
+</code></pre>
 
 <p>...this relies on a specific <code>config.json</code> file which is easier than manually typing all the options. It looks like this:</p>
 
-<p>```js
-{
+<pre><code>{
     // Settings
     &quot;passfail&quot;      : false,  // Stop on first error.
-    &quot;maxerr&quot;        : 200,    // Maximum error before stopping.</p>
-
-<pre><code>// Predefined globals whom JSHint will ignore.
-&quot;browser&quot;       : true,   // Standard browser globals e.g. `window`, `document`.
-
-&quot;node&quot;          : false,
-&quot;rhino&quot;         : false,
-&quot;couch&quot;         : false,
-&quot;wsh&quot;           : false,   // Windows Scripting Host.
-
-&quot;jquery&quot;        : true,
-&quot;prototypejs&quot;   : false,
-&quot;mootools&quot;      : false,
-&quot;dojo&quot;          : false,
-
-&quot;predef&quot;        : [  // Custom globals.
-    // this is because we use require() from RequireJS library
-    &quot;require&quot;,
-    &quot;define&quot;,
-
-    // this is because we use Jasmine BDD for unit-testing
-    &quot;jasmine&quot;,
-    &quot;describe&quot;,
-    &quot;beforeEach&quot;,
-    &quot;afterEach&quot;,
-    &quot;it&quot;,
-    &quot;expect&quot;
-],
+    &quot;maxerr&quot;        : 200,    // Maximum error before stopping.
 
 
-// Development.
-&quot;debug&quot;         : false,  // Allow debugger statements e.g. browser breakpoints.
-&quot;devel&quot;         : false,  // Allow developments statements e.g. `console.log();`.
+    // Predefined globals whom JSHint will ignore.
+    &quot;browser&quot;       : true,   // Standard browser globals e.g. `window`, `document`.
+
+    &quot;node&quot;          : false,
+    &quot;rhino&quot;         : false,
+    &quot;couch&quot;         : false,
+    &quot;wsh&quot;           : false,   // Windows Scripting Host.
+
+    &quot;jquery&quot;        : true,
+    &quot;prototypejs&quot;   : false,
+    &quot;mootools&quot;      : false,
+    &quot;dojo&quot;          : false,
+
+    &quot;predef&quot;        : [  // Custom globals.
+        // this is because we use require() from RequireJS library
+        &quot;require&quot;,
+        &quot;define&quot;,
+
+        // this is because we use Jasmine BDD for unit-testing
+        &quot;jasmine&quot;,
+        &quot;describe&quot;,
+        &quot;beforeEach&quot;,
+        &quot;afterEach&quot;,
+        &quot;it&quot;,
+        &quot;expect&quot;
+    ],
 
 
-// ECMAScript 5.
-&quot;es5&quot;           : true,   // Allow ECMAScript 5 syntax.
-&quot;strict&quot;        : false,  // Require `use strict` pragma  in every file.
-&quot;globalstrict&quot;  : false,  // Allow global &quot;use strict&quot; (also enables &#39;strict&#39;).
+    // Development.
+    &quot;debug&quot;         : false,  // Allow debugger statements e.g. browser breakpoints.
+    &quot;devel&quot;         : false,  // Allow developments statements e.g. `console.log();`.
 
 
-// The Good Parts.
-&quot;asi&quot;           : false,  // Tolerate Automatic Semicolon Insertion (no semicolons).
-&quot;laxbreak&quot;      : true,   // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
-&quot;bitwise&quot;       : true,   // Prohibit bitwise operators (&amp;, |, ^, etc.).
-&quot;boss&quot;          : true,   // Tolerate assignments inside if, for &amp; while. Usually conditions &amp; loops are for comparison, not assignments.
-&quot;curly&quot;         : true,   // Require {} for every new block or scope.
-&quot;eqeqeq&quot;        : true,   // Require triple equals i.e. `===`.
-&quot;eqnull&quot;        : false,  // Tolerate use of `== null`.
-&quot;evil&quot;          : false,  // Tolerate use of `eval`.
-&quot;expr&quot;          : false,  // Tolerate `ExpressionStatement` as Programs.
-&quot;forin&quot;         : false,  // Tolerate `for in` loops without `hasOwnPrototype`.
-&quot;immed&quot;         : true,   // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
-&quot;latedef&quot;       : true,   // Prohipit variable use before definition.
-&quot;loopfunc&quot;      : false,  // Allow functions to be defined within loops.
-&quot;noarg&quot;         : true,   // Prohibit use of `arguments.caller` and `arguments.callee`.
-&quot;regexp&quot;        : false,  // Prohibit `.` and `[^...]` in regular expressions.
-&quot;regexdash&quot;     : false,  // Tolerate unescaped last dash i.e. `[-...]`.
-&quot;scripturl&quot;     : true,   // Tolerate script-targeted URLs.
-&quot;shadow&quot;        : true,   // Allows re-define variables later in code e.g. `var x=1; x=2;`.
-&quot;supernew&quot;      : false,  // Tolerate `new function () { ... };` and `new Object;`.
-&quot;undef&quot;         : true,   // Require all non-global variables be declared before they are used.
+    // ECMAScript 5.
+    &quot;es5&quot;           : true,   // Allow ECMAScript 5 syntax.
+    &quot;strict&quot;        : false,  // Require `use strict` pragma  in every file.
+    &quot;globalstrict&quot;  : false,  // Allow global &quot;use strict&quot; (also enables &#39;strict&#39;).
 
 
-// Personal styling preferences.
-&quot;newcap&quot;        : true,   // Require capitalization of all constructor functions e.g. `new F()`.
-&quot;noempty&quot;       : true,   // Prohibit use of empty blocks.
-&quot;nonew&quot;         : true,   // Prohibit use of constructors for side-effects.
-&quot;nomen&quot;         : true,   // Prohibit use of initial or trailing underbars in names.
-&quot;onevar&quot;        : false,  // Allow only one `var` statement per function.
-&quot;plusplus&quot;      : false,  // Prohibit use of `++` &amp; `--`.
-&quot;sub&quot;           : false,  // Tolerate all forms of subscript notation besides dot notation e.g. `dict[&#39;key&#39;]` instead of `dict.key`.
-&quot;trailing&quot;      : false,  // Prohibit trailing whitespaces.
-&quot;white&quot;         : true,   // Check against strict whitespace and indentation rules.
-&quot;indent&quot;        : 4,      // Specify indentation spacing
-&quot;smarttabs&quot;     : true    // Suppress warnings about mixed tabs and spaces
+    // The Good Parts.
+    &quot;asi&quot;           : false,  // Tolerate Automatic Semicolon Insertion (no semicolons).
+    &quot;laxbreak&quot;      : true,   // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
+    &quot;bitwise&quot;       : true,   // Prohibit bitwise operators (&amp;, |, ^, etc.).
+    &quot;boss&quot;          : true,   // Tolerate assignments inside if, for &amp; while. Usually conditions &amp; loops are for comparison, not assignments.
+    &quot;curly&quot;         : true,   // Require {} for every new block or scope.
+    &quot;eqeqeq&quot;        : true,   // Require triple equals i.e. `===`.
+    &quot;eqnull&quot;        : false,  // Tolerate use of `== null`.
+    &quot;evil&quot;          : false,  // Tolerate use of `eval`.
+    &quot;expr&quot;          : false,  // Tolerate `ExpressionStatement` as Programs.
+    &quot;forin&quot;         : false,  // Tolerate `for in` loops without `hasOwnPrototype`.
+    &quot;immed&quot;         : true,   // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
+    &quot;latedef&quot;       : true,   // Prohipit variable use before definition.
+    &quot;loopfunc&quot;      : false,  // Allow functions to be defined within loops.
+    &quot;noarg&quot;         : true,   // Prohibit use of `arguments.caller` and `arguments.callee`.
+    &quot;regexp&quot;        : false,  // Prohibit `.` and `[^...]` in regular expressions.
+    &quot;regexdash&quot;     : false,  // Tolerate unescaped last dash i.e. `[-...]`.
+    &quot;scripturl&quot;     : true,   // Tolerate script-targeted URLs.
+    &quot;shadow&quot;        : true,   // Allows re-define variables later in code e.g. `var x=1; x=2;`.
+    &quot;supernew&quot;      : false,  // Tolerate `new function () { ... };` and `new Object;`.
+    &quot;undef&quot;         : true,   // Require all non-global variables be declared before they are used.
+
+
+    // Personal styling preferences.
+    &quot;newcap&quot;        : true,   // Require capitalization of all constructor functions e.g. `new F()`.
+    &quot;noempty&quot;       : true,   // Prohibit use of empty blocks.
+    &quot;nonew&quot;         : true,   // Prohibit use of constructors for side-effects.
+    &quot;nomen&quot;         : true,   // Prohibit use of initial or trailing underbars in names.
+    &quot;onevar&quot;        : false,  // Allow only one `var` statement per function.
+    &quot;plusplus&quot;      : false,  // Prohibit use of `++` &amp; `--`.
+    &quot;sub&quot;           : false,  // Tolerate all forms of subscript notation besides dot notation e.g. `dict[&#39;key&#39;]` instead of `dict.key`.
+    &quot;trailing&quot;      : false,  // Prohibit trailing whitespaces.
+    &quot;white&quot;         : true,   // Check against strict whitespace and indentation rules.
+    &quot;indent&quot;        : 4,      // Specify indentation spacing
+    &quot;smarttabs&quot;     : true    // Suppress warnings about mixed tabs and spaces
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>When I run that command I see any bugs/issues with my JavaScript code that doesn&#39;t appear to abide by the &#39;rules&#39; specified via the command line options. If I see nothing then that means there were no errors and I&#39;m good to go.</p>
 
@@ -993,8 +954,7 @@ jshint **/*.js --config ./Lint/config.json
 
 <p>One thing I find very useful to do for all my JavaScript files is to include a code structure comment at the top like so...</p>
 
-<p><code>js
-/*
+<pre><code>/*
  * Code Structure:
  * - Variables
  * - Functions
@@ -1009,7 +969,7 @@ jshint **/*.js --config ./Lint/config.json
  *   - fn_name_9
  * - Initialisation
  */
-</code></p>
+</code></pre>
 
 <p>...this makes understanding where specific code is in the file a lot easier (at a glance). As you can see this code structure follows my <a href="https://github.com/Integralist/Style-Guides/blob/master/JavaScript%20Style%20Guide.md">JavaScript Style Guide</a> which goes into more detail about the specifics of my JavaScript code structure.</p>
 
@@ -1082,40 +1042,36 @@ jshint **/*.js --config ./Lint/config.json
 
 <p>Below is an example of a minor performance dilemma I had recently while writing CSS with the Sass pre-processor. Although this example would likely be an extremely neglible performance hit I still found it interesting (afterwards) how potentially easily it is to make mistakes when using a pre-processor. So here is some Sass driven CSS code… </p>
 
-<p>```sass
-.dashboard-box {
+<pre><code>.dashboard-box {
     @include box-sizing(border-box);
     @include shadow(1px 1px 3px rgba(0, 0, 0, .2));
-    @extend .box-gradient-bg;</p>
+    @extend .box-gradient-bg;
 
-<pre><code>border: 1px solid $grey;
-margin-bottom: 1.5em;
+    border: 1px solid $grey;
+    margin-bottom: 1.5em;
 
-&amp;,
-&gt; div {
-   @include radius(.5em);
-}
+    &amp;,
+    &gt; div {
+       @include radius(.5em);
+    }
 
-&gt; div {
-    border: 1px solid $white;
-    padding: 0.2em;
-}
+    &gt; div {
+        border: 1px solid $white;
+        padding: 0.2em;
+    }
 
-.title {
-    @include radius(.3em);
-    @extend .header-gradient-bg;
-    font-size: 1.166666667em;
-    margin: 0;
+    .title {
+        @include radius(.3em);
+        @extend .header-gradient-bg;
+        font-size: 1.166666667em;
+        margin: 0;
+    }
 }
 </code></pre>
 
-<p>}
-```</p>
-
 <p>…which generates the following CSS…</p>
 
-<p><code>css
-.dashboard-box {
+<pre><code>.dashboard-box {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -o-box-sizing: border-box;
@@ -1146,41 +1102,37 @@ margin-bottom: 1.5em;
   font-size: 1.166666667em;
   margin: 0;
 }
-</code></p>
+</code></pre>
 
 <p>…but at first I wasn&#39;t sure if having duplicated selectors (i.e. <code>.dashboard-box</code> and <code>.dashboard-box &gt; div</code>) was very efficient, so I went back and changed my Sass code. This time I put <code>@include radius(.5em);</code> both at the top of the main declaration block as well as inside the <code>&gt; div</code> declaration...</p>
 
-<p>```sass
-.dashboard-box {
+<pre><code>.dashboard-box {
     @include radius(.5em);
     @include box-sizing(border-box);
     @include shadow(1px 1px 3px rgba(0, 0, 0, .2));
-    @extend .box-gradient-bg;</p>
+    @extend .box-gradient-bg;
 
-<pre><code>border: 1px solid $grey;
-margin-bottom: 1.5em;
+    border: 1px solid $grey;
+    margin-bottom: 1.5em;
 
-&gt; div {
-    @include radius(.5em);
-    border: 1px solid $white;
-    padding: 0.2em;
-}
+    &gt; div {
+        @include radius(.5em);
+        border: 1px solid $white;
+        padding: 0.2em;
+    }
 
-.title {
-    @include radius(.3em);
-    @extend .header-gradient-bg;
-    font-size: 1.166666667em;
-    margin: 0;
+    .title {
+        @include radius(.3em);
+        @extend .header-gradient-bg;
+        font-size: 1.166666667em;
+        margin: 0;
+    }
 }
 </code></pre>
 
-<p>}
-```</p>
-
 <p>...which resulted in the following CSS… </p>
 
-<p><code>css
-.dashboard-box {
+<pre><code>.dashboard-box {
   -webkit-border-radius: 0.5em;
   -moz-border-radius: 0.5em;
   -o-border-radius: 0.5em;
@@ -1212,7 +1164,7 @@ margin-bottom: 1.5em;
   font-size: 1.166666667em;
   margin: 0;
 }
-</code></p>
+</code></pre>
 
 <p>Now, what has this given us? OK so yes this means I don&#39;t have the <code>.dashboard-box</code> or <code>.dashboard-box &gt; div</code> selectors duplicated (which is good), BUT now I&#39;ve got two different problems:</p>
 

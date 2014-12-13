@@ -176,25 +176,23 @@
 
 <p>As mentioned earlier, we use RequireJS and AMD to wrap the above API calls, for example… </p>
 
-<p><code>js
-// the only part of this code that needs to change
+<pre><code>// the only part of this code that needs to change
 // is the list of extensions you want to use
 // the rest is standard (read: required to be run)
 require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
     app.use(&#39;extension-a&#39;, &#39;extension-b&#39;);
     app.start();
 });
-</code></p>
+</code></pre>
 
 <p>But now let&#39;s look at each section individually… </p>
 
 <h3>HTML…</h3>
 
-<p><code>html
-&lt;div data-component=&quot;hello&quot; id=&quot;js-component-hello&quot;&gt;hello&lt;/div&gt;
+<pre><code>&lt;div data-component=&quot;hello&quot; id=&quot;js-component-hello&quot;&gt;hello&lt;/div&gt;
 &lt;div data-component=&quot;world&quot; id=&quot;js-component-world&quot;&gt;world&lt;/div&gt;
 &lt;script src=&quot;libs/require.js&quot; data-main=&quot;bootstrap-about&quot; async&gt;&lt;/script&gt;
-</code></p>
+</code></pre>
 
 <p>As you can see we have a <code>data-component</code> attribute which is used by the JavaScript application when it is booting up (initialised). </p>
 
@@ -206,44 +204,40 @@ require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
 
 <h3>Bootstrap...</h3>
 
-<p><code>js
-require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
+<pre><code>require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
     app.use(&#39;mediator&#39;, &#39;extension-a&#39;, &#39;extension-b&#39;);
     app.start();
 });
-</code></p>
+</code></pre>
 
 <p>I had considered just having a single bootstrap script but the list of extensions used is very likely going to be different per page, hence we have a different bootstrap for each page.</p>
 
 <p>The bootstrap loads in our JavaScript application along with a configuration object (which is just the RequireJS config)… </p>
 
-<p><code>js
-require.config({
+<pre><code>require.config({
     baseUrl: &#39;./&#39;,
     paths: {
         jquery: &#39;libs/jquery&#39;
     }
 });
-</code></p>
+</code></pre>
 
 <p>Once our application is loaded we tell the app what extensions we want to use and then we tell the application to start.</p>
 
 <h3>Component...</h3>
 
-<p><code>js
-define({
+<pre><code>define({
     init: function() {
         console.log(&#39;an example component&#39;);
     }
 });
-</code></p>
+</code></pre>
 
 <p>This is an example component. As mentioned earlier: components need to have a public <code>init</code> method, otherwise they can do whatever you want them to.</p>
 
 <h3>Extension...</h3>
 
-<p><code>js
-// Silly example
+<pre><code>// Silly example
 define(function(){
     if (!String.prototype.blah) {
         String.prototype.blah = function() {
@@ -251,7 +245,7 @@ define(function(){
         };
     }
 });
-</code></p>
+</code></pre>
 
 <p>This is an example extension. Extensions can do whatever you want them to do. </p>
 
@@ -261,24 +255,21 @@ define(function(){
 
 <p>So for example, our Mediator extension uses <code>window.app.mediator = mediator;</code> like so… </p>
 
-<p>```js
-define(function(){
+<pre><code>define(function(){
     var mediator = (function(){
-        // code</p>
+        // code
 
-<pre><code>    return {
-        // public api
-    };
+        return {
+            // public api
+        };
 
-}());
+    }());
 
-window.app.mediator = mediator;
+    window.app.mediator = mediator;
 
-return mediator;
+    return mediator;
+});
 </code></pre>
-
-<p>});
-```</p>
 
 <p><strong>Don&#39;t mistake the phrase: &quot;<em>Don&#39;t pollute the global namespace</em>&quot; with &quot;<em>Don&#39;t ever use the global namespace ever ever ever</em>&quot; - that&#39;s just dogmatic nonsense.</strong></p>
 
@@ -288,57 +279,56 @@ return mediator;
 
 <p>So our example page loads <code>project.css</code>, the Sass file looks like this… </p>
 
-<p>```sass
-/* =============================================================================
+<pre><code>/* =============================================================================
   Base Utilities
-  ========================================================================== */</p>
+  ========================================================================== */
 
-<p>@import &#39;partials/variables&#39;;
+  @import &#39;partials/variables&#39;;
   @import &#39;partials/utils&#39;;
   @import &#39;partials/baseline&#39;;
-  @import &#39;partials/grid&#39;;</p>
+  @import &#39;partials/grid&#39;;
 
-<p>/* =============================================================================
+/* =============================================================================
   Patterns
   These are common design patterns abstracted into reusable chunks of code
-  ========================================================================== */</p>
+  ========================================================================== */
 
-<p>@import &#39;patterns/media&#39;;</p>
+  @import &#39;patterns/media&#39;;
 
-<p>/* =============================================================================
+/* =============================================================================
   Core
   This is the experience for either really old devices, or non-js devices
-  ========================================================================== */</p>
+  ========================================================================== */
 
-<p>@import &#39;partials/core&#39;;</p>
+  @import &#39;partials/core&#39;;
 
-<p>/* =============================================================================
+/* =============================================================================
   Groups
   Any design enhancements that aren&#39;t a separate component and aren&#39;t part 
-  of the core experience should be placed within one of the following groups.</p>
+  of the core experience should be placed within one of the following groups.
 
-<p>Note: we&#39;re using inheritance for our CSS loading strategy which means each
+  Note: we&#39;re using inheritance for our CSS loading strategy which means each
   stylesheet inherits styles from the group that came before it
-  ========================================================================== */</p>
+  ========================================================================== */
 
-<p>@import &#39;groups/group1&#39;;
+  @import &#39;groups/group1&#39;;
   @import &#39;groups/group2&#39;;
   @import &#39;groups/group3&#39;;
-  @import &#39;groups/group4&#39;;</p>
+  @import &#39;groups/group4&#39;;
 
-<p>/* =============================================================================
+/* =============================================================================
   Components
   You only need to import components into the top-level project/project-ie files
   Components have been built to be self contained.
   This means they encapsulate any logic about viewport dimensions.
   This allows them to control their own visual display.
-  ========================================================================== */</p>
+  ========================================================================== */
 
-<p>@import &#39;components/hello&#39;;
+  @import &#39;components/hello&#39;;
   @import &#39;components/world&#39;;
   @import &#39;components/features-and-analysis&#39;;
   @import &#39;components/index&#39;;
-```</p>
+</code></pre>
 
 <p>I won&#39;t go into detail for each part of this file because the code comments should be self explanatory. But we&#39;ll look at bit more at the &#39;groups&#39; and also the &#39;components&#39;.</p>
 
@@ -348,35 +338,33 @@ return mediator;
 
 <p>Here is what our group 1 looks like… </p>
 
-<p>```sass
-/* =============================================================================
+<pre><code>/* =============================================================================
    Group 1
    All devices sizes
-   ========================================================================== */</p>
+   ========================================================================== */
 
-<p>.js {
+.js {
     body {
         background-color: red;
     }
 }
-```</p>
+</code></pre>
 
 <p>…so group 1 is applied for all device sizes and we&#39;re saying all device sizes should see a red background colour.</p>
 
-<p>```sass
-/* =============================================================================
+<pre><code>/* =============================================================================
    Group 2
    Viewport &gt;= 400px
-   ========================================================================== */</p>
+   ========================================================================== */
 
-<p>.js {
+.js {
     @include respond-min($mq-group2) {
         body {
             background-color: yellow;
         }
     }
 }
-```</p>
+</code></pre>
 
 <p>All our other groups constrain their stylings using media queries (which we&#39;ve abstracted into a mixin) and use a variable to store a reference to the relevant break-point size.</p>
 
@@ -396,115 +384,107 @@ return mediator;
 
 <p>Here is an example component… </p>
 
-<p>```sass
-/* =============================================================================
+<pre><code>/* =============================================================================
    Component: Features &amp; Analysis
    Distinguishes featured content from standard content
-   ========================================================================== */</p>
+   ========================================================================== */
 
-<p>[data-component=&quot;features-and-analysis&quot;] {
-    border: 1px solid blue;</p>
+[data-component=&quot;features-and-analysis&quot;] {
+    border: 1px solid blue;
 
-<pre><code>@include respond-min($mq-group2) {
-    &amp; {
-        border-color: pink;
+    @include respond-min($mq-group2) {
+        &amp; {
+            border-color: pink;
 
-        .media {
-            float: left;
-            width: (1 / 2) * 100%;
+            .media {
+                float: left;
+                width: (1 / 2) * 100%;
+            }
         }
     }
-}
 
-@include respond-min($mq-group3) {
-    &amp; {
-        border-color: yellow;
+    @include respond-min($mq-group3) {
+        &amp; {
+            border-color: yellow;
 
-        .media {
-            width: (1 / 3) * 100%;
+            .media {
+                width: (1 / 3) * 100%;
+            }
         }
     }
-}
 
-@include respond-min($mq-group4) {
-    &amp; {
-        border-color: red;
+    @include respond-min($mq-group4) {
+        &amp; {
+            border-color: red;
 
-        .media {
-            width: (1 / 4) * 100%;
+            .media {
+                width: (1 / 4) * 100%;
+            }
         }
     }
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <h4>Internet Explorer</h4>
 
 <p>So how do we encapsulate logic (read: bug fixes) for Internet Explorer? We use Sass to help us incorporate these IE specific fixes… </p>
 
-<p>```sass
-[data-component=&quot;hello&quot;] {
-    border: 1px solid blue;</p>
+<pre><code>[data-component=&quot;hello&quot;] {
+    border: 1px solid blue;
 
-<pre><code>@include respond-min($mq-group2) {
-    &amp; {
-        border-color: green;
+    @include respond-min($mq-group2) {
+        &amp; {
+            border-color: green;
 
-        @include old-ie {
-            border-width: 2px;
+            @include old-ie {
+                border-width: 2px;
+            }
         }
     }
-}
 
-@include respond-min($mq-group3) {
-    &amp; {
-        border-color: yellow;
+    @include respond-min($mq-group3) {
+        &amp; {
+            border-color: yellow;
 
-        @include old-ie {
-            border-width: 3px;
+            @include old-ie {
+                border-width: 3px;
+            }
         }
     }
-}
 
-@include respond-min($mq-group4) {
-    &amp; {
-        border-color: red;
+    @include respond-min($mq-group4) {
+        &amp; {
+            border-color: red;
 
-        @include old-ie {
-            border-width: 4px;
+            @include old-ie {
+                border-width: 4px;
+            }
         }
     }
 }
 </code></pre>
 
-<p>}
-```</p>
-
 <p>…in the above example you can see we have a <code>old-ie</code> mixin that applies a different style for Internet Explorer versions &lt;= 8. It&#39;s nested inside and the way the mixin works is when you compile this Sass code, if a variable (<code>$old-ie</code>) is set to <code>true</code> then the mixin will generate the relevant code.</p>
 
 <p>So in our HTML page we have the following code… </p>
 
-<p><code>html
-&lt;link rel=&quot;stylesheet&quot; href=&quot;styles/project.css&quot;&gt;
+<pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;styles/project.css&quot;&gt;
 &lt;!--[if lte IE 8]&gt;
 &lt;link rel=&quot;stylesheet&quot; href=&quot;styles/project-ie.css&quot;&gt;
 &lt;![endif]--&gt;
-</code></p>
+</code></pre>
 
 <p>…as you can see we use a Microsoft Conditional Comment to load an additional style sheet just for IE versions less than or equal to 8.</p>
 
 <p>The contents of the associated Sass file is… </p>
 
-<p>```sass
-@import &#39;partials/variables&#39;;</p>
+<pre><code>@import &#39;partials/variables&#39;;
 
-<p>$old-ie: true;
-$fix-mqs: $mq-group4;</p>
+$old-ie: true;
+$fix-mqs: $mq-group4;
 
-<p>@import &#39;project&#39;;
-```</p>
+@import &#39;project&#39;;
+</code></pre>
 
 <p>…this Sass file will generate a <code>project-ie.css</code> file. It simply sets some variables and then imports our main <code>projects.scss</code> file. But when we import that file, the decision the Sass code makes (e.g. the <code>old-ie</code> mixin) will change as it relies on variables which we&#39;ve overwritten within <code>project-ie.css</code>.</p>
 

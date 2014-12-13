@@ -38,54 +38,53 @@
 
 <p>A basic example is as follows…</p>
 
-<p>```js
-var Person = function (settings) {
-   if (!settings) { settings = {}; } // code defensively</p>
+<pre><code>var Person = function (settings) {
+   if (!settings) { settings = {}; } // code defensively
 
-<p>// Instance properties (any new instances of the Person class will have these properties)
+   // Instance properties (any new instances of the Person class will have these properties)
    this.name = settings.name || &#39;no name given&#39;;
-   this.age = settings.age || &#39;no age given&#39;;</p>
+   this.age = settings.age || &#39;no age given&#39;;
 
-<p>// Instance method (any new instances of the Person class will have this method)
+   // Instance method (any new instances of the Person class will have this method)
    this.getName = function() {
       alert(this.name);
    };
-};</p>
+};
 
-<p>// Create a new instance of the Person Class
-var integralist = new Person({ name:&#39;Mark&#39;, age:7 });</p>
+// Create a new instance of the Person Class
+var integralist = new Person({ name:&#39;Mark&#39;, age:7 });
 
-<p>// Add a method to this instance of the Person Class only (no other instances created will have this method)
+// Add a method to this instance of the Person Class only (no other instances created will have this method)
 integralist.getAge = function() {
    alert(this.age);
-}</p>
+}
 
-<p>// Test the integralist instance has access to both methods
+// Test the integralist instance has access to both methods
 integralist.getName();
-integralist.getAge();</p>
+integralist.getAge();
 
-<p>// Create another instance of the Person Class
-var user = new Person();</p>
+// Create another instance of the Person Class
+var user = new Person();
 
-<p>// Notice the user has access to a &#39;getName&#39; method but not a &#39;getAge&#39; method
-user.getName();</p>
+// Notice the user has access to a &#39;getName&#39; method but not a &#39;getAge&#39; method
+user.getName();
 
-<p>// I know this will error so I&#39;m wrapping it in a try statement
+// I know this will error so I&#39;m wrapping it in a try statement
 try {
    user.getAge();
 } catch(err) {
    alert(err); // Uncaught TypeError: Object [object Object] has no method &#39;getAge&#39;
-}</p>
+}
 
-<p>// Add a method to the Person Class&#39; prototype chain (all instances of the Person Class will now get this method - even those already defined)
+// Add a method to the Person Class&#39; prototype chain (all instances of the Person Class will now get this method - even those already defined)
 Person.prototype.getNameAndAge = function() {
    alert(&#39;Hi, my name is &#39; + this.name + &#39;, and I\&#39;m &#39; + this.age + &#39; years old.&#39;);
-}</p>
+}
 
-<p>// Test this new method is accessible to all instances of the Person Class
+// Test this new method is accessible to all instances of the Person Class
 integralist.getNameAndAge();
 user.getNameAndAge();
-```</p>
+</code></pre>
 
 <h2>Conclusion</h2>
 

@@ -67,15 +67,14 @@
 
 <p>Here&#39;s a super quick introduction on how to use PhantomJS… </p>
 
-<p>```js
-var page = require(&#39;webpage&#39;).create(),
-    url = &#39;http://www.phantomjs.org/&#39;;</p>
+<pre><code>var page = require(&#39;webpage&#39;).create(),
+    url = &#39;http://www.phantomjs.org/&#39;;
 
-<p>page.open(url, function (status) {
+page.open(url, function (status) {
     // Page is loaded!
     phantom.exit();
 });
-```</p>
+</code></pre>
 
 <p>…here we load the PhantomJS <code>webpage</code> module, and call the <code>create()</code> method which instantiates a new web page.</p>
 
@@ -106,8 +105,7 @@ var page = require(&#39;webpage&#39;).create(),
 
 <h3>Set-up</h3>
 
-<p><code>js
-var _          = require(&#39;lodash&#39;),
+<pre><code>var _          = require(&#39;lodash&#39;),
     system     = require(&#39;system&#39;),
     fs         = require(&#39;fs&#39;),
     page       = require(&#39;webpage&#39;).create(),
@@ -121,7 +119,7 @@ var _          = require(&#39;lodash&#39;),
     images     = [],
     javascript = [],
     links, url;
-</code></p>
+</code></pre>
 
 <p>…OK so this looks a bit ugly but this long list of variables is basically us loading the Lo-Dash utility library, the Node file system, the PhantomJS web page module and then grabbing any arguments passed via the command line and reading the content of our manifest file.</p>
 
@@ -133,166 +131,144 @@ var _          = require(&#39;lodash&#39;),
 
 <ul>
 <li><p><code>getLinks</code> uses the PhantomJS&#39; <code>evaluate</code> method on the web page object (which lets you parse the open web page using JavaScript, meaning you run JavaScript code within the context of the open web page).
-```js
 function getLinks(){
-var results = page.evaluate(function(){
-    return Array.prototype.slice.call(document.getElementsByTagName(&#39;a&#39;)).map(function (item) {
-        return item.href;
-    });
-});</p>
+    var results = page.evaluate(function(){
+        return Array.prototype.slice.call(document.getElementsByTagName(&#39;a&#39;)).map(function (item) {
+            return item.href;
+        });
+    });</p>
 
-<p>return results;
-}
-```</p></li>
+<pre><code>return results;
+</code></pre>
+
+<p>}</p></li>
 <li><p><code>populateManifest</code> is called next but this just delegates calls to the following other functions.
-```js
 function populateManifest(){
-writeVersion();</p>
+    writeVersion();</p>
 
-<p>writeListContentFor(&#39;Images&#39;, images);
+<pre><code>writeListContentFor(&#39;Images&#39;, images);
 writeListContentFor(&#39;Internal HTML documents&#39;, links);
 writeListContentFor(&#39;Style Sheets&#39;, css);
-writeListContentFor(&#39;JavaScript&#39;, javascript);</p>
+writeListContentFor(&#39;JavaScript&#39;, javascript);
 
-<p>writeManifest();
-}
-```</p></li>
+writeManifest();
+</code></pre>
+
+<p>}</p></li>
 <li><p><code>writeVersion</code> replaces the current time stamp within our manifest file (we&#39;re doing this in memory, not saving the change back to the manifest file yet).
-<code>js
 function writeVersion(){
-manifest = manifest.replace(/# Timestamp: \d+/i, &#39;# Timestamp: &#39; + (new Date()).getTime());
-}
-</code></p></li>
+    manifest = manifest.replace(/# Timestamp: \d+/i, &#39;# Timestamp: &#39; + (new Date()).getTime());
+}</p></li>
 <li><p><code>writeListContentFor</code> is called multiple times and is just an abstraction for a common pattern of code which looks through the manifest file content for &#39;hooks&#39; and then replace the content found with the updated content that we&#39;ve parsed from the page as it was loading (e.g. the event listener we set-up for <code>onResourceReceived</code> which checked the <code>contentType</code> of the resource being loaded).
-<code>js
 function writeListContentFor (str, type) {
-manifest = manifest.replace(new RegExp(&#39;(# &#39; + str + &#39;)\\n[\\s\\S]+?\\n\\n&#39;, &#39;igm&#39;), function (match, cg) {
-    return cg + &#39;\n&#39; + type.join(&#39;\n&#39;) + &#39;\n\n&#39;;
-});
-}
-</code></p></li>
+    manifest = manifest.replace(new RegExp(&#39;(# &#39; + str + &#39;)\n[\s\S]+?\n\n&#39;, &#39;igm&#39;), function (match, cg) {
+        return cg + &#39;\n&#39; + type.join(&#39;\n&#39;) + &#39;\n\n&#39;;
+    });
+}</p></li>
 <li><p><code>writeManifest</code> opens up our original manifest file using Node&#39;s file system module and writes over the content with the new content string we&#39;ve constructed in the <code>manifest</code> variable.
-<code>js
 function writeManifest(){
-fs.write(path, manifest, &#39;w&#39;);
-}
-</code></p></li>
+    fs.write(path, manifest, &#39;w&#39;);
+}</p></li>
 <li><p><code>urlProvided</code> just checks to make sure an argument was provided by the user on the command line.
-<code>js
 function urlProvided(){
-return args.length &gt; 1 &amp;&amp; /(?:www\.)?[a-z-z1-9]+\./i.test(args[1]);
-}
-</code></p></li>
+    return args.length &gt; 1 &amp;&amp; /(?:www.)?[a-z-z1-9]+./i.test(args[1]);
+}</p></li>
 <li><p><code>cleanUrl</code> takes in a URL and formats it so it doesn&#39;t break PhantomJS
-<code>js
 function cleanUrl (providedUrl) {
-// If no http or https found at the start of the url...
-if (/^(?!https?:\/\/)[\w\d]/i.test(providedUrl)) {
-    return &#39;http://&#39; + providedUrl + &#39;/&#39;;
-}
-}
-</code></p></li>
+    // If no http or https found at the start of the url...
+    if (/^(?!https?:\/\/)[\w\d]/i.test(providedUrl)) {
+        return &#39;http://&#39; + providedUrl + &#39;/&#39;;
+    }
+}</p></li>
 <li><p><code>bbcNews</code> checks to see if the URL is for the BBC News site (if it is then later on we&#39;ll do something specific for that scenario). It&#39;s not essential for the script to work, just something specific I wanted to demonstrate.
-<code>js
 function bbcNews(){
-if (/bbc.co.uk\/news/i.test(url)) {
-    return true;
-}
-}
-</code></p></li>
+    if (/bbc.co.uk\/news/i.test(url)) {
+        return true;
+    }
+}</p></li>
 </ul>
 
 <h3>Checking resources that are loaded</h3>
 
 <p>The following is our event handler that checks the content type of the resource being loaded and stores it in the relevant Array.</p>
 
-<p>``<code>js
-page.onResourceReceived = function (request) {
-    // Some requests can have</code>contentType = null` which causes errors if we don&#39;t check for truthy value
+<pre><code>page.onResourceReceived = function (request) {
+    // Some requests can have `contentType = null` which causes errors if we don&#39;t check for truthy value
     if (request.contentType) {
         if (request.contentType.indexOf(&#39;text/css&#39;) !== -1) {
             css.push(request.url);
-        }</p>
+        }
 
-<pre><code>    // application/javascript &amp; application/x-javascript
-    if (request.contentType.indexOf(&#39;javascript&#39;) !== -1) {
-        javascript.push(request.url);
-    }
+        // application/javascript &amp; application/x-javascript
+        if (request.contentType.indexOf(&#39;javascript&#39;) !== -1) {
+            javascript.push(request.url);
+        }
 
-    if (request.contentType.indexOf(&#39;image/png&#39;) !== -1) {
-        if (request.url.indexOf(&#39;data:image&#39;) === -1) {
-            pngs.push(request.url);
+        if (request.contentType.indexOf(&#39;image/png&#39;) !== -1) {
+            if (request.url.indexOf(&#39;data:image&#39;) === -1) {
+                pngs.push(request.url);
+            }
+        }
+
+        if (request.contentType.indexOf(&#39;image/jpeg&#39;) !== -1) {
+            if (request.url.indexOf(&#39;data:image&#39;) === -1) {
+                jpgs.push(request.url);
+            }
+        }
+
+        if (request.contentType.indexOf(&#39;image/gif&#39;) !== -1) {
+            if (request.url.indexOf(&#39;data:image&#39;) === -1) {
+                gifs.push(request.url);
+            }
         }
     }
-
-    if (request.contentType.indexOf(&#39;image/jpeg&#39;) !== -1) {
-        if (request.url.indexOf(&#39;data:image&#39;) === -1) {
-            jpgs.push(request.url);
-        }
-    }
-
-    if (request.contentType.indexOf(&#39;image/gif&#39;) !== -1) {
-        if (request.url.indexOf(&#39;data:image&#39;) === -1) {
-            gifs.push(request.url);
-        }
-    }
-}
+};
 </code></pre>
-
-<p>};
-```</p>
 
 <p>To be honest we don&#39;t need to separate the content types out into jpg, gif and png. We could just have an images Array that holds them all - it would be cleaner and more efficient code, something like...</p>
 
-<p>```js
-page.onResourceReceived = function (request) {
+<pre><code>page.onResourceReceived = function (request) {
     if (request.contentType) {
         if (request.contentType.indexOf(&#39;text/css&#39;) !== -1) {
             css.push(request.url);
-        }</p>
+        }
 
-<pre><code>    if (request.contentType.indexOf(&#39;javascript&#39;) !== -1) {
-        javascript.push(request.url);
-    }
+        if (request.contentType.indexOf(&#39;javascript&#39;) !== -1) {
+            javascript.push(request.url);
+        }
 
-    if (/image\/(?:png|jpeg|gif)/i.test(request.contentType) &amp;&amp; request.url.indexOf(&#39;data:image&#39;) === -1) {
-        images.push(request.url);
+        if (/image\/(?:png|jpeg|gif)/i.test(request.contentType) &amp;&amp; request.url.indexOf(&#39;data:image&#39;) === -1) {
+            images.push(request.url);
+        }
     }
-}
+};
 </code></pre>
-
-<p>};
-```</p>
 
 <h3>Checking for errors</h3>
 
 <p>This should be self explanatory, but basically it checks for any errors that happen while the page is loading and displays them for the user… </p>
 
-<p>```js
-page.onError = function (msg, trace) {
-    console.log(msg);</p>
+<pre><code>page.onError = function (msg, trace) {
+    console.log(msg);
 
-<pre><code>trace.forEach(function (item) {
-    console.log(&#39;  &#39;, item.file, &#39;:&#39;, item.line);
-});
+    trace.forEach(function (item) {
+        console.log(&#39;  &#39;, item.file, &#39;:&#39;, item.line);
+    });
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <h3>Ensure URL is provided</h3>
 
 <p>Following conditional makes sure that a URL was provided by the user from the command line and if not it displays appropriate feedback to the user to let them know what they should be doing… </p>
 
-<p><code>js
-if (urlProvided()) {
+<pre><code>if (urlProvided()) {
     url = cleanUrl(args[1]);
 } else {
     console.log(&#39;Sorry a valid URL should have been provided&#39;);
     console.log(&#39;Example usage: phantomjs appcache.js bbc.co.uk/news&#39;);
     phantom.exit();
 }
-</code></p>
+</code></pre>
 
 <h3>Setting custom headers</h3>
 
@@ -300,8 +276,7 @@ if (urlProvided()) {
 
 <p>Here we check if the URL being requested is BBC News and if so I want the user to load up the responsive code base version of the site, and to do that we need to set a cookie for the page to know to load that version of the page… </p>
 
-<p><code>js
-if (bbcNews()) {
+<pre><code>if (bbcNews()) {
     // We want to serve up the responsive code base...
     phantom.addCookie({
         &#39;name&#39;  : &#39;ckps_d&#39;,
@@ -309,33 +284,30 @@ if (bbcNews()) {
         &#39;domain&#39;: &#39;.bbc.co.uk&#39;
     });
 }
-</code></p>
+</code></pre>
 
 <h3>The main star of the show</h3>
 
 <p>Here is the fundamental piece of the puzzle, the call to open the web page specified by the user and which once the page has loaded then parses the page for the information we&#39;re interested in…  </p>
 
-<p>```js
-page.open(url, function (status) {
-    links = getLinks();</p>
+<pre><code>page.open(url, function (status) {
+    links = getLinks();
 
-<pre><code>links      = _.unique(links);
-images     = _.unique(pngs.concat(jpgs).concat(gifs));
-css        = _.unique(css);
-javascript = _.unique(javascript);
+    links      = _.unique(links);
+    images     = _.unique(pngs.concat(jpgs).concat(gifs));
+    css        = _.unique(css);
+    javascript = _.unique(javascript);
 
-console.log(&#39;links: &#39;, links.length);
-console.log(&#39;images: &#39;, images.length);
-console.log(&#39;css: &#39;, css.length);
-console.log(&#39;javascript: &#39;, javascript.length);
+    console.log(&#39;links: &#39;, links.length);
+    console.log(&#39;images: &#39;, images.length);
+    console.log(&#39;css: &#39;, css.length);
+    console.log(&#39;javascript: &#39;, javascript.length);
 
-populateManifest();
+    populateManifest();
 
-phantom.exit();
+    phantom.exit();
+});
 </code></pre>
-
-<p>});
-```</p>
 
 <p>…PhantomJS passes us a status string as an argument to the callback function and which tells us if the page loaded successfully or not.</p>
 
@@ -361,12 +333,11 @@ phantom.exit();
 
 <p>For BBC News I wrote a similar script, but because I was interrogating a local development URL which uses test data I had to set some additional headers to get the page to load live data…</p>
 
-<p><code>js
-page.customHeaders = { 
+<pre><code>page.customHeaders = { 
     &#39;X-Candy-Override&#39;: &#39;https://api.live.bbc.co.uk&#39;,
     &#39;X-Compiled-Js&#39;   : &#39;true&#39;
 };
-</code></p>
+</code></pre>
 
 <h3>Remote Debugging</h3>
 
@@ -376,9 +347,8 @@ page.customHeaders = {
 
 <p>You can change the dimensions of the page being loaded using the <code>viewportSize</code> property (this is used in the <a href="http://github.com/BBC-News/wraith/">Wraith</a> open-source project released by BBC News)… </p>
 
-<p><code>js
-page.viewportSize = { width: 320, height: 480 };
-</code></p>
+<pre><code>page.viewportSize = { width: 320, height: 480 };
+</code></pre>
 
 <h2>Conclusion</h2>
 
