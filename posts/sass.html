@@ -20,18 +20,20 @@
 <h1>Guide to using Sass</h1>
 
 <ul>
-<li>Introduction</li>
-<li>Installation</li>
-<li>How to run</li>
-<li>Comments</li>
-<li>Variables</li>
-<li>Calculations</li>
-<li>Colour functions</li>
-<li>Importing</li>
-<li>Extend</li>
-<li>Mixins</li>
-<li>Interpolation</li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Installation</a></li>
+<li><a href="#3">How to run</a></li>
+<li><a href="#4">Comments</a></li>
+<li><a href="#5">Variables</a></li>
+<li><a href="#6">Calculations</a></li>
+<li><a href="#7">Colour functions</a></li>
+<li><a href="#8">Importing</a></li>
+<li><a href="#9">Extend</a></li>
+<li><a href="#10">Mixins</a></li>
+<li><a href="#11">Interpolation</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
@@ -40,6 +42,8 @@
 <p>That being said, there are some areas where pre-processors can really help out, such as being able to use <code>@import</code> without worrying about the browser loading the stylesheet synchronously and thus making the page slower to load. Or being able to create a variable to hold your client&#39;s branding colours for easy re-use.</p>
 
 <p>In this post I&#39;ve purposely not included details on everything that Sass can do because I don&#39;t believe they are useful. I would rather you utilise principles of OOCSS and only use Sass as an addition to that which helps round off those rough edges when developing CSS for large scale applications. Two items I have mentioned which should be avoided (and I&#39;ll repeat this later as well) are <code>@extend</code> and <code>@mixin</code>. Both of these causes more problems than they solve and can be worked around with good OOCSS structuring, but I&#39;ve mentioned them so curious readers don&#39;t think I&#39;ve neglected them out of hand and so I&#39;ve detailed some of the potential issues with using them (use at your own risk!)</p>
+
+<div id="2"></div>
 
 <h2>Installation</h2>
 
@@ -53,6 +57,8 @@
 
 <p>From the command line execute <code>gem install sass</code> (I needed to use <code>sudo</code> along with that because I didn&#39;t have authorisation to install in the directory it wanted)</p>
 
+<div id="3"></div>
+
 <h2>How to run</h2>
 
 <p>Within the command line navigate to your website directory and execute the command <code>sass --watch Assets/Styles/</code> (change <code>Assets/Styles/</code> to whatever path your Sass/CSS files are). As you can see in my example, from the root directory of my website I have my Sass files stored here: <code>Assets/Styles</code>. This command uses the <code>--watch</code> flag which means every time a <code>.scss</code> file is saved a corresponding <code>.css</code> file is compiled automatically for you.</p>
@@ -65,11 +71,15 @@
 
 <p>…this basically says &quot;watch the folder <code>Assets/Styles/Sass/</code> and compile any files into the parent folder <code>Assets/Styles</code>&quot; - you&#39;ll notice that the colon character <code>:</code> is what helped make that happen.</p>
 
+<div id="4"></div>
+
 <h2>Comments</h2>
 
 <p>Comments are a standard feature of CSS, but sometimes it would be nice to use a easier syntax for writing them (as seen in other programming languages). Such as: <code>// this is a comment</code> rather than having to write <code>/* a typical CSS comment */</code>.</p>
 
 <p>Sass lets you do this, but it&#39;s worth keeping in mind that the reason they provide this is so you can have &#39;private&#39; comments, and by this they mean that comments like <code>// comment</code> are not included in the compiled CSS file, where as the standard comments style <code>/* comment */</code> are. Not that this should matter because when you push your CSS to the production server it should be minified for performance purposes, but it&#39;s worth knowing about.</p>
+
+<div id="5"></div>
 
 <h2>Variables</h2>
 
@@ -84,6 +94,8 @@
 
 <p>This makes life a lot easier and although I&#39;ve seen people claim that OOCSS can work around this, it can, but not easily and so using Sass for this alone is still extremely useful in my mind.</p>
 
+<div id="6"></div>
+
 <h2>Calculations</h2>
 
 <p>I can&#39;t imagine me ever using this feature, but I&#39;ve included it because it also doesn&#39;t cause any negative effect (unlike <code>@extend</code> and <code>@mixin</code>).</p>
@@ -97,6 +109,8 @@ $double_width: $width * 2;
 <p>You can do calculations inline (i.e. where the property value is set) and you can also group calculations:</p>
 
 <p><code>width: $width * (1 - $sidebar_percent);</code></p>
+
+<div id="7"></div>
 
 <h2>Colour functions</h2>
 
@@ -151,6 +165,8 @@ $double_width: $width * 2;
 }
 </code></pre>
 
+<div id="8"></div>
+
 <h2>Importing</h2>
 
 <p>You can import other Sass files into your main stylesheet using <code>@import &quot;other.scss&quot;</code></p>
@@ -201,6 +217,8 @@ $double_width: $width * 2;
 
 <p>Lastly, be aware that you could end up trying to import the same Sass file multiple times, and the way Sass handles that situation is by only including the imported file once BUT in the last place it was referenced (which may or may not cause you specificity issues).</p>
 
+<div id="9"></div>
+
 <h2>Extend</h2>
 
 <p>This feature is almost pointless as you really should be developing OOCSS (object-oriented CSS). All this does is repeat properties in the compiled CSS file. </p>
@@ -235,6 +253,8 @@ button {
 <p>A couple of last words of caution: <code>extend</code> avoids code duplication but it also causes other problems in that the amount of selectors can become an issue. If you @extend the same base class multiple times you may end up with a rule that has thousands of selectors, which isn&#39;t good for performance and can even make the browser crash (limit its use if you must use it).</p>
 
 <p>Also, you could end up adding properties that are already specified in the <code>extend</code>/<code>mixin</code> because let&#39;s face it you&#39;re unlikely to remember every property set inside them, so when you do use them and come back a few days/weeks/months later to make further updates you&#39;ll have to keep checking them before you can safely add another property just to make sure you&#39;re not doubling up on properties already there - which is hassle and can lead to mistakes.</p>
+
+<div id="10"></div>
 
 <h2>Mixins</h2>
 
@@ -301,6 +321,8 @@ button {
     opacity: $opacity; 
 }
 </code></pre>
+
+<div id="11"></div>
 
 <h2>Interpolation</h2>
 

@@ -20,18 +20,20 @@
 <h1>Object-Oriented Design (OOD)</h1>
 
 <ul>
-<li>Quick Summary</li>
-<li>Introduction</li>
-<li>Objects</li>
-<li>Class Analysis</li>
-<li>Dependencies</li>
-<li>Flexible Interfaces</li>
-<li>Duck Typing</li>
-<li>Inheritance</li>
-<li>Inheritance vs Composition</li>
-<li>Further good rules of development from Sandi Metz</li>
-<li>Summary</li>
+<li><a href="#1">Quick Summary</a></li>
+<li><a href="#2">Introduction</a></li>
+<li><a href="#3">Objects</a></li>
+<li><a href="#4">Class Analysis</a></li>
+<li><a href="#5">Dependencies</a></li>
+<li><a href="#6">Flexible Interfaces</a></li>
+<li><a href="#7">Duck Typing</a></li>
+<li><a href="#8">Inheritance</a></li>
+<li><a href="#9">Inheritance vs Composition</a></li>
+<li><a href="#10">Further good rules of development from Sandi Metz</a></li>
+<li><a href="#11">Summary</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Quick Summary</h2>
 
@@ -74,11 +76,15 @@ e.g. for each class write down a single line description and try to avoid the wo
 </ul></li>
 </ul>
 
+<div id="2"></div>
+
 <h2>Introduction</h2>
 
 <p>All of the following information has been distilled from Sandi Metz&#39; <a href="http://www.poodr.info/">Practical Object-Oriented Design in Ruby</a>, and although the code in this post is based on the Ruby language, don&#39;t worry - the concepts are applicable for any object-oriented language.</p>
 
 <p>I would highly recommend you read <a href="http://www.poodr.info/">Practical Object-Oriented Design in Ruby</a> as the author goes into far more code detail and background information (as well as covering other subjects such as test-driven development and the process of writing efficient unit tests) which will help you understand the concepts better than I could in this single post. But hopefully the following distilled version should be a sufficient starting point for your journey into writing more flexible and maintainable code.</p>
+
+<div id="3"></div>
 
 <h2>Objects</h2>
 
@@ -91,6 +97,8 @@ e.g. for each class write down a single line description and try to avoid the wo
 <p>This single line quote perfectly captures the intention behind good Object-Oriented design. </p>
 
 <p>It seems our focus on objects has been wrong. We should be thinking primarily about the messages we want to send. This way we build up classes based on good clean interfaces and so our subsequent objects are clearer and more direct in their message handling.</p>
+
+<div id="4"></div>
 
 <h2>Class Analysis</h2>
 
@@ -153,6 +161,8 @@ end
     end
 end
 </code></pre>
+
+<div id="5"></div>
 
 <h2>Dependencies</h2>
 
@@ -290,6 +300,8 @@ Imagine you have a class with a hard coded reference to another class. We could 
 <p>&quot;Depend on things that change less often than you do&quot;</p>
 </blockquote>
 
+<div id="6"></div>
+
 <h2>Flexible Interfaces</h2>
 
 <p>Object-Oriented applications are made up of objects(classes) but are defined by the messages that pass between these objects. </p>
@@ -354,6 +366,8 @@ Imagine you have a class with a hard coded reference to another class. We could 
 
 <p>Object-Oriented applications are defined by messages that pass between objects. This is handled via public interfaces. Ask for what you want and don&#39;t include any &#39;hows&#39; as part of the request which would be telling the receiving object how to behave rather than it handling the how itself. </p>
 
+<div id="7"></div>
+
 <h2>Duck Typing</h2>
 
 <p>Duck Typing is the process of making code more flexible and less tightly coupled by taking into consideration that if an object &quot;sounds like a duck, and quacks like a duck&quot; then it stands to reason the object must indeed be (or act like) a duck.</p>
@@ -365,6 +379,8 @@ Imagine you have a class with a hard coded reference to another class. We could 
 <p>Instead, for each object create a generically named method (same name for each object) which handles the appropriate internal/specific details relevant for that object. This way you can just call the method (and even pass the calling object as a reference <code>self</code> in case the receiving object needs further information to carry out its work) and thus make your code more reusable by not tightly coupling a specific method to multiple object calls. </p>
 
 <p>Also, any where you see the use of <code>is_a?</code> or <code>responds_to?</code> then that is an indication of a potential code smell because the principle issue identical to the switch statement. </p>
+
+<div id="8"></div>
 
 <h2>Inheritance</h2>
 
@@ -430,6 +446,8 @@ end
 
 <p>But composition from a design perspective is more about the resulting &#39;whole&#39;, than the subsequent parts that make up the whole. </p>
 
+<div id="9"></div>
+
 <h2>Inheritance vs Composition</h2>
 
 <p>Inheritance is the more appropriate solution if your design dictates that the objects have a well defined concrete class of functionality and that most of that base functionality is the same for all other objects. With inheritance you would write only small amounts of new code to extend the base functionality so the extending objects become more specialised.</p>
@@ -446,6 +464,8 @@ end
 <em>Grady Booch, Object-Oriented Analysis and Design</em></p>
 </blockquote>
 
+<div id="10"></div>
+
 <h2>Further good rules of development from Sandi Metz</h2>
 
 <ol>
@@ -456,6 +476,8 @@ end
 <li>Your view can only know about one instance variable.</li>
 <li>Rules are meant to be broken if by breaking them you produce better code. [ ...where &quot;better code&quot; is validated by explaining why you want to break the rule to someone else. ]</li>
 </ol>
+
+<div id="11"></div>
 
 <h2>Summary</h2>
 

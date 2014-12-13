@@ -20,35 +20,37 @@
 <h1>MVCP: Model, View, Controller, Presenter</h1>
 
 <ul>
-<li>Introduction
+<li><a href="#1">Introduction</a>
 
 <ul>
 <li>Model</li>
 <li>View</li>
 <li>Controller</li>
 </ul></li>
-<li>Mixed definitions
+<li><a href="#2">Mixed definitions</a>
 
 <ul>
 <li>God Controller</li>
 <li>Problems</li>
 <li>Skinny Controller</li>
 </ul></li>
-<li>Presenters?
+<li><a href="#3">Presenters?</a>
 
 <ul>
 <li>What problem are Presenters trying to solve?</li>
 <li>How do they work?</li>
 </ul></li>
-<li>Code Example
+<li><a href="#4">Code Example</a>
 
 <ul>
 <li>Controller</li>
 <li>View</li>
 <li>Presenter</li>
 </ul></li>
-<li>Conclusion</li>
+<li><a href="#5">Conclusion</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
@@ -67,6 +69,8 @@
 <h3>Controller</h3>
 
 <p>The controller is the boss. He sits at the top and delegates responsibilities to either the view or the model.</p>
+
+<div id="2"></div>
 
 <h2>Mixed definitions</h2>
 
@@ -119,6 +123,8 @@
 
 <p>The next step from here was to separate out our logic even further by implementing Presenters, and it was our tech lead at BBC News (<a href="http://twitter.com/jcleveley">John Cleveley</a>) who made that decision which resulted in a much more efficient, maintainable and scalable code base.</p>
 
+<div id="3"></div>
+
 <h2>Presenters</h2>
 
 <h3>What problem are Presenters trying to solve?</h3>
@@ -146,6 +152,8 @@
 <p>For example, at BBC News we initially were manually creating new Presenter instances within our page Controllers. But the team here are quite clever chaps (especially <a href="http://twitter.com/kenturamon">Robert Kenny</a> and <a href="http://twitter.com/sthulb">Simon Thulbourn</a>) and they realised that this process could be greatly improved by using configuration files instead (specifically <a href="http://yaml.org/">YAML</a>). As we have multiple teams working on the BBC News code base and in multiple languages, using configuration files is a much easier and maintainable solution.</p>
 
 <p>I&#39;m not going to go into the configuration set-up we use at BBC News. Instead I&#39;ll focus on the basic principles of how Presenters work, which is quite simply a case of moving the logic (getting component specific Model data and assigning it to to component specific variables) into separate files called Presenters which you can instantiate within your controller.</p>
+
+<div id="4"></div>
 
 <h2>Code Example</h2>
 
@@ -231,6 +239,8 @@ end
 </code></pre>
 
 <p>…it&#39;s just a module namespace with a base class that has a single method <code>prepare_view_data</code> which dynamically generates instance variables based on the data we passed through from the inheriting Presenter class and which then are usable within the View.</p>
+
+<div id="5"></div>
 
 <h2>Conclusion</h2>
 

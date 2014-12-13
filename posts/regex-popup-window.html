@@ -20,12 +20,14 @@
 <h1>Regex Popup Window</h1>
 
 <ul>
-<li>Introduction</li>
-<li>The (original) Regex Solution</li>
-<li>Example Code</li>
-<li>Update 1</li>
-<li>Update 2</li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">The (original) Regex Solution</a></li>
+<li><a href="#3">Example Code</a></li>
+<li><a href="#4">Update 1</a></li>
+<li><a href="#5">Update 2</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
@@ -35,14 +37,17 @@
 
 <p>This solution is an updated version. The previous version was recklessly using <a href="http://www.regular-expressions.info/brackets.html">capture groups</a> when really they should have been using non-capturing groups (as the brackets in the following solution are solely for applying <a href="http://www.regular-expressions.info/repeat.html">quantifiers</a> and <a href="http://www.regular-expressions.info/optional.html">optional items</a>). The reason you should use capturing groups sparingly is to do with performance and saving the regex engine from having to remember content within the capturing groups. The Regular Expression checks for things like whether the URL is an SSL protected URL and uses a <a href="http://www.regular-expressions.info/lookaround.html">negative look ahead assertion</a> to make sure that it doesn’t incorrectly match URL’s that <em>appear</em> to be external (e.g. they start with a http) but in fact actually are links to the current website URL (this happens a lot with Content Management Systems where a user will copy and paste the full URL to one of their own pages).</p>
 
+<div id="2"></div>
+
 <h2>The (original) Regex Solution</h2>
 
 <p><code>^http(?:s)?:\/\/(?!(?:www.)?integralist)</code></p>
 
+<div id="3"></div>
+
 <h2>Example Code</h2>
 
-<p>```js
-/**
+<pre><code>/**
  * The Integralist global namespace object.
  *
  * @class Integralist
@@ -51,11 +56,11 @@
  */
 function Integralist() {
     // Constructor
-}</p>
+}
 
-<p>/**
+/**
  * Augment the Integralist class so it includes a method
- * which finds all <a> elements that link to an external website
+ * which finds all &lt;a&gt; elements that link to an external website
  * and sets them to open in a popup window
  */
 Integralist.prototype.external = function() {
@@ -67,35 +72,37 @@ Integralist.prototype.external = function() {
             window.open(url, &#39;external&#39; , that.settings);
             return false;
         };
-    };</p>
+    };
 
-<pre><code>var a = document.getElementsByTagName(&#39;a&#39;), // Private variable to store HTMLCollection of all &lt;a&gt; elements
-    len = a.length, // Store array length in variable
-    pattern = /^http(?:s)?:\/\/(?!(?:www.)?integralist)/; // RegExp pattern to match any external URL&#39;s but not the current website
+    var a = document.getElementsByTagName(&#39;a&#39;), // Private variable to store HTMLCollection of all &lt;a&gt; elements
+        len = a.length, // Store array length in variable
+        pattern = /^http(?:s)?:\/\/(?!(?:www.)?integralist)/; // RegExp pattern to match any external URL&#39;s but not the current website
 
-// Loop through the array checking for any A elements that link to an external URL
-while (len--) {
-    var element = a[len].getAttribute(&#39;href&#39;);
-    if (pattern.test(element)) {
-        a[len].onclick = this.popup(a[len]);
+    // Loop through the array checking for any A elements that link to an external URL
+    while (len--) {
+        var element = a[len].getAttribute(&#39;href&#39;);
+        if (pattern.test(element)) {
+            a[len].onclick = this.popup(a[len]);
+        }
     }
-}
+};
+
+// Create a singleton of the Integralist Class
+var Integralist = new Integralist();
+
+// Trigger &#39;external&#39; method
+window.onload = Integralist.external;
 </code></pre>
 
-<p>};</p>
-
-<p>// Create a singleton of the Integralist Class
-var Integralist = new Integralist();</p>
-
-<p>// Trigger &#39;external&#39; method
-window.onload = Integralist.external;
-```</p>
+<div id="4"></div>
 
 <h2>Update 1</h2>
 
 <p>Tweaked the regex again to make it simpler. Decided using a character class for just a single dot character was pointless, might as well just escape the dot. Also got rid of the non-capturing group around the s in https and just used an optional token <code>?</code> on its own as again it was pointless wrapping a single character in a non-capturing group.</p>
 
 <p><code>^https?:\/\/(?!(?:www\.)?integralist)</code></p>
+
+<div id="5"></div>
 
 <h2>Update 2</h2>
 

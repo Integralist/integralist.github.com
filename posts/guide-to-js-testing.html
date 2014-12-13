@@ -20,16 +20,18 @@
 <h1>Beginners guide on how to test your code</h1>
 
 <ul>
-<li>Introduction</li>
-<li>Start how you mean to go on</li>
-<li>The ‘write test first’ process</li>
-<li>Other aspects of TDD/BDD</li>
-<li>What do these test &#39;types&#39; mean?</li>
-<li>Using Jasmine</li>
-<li>An example</li>
-<li>Review of example</li>
-<li>Conclusion</li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Start how you mean to go on</a></li>
+<li><a href="#3">The ‘write test first’ process</a></li>
+<li><a href="#4">Other aspects of TDD/BDD</a></li>
+<li><a href="#5">What do these test &#39;types&#39; mean?</a></li>
+<li><a href="#6">Using Jasmine</a></li>
+<li><a href="#7">An example</a></li>
+<li><a href="#8">Review of example</a></li>
+<li><a href="#9">Conclusion</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
@@ -52,6 +54,8 @@
 
 <p>Fundamentally TDD is about the developer and their perspective on testing a piece of code, where BDD is more about using language that management and stake holders can understand (so your tests are still written in code but uses more &#39;domain specific language&#39; - e.g. instead of <code>assertEqual(x, y)</code> you would write <code>expect(x).toEqual(y)</code>).</p>
 
+<div id="2"></div>
+
 <h2>Start how you mean to go on</h2>
 
 <p>Something else you normally hear from the TDD crowd is that you <em>should</em> write your tests first! That’s probably going to sound a bit alien to you because how can you write tests for code that doesn’t yet exist? Why would anyone do that?</p>
@@ -61,6 +65,8 @@
 <p>So the idea of writing tests first is that you’re thinking about your API from the beginning. You’ll think about what the perfect API is for your code to produce and you’ll ensure you write code that fits that API (you won’t realise halfway through coding “ah crap, this doesn’t work as well as I had hoped it would, I’m going to have to change this”).</p>
 
 <p>Although we’re not worrying about “writing tests first” in this article, I mention it so you are at least aware of the process.</p>
+
+<div id="3"></div>
 
 <h2>The ‘write test first’ process</h2>
 
@@ -75,6 +81,8 @@
 <li>Run the test again and watch it pass</li>
 </ul>
 
+<div id="4"></div>
+
 <h2>Other aspects of TDD/BDD</h2>
 
 <p>Here are a few other aspects of testing worth mentioning before we get stuck into some examples: methods such as ‘setUp’ and ‘tearDown’ (which run before and after each test) are useful (for example…) because it means you can prepare each test to run from a fresh set-up.  This probably doesn’t make a lot of sense at the moment so I’ll demonstrate this later in our example code below, but trust me, when you’re testing your code it’s useful before each test (or after each test) to reset your environment.</p>
@@ -82,6 +90,8 @@
 <p>There are also more complicated aspects such as mocks, stubs and spies which are useful when you start getting deep into testing application code where ‘state’ becomes relevant (e.g. using some of these features makes testing code in the deepest parts of your application a lot easier).</p>
 
 <p>So with all this in mind, I would highly recommend you go and read a book titled ‘Test-Driven JavaScript Development’ by Christian Johansen (<a href="http://twitter.com/cjno">@cjno</a>) which covers all these topics in great detail.</p>
+
+<div id="5"></div>
 
 <h2>What do these test &#39;types&#39; mean?</h2>
 
@@ -100,6 +110,8 @@
 <h3>Regression Tests</h3>
 
 <p>This is the process of running your unit tests again after fixing any integration tests to make sure your fixes haven&#39;t caused your unit tests to break.</p>
+
+<div id="6"></div>
 
 <h2>Using Jasmine</h2>
 
@@ -127,6 +139,8 @@ jasmine.getEnv().execute();</p></li>
     // if any assertions fail then this entire suite fails
 });
 </code></pre>
+
+<div id="7"></div>
 
 <h2>An example</h2>
 
@@ -218,6 +232,8 @@ beforeEach(function() {
 });
 </code></pre>
 
+<div id="8"></div>
+
 <h2>Review of example</h2>
 
 <p>We’ll look at one of the example tests and explain what’s happening so you get an idea of how Jasmine works, then from there you should be at least good to go in getting up and running and playing around with it yourself.</p>
@@ -252,6 +268,8 @@ beforeEach(function() {
 &gt;&gt;&gt; Expected &#39;myclassa myclassb newclass&#39; to be &#39;x myclassa myclassb newclass&#39;. (this tells you what the result actually was followed by what the test was expecting - so you can see where the result went wrong)
 &gt;&gt;&gt;&gt; (after this you get a stack trace of what was executed so you can see specifics of where the error occurred)
 </code></pre>
+
+<div id="9"></div>
 
 <h2>Conclusion</h2>
 

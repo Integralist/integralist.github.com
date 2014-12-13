@@ -20,60 +20,62 @@
 <h1>Unix Commands</h1>
 
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#basics">Basics</a>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Basics</a>
 
 <ul>
-<li><a href="#what-directory-am-i-currently-in">What directory am I currently in?</a></li>
-<li><a href="#how-can-i-see-whats-in-this-directory">How can I see what&#39;s in this directory?</a></li>
-<li><a href="#moving-around">Moving around</a></li>
-<li><a href="#displaying-content-of-a-file">Displaying content of a file</a></li>
-<li><a href="#copy-a-file">Copy a file</a></li>
-<li><a href="#move-a-file">Move a file</a></li>
-<li><a href="#create-a-file">Create a file</a></li>
-<li><a href="#rename-a-file">Rename a file</a></li>
-<li><a href="#delete-a-file">Delete a file</a></li>
-<li><a href="#delete-a-directory">Delete a directory</a></li>
-<li><a href="#create-a-directory">Create a directory</a></li>
+<li>What directory am I currently in?</li>
+<li>How can I see what&#39;s in this directory?</li>
+<li>Moving around</li>
+<li>Displaying content of a file</li>
+<li>Copy a file</li>
+<li>Move a file</li>
+<li>Create a file</li>
+<li>Rename a file</li>
+<li>Delete a file</li>
+<li>Delete a directory</li>
+<li>Create a directory</li>
 </ul></li>
-<li><a href="#find-searching-for-files">Find (searching for files)</a>
+<li><a href="#3">Find (searching for files)</a>
 
 <ul>
-<li><a href="#finding-files-over-a-certain-size">Finding files over a certain size</a></li>
+<li>Finding files over a certain size</li>
 </ul></li>
-<li><a href="#grep-searching-for-patterns">Grep (Searching for patterns)</a></li>
-<li><a href="#sed-find-and-replace">Sed (Find and Replace)</a></li>
-<li><a href="#awk-looping-logic">Awk (Looping Logic)</a></li>
-<li><a href="#piping-io">Piping I/O</a>
+<li><a href="#4">Grep (Searching for patterns)</a></li>
+<li><a href="#5">Sed (Find and Replace)</a></li>
+<li><a href="#6">Awk (Looping Logic)</a></li>
+<li><a href="#7">Piping I/O</a>
 
 <ul>
-<li><a href="#input-and-output">Input and Output</a></li>
-<li><a href="#redirection">Redirection</a></li>
-<li><a href="#piping">Piping</a></li>
-<li><a href="#piping-examples">Piping examples</a></li>
-<li><a href="#sequences-and-parallelism">Sequences and Parallelism</a></li>
+<li>Input and Output</li>
+<li>Redirection</li>
+<li>Piping</li>
+<li>Piping examples</li>
+<li>Sequences and Parallelism</li>
 </ul></li>
-<li><a href="#processes">Processes</a>
+<li><a href="#8">Processes</a>
 
 <ul>
-<li><a href="#viewing-processes">Viewing processes</a></li>
-<li><a href="#moving-processes-between-the-forebackground">Moving processes between the fore/background</a></li>
+<li>Viewing processes</li>
+<li>Moving processes between the fore/background</li>
 </ul></li>
-<li><a href="#miscellaneous-commands">Miscellaneous Commands</a>
+<li><a href="#9">Miscellaneous Commands</a>
 
 <ul>
-<li><a href="#tee">tee</a></li>
-<li><a href="#dig">dig</a></li>
-<li><a href="#ps">ps</a></li>
-<li><a href="#xargs">xargs</a></li>
-<li><a href="#cut">cut</a></li>
-<li><a href="#tr">tr</a></li>
-<li><a href="#du">du</a></li>
-<li><a href="#double-exclamation">!!</a></li>
-<li><a href="#ctrl-r">Ctrl-r</a></li>
+<li>tee</li>
+<li>dig</li>
+<li>ps</li>
+<li>xargs</li>
+<li>cut</li>
+<li>tr</li>
+<li>du</li>
+<li>!!</li>
+<li>Ctrl-r</li>
 </ul></li>
-<li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#10">Conclusion</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
@@ -82,6 +84,8 @@
 <p>Shell commands aren&#39;t something you can cover in one post. Entire books have been written on the subject. So don&#39;t expect anything other than the bare bone basics here, which should hopefully give you enough of an understanding to take your own learning forward.</p>
 
 <p>So let&#39;s begin… </p>
+
+<div id="2"></div>
 
 <h2>Basics</h2>
 
@@ -163,6 +167,8 @@
 
 <p>To make creating lots of sub directories easier you can pass a <code>-p</code> flag like so <code>mkdir -p Assets/{Scripts,Styles}</code> (notice we use interpolation <code>{}</code> which lets use specify multiple folder names in the current directory level).</p>
 
+<div id="3"></div>
+
 <h2>Find (searching for files)</h2>
 
 <p>The <code>find</code> command is useful for walking a directory hierarchy and returning a list of files found based on a set of criteria you have determined.</p>
@@ -217,6 +223,8 @@ find . -size +0 -a -size -500c # (-a is AND, -c is bytes)
 find . -size 0 -o -atime +365
 </code></pre>
 
+<div id="4"></div>
+
 <h2>Grep (Searching for patterns)</h2>
 
 <p>Grep is a command that lets you find a pattern (either a string or a regular expression) inside of a file or list of files.</p>
@@ -227,6 +235,8 @@ find . -size 0 -o -atime +365
 
 <p>So: <code>grep -r &#39;something&#39; ~/Desktop</code> looks for the word &#39;something&#39; inside of any files on the Desktop.</p>
 
+<div id="5"></div>
+
 <h2>Sed (Find and Replace)</h2>
 
 <p>The <code>sed</code> command stands for (S)tream (Ed)itor and allows you to  read in the contents of a file and then write the modified output to another file or pipe it through to another I/O command (we&#39;ll cover piping later).</p>
@@ -234,6 +244,8 @@ find . -size 0 -o -atime +365
 <p>A basic example of its use would be: <code>sed s/day/night/ novel.txt</code></p>
 
 <p>This replaces the first occurrence of &#39;day&#39; to &#39;night&#39;. If we wanted to replace multiple occurrences then you would need to pass a <code>g</code> flag (meaning global) to the regular expression like so: <code>sed s/day/night/g novel.txt</code></p>
+
+<div id="6"></div>
 
 <h2>Awk (Looping Logic)</h2>
 
@@ -271,6 +283,8 @@ Line 3: third
 <li><code>NF</code> stands for (N)umber of (F)ields.</li>
 <li>The <code>$()</code> wrapping around <code>NF</code> is our &#39;process substitution&#39;. This means we&#39;re not just outputting some data but manipulating it by using logic to give us 1 field back from the last, hence it needs to be wrapped in <code>$()</code></li>
 </ul>
+
+<div id="7"></div>
 
 <h2>Piping I/O</h2>
 
@@ -395,6 +409,8 @@ Line 3: third
 
 <p>The use of a single <code>&amp;</code> between commands means the commands are run in parallel (meaning they don&#39;t wait for each other). So for example, <code>x &amp; y</code> will mean <code>x</code> and <code>y</code> both run <em>at the same time</em>.</p>
 
+<div id="8"></div>
+
 <h2>Processes</h2>
 
 <p>Each command you execute is a &quot;process&quot;. So when we execute the command <code>vim</code> (which opens up the Vim text editor) we have effectively started up a new &quot;process&quot;.</p>
@@ -412,6 +428,8 @@ Line 3: third
 <p>To then bring the latest process (i.e. the last process that was put into the background) to the foreground again you would run the command <code>fg</code>. </p>
 
 <p>If you have multiple processes in the background then you can look up the processes using <code>job</code> and then pick one and foreground it using the command <code>fg %n</code> where <code>n</code> is the number of the job.</p>
+
+<div id="9"></div>
 
 <h2>Miscellaneous Commands</h2>
 
@@ -582,6 +600,8 @@ b!!
 <h3>Ctrl-r</h3>
 
 <p>Rather than try to remember an old command you typed a few hours ago, let the terminal remember for you. If you press <code>&lt;C-r&gt;</code> (which is <code>&lt;Ctrl&gt;</code> and <code>r</code> keys at the same time) then start typing what you think the command was, the terminal will start to autocomplete using your command history. You can even press <code>&lt;C-r&gt;</code> multiple times to start cycling through your command history.</p>
+
+<div id="10"></div>
 
 <h2>Conclusion</h2>
 

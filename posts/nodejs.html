@@ -20,19 +20,23 @@
 <h1>NodeJS as a tool</h1>
 
 <ul>
-<li>Introduction</li>
-<li>Prerequisite</li>
-<li>CSSLint</li>
-<li>JsHint</li>
-<li>RequireJS/r.js</li>
-<li>gh-markdown-cli</li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Prerequisite</a></li>
+<li><a href="#3">CSSLint</a></li>
+<li><a href="#4">JsHint</a></li>
+<li><a href="#5">RequireJS/r.js</a></li>
+<li><a href="#6">gh-markdown-cli</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
 <p>NodeJs is best known for running server-side JavaScript, but it can also be used for other processes that run on your local machine: See: <a href="http://blog.millermedeiros.com/node-js-as-a-build-script/">Node.js as a build script</a> (by <a href="https://github.com/millermedeiros/">@millermedeiros</a>) for lots of examples of this.</p>
 
 <p>With the help of <a href="http://mxcl.github.com/homebrew/">Homebrew</a> (yes I know I&#39;m only catering for Mac users here - what a scum bag I am - but the principles are the same I&#39;m just using <code>Homebrew</code> to get these packages installed) we can get our prerequisite installed.</p>
+
+<div id="2"></div>
 
 <h2>Prerequisite</h2>
 
@@ -48,6 +52,8 @@
 </ol>
 
 <p>After that you should be able to execute <code>brew --version</code>, <code>node --version</code> and <code>npm --version</code> and get version numbers back to show that they&#39;ve installed.</p>
+
+<div id="3"></div>
 
 <h2>CSSLint</h2>
 
@@ -86,6 +92,8 @@ java -jar js.jar csslint-rhino.js $@
 
 <p>After creating the file, you need to ensure it can be executed, so go to the command line and type:<br>
 <code>chmod +x csslint</code></p>
+
+<div id="4"></div>
 
 <h2>JsHint</h2>
 
@@ -196,6 +204,8 @@ Your <code>config.json</code> file could look like the following…</p>
 }
 </code></pre>
 
+<div id="5"></div>
+
 <h2>RequireJS/r.js</h2>
 
 <p>&quot;<em>Runs RequireJS in Node and used to run the RequireJS optimizer</em>&quot;</p>
@@ -246,6 +256,8 @@ You create a &#39;build&#39; script file (see below for an example) and then you
     ]
 })
 </code></pre>
+
+<div id="6"></div>
 
 <h2>gh-markdown-cli</h2>
 

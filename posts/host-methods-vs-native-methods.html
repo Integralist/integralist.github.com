@@ -20,21 +20,27 @@
 <h1>Host Methods vs Native Methods</h1>
 
 <ul>
-<li>Introduction</li>
-<li>What they are?</li>
-<li>How to detect them?</li>
-<li>When is it OK to modify them?</li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">What they are?</a></li>
+<li><a href="#3">How to detect them?</a></li>
+<li><a href="#4">When is it OK to modify them?</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
 <p>This was intended as a short and overly simplified post about Host methods and Native methods.</p>
+
+<div id="2"></div>
 
 <h2>What they are?</h2>
 
 <p>Native methods are built-in functions provided by the ECMAScript core specification. So things like Object methods (e.g. <code>Object.create</code>), Array methods (e.g. <code>Array#forEach</code>) etc.</p>
 
 <p>Host methods are functions provided by the host environment (most of the time when working in web development the host environment will be the user’s web browser). So things like the DOM API and the Events object are host objects/methods (e.g. <code>attachEvent</code> is a host method and <code>addEventListener</code> is a host method)</p>
+
+<div id="3"></div>
 
 <h2>How to detect them?</h2>
 
@@ -106,6 +112,8 @@ In older versions of IE (less than 9) it implements some of its host objects not
 
 <p>So, in IE calling the <code>typeof</code> operator with properties of an ActiveX Object will result in <code>unknown</code>.</p></li>
 </ul>
+
+<div id="4"></div>
 
 <h2>When is it OK to modify them?</h2>
 

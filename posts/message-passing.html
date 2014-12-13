@@ -20,13 +20,15 @@
 <h1>Message passing in Object-Oriented Code</h1>
 
 <ul>
-<li>Introduction</li>
-<li>Quick example</li>
-<li>The Proxy Design Pattern</li>
-<li>How Ruby handles method calls</li>
-<li>Implementing <code>method_missing</code></li>
-<li>Conclusion</li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Quick example</a></li>
+<li><a href="#3">The Proxy Design Pattern</a></li>
+<li><a href="#4">How Ruby handles method calls</a></li>
+<li><a href="#5">Implementing <code>method_missing</code></a></li>
+<li><a href="#6">Conclusion</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
@@ -42,6 +44,8 @@
 
 <p>His comments really nailed home for me the design benefits of thinking more about &#39;messages&#39; being passed to objects, and it&#39;s that point which I want to elaborate on below.</p>
 
+<div id="2"></div>
+
 <h2>Quick example</h2>
 
 <p>Imagine the following code example: <code>account.deposit(50)</code></p>
@@ -53,6 +57,8 @@
 <blockquote>
 <p>&quot;we&#39;re sending a deposit message to an account object&quot;</p>
 </blockquote>
+
+<div id="3"></div>
 
 <h2>The Proxy Design Pattern</h2>
 
@@ -70,11 +76,15 @@
 
 <p>This isn&#39;t necessarily an issue for all types of objects. But if you look at built-in objects such as the <code>Array</code> object, that has approximately 118 (maybe more) methods! So for us to implement a proxy for that object we&#39;d theorectically need to implement 118 stub methods, each of which would simply forward on the request to the corresponding method on the real object to handle. That would not only be tedious but an inefficient way to implement our proxy object.</p>
 
+<div id="4"></div>
+
 <h2>How Ruby handles method calls</h2>
 
 <p>In Ruby if you pass a message (e.g. call a method) to an object and that method doesn&#39;t exist, then Ruby will try to find another method on that object: <code>method_missing</code>. </p>
 
 <p>If <code>method_missing</code> doesn&#39;t exist then Ruby will try to lookup the method on the parent object, and will keep moving up the inheritance chain until it reaches the core <code>Object</code> object (which does implement <code>method_missing</code>) and which simply raises a <code>NoMethodError</code> exeception.</p>
+
+<div id="5"></div>
 
 <h2>Implementing <code>method_missing</code></h2>
 
@@ -112,6 +122,8 @@ end
 </code></pre>
 
 <p>You can see from the above example that we&#39;re using the <a href="http://ruby-doc.org/core-2.0/Object.html#method-i-send">send</a> method to pass the message (i.e. the method invoked by the user on the proxy object) directly to the real object.</p>
+
+<div id="6"></div>
 
 <h2>Conclusion</h2>
 

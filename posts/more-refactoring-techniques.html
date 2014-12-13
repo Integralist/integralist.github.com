@@ -20,24 +20,28 @@
 <h1>Even More Refactoring Techniques</h1>
 
 <ul>
-<li>Introduction
+<li><a href="#0">Introduction</a>
 
 <ul>
-<li><a href="#remove-redundancy">Remove Redundancy</a></li>
-<li><a href="#dynamic-method-definition">Dynamic Method Definition</a></li>
-<li><a href="#extract-class">Extract Class</a></li>
-<li><a href="#hide-delegate">Hide Delegate</a></li>
-<li><a href="#replace-array-with-object">Replace Array with Object</a></li>
-<li><a href="#replace-conditional-with-polymorphism">Replace Conditional with Polymorphism</a></li>
-<li><a href="#decompose-conditional">Decompose Conditional</a></li>
-<li><a href="#introduce-null-object">Introduce Null Object</a></li>
+<li><a href="#1">Remove Redundancy</a></li>
+<li><a href="#2">Dynamic Method Definition</a></li>
+<li><a href="#3">Extract Class</a></li>
+<li><a href="#4">Hide Delegate</a></li>
+<li><a href="#5">Replace Array with Object</a></li>
+<li><a href="#6">Replace Conditional with Polymorphism</a></li>
+<li><a href="#7">Decompose Conditional</a></li>
+<li><a href="#8">Introduce Null Object</a></li>
 </ul></li>
-<li>Conclusion</li>
+<li><a href="#9">Conclusion</a></li>
 </ul>
+
+<div id="0"></div>
 
 <h2>Introduction</h2>
 
 <p>Well here we are again to learn some more refactoring techniques. If you want to recap the other techniques then go <a href="/posts/refactoring-techniques/">read my previous post</a>, otherwise let&#39;s just crack on...</p>
+
+<div id="1"></div>
 
 <h3>Remove Redundancy</h3>
 
@@ -54,6 +58,8 @@
 <p>This principle applies with other refactoring techniques. </p>
 
 <p>Imagine an earlier refactoring included implementing a default parameter value for a method call. As your code evolves, if you discover you now only ever call the method <em>with</em> an argument then the default value becomes redundant and makes the code more complex than it needs to be by providing a default value. So just remove the redundant code.</p>
+
+<div id="2"></div>
 
 <h3>Dynamic Method Definition</h3>
 
@@ -124,6 +130,8 @@ module Presenters
 end 
 </code></pre>
 
+<div id="3"></div>
+
 <h3>Extract Class</h3>
 
 <p>This is a pretty standard technique which helps ensure your objects abide by the SRP (Single Responsibility Principle). </p>
@@ -131,6 +139,8 @@ end
 <p>If you find your classes are doing too much then simply create a new class and move the relevant fields and methods over one by one (while running the tests as you go to ensure all code continues working as expected).</p>
 
 <p>Doing so you&#39;ll end up with two small, focused and clean classes which are easier to manage. </p>
+
+<div id="4"></div>
 
 <h3>Hide Delegate</h3>
 
@@ -167,6 +177,8 @@ foo.do_something
 <p>The implementation details of <code>do_somthing</code> (in this case the delegation off to another method) are hidden.</p>
 
 <p>If we changed <code>include Bar</code> for <code>include Baz</code>, or maybe we don&#39;t mixin a module at all and just write some code inside of <code>do_something</code>, it doesn&#39;t matter because the public interface is set as far as the user is concerned.</p>
+
+<div id="5"></div>
 
 <h3>Replace Array with Object</h3>
 
@@ -231,6 +243,8 @@ obj.do_something
 </code></pre>
 
 <p>...here we convert the Array into an object and instead can more easily and safely reference the data we&#39;re interested in via recognisable property identifiers. This doesn&#39;t mean if the data source changes that we&#39;ll totally avoid all problems but it&#39;ll be clearer where the problem is arising.</p>
+
+<div id="6"></div>
 
 <h3>Replace Conditional with Polymorphism</h3>
 
@@ -317,6 +331,8 @@ foo_qux.do_something
 
 <p>Notice we have removed the need for a conditional and just sent the message to the relevant object to be handled. Much cleaner and easier to maintain and scale.</p>
 
+<div id="7"></div>
+
 <h3>Decompose Conditional</h3>
 
 <p>Not all conditional statements can be avoided through the use of polymorphism. In those cases you can simplify the conditional logic (and the subsequent statements) by <a href="/posts/refactoring-techniques/#extract-method">extracting them into external methods</a>. </p>
@@ -340,6 +356,8 @@ end
 </code></pre>
 
 <p>...much better.</p>
+
+<div id="8"></div>
 
 <h3>Introduce Null Object</h3>
 
@@ -412,6 +430,8 @@ Post.find_and_publish(1) # displays true
 <p>...as you can see, effectively we have the same code with the exception that we no longer check for <code>nil?</code> in the second example and instead we rely on another object <code>NullPost</code> implementing the same interface but returns a null related value.</p>
 
 <p>This way we&#39;re using objects to handle our logic. Yes, we end up with more code (one extra Class) but ultimately this is more maintainable and understandable than lots of inline logic.</p>
+
+<div id="9"></div>
 
 <h2>Conclusion</h2>
 

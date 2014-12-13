@@ -20,20 +20,22 @@
 <h1>JavaScript 101</h1>
 
 <ul>
-<li>Introduction</li>
-<li>What is JavaScript</li>
-<li>Terminology</li>
-<li>Global Object</li>
-<li>Variables</li>
-<li>Types</li>
-<li>Objects</li>
-<li>Arrays</li>
-<li>Conditional Statements</li>
-<li>Coercion</li>
-<li>Functions</li>
-<li>Code Reuse (inheritance)</li>
-<li>Conclusion</li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">What is JavaScript</a></li>
+<li><a href="#3">Terminology</a></li>
+<li><a href="#4">Global Object</a></li>
+<li><a href="#5">Variables</a></li>
+<li><a href="#6">Types</a></li>
+<li><a href="#7">Objects</a></li>
+<li><a href="#8">Arrays</a></li>
+<li><a href="#9">Conditional Statements</a></li>
+<li><a href="#10">Coercion</a></li>
+<li><a href="#11">Functions</a></li>
+<li><a href="#12">Code Reuse (inheritance)</a></li>
+<li><a href="#13">Conclusion</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
@@ -41,9 +43,13 @@
 
 <p>This article&#39;s main purpose is to give readers new to the language a glimpse of the JavaScript environment and to hopefully spur them onto further reading/learning. </p>
 
+<div id="2"></div>
+
 <h2>What is JavaScript</h2>
 
 <p>JavaScript is a <em>scripting language</em> - this means it is not <em>compiled</em> (like traditional software languages like C or C++) but is executed &#39;line by line&#39; via its host environment at run time (the host environment can be: Web Browser, Server, Command Line, Desktop).</p>
+
+<div id="3"></div>
 
 <h2>Terminology</h2>
 
@@ -74,6 +80,8 @@ operator            | <code>+</code>, <code>-</code>, <code>!</code>, <code>++</
 <li><code>while (condition) { /* code */ }</code></li>
 <li><code>return</code>, <code>break</code>, <code>throw</code> are single command statements</li>
 </ul>
+
+<div id="4"></div>
 
 <h2>Global Object</h2>
 
@@ -120,6 +128,8 @@ app.do_something(); // =&gt; &#39;Private&#39;
 </code></pre>
 
 <p>Another pattern is to use AMD (Asynchronous Module Definition) which is a module based pattern (see: <a href="https://github.com/Integralist/Blog-Posts/blob/master/Beginners-guide-to-AMD-and-RequireJS.md">Beginners guide to AMD and RequireJS</a>)</p>
+
+<div id="5"></div>
 
 <h2>Variables</h2>
 
@@ -178,6 +188,8 @@ var my_name = &#39;Mark&#39;;
 
 <p>Most companies name their global namespace after their company: <code>var mycompany_app = /* code */;</code></p>
 
+<div id="6"></div>
+
 <h2>Types</h2>
 
 <p>JavaScript types are split into two groups: <code>primitive</code> types and <code>reference</code> types. </p>
@@ -199,6 +211,8 @@ new_arr.push(&#39;d&#39;);
 <p>…you might think that <code>new_arr</code> will be <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;]</code> and <code>my_arr</code> would still be equal to <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</code> but you&#39;d be wrong because Arrays are passed by &#39;reference&#39; and so your change: <code>new_arr.push(&#39;d&#39;);</code> is effectively doing this: <code>my_arr.push(&#39;d&#39;);</code>, hence <code>my_arr</code> now has the value of <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;]</code> and so does <code>new_arr</code> because it really is just referencing (i.e. pointing to) <code>my_arr</code>.</p>
 
 <p>So be careful.</p>
+
+<div id="7"></div>
 
 <h2>Objects</h2>
 
@@ -287,6 +301,8 @@ console.log(Object.prototype.toString.call(arr)); // =&gt; &quot;[object Array]&
 
 <p>The way this trick works actually requires a deep level understanding of how JavaScript handles its conversion of data types: something I definitely wont go into here).</p>
 
+<div id="8"></div>
+
 <h2>Arrays</h2>
 
 <p>Arrays are like a simplified Object.</p>
@@ -337,6 +353,8 @@ console.log(Object.prototype.toString.call(arr)); // =&gt; &quot;[object Array]&
 <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/sort">sort</a>     | <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/lastIndexOf">lastIndexOf</a> | <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/some">some</a>
 <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/splice">splice</a>   |             | <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/Reduce">reduce</a>
 <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/unshift">unshift</a>  |             | <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/ReduceRight">reduceRight</a></p>
+
+<div id="9"></div>
 
 <h2>Conditional Statements</h2>
 
@@ -435,6 +453,8 @@ var x = &#39;abc&#39;;
 var y = (x === &#39;abc&#39;) ? &#39;def&#39; : &#39;xyz&#39;; // y will equal a String value of &#39;def&#39;
 </code></pre>
 
+<div id="10"></div>
+
 <h2>Coercion</h2>
 
 <p>One of the areas of most confusion in JavaScript is its ability to coerce data &#39;types&#39;.</p>
@@ -480,6 +500,8 @@ if (!bool) {
 <p>An empty String wil coerce to false.</p>
 
 <p>There is a lot to learn about JavaScript&#39;s coercion process, so for full details please see the following article: <a href="http://webreflection.blogspot.co.uk/2010/10/javascript-coercion-demystified.html">http://webreflection.blogspot.co.uk/2010/10/javascript-coercion-demystified.html</a></p>
+
+<div id="11"></div>
 
 <h2>Functions</h2>
 
@@ -548,6 +570,8 @@ obj2.speak.call(obj1); // =&gt; &#39;My name is Bob&#39;
 </code></pre>
 
 <p>…you can see how by using the <code>call</code> method we can make better use of existing functions and so we become more productive as well as have smaller and more efficient code.</p>
+
+<div id="12"></div>
 
 <h2>Code Reuse (inheritance)</h2>
 
@@ -667,6 +691,8 @@ extend(person, people); // copy properties from `people` to `person`
 // `person` now has a `speak` method it didn&#39;t have originally 
 person.speak(1); // =&gt; &#39;Hi, my name is Neil&#39;
 </code></pre>
+
+<div id="13"></div>
 
 <h2>Conclusion</h2>
 

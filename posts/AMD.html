@@ -20,19 +20,23 @@
 <h1>Beginners guide to AMD and RequireJS</h1>
 
 <ul>
-<li>What is AMD?</li>
-<li>Why does it matter?</li>
-<li>How did we get here?</li>
-<li>How does RequireJS (and alternatives) fit in?</li>
-<li>Can we use jQuery?</li>
-<li>Basic Example</li>
-<li>What now?</li>
-<li>Links/Reference Material</li>
+<li><a href="#1">What is AMD?</a></li>
+<li><a href="#2">Why does it matter?</a></li>
+<li><a href="#3">How did we get here?</a></li>
+<li><a href="#4">How does RequireJS (and alternatives) fit in?</a></li>
+<li><a href="#5">Can we use jQuery?</a></li>
+<li><a href="#6">Basic Example</a></li>
+<li><a href="#7">What now?</a></li>
+<li><a href="#8">Links/Reference Material</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>What is AMD?</h2>
 
 <p>AMD stands for “Asynchronous Module Definition” and is a proposed API for loading modules (i.e. scripts) asynchronously.</p>
+
+<div id="2"></div>
 
 <h2>Why does it matter?</h2>
 
@@ -43,6 +47,8 @@
 <li>Modular (which means code that is easier to maintain and re-use).</li>
 <li>Best practice (helps to reduce global variables, maintain dependancies, and your code will follow guidelines that will in the future become the standards for the next iteration of JavaScript)</li>
 </ul>
+
+<div id="3"></div>
 
 <h2>How did we get here?</h2>
 
@@ -75,17 +81,23 @@
 
 <p>So moving forward from that slightly better situation we come to ‘AMD Script Loaders’ which also lets you load scripts asynchronously but the scripts you are loading aren’t just a hodge podgy of random scripts pulled from the different corners of the web, they are well structured ‘modules’ that define their own dependancies and can be easily re-used across different projects because of their loose coupling with other scripts. They are also defined within their own scope so they don’t interfere with other scripts that may have been added by another developer before you, and so make it easier not to have a page full of global variables floating around causing havoc.</p>
 
+<div id="4"></div>
+
 <h2>How does RequireJS (and alternatives) fit in?</h2>
 
 <p>RequireJS is one of the more well known (and thus ‘popular’) AMD script loaders. It follows the ‘Modules Transport/C’ specification laid out by the CommonJs group (<a href="http://wiki.commonjs.org/wiki/CommonJS">http://wiki.commonjs.org/wiki/CommonJS</a>).</p>
 
 <p>The RequireJS website has a lot of information to get you started, but can be a bit confusing for those new to the concept. So we’ll dive into some of our own examples which will make it easier to understand how you can use RequireJS and AMD in general in your projects.</p>
 
+<div id="5"></div>
+
 <h2>Can we use jQuery?</h2>
 
 <p>Sure! RequireJS actually has a special build of it that includes jQuery, but as jQuery too has seen AMD as the future, it has made itself AMD compatible (well, for those who might have more knowledge about AMD, it’s compatible in the sense that it can be loaded as a ‘named module’). </p>
 
 <p>So for the 1.7 release of jQuery it will be possible to not need the RequireJS specific build that includes jQuery - you’ll be able to just load jQuery as a dependancy when defining your ‘module’.</p>
+
+<div id="6"></div>
 
 <h2>Basic Example</h2>
 
@@ -282,6 +294,8 @@ define([&quot;Models/Person&quot;, &quot;Utils/random&quot;, &quot;jquery&quot;]
 
 <p>The above build script only takes a second and it generates a lovely single script file called main.js and actually places it <em>outside</em> of my website directory into a folder called ‘project-build’ (i don’t like to risk accidentally over-writing my source JavaScript files… if you know what I mean).</p>
 
+<div id="7"></div>
+
 <h2>What now?</h2>
 
 <p>Well… start using AMD in your projects. </p>
@@ -289,6 +303,8 @@ define([&quot;Models/Person&quot;, &quot;Utils/random&quot;, &quot;jquery&quot;]
 <p>The best way to learn it is to use it. Try out some of the basic structural changes to get yourself used to architecting your apps in a modular fashion, and then just go for it!</p>
 
 <p>I’ve covered RequireJS here, but I’ve heard good things about <a href="http://twitter.com/unscriptable">@unscriptable</a>’s Curl loader (<a href="https://github.com/unscriptable/curl">https://github.com/unscriptable/curl</a>) so I’d recommend checking that out too.</p>
+
+<div id="8"></div>
 
 <h2>Links/Reference Material</h2>
 

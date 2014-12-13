@@ -20,26 +20,30 @@
 <h1>How to use Git and GitHub</h1>
 
 <ul>
-<li>Introduction</li>
-<li>What is Git/GitHub?</li>
-<li>Using the GitHub interface</li>
-<li>Installing Git</li>
-<li>Setting up a new Git repository</li>
-<li>Adding files for Git to track</li>
-<li>Commiting files to Git</li>
-<li>Setting up a GitHub account</li>
-<li>Generating an SSH Public Key</li>
-<li>Creating a new GitHub repository</li>
-<li>Pushing your project up to GitHub’s repository</li>
-<li>Removing/Editing files</li>
-<li>Git Tips</li>
-<li>Tell Git to ignore certain files and formats</li>
-<li>Best practices for Commit Messages</li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">What is Git/GitHub?</a></li>
+<li><a href="#3">Using the GitHub interface</a></li>
+<li><a href="#4">Installing Git</a></li>
+<li><a href="#5">Setting up a new Git repository</a></li>
+<li><a href="#6">Adding files for Git to track</a></li>
+<li><a href="#7">Commiting files to Git</a></li>
+<li><a href="#8">Setting up a GitHub account</a></li>
+<li><a href="#9">Generating an SSH Public Key</a></li>
+<li><a href="#10">Creating a new GitHub repository</a></li>
+<li><a href="#10">Pushing your project up to GitHub’s repository</a></li>
+<li><a href="#11">Removing/Editing files</a></li>
+<li><a href="#12">Git Tips</a></li>
+<li><a href="#13">Tell Git to ignore certain files and formats</a></li>
+<li><a href="#14">Best practices for Commit Messages</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
 <p>If you’re having trouble understanding how to get up and running with GitHub, or you just wanted to find a free version-control system and heard about this thing called ‘Git’ then hopefully the following information should help…</p>
+
+<div id="2"></div>
 
 <h2>What is Git/GitHub?</h2>
 
@@ -54,6 +58,8 @@
 <p>So with this in mind it’s best to learn about Git first, so then using GitHub will suddenly make a whole lot more sense! And this is why I think I struggled with GitHub initially: because I had no idea about what Git was and how it worked.</p>
 
 <p>But before we get started…</p>
+
+<div id="3"></div>
 
 <h2>Using the GitHub interface</h2>
 
@@ -81,6 +87,8 @@
 
 <p>From here you can sit back and relax, I think? Again I’ve read somewhere previously (for jQuery UI) that you need to add a link to your commit to the ticket in their tracker system (jQuery may very well have something similar I’m not sure though). But enough of this GUI nonsense, lets start using Git how it was meant to be used… on the command line!</p>
 
+<div id="4"></div>
+
 <h2>Installing Git</h2>
 
 <p>OK, first thing first, lets get Git installed (by the way I work on a Mac so hopefully this guide is still somewhat useful to PC users). I personally found the easiest way to install git is via a pre-compiled installer: <a href="http://code.google.com/p/git-osx-installer/">http://code.google.com/p/git-osx-installer/</a>.</p>
@@ -107,6 +115,8 @@ git config user.email
 
 <p>Now that we’ve got Git set-up we need to look at how we can tell it to ‘track’ certain files &amp; folders in your project.</p>
 
+<div id="5"></div>
+
 <h2>Setting up a new Git repository</h2>
 
 <p>Now, using Git does require a tiny bit of command line knowledge (such as navigating your computer via command line, making new directories and files, removing files etc). I’ll try and cover as much of this as I think is needed to use Git (you may need more commands than I cover but then I’ll leave that up to you to look into further). OK, so with the Terminal still open, navigate to your project folder (we do this by using the <code>cd</code> command - which stands for ‘change directory’)…</p>
@@ -126,6 +136,8 @@ killall Finder
 </code></pre>
 
 <p>…the first line tells Finder to allow showing of hidden files, and the second line restarts Finder so you can see the changes take effect. Once you have a new Git repository set-up you need to tell Git what files/folders to start ‘tracking’.</p>
+
+<div id="6"></div>
 
 <h2>Adding files for Git to track</h2>
 
@@ -155,6 +167,8 @@ killall Finder
 
 <p>You can add some files, go away and make a cup of tea, work on something else and then come back and add some more files to the Staging Area. But for any of these files to be ‘committed’ and thus have a ‘snap shot’ of the project (so we can - if we need to - revert back to an older version) we need to use the <code>commit</code> command to tell Git we want it to snap shot our project in its current state…</p>
 
+<div id="7"></div>
+
 <h2>Commiting files to Git</h2>
 
 <p><code>git commit -m &#39;Add a README file to help explain the project&#39;</code></p>
@@ -163,6 +177,8 @@ killall Finder
 
 <p>Now that we’ve been acquainted with Git, and created a new Git repository, added some files and committed them to Git we can start looking at using a remote server for collaborating on our project. To do this we’re going to use <a href="https://github.com/">https://github.com/</a> the ‘Social Coding’ website.</p>
 
+<div id="8"></div>
+
 <h2>Setting up a GitHub account</h2>
 
 <p>Note: if you need extra help (beyond what I’ve shared) then you can refer to the official GitHub help pages here: <a href="http://learn.github.com/p/setup.html">http://learn.github.com/p/setup.html</a> So the first thing to do is to register for an account (you have to go through the ‘Pricing and Signup’ page to find the ‘free’ account set-up): <a href="https://github.com/signup/free">https://github.com/signup/free</a> (as you’ll see on that page, there are paid for options available so your team of developers can collaborate with a version-controlled project using GitHub’s servers, rather than having to work out how to set-up their own ‘remote’ server to push code changes to).</p>
@@ -170,6 +186,8 @@ killall Finder
 <p>Once you’ve signed up, I recommend the first thing you do is to create a SSH Public Key (you’re going to need it to be able to securely access remote files - and by ‘remote’ I mean access your project files on the GitHub server). GitHub have a useful page for explaining how to set-up the SSH Public Key: <a href="http://help.github.com/mac-key-setup/">http://help.github.com/mac-key-setup/</a>.</p>
 
 <p>Most of you will find that you can skip the first part of the page and head straight down to the section titled ‘Generating a key’ (I mention how to set-up your SSH Public Key below, but do have a read over the provided link as it should help clarify what to do).</p>
+
+<div id="9"></div>
 
 <h2>Generating an SSH Public Key</h2>
 
@@ -201,6 +219,8 @@ Enter file in which to save the key (/Users/tekkub/.ssh/id_rsa):
 
 <p>…once copied into your clipboard, go back to the relevant GitHub SSH page and paste your key in and save the changes to your account settings. This now leaves just one last thing for you to do while logged into the GitHub website and that is to create a new ‘repository’.</p>
 
+<div id="11"></div>
+
 <h2>Creating a new GitHub repository</h2>
 
 <p>To create a new repository you’ll need to go to this page <a href="https://github.com/repositories/new">https://github.com/repositories/new</a> (you’ll find links all over the place for creating a new repository, but it’s easier if I just link to it for you).</p>
@@ -208,6 +228,8 @@ Enter file in which to save the key (/Users/tekkub/.ssh/id_rsa):
 <p>Now enter the information GitHub asks for (I created a repository called ‘Project Template’ and it generated the following URL: https://github.com/Integralist/Project-Template).</p>
 
 <p>Once you’ve created a new repository on GitHub, it will show you some Terminal commands you can run for setting up Git locally and pushing the project file to GitHub’s online repository.</p>
+
+<div id="12"></div>
 
 <h2>Pushing your project up to GitHub’s repository</h2>
 
@@ -246,6 +268,8 @@ git commit -m &#39;Add some new robot configurations&#39;
 git push origin master
 </code></pre>
 
+<div id="13"></div>
+
 <h2>Removing/Editing files</h2>
 
 <p>To remove a file (e.g. lets remove the ‘robots.txt’ file) simply type…</p>
@@ -261,6 +285,8 @@ git push origin master
 <p>To edit existing files is the same process as adding files. But beware, as you’ll get an error if the file hasn’t actually been changed!</p>
 
 <p>Remember, Git tracks file <em>content</em>, NOT individual files. So it wont like you wasting its time by uploading files that haven’t changed at all.</p>
+
+<div id="14"></div>
 
 <h2>Git Tips</h2>
 
@@ -366,6 +392,8 @@ git push origin master
 
 <p>e.g. my<em>first</em>tag-1-gd8a7d27*</p>
 
+<div id="15"></div>
+
 <h2>Tell Git to ignore certain files and formats</h2>
 
 <p><code>.gitignore</code> is a file that you can create to hold rules about what items Git should ignore.</p>
@@ -386,6 +414,8 @@ git push origin master
 <pre><code>*.log
 !errors.log
 </code></pre>
+
+<div id="16"></div>
 
 <h2>Best practices for Commit Messages</h2>
 
@@ -413,6 +443,8 @@ git push origin master
 <p>When writing your commit message it’s probably a good idea to write in the ‘present tense’ (e.g. ‘fix’ rather than ‘fixed’) - this is to help keep consistency between other git commands such as <code>git merge</code> | <code>git revert</code>.</p>
 
 <p>Also, when writing the ‘body’ part of your commit message, make sure to keep the character length to 72 per line. Feel free to read up on the details of why at <a href="http://tbaggery.com/">tbaggery.com</a>, but the principle is basically that using certain git commands on certain set-ups could cause the text to overflow off the edge of the screen. The previous link also includes some tips on how to achieve this via Vim or TextMate.</p>
+
+<div id="17"></div>
 
 <h2>Conclusion</h2>
 

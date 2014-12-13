@@ -20,13 +20,13 @@
 <h1>Rack Middleware</h1>
 
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#how-middleware-works">How middleware works</a></li>
-<li><a href="#simple-example">Simple example</a></li>
-<li><a href="#custom-cache-middleware">Custom Cache Middleware</a></li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">How middleware works</a></li>
+<li><a href="#3">Simple example</a></li>
+<li><a href="#4">Custom Cache Middleware</a></li>
 </ul>
 
-<div id="introduction"></div>
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
@@ -52,6 +52,8 @@
 <p>The above example demonstrates the most minimalistic implementation by using a <a href="https://gist.github.com/Integralist/9994331">Lambda</a> function (that link is to a Gist I wrote a while ago demonstrating Lambda shorthand syntax and other concepts such as partial application and currying). </p>
 
 <p>This works because Ruby&#39;s <code>Proc</code> has an internal <code>call</code> method (remember in the above description it stated the object that handles incoming requests must have a <code>call</code> method)</p>
+
+<div id="2"></div>
 
 <h2>How middleware works</h2>
 
@@ -113,6 +115,8 @@ app = Rack::Builder.new do
 end
 </code></pre>
 
+<div id="3"></div>
+
 <h2>Simple example</h2>
 
 <pre><code>use Rack::Lint # gives more descriptive error messages when responses aren&#39;t valid
@@ -162,6 +166,8 @@ run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&q
 <pre><code>&quot;LogIt: &lt;H1&gt;HELLO WORLD&lt;/H1&gt;&quot;
 127.0.0.1 - - [15/Nov/2014 11:21:07] &quot;GET / HTTP/1.1&quot; 200 - 0.0006
 </code></pre>
+
+<div id="4"></div>
 
 <h2>Custom Cache Middleware</h2>
 

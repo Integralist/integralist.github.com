@@ -20,21 +20,25 @@
 <h1>Understanding recursion in functional JavaScript programming</h1>
 
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#the-problem">The problem</a></li>
-<li><a href="#tail-call-optimisation">Tail Call Optimisation</a></li>
-<li><a href="#the-solution">The solution</a></li>
-<li><a href="#replace-recursion-with-a-loop">Replace Recursion with a Loop</a></li>
-<li><a href="#a-more-advanced-solution">A more advanced solution</a></li>
-<li><a href="#explanation">Explanation</a></li>
-<li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">The problem</a></li>
+<li><a href="#3">Tail Call Optimisation</a></li>
+<li><a href="#4">The solution</a></li>
+<li><a href="#5">Replace Recursion with a Loop</a></li>
+<li><a href="#6">A more advanced solution</a></li>
+<li><a href="#7">Explanation</a></li>
+<li><a href="#8">Conclusion</a></li>
 </ul>
+
+<div id="1"></div>
 
 <h2>Introduction</h2>
 
 <p>This post isn&#39;t about <a href="http://en.wikipedia.org/wiki/Functional_Programming">Functional Programming</a> per se, as there are many parts to pure FP (seen in Lisp, Clojure, Haskell etc) which we can&#39;t achieve completely in the JavaScript language (for example, implementing fundamental principles of FP such as &quot;immutable data&quot; is very difficult in a language designed around allowing data structures to be mutable. Although immutable data would be a lot easier with ES5 getters/setters and ES6 proxies). </p>
 
 <p>What we do cover is recursion and a problem known as &quot;tail call optimisation&quot; and how to work around it in JavaScript. </p>
+
+<div id="2"></div>
 
 <h2>The problem</h2>
 
@@ -83,6 +87,8 @@ sum(1, 10); // =&gt; 11
 
 <p>This problem can occur very easily (as we&#39;ve seen in this simple code example).</p>
 
+<div id="3"></div>
+
 <h2>Tail Call Optimisation</h2>
 
 <p>In other programming languages the recursion could be rewritten in such a way that the engine would recognise a recursive execution was happening and optimise the code internally into a loop form. This is called a &quot;tail call optimisation&quot; (TCO). </p>
@@ -116,6 +122,8 @@ sum(1, 10); // =&gt; 11
 
 <p>For now, we need an alternative solution.</p>
 
+<div id="4"></div>
+
 <h2>The solution</h2>
 
 <p>The fix to this problem (in JavaScript at least) is to consume fewer stacks.</p>
@@ -125,6 +133,8 @@ sum(1, 10); // =&gt; 11
 <p>The problem with using a loop is that it&#39;s not as elegant as the recursive style we associate with functional programming.</p>
 
 <p>Another solution is to use a type of functional pattern called &quot;trampolining&quot;. Let&#39;s take a look at one implementation of it...</p>
+
+<div id="5"></div>
 
 <h2>Replace Recursion with a Loop</h2>
 
@@ -172,6 +182,8 @@ sum(1, 10); // =&gt; 11
 <li>On the next iteration of the <code>while</code> loop, <code>f</code> is now a value and not a function and so the <code>while</code> loop ends and the accumulated value is returned to the <code>sum</code> function which returns that as its accumulated value.</li>
 </ul>
 
+<div id="6"></div>
+
 <h2>A more advanced solution</h2>
 
 <p>The previous code we just looked at works fine, but it required us to modify our code to work with the &#39;trampoline&#39; pattern. This is a bit of a pain and means if we have lots of recursive code then it means each one might need subtle changes to accommodate this pattern.</p>
@@ -218,6 +230,8 @@ sum(1, 100000) // =&gt; 100001
 
 <p>Let&#39;s now take a look at how it works.</p>
 
+<div id="7"></div>
+
 <h2>Explanation</h2>
 
 <p>Be warned that understanding this code <em>could</em> take a while (lord knows it took me long enough to figure it out; that&#39;s what prompted me to write this post, so I wouldn&#39;t forget!). </p>
@@ -257,6 +271,8 @@ sum(1, 100000) // =&gt; 100001
 <li>And <em>that</em> is where the recursive magic happens. At some point our code is going to call <code>sum</code> with the <code>y</code> argument set to zero meaning that when the <code>accumulator</code> function calls our code the condition <code>y &gt; 0</code> will fail and so we return the value of <code>x</code> (which has been incremented each time along the way).</li>
 <li>When that happens, <code>x</code> is returned and assigned as the value to the <code>value</code> variable, and so our code never called <code>sum</code> and thus the <code>accumulated</code> Array is never modified again; meaning the <code>while</code> loop condition inside the <code>accumulator</code> function will fail and thus the <code>accumulator</code> function will end returning whatever value is stored inside the <code>value</code> variable (which in this example is the value of <code>x</code>).</li>
 </ul>
+
+<div id="8"></div>
 
 <h2>Conclusion</h2>
 
