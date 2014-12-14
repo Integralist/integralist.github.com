@@ -80,5 +80,9 @@ end
 
 posts = Dir.glob "posts/*.md"
 
+start = Time.now
+
 generate_posts posts
 generate_index posts
+
+p "Execution time: #{Time.now - start} seconds"
