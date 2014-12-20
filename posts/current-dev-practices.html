@@ -198,11 +198,28 @@ Location: Address
 
 <p>A slightly more awkward example though: imagine we have one of those large &#39;web 2.0&#39; (how old does that sound already!) footer areas where the designer has a massive list of helpful links and contact information. The structure of that might be something like this…</p>
 
-<p>Services     | Social        | Contacts
------------- | ------------- | ------------
-Service A    | Facebook      | 00000 000000
-Service B    | Twitter       | 11111 111111
-Service C    | Google+       | 22222 222222</p>
+<table>
+    <tr>
+        <th>Services</th>
+        <th>Social</th>
+        <th>Contacts</th>
+    </tr>
+    <tr>
+        <td>Service A</td>
+        <td>Facebook</td>
+        <td>00000 000000</td>
+    </tr>
+    <tr>
+        <td>Service B</td>
+        <td>Twitter</td>
+        <td>11111 111111</td>
+    </tr>
+    <tr>
+        <td>Service C</td>
+        <td>Google+</td>
+        <td>22222 222222</td>
+    </tr>
+</table>
 
 <p>…you <em>could</em> use a <code>&lt;dl&gt;</code> element, but is this strictly the correct element to use? An example of what that would look like is…</p>
 
