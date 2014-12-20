@@ -15,9 +15,10 @@ def render_index_content(content)
 end
 
 def wrapper(content, is_index = false)
-  title  = h1_from(content)
-  header = interpolate(File.read("fixture/header.html"), is_index, title)
-  footer = interpolate(File.read("fixture/footer.html"), is_index)
+  title   = h1_from(content)
+  header  = interpolate(File.read("fixture/header.html"), is_index, title)
+  footer  = interpolate(File.read("fixture/footer.html"), is_index)
+  content = language_highlighting content
   "#{header}\n#{content}\n#{footer}"
 end
 
@@ -28,6 +29,10 @@ end
 
 def determine_root(is_index)
   is_index ? "./" : "../"
+end
+
+def language_highlighting(content)
+  content.gsub(/<!--(.+?)-->\n\n<pre><code>/, '<pre><code class="\1">') # replacement needs to be inside single quotes for capture group to be inserted?
 end
 
 def h1_from(content)
