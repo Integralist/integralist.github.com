@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>JavaScript 101</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -53,15 +54,40 @@
 
 <h2>Terminology</h2>
 
-<p>Term                | Example
-------------------- | -------------
-expression          | An expression is a command that the JavaScript engine can <em>evaluate</em> to produce a value
-statement           | A statement is a command that can be executed (statements are terminated with a semicolon)
-identifier          | A name (e.g. variable name, function name, labels for loops).
-function declaration| <code>function myFunction(){ /* code */ }</code>
-function expression | <code>var myFunction = function(){ /* code */ };</code>
-primitive           | <code>undefined</code>, <code>null</code>, <code>boolean</code>, <code>string</code> and <code>number</code>
-operator            | <code>+</code>, <code>-</code>, <code>!</code>, <code>++</code>, <code>===</code>, <code>&amp;&amp;</code>, <code>typeof</code></p>
+<table>
+    <tr>
+        <th>Term</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>expression</td>
+        <td>An expression is a command that the JavaScript engine can <em>evaluate</em> to produce a value</td>
+    </tr>
+    <tr>
+        <td>statement</td>
+        <td>A statement is a command that can be executed (statements are terminated with a semicolon)</td>
+    </tr>
+    <tr>
+        <td>identifier</td>
+        <td>A name (e.g. variable name, function name, labels for loops).</td>
+    </tr>
+    <tr>
+        <td>function declaration</td>
+        <td><code>function myFunction(){ /* code */ }</code></td>
+    </tr>
+    <tr>
+        <td>function expression</td>
+        <td><code>var myFunction = function(){ /* code */ };</code></td>
+    </tr>
+    <tr>
+        <td>primitive</td>
+        <td><code>undefined</code>, <code>null</code>, <code>boolean</code>, <code>string</code> and <code>number</code></td>
+    </tr>
+    <tr>
+        <td>operator</td>
+        <td><code>+</code>, <code>-</code>, <code>!</code>, <code>++</code>, <code>===</code>, <code>&&</code>, <code>typeof</code></td>
+    </tr>
+</table>
 
 <h3>Expressions</h3>
 
@@ -101,7 +127,7 @@ operator            | <code>+</code>, <code>-</code>, <code>!</code>, <code>++</
 
 <p>To avoid declaring global properties/methods there are certain &#39;patterns&#39; that have been designed to work around this issue, such as the IIFE pattern…</p>
 
-<pre><code>/*
+<pre><code class="language-javascript">/*
  * this pattern is referred to as an IIFE (immediately invoked function expression)
  * the function is immediately executed and all code within it is scoped to the function
  * when executed we pass through &#39;this&#39; which refers to the global object
@@ -156,7 +182,7 @@ variable becomes a global variable (i.e. is available any where within the JavaS
 
 <p>To see why this is a problem first imagine you have a web page you&#39;re working on and in which you have included a 3rd party JavaScript file (i.e. a script written by another developer). Now imagine the content of that 3rd party script is as follows:</p>
 
-<pre><code>// 3rd party script written by another developer...
+<pre><code class="language-javascript">// 3rd party script written by another developer...
 var my_name = &#39;Mark&#39;;
 </code></pre>
 
@@ -166,7 +192,7 @@ var my_name = &#39;Mark&#39;;
 
 <p>So now imagine you&#39;re going to add your own code to the page. You write the following…</p>
 
-<pre><code>function do_something(){
+<pre><code class="language-javascript">function do_something(){
     my_name = &#39;Bob&#39;;
 }
 </code></pre>
@@ -175,7 +201,7 @@ var my_name = &#39;Mark&#39;;
 
 <p>To fix this you would simply make sure you properly declared your variable like so…</p>
 
-<pre><code>function do_something(){
+<pre><code class="language-javascript">function do_something(){
     var my_name = &#39;Bob&#39;;
 }
 </code></pre>
@@ -202,7 +228,7 @@ var my_name = &#39;Mark&#39;;
 
 <p>What this means is if you have an Array and want to copy it so you can make changes to the copy (e.g. you want to leave the original as it is) then you might think to do something like this…</p>
 
-<pre><code>var my_arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;];
+<pre><code class="language-javascript">var my_arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;];
 var new_arr = my_arr;
 
 new_arr.push(&#39;d&#39;);
@@ -220,7 +246,7 @@ new_arr.push(&#39;d&#39;);
 
 <p>For example:</p>
 
-<pre><code>var obj = {
+<pre><code class="language-javascript">var obj = {
     name: &#39;Mark&#39;,
     location: &#39;London, England&#39;
 };
@@ -233,7 +259,7 @@ A function added to an Object is known as a &#39;method&#39;  </p>
 
 <p>So for example:</p>
 
-<pre><code>var obj = {
+<pre><code class="language-javascript">var obj = {
     /* Property */
         name: &#39;Mark&#39;,
     /* Property */
@@ -265,13 +291,13 @@ A function added to an Object is known as a &#39;method&#39;  </p>
 
 <p>Using the previous example code, if your program was written by you then to access the &#39;name&#39; property you would simply use: <code>obj.name</code> - but if your application accepted input from the user (where by you asked them what property/method they wanted to access) you obviously don&#39;t know before hand what the user is going to choose. In this instance you would use the bracket notation: </p>
 
-<pre><code>var user_input = document.getElementById(&#39;my_form_input&#39;);
+<pre><code class="language-javascript">var user_input = document.getElementById(&#39;my_form_input&#39;);
 console.log(obj[user_input]);
 </code></pre>
 
 <p>The other time you&#39;ll need to use bracket notation is if you want to access a property that has special characters:</p>
 
-<pre><code>var obj = { 
+<pre><code class="language-javascript">var obj = { 
     &#39;my property&#39;: 123 // YOU SHOULD NEVER NEED TO CREATE A PROPERTY NAME LIKE THIS
 };
 
@@ -288,7 +314,7 @@ console.log(obj[&#39;my property&#39;]);
 
 <p>But there is a trick to accessing an object&#39;s <em>class</em> attribute and that is to call the <code>toString()</code> method on the top level <code>Object.prototype</code> but using it on the relevant object you want to get the class of. The following example demonstrates the most common use case of accessing the <em>class</em> attribute: trying to work out if an object is actually an <code>Array</code>…</p>
 
-<pre><code>var arr = [&#39;a&#39;,&#39;b&#39;,&#39;c&#39;];
+<pre><code class="language-javascript">var arr = [&#39;a&#39;,&#39;b&#39;,&#39;c&#39;];
 
 console.log(typeof arr); // =&gt; &quot;object&quot; - well that&#39;s not right, it should return the type as &#39;Array&#39;! (note: this is a known JavaScript bug)
 
@@ -309,7 +335,7 @@ console.log(Object.prototype.toString.call(arr)); // =&gt; &quot;[object Array]&
 
 <p>An Object is effectively a mapping of names (identifiers) to values… </p>
 
-<pre><code>var obj = {
+<pre><code class="language-javascript">var obj = {
     name: value,
     name: value,
     name: value
@@ -318,12 +344,12 @@ console.log(Object.prototype.toString.call(arr)); // =&gt; &quot;[object Array]&
 
 <p>…an Array is the same with the exception that the &#39;name&#39; identifiers are automatically incremented numerical values. So an Array like this…</p>
 
-<pre><code>var arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;];
+<pre><code class="language-javascript">var arr = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;];
 </code></pre>
 
 <p>…would effectively be similar to the following object…</p>
 
-<pre><code>var obj = {
+<pre><code class="language-javascript">var obj = {
     0: &#39;a&#39;,
     1: &#39;b&#39;,
     2: &#39;c&#39;
@@ -405,7 +431,7 @@ console.log(Object.prototype.toString.call(arr)); // =&gt; &quot;[object Array]&
 
 <h3>If Statement</h3>
 
-<pre><code>if (condition) {
+<pre><code class="language-javascript">if (condition) {
 
     // if &#39;condition&#39; evaluated to true then run this code
 
@@ -422,7 +448,7 @@ console.log(Object.prototype.toString.call(arr)); // =&gt; &quot;[object Array]&
 
 <p>So a basic example would be something like this…</p>
 
-<pre><code>var can_drink = false;
+<pre><code class="language-javascript">var can_drink = false;
 var age = 18;
 
 if (age &gt;= 18) {
@@ -434,7 +460,7 @@ if (age &gt;= 18) {
 
 <p>If you have lots of checks against the same variable/condition then you&#39;re better off using a <code>switch</code> statement… </p>
 
-<pre><code>switch (condition) {
+<pre><code class="language-javascript">switch (condition) {
     case x:
         // Execute this code block
         break;
@@ -452,7 +478,7 @@ if (age &gt;= 18) {
 
 <p>An example of using this statement would be… </p>
 
-<pre><code>var car = &#39;Porsche&#39;;
+<pre><code class="language-javascript">var car = &#39;Porsche&#39;;
 
 switch (car) {
     case &#39;Ford&#39;:
@@ -474,12 +500,12 @@ switch (car) {
 
 <p>For very short <code>if</code> statements you can also use a shortened syntax (a conditional operator sometimes referred to as a &#39;ternary&#39; operator because of its three operands). The syntax is like so…</p>
 
-<pre><code>condition ? true : false
+<pre><code class="language-javascript">condition ? true : false
 </code></pre>
 
 <p>…and can be used like so…</p>
 
-<pre><code>var age = 18;
+<pre><code class="language-javascript">var age = 18;
 var can_drink = (age &gt;= 18) ? true : false; // can_drink will equal a Boolean value of true
 
 var x = &#39;abc&#39;;
@@ -496,7 +522,7 @@ var y = (x === &#39;abc&#39;) ? &#39;def&#39; : &#39;xyz&#39;; // y will equal a
 
 <p>For example, with an <code>if</code> conditional statement JavaScript will try to coerce the expression into either <code>true</code> or <code>false</code> like so… </p>
 
-<pre><code>var element = document.getElementById(&#39;js-element&#39;);
+<pre><code class="language-javascript">var element = document.getElementById(&#39;js-element&#39;);
 
 if (element) {
     // if the DOM element is available then this conditional
@@ -511,7 +537,7 @@ if (element) {
 
 <p>In the above example JavaScript automatically converts the condition into a Boolean, but you can manually coerce a value into a Boolean by using the double negation operator <code>!!</code> like so...</p>
 
-<pre><code>var obj = { age: 0, year: 1980 };
+<pre><code class="language-javascript">var obj = { age: 0, year: 1980 };
 
 !!obj.age // =&gt; false (because zero coerces to false)
 !!obj.year // =&gt; true (any number greater than zero coerces to true)
@@ -519,7 +545,7 @@ if (element) {
 
 <p>You can also use a single negation operator <code>!</code> to return the opposite Boolean value of an object (this is useful for saying &#39;if NOT x&#39;)…</p>
 
-<pre><code>var bool = false;
+<pre><code class="language-javascript">var bool = false;
 
 if (!bool) {
     // this statement is executed if &#39;bool&#39; is NOT true (i.e. if it&#39;s false)
@@ -542,14 +568,14 @@ if (!bool) {
 
 <p>An example of the function syntax is as follows…</p>
 
-<pre><code>function identifier (parameters) {
+<pre><code class="language-javascript">function identifier (parameters) {
     // statements
 }
 </code></pre>
 
 <p>…which could be used like so…</p>
 
-<pre><code>function add (a, b) {
+<pre><code class="language-javascript">function add (a, b) {
     return a + b;
 }
 
@@ -562,7 +588,7 @@ console.log(add(1, 1)); // =&gt; 2
 
 <p>Within a function you can access all arguments via a special <code>arguments</code> property…</p>
 
-<pre><code>function test (a, b, c) { 
+<pre><code class="language-javascript">function test (a, b, c) { 
     console.log(arguments); 
 }
 
@@ -583,7 +609,7 @@ test(1, 2, 3) // =&gt; [1, 2, 3]
 
 <p>The purpose of these methods is to allow you to <em>borrow</em> a function/method from another object. The following code demonstrates its usage and how powerful it can be… </p>
 
-<pre><code>var obj1 = {
+<pre><code class="language-javascript">var obj1 = {
     name: &#39;Bob&#39;
 };
 
@@ -616,7 +642,7 @@ obj2.speak.call(obj1); // =&gt; &#39;My name is Bob&#39;
 
 <p>An example of how to emulate Class style syntax in JavaScript (currently) is by using functions as &#39;Constructors&#39; like so… </p>
 
-<pre><code>var Person = function (settings) {
+<pre><code class="language-javascript">var Person = function (settings) {
    // Instance properties (any new instances of the Person class will have these properties)
    this.name = settings.name || &#39;no name given&#39;;
    this.age = settings.age || &#39;no age given&#39;;
@@ -668,7 +694,7 @@ user.getNameAndAge();
 
 <p>An example of this is as follows…</p>
 
-<pre><code>var person = {
+<pre><code class="language-javascript">var person = {
         names: [&#39;James&#39;, &#39;Neil&#39;, &#39;Russ&#39;, &#39;Stuart&#39;]
     };
 
@@ -689,7 +715,7 @@ people.speak.call(person, 1); // =&gt; &#39;Hi, my name is Neil&#39;
 
 <p>The following example demonstrates how this works… </p>
 
-<pre><code>function extend(destination, source, overwrite) {
+<pre><code class="language-javascript">function extend(destination, source, overwrite) {
     var overwrite = overwrite || false;
     for (var i in source) {
         if (source.hasOwnProperty(i)) {
@@ -745,6 +771,7 @@ person.speak(1); // =&gt; &#39;Hi, my name is Neil&#39;
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

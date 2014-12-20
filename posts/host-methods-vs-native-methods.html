@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Host Methods vs Native Methods</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -52,7 +53,7 @@
 
 <p>To detect a Native method such as Array#forEach you should be able to do the following:</p>
 
-<pre><code>if (!Array.prototype.forEach) { 
+<pre><code class="language-javascript">if (!Array.prototype.forEach) { 
     /* polyfill for missing forEach method */ 
 }
 </code></pre>
@@ -75,7 +76,7 @@
 
 <p>But for testing a host method exists, the following function has become the de-facto standard:</p>
 
-<pre><code>/*
+<pre><code class="language-javascript">/*
  * Feature Testing a Host Method
  * Because a callable host object can legitimately have any typeof result then it can&#39;t be relied upon.
  *
@@ -131,6 +132,7 @@ In older versions of IE (less than 9) it implements some of its host objects not
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

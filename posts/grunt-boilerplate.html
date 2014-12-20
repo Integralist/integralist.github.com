@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Grunt Boilerplate</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -89,7 +90,7 @@
 
 <p>Below is the <code>package.json</code> file for my Grunt Boilerplate project...</p>
 
-<pre><code>{
+<pre><code class="language-javascript">{
     &quot;name&quot;: &quot;Grunt Boilerplate&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;description&quot;: &quot;This is a project set-up using Grunt to take case of some standard tasks such as: compiling AMD based modules using RequireJS, watching/compiling Sass into CSS, watching/linting JS code and some other things such as running unit tests&quot;,
@@ -169,7 +170,7 @@
 
 <p>Because Grunt is run using Node.js you&#39;ll notice the content of the file is wrapped in a closure and assigned to a module <code>exports</code> property…</p>
 
-<pre><code>module.exports = function (grunt) {
+<pre><code class="language-javascript">module.exports = function (grunt) {
     grunt.initConfig({
         // our Grunt task settings
     });
@@ -190,7 +191,7 @@
 
 <p>Here is an example...</p>
 
-<pre><code>sass: {
+<pre><code class="language-javascript">sass: {
     dist: {
         options: {
             style: &#39;compressed&#39;,
@@ -246,7 +247,7 @@
 
 <p>This task is effectively the <code>r.js</code> build script that comes with RequireJS so I won&#39;t go into the details of how to write a build script - I&#39;ll instead refer you to the <a href="https://github.com/jrburke/r.js/blob/master/build/example.build.js">r.js documentation</a>, but know that the following has exactly the same settings as you would have used for <code>r.js</code> previously… </p>
 
-<pre><code>requirejs: {
+<pre><code class="language-javascript">requirejs: {
     compile: {
         options: {
             baseUrl: &#39;./app&#39;,
@@ -267,7 +268,7 @@
 
 <p>JSHint is a task that mimics the <a href="http://www.jshint.com/">web interface</a> in that it lets you specify files to lint (i.e. makes sure the code is written with valid syntax according to a set of rules you want it to abide by)… </p>
 
-<pre><code>jshint: {
+<pre><code class="language-javascript">jshint: {
     files: [&#39;Gruntfile.js&#39;, &#39;app/**/*.js&#39;, &#39;!app/release/**&#39;, &#39;modules/**/*.js&#39;, &#39;specs/**/*Spec.js&#39;],
     options: {
         curly:   true,
@@ -322,7 +323,7 @@
 
 <p>The first first task it relies on is the <code>connect</code> task which fires up a web server using PhantomJS. But realise that this isn&#39;t required if your scripts have no DOM interaction (unlikely if you&#39;re doing web development), but because we&#39;re doing DOM manipulation and we&#39;re testing that interaction we need a DOM to test against, hence the need for the <code>connect</code> web server task… </p>
 
-<pre><code>connect: {
+<pre><code class="language-javascript">connect: {
     test: {
         port: 8000
     }
@@ -331,7 +332,7 @@
 
 <p>…after that we set-up the actual <code>jasmine</code> task… </p>
 
-<pre><code>jasmine: {
+<pre><code class="language-javascript">jasmine: {
     src: [&#39;app/**/*.js&#39;, &#39;!app/release/**&#39;],
     options: {
         host: &#39;http://127.0.0.1:8000/&#39;,
@@ -366,7 +367,7 @@
 
 <p>As you can see from the below example we&#39;re using the <code>expand: true</code> setting (and subsequent settings) to tell Grunt where to find our images and where to export them to… </p>
 
-<pre><code>imagemin: {
+<pre><code class="language-javascript">imagemin: {
     png: {
         options: {
             optimizationLevel: 7
@@ -404,7 +405,7 @@
 
 <p>As you can see from the below example we&#39;ve NOT used the <code>expand: true</code> setting but instead this task provided a slightly different api to let us tell Grunt where to find our HTML files and where to export the minified versions to (but effectively we could use <code>expand: true</code> if we wanted)…</p>
 
-<pre><code>htmlmin: {
+<pre><code class="language-javascript">htmlmin: {
     dist: {
         options: {
             removeComments: true,
@@ -428,7 +429,9 @@
 
 <p>For example, you could create a task which when run would execute a specific set of tasks… </p>
 
-<p><code>grunt.registerTask(&#39;release&#39;, [&#39;jshint&#39;, &#39;jasmine&#39;, &#39;requirejs&#39;, &#39;sass:dist&#39;, &#39;imagemin&#39;, &#39;htmlmin&#39;]);</code></p>
+<!--language-javascript-->
+
+<p>grunt.registerTask(&#39;release&#39;, [&#39;jshint&#39;, &#39;jasmine&#39;, &#39;requirejs&#39;, &#39;sass:dist&#39;, &#39;imagemin&#39;, &#39;htmlmin&#39;]);</p>
 
 <p>…in the above example we&#39;ve created a &#39;release&#39; task which when run will get our files ready to be pushed to our production environment. I would typically run this task when I was finished building my application.</p>
 
@@ -436,7 +439,9 @@
 
 <p>When you execute the command <code>grunt</code> by itself then it will  look for a registered task called <code>default</code>… </p>
 
-<p><code>grunt.registerTask(&#39;default&#39;, [&#39;jshint&#39;, &#39;connect&#39;, &#39;jasmine&#39;, &#39;sass:dev&#39;]);</code></p>
+<!--language-javascript-->
+
+<p>grunt.registerTask(&#39;default&#39;, [&#39;jshint&#39;, &#39;connect&#39;, &#39;jasmine&#39;, &#39;sass:dev&#39;]);</p>
 
 <p>…in this case we&#39;re telling it to execute our JavaScript linting task, then to check our unit tests are still passing and finally to generate debug versions of our CSS.</p>
 
@@ -444,7 +449,7 @@
 
 <p>Instead of manually running a Grunt command every time we make a change (e.g. imagine making a change to your Sass file and then having to go to the terminal and running <code>grunt sass:dev</code> to get the Sass to compile to CSS just so you can see the change reflected in your browser), we can instead get Grunt to do the hard work for us and to automatically run a task (or multiple tasks) whenever a specific set of files have been changed/updated… </p>
 
-<pre><code>watch: {
+<pre><code class="language-javascript">watch: {
     files: [&#39;&lt;%= jshint.files %&gt;&#39;, &#39;&lt;%= jasmine.options.specs %&gt;&#39;, &#39;&lt;%= sass.dev.src %&gt;&#39;],
     tasks: &#39;default&#39;
 }
@@ -487,6 +492,7 @@
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Vim Workflow</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -99,12 +100,6 @@ One to hold our code and one to handle our terminal.</p>
 
 <h2>Downsides to using tmux panes?</h2>
 
-<p>~~Yes, there is one downside to using tmux&#39;s panes which I can&#39;t seem to work around, and that is my speed is restricted.~~</p>
-
-<p>~~By that I mean: if I move to another pane I have to wait a fraction of a second before I can use my arrow keys (or <code>hjkl</code> keys) as tmux will try to move me back to the other pane again.~~</p>
-
-<p>~~That can be frustrating, but I&#39;m learning to live with it.~~</p>
-
 <p><strong>UPDATE:</strong> there is a solution!</p>
 
 <blockquote>
@@ -113,7 +108,7 @@ One to hold our code and one to handle our terminal.</p>
 
 <p>So to resolve the issue you re-bind the keys without <code>-r</code>:</p>
 
-<pre><code>bind-key Up    select-pane -U
+<pre><code class="language-ini">bind-key Up    select-pane -U
 bind-key Down  select-pane -D
 bind-key Left  select-pane -L
 bind-key Right select-pane -R
@@ -168,6 +163,7 @@ bind-key Right select-pane -R
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

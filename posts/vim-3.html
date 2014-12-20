@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Vim Workflow (Part Deux)</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -145,7 +146,7 @@ and awkward to use.</p>
 spot for my fingers to hit it whenever I need it. So I map a few of the window
 keys to use the leader key instead...</p>
 
-<pre><code>&quot; Make handling Vim windows easier
+<pre><code class="language-ini">&quot; Make handling Vim windows easier
 map &lt;leader&gt;w- &lt;C-W&gt;- &quot; smaller
 map &lt;leader&gt;w+ &lt;C-W&gt;+ &quot; larger
 map &lt;leader&gt;w[ &lt;C-W&gt;= &quot; equal
@@ -342,7 +343,7 @@ his dotfile set-up).</p>
 
 <h3>Settings</h3>
 
-<pre><code>&quot; switch syntax highlighting on, when the terminal has colors
+<pre><code class="language-ini">&quot; switch syntax highlighting on, when the terminal has colors
 syntax on
 
 &quot; use vim, not vi api
@@ -446,7 +447,7 @@ set splitright
 
 <h3>File types</h3>
 
-<pre><code>&quot; turn indentation on
+<pre><code class="language-ini">&quot; turn indentation on
 filetype indent on
 
 &quot; enable filetype plugins
@@ -455,7 +456,7 @@ filetype plugin on
 
 <h3>Commands</h3>
 
-<pre><code>&quot; jump to last cursor
+<pre><code class="language-ini">&quot; jump to last cursor
 autocmd BufReadPost *
   \ if line(&quot;&#39;\&quot;&quot;) &gt; 0 &amp;&amp; line(&quot;&#39;\&quot;&quot;) &lt;= line(&quot;$&quot;) |
   \   exe &quot;normal g`\&quot;&quot; |
@@ -483,7 +484,7 @@ au Bufread,BufNewFile *.md set filetype=markdown &quot; Vim interprets .md as
 
 <h3>Plugins</h3>
 
-<pre><code>&quot; Declare bundles are handled via Vundle
+<pre><code class="language-ini">&quot; Declare bundles are handled via Vundle
 set rtp+=$HOME/.vim/bundle/vundle
 call vundle#rc()
 
@@ -632,7 +633,8 @@ files specified via arguments when opening Vim.</p>
 <p>The command to run would be (I&#39;m going to use <code>bufdo</code> as I almost never open Vim
 with files specified via arguments, I always use Ctrl-p to open files): </p>
 
-<p><code>:bufdo %s/search/replace/ge | update</code></p>
+<pre><code class="language-bash">:bufdo %s/search/replace/ge | update
+</code></pre>
 
 <p>...the trick is the <code>e</code> flag which tells Vim to ignore any errors (which could
 occur if a file you&#39;re searching doesn&#39;t find a match). </p>
@@ -662,7 +664,8 @@ that&#39;s a crazy number of files (it would be for me working on the BBC News c
 
 <h4>The Unix Way</h4>
 
-<p><code>sed -i -- &#39;s/search_pattern/replacement/&#39; *.txt &amp;&amp; rm *.txt--</code></p>
+<pre><code class="language-bash">sed -i -- &#39;s/search_pattern/replacement/&#39; *.txt &amp;&amp; rm *.txt--
+</code></pre>
 
 <p>...this uses
 <a href="http://www.integralist.co.uk/posts/unix-commands/#sed-find-and-replace">sed</a>
@@ -687,7 +690,8 @@ this via the shell should/could be more efficient than from within Vim).</p>
 <p>The very last way is the same as the previous solution but is the one I use
 now...</p>
 
-<p><code>gsed -i &#39;s/search_pattern/replacement/&#39; **/*.txt</code></p>
+<pre><code class="language-bash">gsed -i &#39;s/search_pattern/replacement/&#39; **/*.txt
+</code></pre>
 
 <p>...this is the GNU version of the sed command which you can install using <code>brew
 install gnu-sed</code>.</p>
@@ -749,7 +753,7 @@ then use: <code>vi(</code> or <code>vi&#39;</code> or <code>vi&quot;</code> (you
 copy and paste to another place in my code. Imagine you have the following
 code...</p>
 
-<pre><code>/**
+<pre><code class="language-javascript">/**
  * @param abc
  */
 function someThing (def) {
@@ -799,7 +803,7 @@ command <code>bd</code> for every buffer currently open. Simple.</p>
 
 <p>Within my .vimrc file I&#39;ve mapped those last two items to more easily accessible keys...</p>
 
-<pre><code>&quot; List Buffers
+<pre><code class="language-ini">&quot; List Buffers
 map &lt;leader&gt;yt :ls&lt;cr&gt;
 
 &quot; Delete all Buffers (runs the delete buffer command on all open buffers)
@@ -887,13 +891,13 @@ end up using a lot.</p>
 
 <p>So it&#39;ll convert...</p>
 
-<pre><code>Here is some text
+<pre><code class="language-ini">Here is some text
 that is split by a line break
 </code></pre>
 
 <p>...into...</p>
 
-<pre><code>Here is some text that is split by a line break
+<pre><code class="language-ini">Here is some text that is split by a line break
 </code></pre>
 
 <h3>Switching case</h3>
@@ -926,7 +930,7 @@ syntax can be a pain to jump through like that.</p>
 <p>Consider (and this is a contrived example, so forgive me, I realise there are
 better ways)...</p>
 
-<pre><code>this.handlePrevImageCalculations = _.debounce(function() {
+<pre><code class="language-javascript">this.handlePrevImageCalculations = _.debounce(function() {
 </code></pre>
 
 <p>...if I want to get my cursor to just before <code>=</code> then pressing <code>e</code> would take about
@@ -993,6 +997,7 @@ things).</p>
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>JavaScript Inheritance</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -44,7 +45,7 @@
 
 <p>A basic example is as follows…</p>
 
-<pre><code>var Person = function (settings) {
+<pre><code class="language-javascript">var Person = function (settings) {
    if (!settings) { settings = {}; } // code defensively
 
    // Instance properties (any new instances of the Person class will have these properties)
@@ -110,6 +111,7 @@ user.getNameAndAge();
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

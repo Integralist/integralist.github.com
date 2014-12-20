@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>jQuery Mobile - loading script files</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -50,7 +51,7 @@
 
 <p>First we need to write a function to insert our script(s):</p>
 
-<pre><code>function insertScript(script, container) {
+<pre><code class="language-javascript">function insertScript(script, container) {
     var elem = document.createElement(&#39;script&#39;);
     elem.type = &#39;text/javascript&#39;;
     elem.src = &#39;Assets/Scripts/&#39; + script + &#39;.js&#39;;
@@ -60,7 +61,7 @@
 
 <p>Next we need to detect the current page (details are in the code comments):</p>
 
-<pre><code>// The &#39;pagechange&#39; event is triggered after the changePage() request has finished loading the page into the DOM 
+<pre><code class="language-javascript">// The &#39;pagechange&#39; event is triggered after the changePage() request has finished loading the page into the DOM 
 // and all page transition animations have completed.
 // See: https://gist.github.com/1336327 for some other page events
 $(document).bind(&#39;pagechange&#39;, function(event){
@@ -108,6 +109,7 @@ $(document).bind(&#39;pagechange&#39;, function(event){
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

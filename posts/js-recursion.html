@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Understanding recursion in functional JavaScript programming</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -50,7 +51,7 @@
 
 <p>The following function <code>sum</code> simply adds two numbers together; but for the purpose of demonstrating recursion (a potentially complex topic) and making it easier to understand, we have written the <code>sum</code> function in a very convoluted way:</p>
 
-<pre><code>function sum(x, y) {
+<pre><code class="language-javascript">function sum(x, y) {
     if (y &gt; 0) {
       return sum(x + 1, y - 1);
     } else {
@@ -75,7 +76,7 @@ sum(1, 10); // =&gt; 11
 
 <p>As we can see, in the above code the JavaScript engine has to create a new stack for each recursive call. For a small sum of <code>1</code> and <code>10</code> this is fine; but if we try to sum <code>1</code> and <code>100000</code> then that&#39;ll require more stacks than we have memory to allocate. This will cause an error like so:</p>
 
-<pre><code>sum(1, 100000);
+<pre><code class="language-javascript">sum(1, 100000);
 // =&gt; `RangeError: Maximum call stack size exceeded`
 </code></pre>
 
@@ -101,7 +102,7 @@ sum(1, 10); // =&gt; 11
 
 <p>The following is an example of a tail optimised version of the previous code...</p>
 
-<pre><code>function sum(x, y) {
+<pre><code class="language-javascript">function sum(x, y) {
     function recur(a, b) {
         if (b &gt; 0) {
             return recur(a + 1, b - 1);
@@ -140,7 +141,7 @@ sum(1, 10); // =&gt; 11
 
 <p>Note: the following code (and my explanation of it) assumes an understanding of the <code>this</code> keyword and changing its context. If you&#39;re unsure about what this means then read more about it <a href="https://github.com/getify/You-Dont-Know-JS/blob/master/this%20&amp;%20object%20prototypes/README.md">here</a>):</p>
 
-<pre><code>function trampoline(f) {
+<pre><code class="language-javascript">function trampoline(f) {
     while (f &amp;&amp; f instanceof Function) {
         f = f();
     }
@@ -192,7 +193,7 @@ sum(1, 10); // =&gt; 11
 
 <p>Let&#39;s take a look at the implementation...</p>
 
-<pre><code>function tco(f) {
+<pre><code class="language-javascript">function tco(f) {
     var value;
     var active = false;
     var accumulated = [];
@@ -284,7 +285,7 @@ sum(1, 100000) // =&gt; 100001
 
 <p>The following code is an example that is NOT tail-call optimised:</p>
 
-<pre><code>function isEvenNaive (num) {
+<pre><code class="language-javascript">function isEvenNaive (num) {
     if (num === 0) {
         return true;
     }
@@ -308,7 +309,7 @@ isEvenNaive(99999);
 
 <p>The following code snippet demonstrates the first step towards trampolining, which is to flatten the stack by requiring the user to manually execute the function over and over:</p>
 
-<pre><code>function isEvenInner (num) {
+<pre><code class="language-javascript">function isEvenInner (num) {
     if (num === 0) {
         return true;
     }
@@ -337,7 +338,7 @@ isEvenInner(8)()()()();
 
 <p>Now, finally, let&#39;s see an example that automates the execution of the flatterned stack:</p>
 
-<pre><code>function trampoline (func, arg) {
+<pre><code class="language-javascript">function trampoline (func, arg) {
     var value = func(arg);
 
     while(typeof value === &quot;function&quot;) {
@@ -369,6 +370,7 @@ isEven(99999);
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

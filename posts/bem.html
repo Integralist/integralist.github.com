@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Maintainable CSS with BEM</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -57,7 +58,7 @@
 
 <p>The HTML is very simple...</p>
 
-<pre><code>&lt;section&gt;
+<pre><code class="language-markup">&lt;section&gt;
     &lt;h1&gt;Sterling Calculator&lt;/h1&gt;
     &lt;form action=&quot;process.php&quot; method=&quot;post&quot;&gt;
         &lt;p&gt;Please enter an amount: (e.g. 92p, &amp;pound;2.12)&lt;/p&gt;
@@ -71,7 +72,7 @@
 
 <p>So lets add in our classes for styling this widget and lets go on to break down what we&#39;ve added and why...</p>
 
-<pre><code>&lt;section class=&quot;widget&quot;&gt;
+<pre><code class="language-markup">&lt;section class=&quot;widget&quot;&gt;
     &lt;h1 class=&quot;widget__header&quot;&gt;Sterling Calculator&lt;/h1&gt;
     &lt;form class=&quot;widget__form&quot; action=&quot;process.php&quot; method=&quot;post&quot;&gt;
         &lt;p&gt;Please enter an amount: (e.g. 92p, &amp;pound;2.12)&lt;/p&gt;
@@ -106,7 +107,7 @@
 
 <p>This means that our CSS code for this widget ends up looking like this…</p>
 
-<pre><code>.widget {
+<pre><code class="language-css">.widget {
     background-color: #FC3;
 }
 
@@ -220,6 +221,7 @@
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

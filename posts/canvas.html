@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Building a game with HTML5 Canvas</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -62,7 +63,7 @@
 
 <p>The HTML is pretty straight forward, it consists of a <code>meta</code> tag which tells the device to set the width to be 760px wide (this is so the game fits the full width of the device) and also specifies that the user cannot resize the content - the reason being is we want to ensure the game is always fitting the screen. After this we have a link to our style sheet - note: there are some declarations in our CSS which are included specifically to help with &#39;touch&#39; based devices (e.g. devices such as smart phones which don&#39;t utilise a &#39;mouse&#39; to interact with the content) - along with a single <code>canvas</code> element (which we could have created via JavaScript but I decided I preferred to have the element coded into the HTML). We also have a checkbox on the page which lets the user make the game a little easier by allowing them to move certain &#39;illegal&#39; puzzle pieces, and finally we have the <code>script</code> element which obviously is pointing to our JavaScript file which creates the game… </p>
 
-<pre><code>&lt;!doctype html&gt;
+<pre><code class="language-markup">&lt;!doctype html&gt;
 &lt;html lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;
     &lt;head&gt;
         &lt;meta charset=&quot;utf-8&quot;&gt;
@@ -88,7 +89,7 @@
 
 <p>The <code>canvas</code> selector sets a rule which has some specific declarations (along with appropriate vendor prefixes) that are applied to any <code>canvas</code> element found in the page. The declaration we&#39;re applying is <a href="https://developer.mozilla.org/en/CSS/-moz-user-select"><code>user-select</code></a> which controls the selection a user makes on the content. You&#39;ll see we&#39;ve set this to <code>none</code>. What this does is it prevents any iOS devices (and potentially other devices - hence the use of the vendor prefixes) from showing an additional option which lets the user carry out an action (e.g. &#39;copy&#39;). The reason I want to prevent this is because in our game we also want users to be able to &#39;drag and drop&#39; puzzle pieces (rather than just letting them &#39;click&#39; or &#39;touch&#39; to move a puzzle piece) and the way we do this (again, we&#39;ll go into this in more detail later) is by checking how long the user holds their &#39;touch&#39; down on the puzzle piece. But if you have ever used an iOS device you&#39;ll know that if you hold your touch down for more than a second you&#39;ll see a context menu pop up asking you to either &#39;Select, Select All, Paste&#39; or &#39;Copy&#39; and it&#39;s these options we want to disable while the user is playing our game.</p>
 
-<pre><code>body {
+<pre><code class="language-css">body {
     font-family: Helvetica, Arial, sans-serif;
     font-size: 100%; /* this sets 1em to equal approximately 16px */
     margin: 0;
@@ -136,7 +137,7 @@ canvas {
 
 <p>The polyfill I&#39;m using I&#39;ve modified slightly so that it creates a property of the global object whose value is a boolean which indicates if it is supported by the user&#39;s browser or not. The reason I store this result is because later in the script when I specify a &#39;step amount&#39; (e.g. how far I want the puzzle piece to move on each iteration) I found that I got better performance setting a higher step amount for browsers that support <code>requestAnimationFrame</code> so I want to change the step amount depending on if I&#39;m using <code>setInterval</code> or not.</p>
 
-<pre><code>// Polyfill for requestAnimationFrame which I&#39;ve modified from Paul Irish&#39;s original
+<pre><code class="language-javascript">// Polyfill for requestAnimationFrame which I&#39;ve modified from Paul Irish&#39;s original
 // See: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 (function (global) {
     var lastTime = 0,
@@ -175,7 +176,7 @@ canvas {
 
 <p>Following this is our main script which we&#39;ve wrapped in an &#39;immediately invoked function expression&#39; (or <a href="benalman.com/news/2010/11/immediately-invoked-function-expression/">IIFE</a> for short). You&#39;ll see that we&#39;re passing in the value <code>this</code> which in this context is the global object (i.e. <code>Window</code>)… </p>
 
-<pre><code>(function (global) {
+<pre><code class="language-javascript">(function (global) {
     // REST OF OUR CODE
 }(this));
 </code></pre>
@@ -192,7 +193,7 @@ canvas {
 
 <p>…and this structure applies to all executing contexts (e.g. sub functions also have the same structure). So looking at our code you can see we&#39;ve got a whole ton of variables specified which are used throughout the program. The reason for this is because of how the JavaScript interpreter handles variables when the program starts, which is to invisibly move variable declarations to the top of their containing scope. So to avoid confusion I try (wherever possible) to keep my variable declarations at the top… </p>
 
-<pre><code>// Following variables are related to the creation of the canvas&#39; and specific configuration
+<pre><code class="language-javascript">// Following variables are related to the creation of the canvas&#39; and specific configuration
     var doc = global.document,
         canvas = doc.getElementById(&quot;game&quot;),
         context = canvas.getContext(&quot;2d&quot;),
@@ -235,7 +236,7 @@ canvas {
 
 <p>You&#39;ll also see that we&#39;ve created an object called <code>eventsMap</code> which we&#39;re using to map our own events (such as &#39;select&#39;, &#39;down&#39;, &#39;up&#39;, &#39;move&#39;) to the relevant mouse events available. This is because it makes it easier for us to swap to using touch events if they are supported by the users browser. So for example, just after setting up these variables we do a check for whether touch events are supported and if they are we swap the mouse specific values for touch specific values… </p>
 
-<pre><code>if (&quot;ontouchstart&quot; in global) {
+<pre><code class="language-javascript">if (&quot;ontouchstart&quot; in global) {
     touchSupported = true;
     eventsMap  = {
         select: &quot;touchstart&quot;,
@@ -254,7 +255,7 @@ canvas {
 
 <p>We then finally call <code>loadImageOntoCanvas</code> to load the image on to the main <code>canvas</code>… </p>
 
-<pre><code>img.src = &quot;Assets/Images/photo.jpg&quot;;    
+<pre><code class="language-javascript">img.src = &quot;Assets/Images/photo.jpg&quot;;    
 img.onload = function(){
     piece_height = ~~(this.height / canvas_grid);
     piece_width = this.width / canvas_grid;
@@ -277,7 +278,7 @@ img.onload = function(){
 
 <p>Next we see a function called <code>clearCanvas</code>… </p>
 
-<pre><code>function clearCanvas (c) {
+<pre><code class="language-javascript">function clearCanvas (c) {
    c.width = c.width;
 }
 </code></pre>
@@ -288,7 +289,7 @@ img.onload = function(){
 
 <p>Now we move onto the function <code>loadImageOntoCanvas</code>… </p>
 
-<pre><code>function loadImageOntoCanvas(){
+<pre><code class="language-javascript">function loadImageOntoCanvas(){
     context.drawImage(img, 0, 0, canvas_width, canvas_height);
     context.save();
 
@@ -306,17 +307,17 @@ img.onload = function(){
 
 <p>…which first draws the image onto the <code>canvas</code>, then writes some text onto the <code>canvas</code> which says &quot;Start Game&quot;. We position the text centrally to the <code>canvas</code> by using the API method <code>measureText</code> which gives us the dimensions of the text. Remember up in the variable declarations we had… </p>
 
-<pre><code>text_dimensions = context.measureText(opening_message);
+<pre><code class="language-javascript">text_dimensions = context.measureText(opening_message);
 </code></pre>
 
 <p>…well now we can use that to write the text centrally onto the <code>canvas</code>… </p>
 
-<pre><code>context.fillText(opening_message, (canvas_width / 2) - text_dimensions.width, (canvas_height / 2));
+<pre><code class="language-javascript">context.fillText(opening_message, (canvas_width / 2) - text_dimensions.width, (canvas_height / 2));
 </code></pre>
 
 <p>The last part of that function is an event listener for the <code>click</code>/<code>touchstart</code> event (depending on the browser support) which will call the <code>init</code> function when the user clicks on the <code>canvas</code> (to start the game)… </p>
 
-<pre><code>dragCanvas.addEventListener(eventsMap.select, init, false);
+<pre><code class="language-javascript">dragCanvas.addEventListener(eventsMap.select, init, false);
 </code></pre>
 
 <h3>Initialise Game</h3>
@@ -325,7 +326,7 @@ img.onload = function(){
 
 <p>Lets look at this function in more detail… </p>
 
-<pre><code>dragCanvas.removeEventListener(eventsMap.select, init, false);
+<pre><code class="language-javascript">dragCanvas.removeEventListener(eventsMap.select, init, false);
 clearCanvas(canvas);
 
 // Remove shadow (otherwise all puzzle pieces would get shadow applied to them)
@@ -341,7 +342,7 @@ context.shadowOffsetY = 0;
 
 <p>So first thing we see is we call the <code>loop</code> function. Now this function is actually called twice within <code>init</code> and the reason for that is because the main chunk of the <code>loop</code> function is (as you would expect) a loop and that loop has to happen twice: once for splitting the image into pieces and the second time is for actually drawing those pieces (after they&#39;ve been jumbled up) back onto the <code>canvas</code>. But some extra things need to happen when the loop runs a second time, so we pass in a parameter so the <code>loop</code> function knows that this time it will need to draw the puzzle pieces onto the <code>canvas</code>…</p>
 
-<pre><code>// Build map of co-ordinates
+<pre><code class="language-javascript">// Build map of co-ordinates
 loop();
 
 // Randomise puzzle pices
@@ -355,7 +356,7 @@ loop(true);
 
 <p>From here we randomly select a puzzle piece to remove (remember we need to have one empty space for the other pieces to move into) and then we set the initial empty space values (which we use throughout the rest of the game as a way to tell which part of the <code>canvas</code> is empty and can have a puzzle piece moved into it)… </p>
 
-<pre><code>random_number = Math.round(Math.random()*puzzle_randomised.length-1);
+<pre><code class="language-javascript">random_number = Math.round(Math.random()*puzzle_randomised.length-1);
 
 if (random_number &lt; 0) {
     random_number = 0;
@@ -375,7 +376,7 @@ empty_space = {
 
 <p>And the last part of the <code>init</code> function is to set-up the event listeners for the &#39;down&#39;/&#39;up&#39; events (which as we&#39;ve mentioned already are just alias&#39; to the relevant mouse and touch events)… </p>
 
-<pre><code>dragCanvas.addEventListener(eventsMap.down, checkDrag, false);
+<pre><code class="language-javascript">dragCanvas.addEventListener(eventsMap.down, checkDrag, false);
 dragCanvas.addEventListener(eventsMap.up, toggleDragCheck, false);
 </code></pre>
 
@@ -385,7 +386,7 @@ dragCanvas.addEventListener(eventsMap.up, toggleDragCheck, false);
 
 <p>So we can see that the &#39;down&#39; event will call the <code>checkDrag</code> function, so lets start from there… </p>
 
-<pre><code>dragCanvas.removeEventListener(eventsMap.down, checkDrag, false);
+<pre><code class="language-javascript">dragCanvas.removeEventListener(eventsMap.down, checkDrag, false);
 
 global.setTimeout(function(){
     if (drag) {
@@ -406,7 +407,7 @@ global.setTimeout(function(){
 
 <p>For example, I had a problem where if the user did a &#39;drag and drop&#39; movement then the <code>toggleDragCheck</code> function would get called in a different order. So if the user then tried to perform another &#39;drag and drop&#39; movement they couldn&#39;t. So I had to put in checks that determined if the user was just in a &#39;drag and drop&#39; motion or not and reset specific variables to make sure the user could perform the actions they wanted… </p>
 
-<pre><code>function toggleDragCheck (e) {
+<pre><code class="language-javascript">function toggleDragCheck (e) {
     upTriggered = true;
 
     // If the user releases while piece is moving but the piece hasn&#39;t yet been placed then stop the drag
@@ -430,7 +431,7 @@ global.setTimeout(function(){
 
 <p>We&#39;re going to start with <code>movePiece</code> as that&#39;s the simpler of the two routes at the moment.</p>
 
-<pre><code>var i = puzzle_randomised.length,
+<pre><code class="language-javascript">var i = puzzle_randomised.length,
     j = canvas_grid,
     selected_piece,
     potential_spaces,
@@ -456,7 +457,7 @@ global.setTimeout(function(){
 
 <p>Our first requirement from here is to find out which puzzle piece was clicked on. When we find out what piece was selected we can then decide whether we want to continue within the function to actually animate the piece into the empty space or not (I say &quot;<em>we can decide</em>&quot; because at this stage we don&#39;t know if the selected puzzle piece is a valid piece that has been clicked on - e.g. there is no empty space immediately next to it)… </p>
 
-<pre><code>// Find the piece that was clicked on
+<pre><code class="language-javascript">// Find the piece that was clicked on
 selected_piece = findSelectedPuzzlePiece(i, eventX, eventY);
 
 // We&#39;re resetting &#39;wasJustDragging&#39; variable to false as we&#39;re now attempting to move the puzzle piece &#39;automatically&#39;
@@ -473,7 +474,7 @@ if (!selected_piece) {
 
 <p>…so the above code is making sense so far (e.g. we need to get the selected puzzle piece and then check if it&#39;s valid). But lets take a closer look at the two functions mentioned in the above snippet: <code>findSelectedPuzzlePiece</code> and <code>resetOptions</code>.</p>
 
-<pre><code>function findSelectedPuzzlePiece (i, eventX, eventY) {
+<pre><code class="language-javascript">function findSelectedPuzzlePiece (i, eventX, eventY) {
     while (i--) {
         // Make sure we haven&#39;t selected the current empty space
         if (eventX &gt;= empty_space.x &amp;&amp; eventX &lt;= (empty_space.x + piece_width) &amp;&amp; eventY &gt;= empty_space.y &amp;&amp; eventY &lt;= (empty_space.y + piece_height)) {
@@ -491,7 +492,7 @@ if (!selected_piece) {
 
 <p>The <code>resetOptions</code> function is a little bit more complicated in that it needs to delay resetting some values. This is because of how the different functions are used to configure the &#39;drag and drop&#39; settings. For example, if the user clicked too quickly after just &#39;dragging and dropping&#39; their puzzle piece then they wouldn&#39;t be able to move another piece (which was fixed by setting a fraction of a second delay before re-applying the event listeners).</p>
 
-<pre><code>function resetOptions(){
+<pre><code class="language-javascript">function resetOptions(){
     if (wasJustDragging) {
         global.setTimeout(function(){
             dragCanvas.addEventListener(eventsMap.down, checkDrag, false);
@@ -508,7 +509,7 @@ if (!selected_piece) {
 
 <p>OK, now we&#39;ve taken a look at those two functions, lets continue on with the next step of the <code>movePiece</code> function which is to create an object with the four potential empty spaces that could be around the selected puzzle piece… </p>
 
-<pre><code>potential_spaces = [
+<pre><code class="language-javascript">potential_spaces = [
     {
         x: selected_piece.drawnOnCanvasX,
         y: selected_piece.drawnOnCanvasY - piece_height
@@ -530,7 +531,7 @@ if (!selected_piece) {
 
 <p>…now we move onto actually looping through the <code>potential_spaces</code> Array to see if we can find a match of the potential empty spaces and the <em>actual</em> empty space… </p>
 
-<pre><code>// Check if we can move the selected piece into the empty space (e.g. can only move selected piece up, down, left and right, not diagonally)
+<pre><code class="language-javascript">// Check if we can move the selected piece into the empty space (e.g. can only move selected piece up, down, left and right, not diagonally)
 while (j--) {
     if (potential_spaces[j].x === empty_space.x &amp;&amp; potential_spaces[j].y === empty_space.y) {
         // NOW WE NEED TO LOOP THROUGH &#39;puzzle_randomised&#39;          
@@ -541,7 +542,7 @@ while (j--) {
 
 <p>…once we&#39;ve found a match we can start looping through the Array that holds the jumbled puzzle pieces (i.e. <code>puzzle_randomised</code>) and see if we can find a match between the selected puzzle piece and the pieces in the Array… </p>
 
-<pre><code>while (i--) {
+<pre><code class="language-javascript">while (i--) {
     if (puzzle_randomised[i].drawnOnCanvasX === selected_piece.drawnOnCanvasX &amp;&amp; 
         puzzle_randomised[i].drawnOnCanvasY === selected_piece.drawnOnCanvasY) {
 
@@ -564,7 +565,7 @@ while (j--) {
 
 <p>At the end of that loop we put in a quick conditional check that calls the <code>resetOptions</code> function only when no matches from the previous loops were found… </p>
 
-<pre><code>// User must have clicked on an item that couldn&#39;t have been moved
+<pre><code class="language-javascript">// User must have clicked on an item that couldn&#39;t have been moved
 if (j &lt; 0) {
     resetOptions();
 }
@@ -572,7 +573,7 @@ if (j &lt; 0) {
 
 <p>So the entire chunk of code (two loops and conditional statement) looks like this… </p>
 
-<pre><code>// Check if we can move the selected piece into the empty space (e.g. can only move selected piece up, down, left and right, not diagonally)
+<pre><code class="language-javascript">// Check if we can move the selected piece into the empty space (e.g. can only move selected piece up, down, left and right, not diagonally)
 while (j--) {
     if (potential_spaces[j].x === empty_space.x &amp;&amp; potential_spaces[j].y === empty_space.y) {
         // We then loop through the shuffled puzzle order looking for the piece that was selected by the user
@@ -610,7 +611,7 @@ if (j &lt; 0) {
 
 <p>We do this by calling the <code>raf</code> function which itself sets-up the <code>requestAnimationFrame</code> and then calls the <code>animate</code> function… </p>
 
-<pre><code>function raf(){
+<pre><code class="language-javascript">function raf(){
     interval = global.requestAnimationFrame(raf);
     animate(foundPieceForAnimation);
 }
@@ -618,7 +619,7 @@ if (j &lt; 0) {
 
 <p>…when <code>animate</code> is called we pass through the relevant puzzle piece. The <code>animate</code> function first clears the space where the selected piece last was found and then checks to see if we need to update the &#39;x&#39; or &#39;y&#39; co-ordinates… </p>
 
-<pre><code>// Clear the space where the selected piece is currently
+<pre><code class="language-javascript">// Clear the space where the selected piece is currently
 context.clearRect(pieceMovedX, pieceMovedY, piece_width, piece_height);
 
 // We don&#39;t want to move the x/y co-ordinates if they&#39;re already the same
@@ -654,7 +655,7 @@ if (pieceMovedX !== empty_space.x) {
 
 <p>Lastly, we call <code>resetOptions</code> and do one final check to see if all the pieces are now in the end position and thus the end of the game…</p>
 
-<pre><code>if (direction &amp;&amp; coord === &quot;x&quot; &amp;&amp; pieceMovedX &gt;= empty_space.x || 
+<pre><code class="language-javascript">if (direction &amp;&amp; coord === &quot;x&quot; &amp;&amp; pieceMovedX &gt;= empty_space.x || 
     direction &amp;&amp; coord === &quot;y&quot; &amp;&amp; pieceMovedY &gt;= empty_space.y || 
     !direction &amp;&amp; coord === &quot;x&quot; &amp;&amp; pieceMovedX &lt;= empty_space.x || 
     !direction &amp;&amp; coord === &quot;y&quot; &amp;&amp; pieceMovedY &lt;= empty_space.y) {
@@ -692,7 +693,7 @@ if (pieceMovedX !== empty_space.x) {
 
 <p>If the user intended to drag the piece we would call the appropriately named function <code>startDrag</code>… </p>
 
-<pre><code>var selected_piece,
+<pre><code class="language-javascript">var selected_piece,
     i = puzzle_randomised.length,
     j = canvas_grid,
     potential_spaces,
@@ -775,7 +776,7 @@ if (!allow_input.checked) {
 
 <p>The rest of this function is actually a repeat of code from the <code>movePiece</code> function! So although it looks a lot you&#39;ve already seen most of it any way. But before we discuss this further lets quickly look at the code after the <code>setUp</code> function… </p>
 
-<pre><code>global.user_positionX = eventX - (piece_width / 2);
+<pre><code class="language-javascript">global.user_positionX = eventX - (piece_width / 2);
 global.user_positionY = eventY - (piece_height / 2);
 
 eventObject = {
@@ -795,7 +796,7 @@ current_piece = selected_piece = findSelectedPuzzlePiece(i, eventX, eventY);
 
 <p>OK, now we come to the conditional statement… </p>
 
-<pre><code>if (!allow_input.checked) {
+<pre><code class="language-javascript">if (!allow_input.checked) {
 
     // Move piece into available empty space.
     // There are 4 potential spaces around the selected piece which it can move in (diagonal doesn&#39;t count - as we&#39;re not worrying about the &#39;drag and drop&#39; yet)
@@ -856,7 +857,7 @@ current_piece = selected_piece = findSelectedPuzzlePiece(i, eventX, eventY);
 
 <p>Now we get to the <code>setUp</code> function itself… </p>
 
-<pre><code>function setUp(){
+<pre><code class="language-javascript">function setUp(){
     context.clearRect(selected_piece.drawnOnCanvasX, selected_piece.drawnOnCanvasY, piece_width, piece_height);
 
     dragCanvasContext.drawImage(img, selected_piece.x, selected_piece.y, piece_width, piece_height, global.user_positionX, global.user_positionY, piece_width, piece_height);
@@ -879,7 +880,7 @@ current_piece = selected_piece = findSelectedPuzzlePiece(i, eventX, eventY);
 
 <p>We&#39;ve now reached the <code>dragPiece</code> function… </p>
 
-<pre><code>var eventX = e.offsetX || e.pageX, 
+<pre><code class="language-javascript">var eventX = e.offsetX || e.pageX, 
     eventY = e.offsetY || e.pageY,
     storeSelectedX = selected_piece.drawnOnCanvasX,
     storeSelectedY = selected_piece.drawnOnCanvasY,
@@ -925,13 +926,13 @@ if ((eventX &gt;= empty_space.x &amp;&amp; eventX &lt; (empty_space.x + piece_wi
 
 <p>…clears where the puzzle piece was last drawn. We then update the co-ordinates for mouse/touch position…</p>
 
-<pre><code>global.user_positionX = eventX - halfWidth;
+<pre><code class="language-javascript">global.user_positionX = eventX - halfWidth;
 global.user_positionY = eventY - halfHeight;
 </code></pre>
 
 <p>…the next step is to see if the user has moved the puzzle piece &#39;near&#39; the empty space. The way we do this is we highlight the empty space so it has a red background whenever the user moves 20px within it. This is so they are aware that at any point soon the puzzle piece will be dropped into this empty space… </p>
 
-<pre><code>if (global.user_positionX &lt;= empty_space.x + (piece_width - 20) &amp;&amp; 
+<pre><code class="language-javascript">if (global.user_positionX &lt;= empty_space.x + (piece_width - 20) &amp;&amp; 
     global.user_positionY &lt;= empty_space.y + (piece_height - 20) &amp;&amp; 
     global.user_positionY + piece_height &gt;= empty_space.y + 20 &amp;&amp; 
     global.user_positionX + piece_width &gt;= empty_space.x + 20) {
@@ -945,7 +946,7 @@ global.user_positionY = eventY - halfHeight;
 
 <p>Now we just have one more conditional statement before we reach the end of the function… </p>
 
-<pre><code>if ((eventX &gt;= empty_space.x &amp;&amp; eventX &lt; (empty_space.x + piece_width)) &amp;&amp; (eventY &gt;= empty_space.y &amp;&amp; eventY &lt; (empty_space.y + piece_height))) {
+<pre><code class="language-javascript">if ((eventX &gt;= empty_space.x &amp;&amp; eventX &lt; (empty_space.x + piece_width)) &amp;&amp; (eventY &gt;= empty_space.y &amp;&amp; eventY &lt; (empty_space.y + piece_height))) {
     dragCanvas.removeEventListener(eventsMap.move, eventObject, false);
     event_moving = false;
     context.drawImage(img, selected_piece.x, selected_piece.y, piece_width, piece_height, empty_space.x, empty_space.y, piece_width, piece_height);
@@ -965,7 +966,7 @@ global.user_positionY = eventY - halfHeight;
 
 <p>So now lets look at the contents of the <code>stopDrag</code> function… </p>
 
-<pre><code>dragCanvas.removeEventListener(eventsMap.move, eventObject, false);
+<pre><code class="language-javascript">dragCanvas.removeEventListener(eventsMap.move, eventObject, false);
 dragCanvas.removeEventListener(eventsMap.up, toggleDragCheck, false);
 wasJustDragging = true;
 resetOptions();
@@ -980,7 +981,7 @@ if (checkIfGameFinished()) {
 
 <p>The <code>checkIfGameFinished</code> function simply loops through all puzzle pieces to see if they match the correct order… </p>
 
-<pre><code>function checkIfGameFinished(){
+<pre><code class="language-javascript">function checkIfGameFinished(){
     var copied_puzzle_randomised = puzzle_randomised.slice(0);
         copied_puzzle_randomised.splice(random_number, 0, removed_piece[0]);
         complete = false;
@@ -1021,6 +1022,7 @@ if (checkIfGameFinished()) {
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

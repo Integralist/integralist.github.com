@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Guide to using Sass</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -87,7 +88,7 @@
 
 <p>To create a variable in Sass you simply prefix the name of the variable with a dollar sign: <code>$brand_color: #C00;</code> I can now use <code>$brand_color</code> wherever I like. For example…</p>
 
-<pre><code>.header {
+<pre><code class="language-scss">.header {
     color: $brand_color;
 }
 </code></pre>
@@ -102,7 +103,7 @@
 
 <p>You can use all standard operators (*, /, +, -) for example:</p>
 
-<pre><code>$width: 10px; 
+<pre><code class="language-scss">$width: 10px; 
 $double_width: $width * 2;
 </code></pre>
 
@@ -118,49 +119,49 @@ $double_width: $width * 2;
 
 <p><code>lighten(colour, percentage)</code></p>
 
-<pre><code>.txt-light {
+<pre><code class="language-scss">.txt-light {
     color: lighten($brand_color, 30%);
 }
 </code></pre>
 
 <p><code>darken(colour, percentage)</code></p>
 
-<pre><code>.txt-dark {
+<pre><code class="language-scss">.txt-dark {
     color: darken($brand_color, 10%);
 }
 </code></pre>
 
 <p><code>saturate(colour, percentage)</code></p>
 
-<pre><code>.txt-sat {
+<pre><code class="language-scss">.txt-sat {
     color: saturate($brand_color, 100%);
 }
 </code></pre>
 
 <p><code>desaturate(colour, percentage)</code></p>
 
-<pre><code>.txt-desat {
+<pre><code class="language-scss">.txt-desat {
     color: desaturate($brand_color, 20%);
 }
 </code></pre>
 
 <p><code>adjust-hue(colour, degrees)</code></p>
 
-<pre><code>.txt-hue {
+<pre><code class="language-scss">.txt-hue {
     color: adjust-hue($brand_color, 180);
 }
 </code></pre>
 
 <p><code>grayscale(colour)</code></p>
 
-<pre><code>.txt-greyscale {
+<pre><code class="language-scss">.txt-greyscale {
     color: grayscale($brand_color);
 }
 </code></pre>
 
 <p><code>mix(colour, colour)</code></p>
 
-<pre><code>.txt-mix {
+<pre><code class="language-scss">.txt-mix {
     color: mix($brand_color, #C00);
 }
 </code></pre>
@@ -183,7 +184,7 @@ $double_width: $width * 2;
 
 <p>For example:</p>
 
-<pre><code>$brand_color = #0000FF;
+<pre><code class="language-scss">$brand_color = #0000FF;
 .brand { 
     color: $brand_color; 
 }
@@ -193,7 +194,7 @@ $double_width: $width * 2;
 
 <p>…generates the following CSS…</p>
 
-<pre><code>.brand { 
+<pre><code class="language-scss">.brand { 
     color: blue; 
 }
 // MORE STYLES
@@ -204,7 +205,7 @@ $double_width: $width * 2;
 
 <p>…which obviously isn&#39;t as efficient or clean as…</p>
 
-<pre><code>.brand { 
+<pre><code class="language-scss">.brand { 
     color: blue; 
     background-color: red; 
 }
@@ -227,7 +228,7 @@ $double_width: $width * 2;
 
 <p>Anywhere you have a CSS class you can re-import that inside another rule:</p>
 
-<pre><code>.myClass {
+<pre><code class="language-scss">.myClass {
     border: 1px solid #969;
     color: red;
 }
@@ -240,7 +241,7 @@ button {
 
 <p>…which generates the following CSS…</p>
 
-<pre><code>.myClass, button {
+<pre><code class="language-scss">.myClass, button {
     border: 1px solid #969;
     color: red;
 }
@@ -264,7 +265,7 @@ button {
 
 <p>You create a mixing like so:</p>
 
-<pre><code>@mixin .myMixin { 
+<pre><code class="language-scss">@mixin .myMixin { 
     color: blue; 
 }
 .product_title {
@@ -274,7 +275,7 @@ button {
 
 <p>…and you can change the values like so…</p>
 
-<pre><code>@mixin .myMixin($set_colour) { 
+<pre><code class="language-scss">@mixin .myMixin($set_colour) { 
     color: $set_colour; 
 }
 .product_title {
@@ -284,14 +285,14 @@ button {
 
 <p>…you can also define a default value if none is provided…</p>
 
-<pre><code>@mixin .myMixin($set_colour: #0000FF) { 
+<pre><code class="language-scss">@mixin .myMixin($set_colour: #0000FF) { 
     color: $set_colour;
 }
 </code></pre>
 
 <p>…you can use mixin&#39;s for things like CSS3 properties…</p>
 
-<pre><code>@mixin rounded_borders($color, $width: 5px, $rounding: 5px) { 
+<pre><code class="language-scss">@mixin rounded_borders($color, $width: 5px, $rounding: 5px) { 
     -moz-border-radius: $rounding $rounding; 
     -webkit-border-radius: $rounding $rounding; 
     -khtml-border-radius: $rounding $rounding; 
@@ -308,7 +309,7 @@ button {
 
 <p>…and use the opacity like so…</p>
 
-<pre><code>.h1 { 
+<pre><code class="language-scss">.h1 { 
     // Use the IE numbering style (instead of the W3C&#39;s 0-1 numbering style)
     @include opacity(60);
 }
@@ -316,7 +317,7 @@ button {
 
 <p>…or you could use the reverse…</p>
 
-<pre><code>@mixin opacity($opacity) {
+<pre><code class="language-scss">@mixin opacity($opacity) {
     filter: alpha(opacity=#{$opacity*100}); // IE 5-9+ 
     opacity: $opacity; 
 }
@@ -330,7 +331,7 @@ button {
 
 <p>One way to work around this issue is to use <code>interpolation</code>. The way it works is that you wrap a variable name with <code>#{}</code> e.g. <code>#{$my_variable}</code> and that will dynamically insert the value at that place in your CSS. Might sound a bit confusing so best to demonstrate this with an example, and the best example I can think of is again the <code>background-image</code> property with multiple different vendor prefixes… </p>
 
-<pre><code>// Variable
+<pre><code class="language-scss">// Variable
 $prefixes:-webkit,-moz,-ms,-o;
 
 // Loop over each item in the $prefixes variable
@@ -357,6 +358,7 @@ $prefixes:-webkit,-moz,-ms,-o;
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

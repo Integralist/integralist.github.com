@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Thoughts on current web development practices</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -92,7 +93,7 @@
 
 <p>Below is an example of a web page HTML structure…</p>
 
-<pre><code>&lt;!doctype html&gt;
+<pre><code class="language-markup">&lt;!doctype html&gt;
 &lt;!--[if IE 8]&gt;&lt;html class=&quot;ie8&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
 &lt;!--[if IE 9]&gt;&lt;html class=&quot;ie9&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
 &lt;!--[if gt IE 9]&gt;&lt;!--&gt; &lt;html dir=&quot;ltr&quot; lang=&quot;en&quot;&gt; &lt;!--&lt;![endif]--&gt;
@@ -146,7 +147,7 @@
 
 <p>Next we have a line of code which lets the host know there is a <code>humans.txt</code> file available. The point of this file is to inform the user who built the site (similar to how a <code>robot.txt</code> file informs a Search Engine robot what can/can&#39;t be indexed). There are no strict rules on how the content of this file should be laid out, but I generally use:</p>
 
-<pre><code>/* the humans responsible &amp; colophon */
+<pre><code class="language-ini">/* the humans responsible &amp; colophon */
 /* humanstxt.org */
 
 /* TEAM */
@@ -182,7 +183,7 @@ Location: Address
 
 <p>It&#39;s important that you use only elements that semantically match the content. There are easy examples and there are slightly more awkward examples. An easy example is a top level navigation menu, I think most of us are aware by now that the most semantically correct element to use here is an un-ordered list <code>&lt;ul&gt;</code>…</p>
 
-<pre><code>&lt;ul&gt;
+<pre><code class="language-markup">&lt;ul&gt;
     &lt;li&gt;&lt;a href=&quot;&quot;&gt;Home&lt;/a&gt;&lt;/li&gt;
     &lt;li&gt;&lt;a href=&quot;&quot;&gt;About&lt;/a&gt;&lt;/li&gt;
     &lt;li&gt;&lt;a href=&quot;&quot;&gt;Services&lt;/a&gt;
@@ -223,7 +224,7 @@ Location: Address
 
 <p>…you <em>could</em> use a <code>&lt;dl&gt;</code> element, but is this strictly the correct element to use? An example of what that would look like is…</p>
 
-<pre><code>&lt;dl&gt;
+<pre><code class="language-markup">&lt;dl&gt;
     &lt;dt&gt;Services&lt;/dt&gt;
         &lt;dd&gt;Service A&lt;dd&gt;
         &lt;dd&gt;Service B&lt;dd&gt;
@@ -249,7 +250,7 @@ Location: Address
 
 <p>…so this looks to be the right element to use as it is an &quot;association list&quot; (i.e. we&#39;ve associated a list of items with the relevant title) but maybe instead we should have used a <code>&lt;table&gt;</code> element because we are kind of dealing with tabular data. There are defined headers with <em>associated</em> rows of content (similar to the association made with a <code>&lt;dl&gt;</code>). An example of what this would look like is…</p>
 
-<pre><code>&lt;table&gt;
+<pre><code class="language-markup">&lt;table&gt;
     &lt;thead&gt;
         &lt;tr&gt;
             &lt;th scope=&quot;col&quot;&gt;Services&lt;/th&gt;
@@ -392,7 +393,7 @@ Location: Address
 
 <p>For example, the home.scss file (which is what generates the home.css file) could contain the following content (note: that this content changes depending on the requirements of your project)…</p>
 
-<pre><code>// Configurations/Settings
+<pre><code class="language-scss">// Configurations/Settings
 @import &quot;Configurations/variables&quot;;
 
 // Functions
@@ -451,7 +452,7 @@ Location: Address
 
 <p>Here is a typical usage of Sass:</p>
 
-<pre><code>.nav{
+<pre><code class="language-scss">.nav{
     li{
         a{}
     }
@@ -460,14 +461,14 @@ Location: Address
 
 <p>Which when the pre-processor executes equates to...</p>
 
-<pre><code>.nav {}
+<pre><code class="language-css">.nav {}
 .nav li {}
 .nav li a {}
 </code></pre>
 
 <p>But this might not have been the result you intended, instead you actually wanted…</p>
 
-<pre><code>.nav {}
+<pre><code class="language-css">.nav {}
 .nav li {}
 .nav a {}
 </code></pre>
@@ -476,7 +477,7 @@ Location: Address
 
 <p>To do that you just need to tweak the Sass code slightly…</p>
 
-<pre><code>.nav{
+<pre><code class="language-scss">.nav{
     li{
 
     }
@@ -490,7 +491,7 @@ Location: Address
 
 <p>One tip for using nested selectors is to use the ampersand <code>&amp;</code> character to reference the whole selector, so for example…</p>
 
-<pre><code>a {
+<pre><code class="language-scss">a {
     text-decoration: none;
 
     // this will be compiled to 
@@ -524,7 +525,7 @@ Location: Address
 
 <p>The <code>@extend</code> statement is slightly better in the sense that you can write a class <code>.funky-border</code> which contains a single declaration: <code>border: 10px dashed blue;</code> and then for every element that uses that same styling you can simply do…</p>
 
-<pre><code>.my-box {
+<pre><code class="language-scss">.my-box {
     @extend .funky-border;
     color: red;
 } 
@@ -532,7 +533,7 @@ Location: Address
 
 <p>…what this ends up compiling to is something like this…</p>
 
-<pre><code>.funky-border,
+<pre><code class="language-css">.funky-border,
 .my-box {
     border: 10px dashed blue;
 }
@@ -552,13 +553,32 @@ Location: Address
 
 <p>I have the following terminology I use when discussing OOCSS…</p>
 
-<p>Term        | Description
-------------| -----------
-&#39;base&#39;      | normalisation of styles across browsers + base styles specific to current project
-&#39;layout&#39;    | structure of site (think of grid systems: they do nothing but give you a structure to place content inside)
-&#39;module&#39;    | this is a complicated one because it means different things in different contexts (see below for more details)
-&#39;extension&#39; | this is a class that can be applied to multiple modules/elements
-&#39;state&#39;     | can be applied to both layouts and modules to affect how they look</p>
+<table>
+    <tr>
+        <th>Term</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>'base'</td>
+        <td>normalisation of styles across browsers + base styles specific to current project</td>
+    </tr>
+    <tr>
+        <td>'layout'</td>
+        <td>structure of site (think of grid systems: they do nothing but give you a structure to place content inside)</td>
+    </tr>
+    <tr>
+        <td>'module'</td>
+        <td>this is a complicated one because it means different things in different contexts (see below for more details)</td>
+    </tr>
+    <tr>
+        <td>'extension'</td>
+        <td>this is a class that can be applied to multiple modules/elements</td>
+    </tr>
+    <tr>
+        <td>'state'</td>
+        <td>can be applied to both layouts and modules to affect how they look</td>
+    </tr>
+</table>
 
 <h4>Base</h4>
 
@@ -604,7 +624,7 @@ Location: Address
 
 <p>Example Mixin:</p>
 
-<pre><code>@mixin transition ($transition: all 0.2s linear) {
+<pre><code class="language-scss">@mixin transition ($transition: all 0.2s linear) {
     -webkit-transition: $transition;
        -moz-transition: $transition;
         -ms-transition: $transition;
@@ -617,7 +637,7 @@ Location: Address
 
 <p>Extensions are effectively re-usable classes which you can incorporate into any existing rule. An example of this could be having a class that lets you set a box shadow…</p>
 
-<pre><code>.shadow {
+<pre><code class="language-scss">.shadow {
     @include shadow(0 3px 6px #666);
     border: 3px solid #fff;
 }
@@ -625,7 +645,7 @@ Location: Address
 
 <p>…which would be used like so… </p>
 
-<pre><code>.profile-photo {
+<pre><code class="language-scss">.profile-photo {
     @extend .shadow;
     // other styles
 }
@@ -650,7 +670,7 @@ Location: Address
 
 <p>The way I keep the IE code within the same file is I stopped having them as separate files like so…</p>
 
-<pre><code>&lt;!--[if IE 8]&gt;
+<pre><code class="language-markup">&lt;!--[if IE 8]&gt;
 &lt;link rel=&quot;stylesheet&quot; href=&quot;/Assets/Styles/IE8.css&quot;&gt;
 &lt;![endif]--&gt;
 
@@ -661,7 +681,7 @@ Location: Address
 
 <p>…and instead went with the <a href="http://paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/">Paul Irish solution</a>…</p>
 
-<pre><code>&lt;!--[if IE 8]&gt;&lt;html class=&quot;ie8&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
+<pre><code class="language-markup">&lt;!--[if IE 8]&gt;&lt;html class=&quot;ie8&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
 &lt;!--[if IE 9]&gt;&lt;html class=&quot;ie9&quot; dir=&quot;ltr&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;
 &lt;!--[if gt IE 9]&gt;&lt;!--&gt; &lt;html dir=&quot;ltr&quot; lang=&quot;en&quot;&gt; &lt;!--&lt;![endif]--&gt;
 </code></pre>
@@ -674,7 +694,7 @@ Location: Address
 
 <p>Where you may have <code>ul.menu</code> just use <code>.menu</code>. This is because if you had another element which isn&#39;t a <code>ul</code> but which needed similar stylings to your <code>.menu</code> class you can now reuse that class, where as before you would of had to of either written another class with similar code, or added another element selector to the rule like so…</p>
 
-<pre><code>ul.menu,
+<pre><code class="language-scss">ul.menu,
 ol.menu {
     // styles
 }
@@ -737,7 +757,7 @@ ol.menu {
 
 <p>To help your images scale appropriately along with your responsive design you can set the <code>max-width</code> property to be 100% which means the image will never be larger than its container but can happily resize/scale downwards on smaller screens…</p>
 
-<pre><code>img {
+<pre><code class="language-css">img {
     max-width: 100%;
 }
 </code></pre>
@@ -756,7 +776,7 @@ ol.menu {
 
 <p>We can now set our wrapper element like so…</p>
 
-<pre><code>.container {
+<pre><code class="language-css">.container {
     max-width: 60em;
 }
 </code></pre>
@@ -767,7 +787,7 @@ ol.menu {
 
 <p>The tool for that job are &#39;Media Queries&#39;…</p>
 
-<pre><code>@media only screen and (min-width: 320px) {
+<pre><code class="language-css">@media only screen and (min-width: 320px) {
     // Mobile styles
 }
 
@@ -814,7 +834,7 @@ ol.menu {
 
 <p>There are different options/ways to use the command line interface of CSS Lint, and they are as follows…</p>
 
-<pre><code>csslint [options] [file|dir]*
+<pre><code class="language-bash">csslint [options] [file|dir]*
 csslint file1.css file2.css
 csslint ./
 csslint --errors=box-model,ids test.css // =&gt; decide what should be errors
@@ -868,7 +888,7 @@ csslint --warnings=box-model,ids test.css // =&gt; decide what should be warning
 
 <p>There are different options/ways to use the command line interface of JS Hint, and they are as follows…</p>
 
-<pre><code>jshint path path2 [options] // =&gt; run against specific scripts
+<pre><code class="language-bash">jshint path path2 [options] // =&gt; run against specific scripts
 jshint *.js // =&gt; run against all scripts
 jshint main.js --show-non-errors // =&gt; show non-errors (e.g. Implied globals etc)
 jshint main.js --config ./Lint/config.json // =&gt; use specific configuration options
@@ -877,12 +897,12 @@ jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of
 
 <p>Below is my general usage command (which I keep in a txt file inside my <code>/Scripts/Lint</code> folder for quicker copy/pasting into the command line interface): </p>
 
-<pre><code>jshint **/*.js --config ./Lint/config.json
+<pre><code class="language-bash">jshint **/*.js --config ./Lint/config.json
 </code></pre>
 
 <p>...this relies on a specific <code>config.json</code> file which is easier than manually typing all the options. It looks like this:</p>
 
-<pre><code>{
+<pre><code class="language-javascript">{
     // Settings
     &quot;passfail&quot;      : false,  // Stop on first error.
     &quot;maxerr&quot;        : 200,    // Maximum error before stopping.
@@ -971,7 +991,7 @@ jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of
 
 <p>One thing I find very useful to do for all my JavaScript files is to include a code structure comment at the top like so...</p>
 
-<pre><code>/*
+<pre><code class="language-javascript">/*
  * Code Structure:
  * - Variables
  * - Functions
@@ -1059,7 +1079,7 @@ jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of
 
 <p>Below is an example of a minor performance dilemma I had recently while writing CSS with the Sass pre-processor. Although this example would likely be an extremely neglible performance hit I still found it interesting (afterwards) how potentially easily it is to make mistakes when using a pre-processor. So here is some Sass driven CSS code… </p>
 
-<pre><code>.dashboard-box {
+<pre><code class="language-scss">.dashboard-box {
     @include box-sizing(border-box);
     @include shadow(1px 1px 3px rgba(0, 0, 0, .2));
     @extend .box-gradient-bg;
@@ -1088,7 +1108,7 @@ jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of
 
 <p>…which generates the following CSS…</p>
 
-<pre><code>.dashboard-box {
+<pre><code class="language-css">.dashboard-box {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -o-box-sizing: border-box;
@@ -1123,7 +1143,7 @@ jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of
 
 <p>…but at first I wasn&#39;t sure if having duplicated selectors (i.e. <code>.dashboard-box</code> and <code>.dashboard-box &gt; div</code>) was very efficient, so I went back and changed my Sass code. This time I put <code>@include radius(.5em);</code> both at the top of the main declaration block as well as inside the <code>&gt; div</code> declaration...</p>
 
-<pre><code>.dashboard-box {
+<pre><code class="language-scss">.dashboard-box {
     @include radius(.5em);
     @include box-sizing(border-box);
     @include shadow(1px 1px 3px rgba(0, 0, 0, .2));
@@ -1149,7 +1169,7 @@ jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of
 
 <p>...which resulted in the following CSS… </p>
 
-<pre><code>.dashboard-box {
+<pre><code class="language-css">.dashboard-box {
   -webkit-border-radius: 0.5em;
   -moz-border-radius: 0.5em;
   -o-border-radius: 0.5em;
@@ -1265,6 +1285,7 @@ jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

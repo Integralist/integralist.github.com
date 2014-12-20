@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Object-Oriented Design (OOD)</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -114,7 +115,7 @@ e.g. for each class write down a single line description and try to avoid the wo
 
 <p>For example, look at the following class which is based on a part of a bicycle (specifically gears)... </p>
 
-<pre><code>class Gear
+<pre><code class="language-ruby">class Gear
     attr_reader :chainring, :cog, :rim, :tire
 
     def initialize (chainring, cog, rim, tire)
@@ -147,7 +148,7 @@ end
 
 <p>One other potential code smell worth avoiding is the direct referencing of class attributes/properties. You should only access them via a getter method to ensure good separation of data access. For example...</p>
 
-<pre><code>class Gear
+<pre><code class="language-ruby">class Gear
     attr_reader :chainring, :cog
 
     def initialize (chainring, cog)
@@ -176,7 +177,7 @@ end
 
 <p>So in the following example we are directly accessing <code>item[0]</code> and <code>item[1]</code> from a multi-dimensional array... </p>
 
-<pre><code>#BAD
+<pre><code class="language-ruby">#BAD
 class MyClass
     attr_reader :data
 
@@ -201,7 +202,7 @@ obj.do_something
 
 <p>Instead you should &#39;transform&#39; your data structure into a simpler and easier to understand structure (a good way to do this in Ruby is by using <code>Struct</code> which is perfect for creating basic data holding classes - which is what we want to do here)...</p>
 
-<pre><code>#GOOD
+<pre><code class="language-ruby">#GOOD
 class MyClass
     attr_reader :new_data
 
@@ -392,13 +393,14 @@ Imagine you have a class with a hard coded reference to another class. We could 
 
 <p>Be careful when using default values. If your base class has a common property which is different for each sub class, but is required within each sub class (hence sticking it in the base class) then you won&#39;t want to give it a value inside the base class. Your base class should take in the value via the constructor and if the value isn&#39;t provided you should set the default using a method like so...</p>
 
-<p><code>xxx = args[:xxx] || default_xxx_value</code></p>
+<pre><code class="language-ruby">xxx = args[:xxx] || default_xxx_value
+</code></pre>
 
 <p>In this example <code>default_xxx_value</code> should be a method the sub class implements which provides the specific value. The reason we have written it like this is so that the sub class has better control over setting the default value. </p>
 
 <p>So far so good. But if a new user doesn&#39;t read the documentation (which states they must implement <code>default_xxx_value</code> within their sub class) then they will get an error thrown. In the above example it may be best to raise your own descriptive error by implementing the <code>default_xxx_value</code> method as an abstract method within the base class like so...</p>
 
-<pre><code>def default_xxx_value
+<pre><code class="language-ruby">def default_xxx_value
     raise NotImplementedError, &quot;#{self.class} cannot respond to: &quot;
 end
 </code></pre>
@@ -421,7 +423,7 @@ end
 
 <p>This works with other methods not just the constructor. The base class could have...</p>
 
-<pre><code>def spares
+<pre><code class="language-ruby">def spares
     { tyre_size:tyre_size }.merge(local_spares)
 end
 </code></pre>
@@ -530,6 +532,7 @@ e.g. for each class write down a single line description and try to avoid the wo
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

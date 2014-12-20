@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>MVCP: Model, View, Controller, Presenter</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -161,7 +162,7 @@
 
 <p>Here is a basic example in Ruby…</p>
 
-<pre><code>require &#39;app/presenters/a&#39;
+<pre><code class="language-ruby">require &#39;app/presenters/a&#39;
 require &#39;app/presenters/b&#39;
 
 class AboutController &lt; ApplicationController
@@ -183,7 +184,7 @@ end
 
 <p>Before I show you the Presenter code itself, I&#39;ll show you the View template file… </p>
 
-<pre><code>&lt;h1&gt;&lt;%= @title %&gt;&lt;/h1&gt;
+<pre><code class="language-ruby">&lt;h1&gt;&lt;%= @title %&gt;&lt;/h1&gt;
 
 &lt;% if @a.run %&gt;
   &lt;%= partial :&quot;components/a&quot;, { :title =&gt; @a.title, :summary =&gt; @a.summary, :data =&gt; @a.data } %&gt;
@@ -206,7 +207,7 @@ end
 
 <p>Now let&#39;s take a look at one of our Presenters, in this case the Presenter for our <code>b</code> component… </p>
 
-<pre><code>require &#39;app/presenters/base&#39;
+<pre><code class="language-ruby">require &#39;app/presenters/base&#39;
 require &#39;app/models/b&#39;
 
 class Presenters::B &lt; Presenters::Base
@@ -225,7 +226,7 @@ end
 
 <p>The <code>Base</code> Presenter which our component Presenters inherit from is very straight forward as you can see from the following example… </p>
 
-<pre><code>module Presenters
+<pre><code class="language-ruby">module Presenters
   class Base
     attr_accessor :model
 
@@ -260,6 +261,7 @@ end
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

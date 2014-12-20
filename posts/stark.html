@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Stark - Simplified separation of components into decoupled applications</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -176,7 +177,7 @@
 
 <p>As mentioned earlier, we use RequireJS and AMD to wrap the above API calls, for example… </p>
 
-<pre><code>// the only part of this code that needs to change
+<pre><code class="language-javascript">// the only part of this code that needs to change
 // is the list of extensions you want to use
 // the rest is standard (read: required to be run)
 require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
@@ -189,7 +190,7 @@ require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
 
 <h3>HTML…</h3>
 
-<pre><code>&lt;div data-component=&quot;hello&quot; id=&quot;js-component-hello&quot;&gt;hello&lt;/div&gt;
+<pre><code class="language-markup">&lt;div data-component=&quot;hello&quot; id=&quot;js-component-hello&quot;&gt;hello&lt;/div&gt;
 &lt;div data-component=&quot;world&quot; id=&quot;js-component-world&quot;&gt;world&lt;/div&gt;
 &lt;script src=&quot;libs/require.js&quot; data-main=&quot;bootstrap-about&quot; async&gt;&lt;/script&gt;
 </code></pre>
@@ -204,7 +205,7 @@ require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
 
 <h3>Bootstrap...</h3>
 
-<pre><code>require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
+<pre><code class="language-javascript">require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
     app.use(&#39;mediator&#39;, &#39;extension-a&#39;, &#39;extension-b&#39;);
     app.start();
 });
@@ -214,7 +215,7 @@ require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
 
 <p>The bootstrap loads in our JavaScript application along with a configuration object (which is just the RequireJS config)… </p>
 
-<pre><code>require.config({
+<pre><code class="language-javascript">require.config({
     baseUrl: &#39;./&#39;,
     paths: {
         jquery: &#39;libs/jquery&#39;
@@ -226,7 +227,7 @@ require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
 
 <h3>Component...</h3>
 
-<pre><code>define({
+<pre><code class="language-javascript">define({
     init: function() {
         console.log(&#39;an example component&#39;);
     }
@@ -237,7 +238,7 @@ require([&#39;app&#39;, &#39;configuration&#39;], function(app) {
 
 <h3>Extension...</h3>
 
-<pre><code>// Silly example
+<pre><code class="language-javascript">// Silly example
 define(function(){
     if (!String.prototype.blah) {
         String.prototype.blah = function() {
@@ -255,7 +256,7 @@ define(function(){
 
 <p>So for example, our Mediator extension uses <code>window.app.mediator = mediator;</code> like so… </p>
 
-<pre><code>define(function(){
+<pre><code class="language-javascript">define(function(){
     var mediator = (function(){
         // code
 
@@ -279,7 +280,7 @@ define(function(){
 
 <p>So our example page loads <code>project.css</code>, the Sass file looks like this… </p>
 
-<pre><code>/* =============================================================================
+<pre><code class="language-scss">/* =============================================================================
   Base Utilities
   ========================================================================== */
 
@@ -338,7 +339,7 @@ define(function(){
 
 <p>Here is what our group 1 looks like… </p>
 
-<pre><code>/* =============================================================================
+<pre><code class="language-scss">/* =============================================================================
    Group 1
    All devices sizes
    ========================================================================== */
@@ -352,7 +353,7 @@ define(function(){
 
 <p>…so group 1 is applied for all device sizes and we&#39;re saying all device sizes should see a red background colour.</p>
 
-<pre><code>/* =============================================================================
+<pre><code class="language-scss">/* =============================================================================
    Group 2
    Viewport &gt;= 400px
    ========================================================================== */
@@ -384,7 +385,7 @@ define(function(){
 
 <p>Here is an example component… </p>
 
-<pre><code>/* =============================================================================
+<pre><code class="language-scss">/* =============================================================================
    Component: Features &amp; Analysis
    Distinguishes featured content from standard content
    ========================================================================== */
@@ -429,7 +430,7 @@ define(function(){
 
 <p>So how do we encapsulate logic (read: bug fixes) for Internet Explorer? We use Sass to help us incorporate these IE specific fixes… </p>
 
-<pre><code>[data-component=&quot;hello&quot;] {
+<pre><code class="language-scss">[data-component=&quot;hello&quot;] {
     border: 1px solid blue;
 
     @include respond-min($mq-group2) {
@@ -468,7 +469,7 @@ define(function(){
 
 <p>So in our HTML page we have the following code… </p>
 
-<pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;styles/project.css&quot;&gt;
+<pre><code class="language-markup">&lt;link rel=&quot;stylesheet&quot; href=&quot;styles/project.css&quot;&gt;
 &lt;!--[if lte IE 8]&gt;
 &lt;link rel=&quot;stylesheet&quot; href=&quot;styles/project-ie.css&quot;&gt;
 &lt;![endif]--&gt;
@@ -478,7 +479,7 @@ define(function(){
 
 <p>The contents of the associated Sass file is… </p>
 
-<pre><code>@import &#39;partials/variables&#39;;
+<pre><code class="language-scss">@import &#39;partials/variables&#39;;
 
 $old-ie: true;
 $fix-mqs: $mq-group4;
@@ -506,6 +507,7 @@ $fix-mqs: $mq-group4;
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

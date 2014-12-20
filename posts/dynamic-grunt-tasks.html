@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Dynamically Generated Grunt Tasks</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -108,7 +109,7 @@
 
 <p>Inside that file we have the following code (note: this is a <em>really</em> stripped back version just so it&#39;s a little bit more readable)…</p>
 
-<pre><code>module.exports = function (grunt) {
+<pre><code class="language-javascript">module.exports = function (grunt) {
 
     grunt.initConfig({
 
@@ -175,7 +176,7 @@
 
 <p>OK, this isn&#39;t strictly speaking a file that has anything to do with the problem/solution that we&#39;re working on. The reason I&#39;ve included it here is because you&#39;ll see that I&#39;ve written two custom Grunt tasks which I&#39;ve gone ahead and made the assumption that A.) this would be of interest to those of you reading this and B.) one of the custom tasks was quite useful in helping me quickly test my code was working... </p>
 
-<pre><code>module.exports = function (grunt) {
+<pre><code class="language-javascript">module.exports = function (grunt) {
     grunt.registerTask(&#39;noop&#39;, &#39;x&#39;, function(){ console.log(&#39;noop run&#39;); });
 
     grunt.registerTask(&#39;concat_specjs&#39;, &#39;Concatenate all JS test/spec files into a single file&#39;, function(){
@@ -205,7 +206,7 @@
 
 <p>This is where the actual work comes in… finally!</p>
 
-<pre><code>module.exports = function (grunt) {
+<pre><code class="language-javascript">module.exports = function (grunt) {
     var file = grunt.file.read(&#39;Gruntfile.js&#39;),
         services = grunt.file.expand(&#39;tabloid/webapp/static/sass/services/*&#39;).map(removePath).filter(removeBlacklistedDirectories),
         watch_subtasks = generateWatchSubTasks(), 
@@ -310,6 +311,7 @@
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

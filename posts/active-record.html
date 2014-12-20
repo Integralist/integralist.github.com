@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>SQLite and ActiveRecord</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -94,7 +95,7 @@
 
 <p>Imagine we have a single file <code>sqlite-example.rb</code> with the following content… </p>
 
-<pre><code>require &#39;active_record&#39;
+<pre><code class="language-ruby">require &#39;active_record&#39;
 
 ActiveRecord::Base.logger = Logger.new(File.open(&#39;database.log&#39;, &#39;w&#39;))
 
@@ -112,7 +113,7 @@ ActiveRecord::Base.establish_connection(
 
 <p>Thirdly, we actually connect to the SQLite database. ActiveRecord has adapters for multiple databases and so here we specify we&#39;re using SQLite and that we want to connect to the <code>example.db</code> database. We could store data all in memory if we wanted (e.g. it wouldn&#39;t persist after the application has finished running), we do this by changing to…</p>
 
-<pre><code>:database =&gt; &#39;:memory:&#39;
+<pre><code class="language-ruby">:database =&gt; &#39;:memory:&#39;
 </code></pre>
 
 <h2>Schema</h2>
@@ -123,7 +124,7 @@ ActiveRecord::Base.establish_connection(
 
 <p>To do this we&#39;ll add… </p>
 
-<pre><code>ActiveRecord::Schema.define do
+<pre><code class="language-ruby">ActiveRecord::Schema.define do
   unless ActiveRecord::Base.connection.tables.include? &#39;albums&#39;
     create_table :albums do |table|
       table.column :title,     :string
@@ -157,7 +158,7 @@ end
 
 <p>The ActiveRecord pattern is based on conventions, so in this instance we&#39;ll create two new classes that inherit from ActiveRecord&#39;s base class and we&#39;ll use these two classes for creating new records for each table… </p>
 
-<pre><code>class Album &lt; ActiveRecord::Base
+<pre><code class="language-ruby">class Album &lt; ActiveRecord::Base
   has_many :tracks
 end
 
@@ -239,12 +240,12 @@ end
 
 <p>We call a <code>create</code> method like so…</p>
 
-<pre><code>album = Album.create(...)
+<pre><code class="language-ruby">album = Album.create(...)
 </code></pre>
 
 <p>…which is equivalent to… </p>
 
-<pre><code>album = Album.new(...);
+<pre><code class="language-ruby">album = Album.new(...);
 album.save
 </code></pre>
 
@@ -254,7 +255,7 @@ album.save
 
 <p>In my example I&#39;m trying to be a bit smarter by not repeating the same chunk of code over and over. So rather than doing… </p>
 
-<pre><code>album.tracks.create(:track_number =&gt; 1, :title =&gt; &#39;a&#39;)
+<pre><code class="language-ruby">album.tracks.create(:track_number =&gt; 1, :title =&gt; &#39;a&#39;)
 album.tracks.create(:track_number =&gt; 2, :title =&gt; &#39;b&#39;)
 album.tracks.create(:track_number =&gt; 3, :title =&gt; &#39;c&#39;)
 #…rinse repeat…
@@ -308,7 +309,7 @@ album.tracks.create(:track_number =&gt; 3, :title =&gt; &#39;c&#39;)
 
 <p>The complete code I was using looks like this… </p>
 
-<pre><code>require &#39;active_record&#39;
+<pre><code class="language-ruby">require &#39;active_record&#39;
 
 ActiveRecord::Base.logger = Logger.new(File.open(&#39;database.log&#39;, &#39;w&#39;))
 
@@ -442,6 +443,7 @@ p Track.where(title: &#39;Grudgeola&#39;) # displays Array of records found (onl
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

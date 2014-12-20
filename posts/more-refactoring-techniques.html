@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Even More Refactoring Techniques</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -39,7 +40,7 @@
 
 <h2>Introduction</h2>
 
-<p>Well here we are again to learn some more refactoring techniques. If you want to recap the other techniques then go <a href="/posts/refactoring-techniques/">read my previous post</a>, otherwise let&#39;s just crack on...</p>
+<p>Well here we are again to learn some more refactoring techniques. If you want to recap the other techniques then go <a href="refactoring-techniques.html">read my previous post</a>, otherwise let&#39;s just crack on...</p>
 
 <div id="1"></div>
 
@@ -49,7 +50,7 @@
 
 <p>The principle idea being that: code evolves, and as it evolves you may find techniques you previously implemented (as part of an earlier refactoring) have since become redundant. </p>
 
-<p>Imagine you implemented the &quot;<a href="/posts/refactoring-techniques/#introduce-named-parameter">Introduce Named Parameter</a>&quot; technique (passing a hash with named properties as a single argument instead of multiple unidentified arguments). </p>
+<p>Imagine you implemented the &quot;<a href="refactoring-techniques.html#22">Introduce Named Parameter</a>&quot; technique (passing a hash with named properties as a single argument instead of multiple unidentified arguments). </p>
 
 <p>Now, after some other refactorings have taken place, you discover the method originally refactored is no longer as complex and so your argument hash refactor has been reduced down to just a single named property. </p>
 
@@ -67,7 +68,7 @@
 
 <p>For example, imagine we had the following code... </p>
 
-<pre><code>def failure do 
+<pre><code class="language-ruby">def failure do 
   self.result = &quot;failure&quot; 
 end 
 
@@ -83,7 +84,7 @@ end
 <p>Notice how the functions are structurally identical. They simply set a <code>result</code> property to have a value
 This can be refactored using Ruby&#39;s <code>define_method</code> method (which let&#39;s you create methods dynamically at run time)... </p>
 
-<pre><code>[:failure, :success, :error].each do |method| 
+<pre><code class="language-ruby">[:failure, :success, :error].each do |method| 
   define_method method do 
     self.result = method.to_s 
   end 
@@ -92,7 +93,7 @@ end
 
 <p>Note: you could also abstract this code into a more reusable (and easier to maintain) function like so... </p>
 
-<pre><code>def dynamic_methods(*method_names, &amp;block) 
+<pre><code class="language-ruby">def dynamic_methods(*method_names, &amp;block) 
   method_names.each do |method_name| 
     define_method method_name do 
       instance_exec(method_name, &amp;block)
@@ -101,9 +102,9 @@ end
 end 
 </code></pre>
 
-<p>You can also use this technique to help ease creating properties on an object. For example, I used this technique in my <a href="/posts/mvcp-model-view-controller-presenter/">MVCP</a> blog post to dynamically create instance variables... </p>
+<p>You can also use this technique to help ease creating properties on an object. For example, I used this technique in my <a href="mvcp.html">MVCP</a> blog post to dynamically create instance variables... </p>
 
-<pre><code>require &#39;app/presenters/base&#39; 
+<pre><code class="language-ruby">require &#39;app/presenters/base&#39; 
 require &#39;app/models/person&#39; 
 
 class Presenters::Person &lt; Presenters::Base 
@@ -148,7 +149,7 @@ end
 
 <p>The following code demonstrates the idea...</p>
 
-<pre><code>module Bar
+<pre><code class="language-ruby">module Bar
   def display
     puts &quot;Bar Stuff&quot;
   end
@@ -188,7 +189,7 @@ foo.do_something
 
 <p>Here is an example where we&#39;re violating the principle of a clean data interaction...</p>
 
-<pre><code>class Foo 
+<pre><code class="language-ruby">class Foo 
   attr_reader :data 
 
   def initialize(data) 
@@ -214,7 +215,7 @@ obj.do_something
 
 <p>But now take a look at the following example which works around this issue by converting our complex data structure into a cleaner data format... </p>
 
-<pre><code>class Foo 
+<pre><code class="language-ruby">class Foo 
   attr_reader :new_data 
 
   def initialize(data) 
@@ -257,7 +258,7 @@ obj.do_something
 
 <p>The following example shows the typical procedural attempt to handle different scenarios based on the data object type being passed...</p>
 
-<pre><code>class Foo
+<pre><code class="language-ruby">class Foo
   def initialize(data)
     @data = data
   end
@@ -291,7 +292,7 @@ foo_qux.do_something
 
 <p>For us to abide by OCP we can use polymorphism and a trusted interface/duck typing to solve the problem...</p>
 
-<pre><code>class Foo
+<pre><code class="language-ruby">class Foo
   def initialize(data)
     @data = data
   end
@@ -339,7 +340,7 @@ foo_qux.do_something
 
 <p>Here is a simple example...</p>
 
-<pre><code>if date &lt; SUMMER_START || date &gt; SUMMER_END 
+<pre><code class="language-ruby">if date &lt; SUMMER_START || date &gt; SUMMER_END 
   charge = # some complex calculation if it&#39;s winter 
 else 
   charge = # some other complex calculation if it&#39;s summer 
@@ -348,7 +349,7 @@ end
 
 <p>...which we can refactor like so... </p>
 
-<pre><code>if not_summer(date) 
+<pre><code class="language-ruby">if not_summer(date) 
   charge = winter_charge 
 else 
   charge = summer_charge 
@@ -365,7 +366,7 @@ end
 
 <p>Here is a simple example of what we want to avoid...</p>
 
-<pre><code>class Post
+<pre><code class="language-ruby">class Post
   attr_reader :id
 
   def initialize id
@@ -396,7 +397,7 @@ Post.find_and_publish(1) # displays true
 
 <p>The following code demonstrates how we can avoid that problem by introducing the concept of having an object to handle null scenarios (it&#39;s the same principle of using duck typing/trusted interfaces/polymorphism)...</p>
 
-<pre><code>class Post
+<pre><code class="language-ruby">class Post
   attr_reader :id
 
   def initialize id
@@ -447,6 +448,7 @@ Post.find_and_publish(1) # displays true
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

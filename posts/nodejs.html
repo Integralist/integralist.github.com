@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>NodeJS as a tool</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -66,7 +67,7 @@
 
 <p><strong>Example usage:</strong></p>
 
-<pre><code>csslint [options] [file|dir]*
+<pre><code class="language-bash">csslint [options] [file|dir]*
 csslint file1.css file2.css  
 csslint ./  
 csslint --errors=box-model,ids test.css // =&gt; decide what should be errors  
@@ -86,7 +87,7 @@ It&#39;s recommended to create a shell script to wrap the CSS Lint functionality
 
 <p>For Linux/Mac, create a file named <code>csslint</code> and add the following to the file:  </p>
 
-<pre><code>#!/bin/bash
+<pre><code class="language-bash">#!/bin/bash
 java -jar js.jar csslint-rhino.js $@
 </code></pre>
 
@@ -106,7 +107,7 @@ npm install jshint</p>
 
 <p><strong>Example usage:</strong>  </p>
 
-<pre><code>jshint path path2 [options] // =&gt; run against specific scripts
+<pre><code class="language-bash">jshint path path2 [options] // =&gt; run against specific scripts
 jshint *.js // =&gt; run against all scripts
 jshint main.js --show-non-errors // =&gt; show non-errors (e.g. Implied globals etc)
 jshint main.js --config ./Lint/config.json // =&gt; use specific configuration options
@@ -121,7 +122,7 @@ jshint main.js --show-non-errors --config ./Lint/config.json // =&gt; example of
 <p><strong>Configuration:</strong><br>
 Your <code>config.json</code> file could look like the following…</p>
 
-<pre><code>{
+<pre><code class="language-javascript">{
     // Settings
     &quot;passfail&quot;      : false,  // Stop on first error.
     &quot;maxerr&quot;        : 200,    // Maximum error before stopping.
@@ -218,7 +219,7 @@ Your <code>config.json</code> file could look like the following…</p>
 <p><strong>Configuration:</strong><br>
 You create a &#39;build&#39; script file (see below for an example) and then you use NodeJs to execute the <code>r.js</code> optimization script and pass through your build script as an argument</p>
 
-<pre><code>/*
+<pre><code class="language-javascript">/*
  * http://requirejs.org/docs/optimization.html
  *
  * See: https://github.com/jrburke/r.js/blob/master/build/example.build.js for an example build script
@@ -283,6 +284,7 @@ You create a &#39;build&#39; script file (see below for an example) and then you
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Beginners guide on how to test your code</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -124,17 +125,18 @@
 <li>In this page insert the provided css file ‘jasmine.css’ + the two provided js files ‘jasmine.js’, ‘jasmine-html.js’</li>
 <li>Then include your own JavaScript code ‘my-cool-library.js’</li>
 <li>Then include your own ‘my-tests.js’</li>
-<li><p>After that have an inline script which executes the Jasmine test runner…</p>
-
-<p>jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-jasmine.getEnv().execute();</p></li>
+<li>After that have an inline script which executes the Jasmine test runner…</li>
 </ul>
+
+<pre><code class="language-javascript">jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+jasmine.getEnv().execute();
+</code></pre>
 
 <p>Within your own ‘my-tests.js’ file is where you’ll write your unit-tests.</p>
 
 <p>Different unit-testing libraries have different API’s. Jasmine’s API is as follows…</p>
 
-<pre><code>describe(&#39;test suite name&#39;, function(){
+<pre><code class="language-javascript">describe(&#39;test suite name&#39;, function(){
     // assertions for your code to try and pass
     // if any assertions fail then this entire suite fails
 });
@@ -146,7 +148,7 @@ jasmine.getEnv().execute();</p></li>
 
 <p>So now imagine your ‘my-cool-library.js’ consisted of an object whose API let the user add/remove or check for CSS classes on an element. Lets say the API was as follows…</p>
 
-<pre><code>var header = document.getElementById(&#39;my-header&#39;);
+<pre><code class="language-javascript">var header = document.getElementById(&#39;my-header&#39;);
 css.add(header, &#39;newclass&#39;) // --&gt; adds the class &#39;newclass&#39; to the specified element &#39;header&#39;
 css.has(header, &#39;newclass&#39;) // --&gt; returns a boolean value (true/false) depending on whether the class &#39;newclass&#39; is found
 css.remove(header, &#39;newclass&#39;) // --&gt; removes the class &#39;newclass&#39; from the specified element &#39;header&#39;
@@ -155,7 +157,7 @@ css.classes(header) // --&gt; returns an Array of classes found on this element
 
 <p>Your test suite for this code could look something like (don’t worry, we’ll discuss after)…</p>
 
-<pre><code>// Test Suite
+<pre><code class="language-javascript">// Test Suite
 describe(&#39;CSS tests&#39;, function() {
 
     var header = document.getElementById(&#39;my-header&#39;);
@@ -215,7 +217,7 @@ describe(&#39;CSS tests&#39;, function() {
 
 <p>You can even create your own matchers…</p>
 
-<pre><code>// Add our two new matchers. One to check if an object is an Array and the other to check if the result is a Number
+<pre><code class="language-javascript">// Add our two new matchers. One to check if an object is an Array and the other to check if the result is a Number
 // You create these within the beforeEach method which is executed before each test is run
 beforeEach(function() {
     this.addMatchers({
@@ -242,7 +244,7 @@ beforeEach(function() {
 
 <p>So lets look at one of the tests…</p>
 
-<pre><code>it(&#39;should add class to element&#39;, function() {
+<pre><code class="language-javascript">it(&#39;should add class to element&#39;, function() {
     css.add(header, &#39;newclass&#39;);
     expect(header.className).toBe(&#39;myclassa myclassb newclass&#39;);
 });
@@ -262,7 +264,7 @@ beforeEach(function() {
 
 <p><a href="http://cl.ly/1z3b1g3U1z0e2r2U2c2H">See screenshot image</a></p>
 
-<pre><code>4 specs, 1 failure in 0.014s
+<pre><code class="language-bash">4 specs, 1 failure in 0.014s
 &gt; CSS tests (this is the name of the test suite that failed - as you could have multiple suites running this helps narrow it down)
 &gt;&gt; should add class to element (this tells you the exact test that fails)
 &gt;&gt;&gt; Expected &#39;myclassa myclassb newclass&#39; to be &#39;x myclassa myclassb newclass&#39;. (this tells you what the result actually was followed by what the test was expecting - so you can see where the result went wrong)
@@ -291,6 +293,7 @@ beforeEach(function() {
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Git Tips</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -71,7 +72,7 @@
 
 <h2>Update your global user details</h2>
 
-<pre><code>git config --global user.name &quot;Your Name&quot;
+<pre><code class="language-git">git config --global user.name &quot;Your Name&quot;
 git config --global user.email &quot;Your Email&quot;
 git config --global apply.whitespace nowarn # ignore white space changes!
 </code></pre>
@@ -86,7 +87,7 @@ git config --global apply.whitespace nowarn # ignore white space changes!
 
 <p>Then add the following content to it (<em>this is a standard ignore file but I&#39;ve added some Sass CSS pre-processor files to it</em>)…</p>
 
-<pre><code># Compiled source #
+<pre><code class="language-ini"># Compiled source #
 ###################
 *.com
 *.class
@@ -134,7 +135,7 @@ Thumbs.db
 
 <p>…then adding the following to it… </p>
 
-<pre><code>[core]
+<pre><code class="language-git">[core]
     excludesfile = /Users/&lt;home-directory&gt;/.gitignore_global
 </code></pre>
 
@@ -196,7 +197,7 @@ Thumbs.db
 
 <p>What we need to do is open the <code>~/.gitconfig</code> file and then add the following content… </p>
 
-<pre><code>[alias]
+<pre><code class="language-git">[alias]
     lg = log --color --graph --pretty=format:&#39;%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset&#39; --abbrev-commit --date=relative
 </code></pre>
 
@@ -208,7 +209,7 @@ Thumbs.db
 
 <p>What we need to do is open the <code>~/.gitconfig</code> file and then add the following content… </p>
 
-<pre><code>[alias] 
+<pre><code class="language-git">[alias] 
     st = status
     sts = status -sb
 </code></pre>
@@ -303,7 +304,7 @@ Thumbs.db
 
 <p>Open up the file <code>~/.gitconfig</code> and then add the following content… </p>
 
-<pre><code>[alias]
+<pre><code class="language-git">[alias]
     unstage = reset HEAD
 </code></pre>
 
@@ -478,6 +479,7 @@ Thumbs.db
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

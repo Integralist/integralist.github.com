@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Using Grunts Config API</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -162,7 +163,7 @@
 
 <h3>grunt-customtasks.js</h3>
 
-<pre><code>module.exports = function (grunt) {
+<pre><code class="language-javascript">module.exports = function (grunt) {
 
     var util = require(&#39;./grunt-helpers.js&#39;)(grunt);
 
@@ -252,7 +253,7 @@
 
 <h3>grunt-helpers.js</h3>
 
-<pre><code>module.exports = function (grunt) {
+<pre><code class="language-javascript">module.exports = function (grunt) {
     function removePath(element) {
         return element.split(&#39;/&#39;).pop();
     }
@@ -301,7 +302,7 @@
 
 <p>So here is a more realistic example...</p>
 
-<pre><code>sass: {
+<pre><code class="language-javascript">sass: {
     /*
         Example usage...
 
@@ -353,6 +354,7 @@
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

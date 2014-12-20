@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>How to use Git and GitHub</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -99,13 +100,13 @@
 
 <p>To inform Git what your username and email address is, open the Terminal application on your Mac and enter:</p>
 
-<pre><code>git config --global user.name &quot;Joe Bloggs&quot;
+<pre><code class="language-bash">git config --global user.name &quot;Joe Bloggs&quot;
 git config --global user.email &quot;joe@bloggs.com&quot;
 </code></pre>
 
 <p>You can check these settings at any time within the Terminal by typing:</p>
 
-<pre><code>git config user.name
+<pre><code class="language-bash">git config user.name
 git config user.email
 </code></pre>
 
@@ -131,7 +132,7 @@ git config user.email
 
 <p>If you’re Mac is set-up to not show ‘hidden’ folders then it wont look like much has happened (although you will now see a message in the Terminal telling you a new empty repository was created). If you really want to see hidden files and folders on your Mac then type the following into the Terminal…</p>
 
-<pre><code>defaults write com.apple.Finder AppleShowAllFiles YES
+<pre><code class="language-bash">defaults write com.apple.Finder AppleShowAllFiles YES
 killall Finder
 </code></pre>
 
@@ -197,7 +198,7 @@ killall Finder
 
 <p>…obviously change the email address from <code>joe@bloggs.com</code> to whatever email address you used to sign-up to GitHub with. Terminal will then tell you…</p>
 
-<pre><code>Generating public/private rsa key pair.
+<pre><code class="language-bash">Generating public/private rsa key pair.
 Enter file in which to save the key (/Users/tekkub/.ssh/id_rsa):
 </code></pre>
 
@@ -263,7 +264,7 @@ Enter file in which to save the key (/Users/tekkub/.ssh/id_rsa):
 
 <p>Lets say I made an update to the file ‘robots.txt’ - I can push that on it’s own:</p>
 
-<pre><code>git add robots.txt
+<pre><code class="language-bash">git add robots.txt
 git commit -m &#39;Add some new robot configurations&#39;
 git push origin master
 </code></pre>
@@ -278,7 +279,7 @@ git push origin master
 
 <p>…then do the normal commit with message and push.</p>
 
-<pre><code>git commit -m &#39;Remove the robots.txt file&#39;
+<pre><code class="language-bash">git commit -m &#39;Remove the robots.txt file&#39;
 git push origin master
 </code></pre>
 
@@ -402,7 +403,7 @@ git push origin master
 
 <p>You can use a <code>#</code> as a comment line and then specify the types of files or specific files to be ignored, such as:</p>
 
-<pre><code>#Mac OS X files
+<pre><code class="language-bash">#Mac OS X files
 .DS_Store
 
 # VIM leave-behinds
@@ -411,7 +412,7 @@ git push origin master
 
 <p>You can also ignore all files of a certain type except one by using the bang (!) such as:</p>
 
-<pre><code>*.log
+<pre><code class="language-bash">*.log
 !errors.log
 </code></pre>
 
@@ -460,6 +461,7 @@ git push origin master
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

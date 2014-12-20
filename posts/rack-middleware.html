@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Rack Middleware</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -42,7 +43,7 @@
 
 <p>Typically you&#39;ll have a <code>config.ru</code> file with content like:</p>
 
-<pre><code>run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]}
+<pre><code class="language-ruby">run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]}
 </code></pre>
 
 <p>...and to run the webserver (WEBrick by default, but you can use many others) you need to execute <code>rackup</code> via your terminal&#39;s shell/command line interface.</p>
@@ -65,7 +66,7 @@
 
 <p>An example will demonstrate this better. The following is a hypothetical <code>config.ru</code> file...</p>
 
-<pre><code>class A
+<pre><code class="language-ruby">class A
   def self.call(env)
     [200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]
   end
@@ -84,7 +85,7 @@ run A
 
 <p>We could theorectically inline the <code>use</code> and <code>run</code> calls into the following example...</p>
 
-<pre><code>D(
+<pre><code class="language-ruby">D(
   C(
     B(A)
   )
@@ -101,7 +102,7 @@ run A
 
 <p>If we didn&#39;t want to use a <code>config.ru</code> file, we could have a Ruby script that uses <code>Rack::Builder</code> directly, like so:</p>
 
-<pre><code>class A
+<pre><code class="language-ruby">class A
   def self.call(env)
     [200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;]]
   end
@@ -119,7 +120,7 @@ end
 
 <h2>Simple example</h2>
 
-<pre><code>use Rack::Lint # gives more descriptive error messages when responses aren&#39;t valid
+<pre><code class="language-ruby">use Rack::Lint # gives more descriptive error messages when responses aren&#39;t valid
 
 class LogIt
   def initialize(app)
@@ -163,7 +164,7 @@ run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&q
 
 <p>The response we would get back is: <code>&lt;H1&gt;HELLO WORLD&lt;/H1&gt;</code> (and if you were to look at your terminal&#39;s <code>stdout</code> you should also see something like: </p>
 
-<pre><code>&quot;LogIt: &lt;H1&gt;HELLO WORLD&lt;/H1&gt;&quot;
+<pre><code class="language-bash">&quot;LogIt: &lt;H1&gt;HELLO WORLD&lt;/H1&gt;&quot;
 127.0.0.1 - - [15/Nov/2014 11:21:07] &quot;GET / HTTP/1.1&quot; 200 - 0.0006
 </code></pre>
 
@@ -177,7 +178,7 @@ run -&gt; env {[200, {&quot;Content-Type&quot; =&gt; &quot;text/html&quot;}, [&q
 
 <p>Fundamentally it comes down to registering the use of the Cache middleware (we&#39;ll take a look at that in a moment):</p>
 
-<pre><code>cache_headers = {
+<pre><code class="language-ruby">cache_headers = {
   :cache_control =&gt; &quot;max-age=2678400, public&quot;, # 86400 seconds == 1 day * 31
   :expires =&gt; 2678400
 }
@@ -187,7 +188,7 @@ use Cache, { :assets =&gt; cache_headers }
 
 <p>In this example we&#39;re passing a Hash into our Middleware class that it&#39;ll use as a pattern for matching resources that should be cached. In this case I only have a single key <code>:assets</code> because all my static assets (images, stylesheets and scripts) are kept within that directory: </p>
 
-<pre><code>├── Assets
+<pre><code class="language-ini">├── Assets
 │   ├── Images
 │   │   └── rack-logo.png
 │   ├── Scripts
@@ -198,7 +199,7 @@ use Cache, { :assets =&gt; cache_headers }
 
 <p>But imagine for a moment that you have a different structure (no <code>Assets</code> parent directory):</p>
 
-<pre><code>├── Images
+<pre><code class="language-ini">├── Images
 │   ├── rack-logo.png
 ├── Scripts
 │   ├── test.js
@@ -208,7 +209,7 @@ use Cache, { :assets =&gt; cache_headers }
 
 <p>...then you would need to change the Hash to:</p>
 
-<pre><code>{
+<pre><code class="language-ruby">{
   :images  =&gt; cache_headers,
   :scripts =&gt; cache_headers,
   :styles  =&gt; cache_headers
@@ -223,7 +224,7 @@ use Cache, { :assets =&gt; cache_headers }
 
 <p>The Cache middleware looks like this...</p>
 
-<pre><code>class Cache
+<pre><code class="language-ruby">class Cache
   attr_reader :app, :pattern
 
   def initialize(app, pattern)
@@ -264,6 +265,7 @@ end
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

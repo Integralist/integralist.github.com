@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Ruby and the Sinatra framework</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -120,7 +121,7 @@
 
 <p>To see what &#39;gems&#39; you have already installed you can run the command <code>gem list --local</code> and this will display something similar to this (which is what I have installed on my own machine currently)…</p>
 
-<pre><code>bundler (1.1.3)
+<pre><code class="language-bash">bundler (1.1.3)
 cgi_multipart_eof_fix (2.5.0)
 daemons (1.1.8)
 eventmachine (0.12.10)
@@ -149,7 +150,7 @@ treetop (1.4.10)
 
 <p>First thing we want to do is to create a file that will be our application. So lets go ahead and do that and call it <code>app.rb</code> and lets add the following content to it…</p>
 
-<pre><code>#!/usr/bin/env ruby
+<pre><code class="language-ruby">#!/usr/bin/env ruby
 
 require &#39;sinatra&#39;
 
@@ -162,7 +163,7 @@ end
 
 <p>You should see a message similar to this…</p>
 
-<pre><code>== Sinatra/1.3.2 has taken the stage on 4567 for development with backup from Thin
+<pre><code class="language-bash">== Sinatra/1.3.2 has taken the stage on 4567 for development with backup from Thin
 &gt;&gt; Thin web server (v1.3.1 codename Triple Espresso)
 &gt;&gt; Maximum connections set to 1024
 &gt;&gt; Listening on 0.0.0.0:4567, CTRL+C to stop
@@ -199,7 +200,7 @@ This is Sinatra&#39;s &quot;Classic&quot;** DSL syntax which basically says when
 
 <p>If you wanted to add a new page called &quot;Projects&quot; that you accessed via <code>http://localhost:4567/projects</code> then all you would need to do is add the following code…</p>
 
-<pre><code>get &#39;/projects&#39; do
+<pre><code class="language-ruby">get &#39;/projects&#39; do
     # page content
 end
 </code></pre>
@@ -208,7 +209,7 @@ end
 
 <p>Imagine now that this &#39;projects&#39; page had a login form on it that let the user enter a username and password and this form POST&#39;ed the data entered by the user back to the current page...</p>
 
-<pre><code>&lt;form method=&quot;post&quot;&gt;
+<pre><code class="language-markup">&lt;form method=&quot;post&quot;&gt;
     &lt;dl&gt;
         &lt;dt&gt;Name&lt;/dt&gt;
         &lt;dd&gt;&lt;input name=&quot;user&quot; type=&quot;text&quot;&gt;&lt;/dd&gt;
@@ -221,7 +222,7 @@ end
 
 <p>...for you to access the POST&#39;ed data then you would need to add another &#39;route&#39; to handle it. But this time instead of using a <code>get</code> request it would be a <code>post</code> request like so…</p>
 
-<pre><code>post &#39;/projects&#39; do
+<pre><code class="language-ruby">post &#39;/projects&#39; do
     # do something with the form fields
     user = params[:user]
     pass = params[:password]
@@ -232,7 +233,7 @@ end
 
 <p>You can also use the URL path as a way for the user to interact with your application. For example if you had a page which added two numbers together then it could be handled directly via the URL as follows…</p>
 
-<pre><code>get &#39;/add/:a/:b&#39; do |a, b|
+<pre><code class="language-ruby">get &#39;/add/:a/:b&#39; do |a, b|
     &quot;#{a.to_i + b.to_i}&quot;
 end
 </code></pre>
@@ -249,7 +250,7 @@ end
 
 <p>Our code is going to start looking something like this…</p>
 
-<pre><code>get &#39;/&#39; do
+<pre><code class="language-ruby">get &#39;/&#39; do
     erb :home
 end
 
@@ -264,7 +265,7 @@ end
 
 <p>Inside our <code>views</code> folder we&#39;ll need to create two files then: <code>home.erb</code> and <code>projects.erb</code> and they&#39;ll look a little bit like this…</p>
 
-<pre><code>&lt;!-- home.erb --&gt;
+<pre><code class="language-markup">&lt;!-- home.erb --&gt;
 &lt;p&gt;HTML content for my home page&lt;/p&gt;
 
 &lt;!-- projects.erb --&gt;
@@ -277,7 +278,7 @@ end
 
 <p>But if I didn&#39;t create a <code>layout.erb</code> file then I could have modified my templates above to include a full set of HTML like so…</p>
 
-<pre><code>&lt;!-- home.erb --&gt;
+<pre><code class="language-markup">&lt;!-- home.erb --&gt;
 &lt;!doctype html&gt;
 &lt;html&gt;
     &lt;head&gt;
@@ -292,7 +293,7 @@ end
 
 <p>…but I prefer having a master layout to handle this stuff, so lets create a <code>layout.erb</code> file (within the <code>views</code> folder) and add the following content to it…</p>
 
-<pre><code>&lt;!-- layout.erb --&gt;
+<pre><code class="language-markup">&lt;!-- layout.erb --&gt;
 &lt;!doctype html&gt;
 &lt;html&gt;
     &lt;head&gt;
@@ -307,7 +308,7 @@ end
 
 <p>…you should notice the Ruby tags <code>&lt;% %&gt;</code> which are used to place Ruby code inside of them. Here we&#39;re telling Ruby to <code>yield</code> to the template file we&#39;re loading. So for example when a user accesses the home page and we load <code>home.erb</code>, we&#39;re effectively loading the <code>layout.erb</code> file and telling it that when it reaches the <code>body</code> tag we want it to load in the content from the <code>home.erb</code> file into it so it will end up rendering in the web browser like this…</p>
 
-<pre><code>&lt;!doctype html&gt;
+<pre><code class="language-markup">&lt;!doctype html&gt;
 &lt;html&gt;
     &lt;head&gt;
         &lt;meta charset=&quot;utf-8&quot;&gt;
@@ -321,7 +322,7 @@ end
 
 <p>If you want to load a different master layout for a specific page then you can do that also. For example I have a page that I display to users of Internet Explorer version 7 or lower. The master layout for that page is a lot simpler than the other pages of my site in that it loads different stylesheets specifically for this IE page. So in my application file I have the following…</p>
 
-<pre><code>get &#39;/internet-explorer&#39; do
+<pre><code class="language-ruby">get &#39;/internet-explorer&#39; do
     erb :ie, :layout =&gt; :layout_ie
 end
 </code></pre>
@@ -330,7 +331,7 @@ end
 
 <p>One other thing worth mentioning is that you can pass variables from your route block into your template using class instance variables…</p>
 
-<pre><code>post &#39;/contact&#39; do
+<pre><code class="language-ruby">post &#39;/contact&#39; do
     redirect &quot;/contact-error/name&quot; if params[:user].empty?
     redirect &quot;/contact-error/email&quot; if params[:email].empty?
     redirect &quot;/contact-error/message&quot; if params[:message].empty?
@@ -346,7 +347,7 @@ end
 
 <p>…in the above example when a user makes an error on my contact form I redirect them to a page that shows them what field they made an error on. In my template file I have…</p>
 
-<pre><code>&lt;p&gt;Sorry there was an error with your form submission. Seems you didn&#39;t fill in the &lt;%= @field %&gt; field.&lt;/p&gt;
+<pre><code class="language-markup">&lt;p&gt;Sorry there was an error with your form submission. Seems you didn&#39;t fill in the &lt;%= @field %&gt; field.&lt;/p&gt;
 </code></pre>
 
 <p>…notice I picked up the field from the URL and stored it in a class instance variable and used that variable within my template.</p>
@@ -373,7 +374,7 @@ end
 
 <p>If the user tries to access a page that doesn&#39;t exist then you can direct them to your own <code>404 error</code> page by using the following route…</p>
 
-<pre><code>not_found do
+<pre><code class="language-ruby">not_found do
     erb :notfound
 end
 </code></pre>
@@ -384,7 +385,7 @@ end
 
 <p>To fix this you can do the following…</p>
 
-<pre><code>before do
+<pre><code class="language-ruby">before do
     request.path_info.sub! %r{/$}, &#39;&#39;
 end
 </code></pre>
@@ -397,7 +398,7 @@ end
 
 <p>If there is an actual error then you can use…</p>
 
-<pre><code>error do
+<pre><code class="language-ruby">error do
     erb :error
 end
 </code></pre>
@@ -406,7 +407,7 @@ end
 
 <p>Also, within your <code>error.erb</code> template file you can access the error using the environment variable <code>sinatra.error</code>…</p>
 
-<pre><code>&lt;p&gt;Sorry there was the following error: &lt;strong class=&quot;error&quot;&gt;&lt;%= env[&quot;sinatra.error&quot;] %&gt;&lt;/strong&gt;&lt;/p&gt;
+<pre><code class="language-markup">&lt;p&gt;Sorry there was the following error: &lt;strong class=&quot;error&quot;&gt;&lt;%= env[&quot;sinatra.error&quot;] %&gt;&lt;/strong&gt;&lt;/p&gt;
 </code></pre>
 
 <h3>Performance</h3>
@@ -431,7 +432,7 @@ end
 
 <p>You can also tell Sinatra to use the <code>Thin</code> server rather than the default <code>WEBrick</code> server if it&#39;s available (<code>Thin</code> is a supremely better performing web server so do please use it!)</p>
 
-<pre><code># We specify which server we want to use (Thin is tried first and then failing that WEBrick)
+<pre><code class="language-ruby"># We specify which server we want to use (Thin is tried first and then failing that WEBrick)
 set :server, %w[thin webrick]
 </code></pre>
 
@@ -459,15 +460,24 @@ set :server, %w[thin webrick]
 <li>You may want to add additional SSH keys, if you do use: <code>heroku keys:add</code></li>
 <li>To create an app on heroku use: <code>heroku create --stack cedar</code> (you can also do: <code>heroku create yourappname --stack cedar</code>) - <code>cedar</code> will shortly be the <em>default</em> web stack on heroku but for the time being it&#39;s worth including it in the command <code>--stack cedar</code> otherwise your app will be created on an older web stack which isn&#39;t as good.</li>
 </ul></li>
-<li><p>Create a <code>config.ru</code> file and add the following content:<br>
-    require &#39;app&#39; # where app is the name of your main file that initializes your web application
-    run Sinatra::Application</p></li>
-<li><p>Create a Gemfile file (no file extension) and add the content:  </p>
+<li>Create a <code>config.ru</code> file and add the following content:<br></li>
+</ol>
 
-<p>source &#39;http://rubygems.org&#39;
+<pre><code class="language-ruby">    require &#39;app&#39; # where app is the name of your main file that initializes your web application
+    run Sinatra::Application
+</code></pre>
+
+<ol>
+<li>Create a Gemfile file (no file extension) and add the content:<br></li>
+</ol>
+
+<pre><code class="language-ruby">source &#39;http://rubygems.org&#39;
 gem &#39;sinatra&#39;, &#39;1.3.2&#39;
-gem &#39;thin&#39;, &#39;1.3.1&#39;</p></li>
-<li><p>Go back to your CLI and enter:</p>
+gem &#39;thin&#39;, &#39;1.3.1&#39;
+</code></pre>
+
+<ol>
+<li>Go back to your CLI and enter:
 
 <ul>
 <li><code>bundle install</code> which will create a <code>Gemfile.lock</code> file specifying ALL the dependancies needed for your app to run (you shouldn&#39;t need to manually create your own Gemfile - as I&#39;ve told you to do in step 5. - but just in case <code>bundle install</code> doesn&#39;t work for you then you can at least do it manually).</li>
@@ -504,6 +514,7 @@ e.g.<br>
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

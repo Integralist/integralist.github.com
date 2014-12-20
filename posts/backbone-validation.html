@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Backbone Validation</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -57,12 +58,12 @@
 
 <p>So as an example here is a form with the mandatory class and the custom data attribute</p>
 
-<pre><code>&lt;input name=&quot;card&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid credit card number&quot;&gt;
+<pre><code class="language-markup">&lt;input name=&quot;card&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid credit card number&quot;&gt;
 </code></pre>
 
 <p>Our full form code looks like this…</p>
 
-<pre><code>&lt;form action=&quot;http://www.google.com/&quot; method=&quot;post&quot; id=&quot;js-form&quot;&gt;
+<pre><code class="language-markup">&lt;form action=&quot;http://www.google.com/&quot; method=&quot;post&quot; id=&quot;js-form&quot;&gt;
     &lt;p&gt;Name: &lt;input name=&quot;fullname&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter your full name&quot;&gt;&lt;/p&gt;
     &lt;p&gt;Date of Birth: &lt;input name=&quot;dob&quot; placeholder=&quot;dd/mm/yyyy&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid date format&quot;&gt;&lt;/p&gt;
     &lt;p&gt;Age: &lt;input name=&quot;age&quot; type=&quot;number&quot; class=&quot;js-mandatory-field&quot; data-message=&quot;Please ensure you enter a valid age&quot;&gt;&lt;/p&gt;
@@ -81,13 +82,13 @@
 
 <p>So in our HTML file we&#39;ll load up the JavaScript files required…</p>
 
-<pre><code>&lt;script src=&quot;Assets/Scripts/curl.js&quot;&gt;&lt;/script&gt;
+<pre><code class="language-markup">&lt;script src=&quot;Assets/Scripts/curl.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;Assets/Scripts/app.js&quot;&gt;&lt;/script&gt;
 </code></pre>
 
 <p>Inside our app.js file we set-up a configuration object which handles the paths to the different dependencies we&#39;ll be using. We then load the &#39;Validation&#39; module (which is a Backbone.View)…</p>
 
-<pre><code>var config = {
+<pre><code class="language-javascript">var config = {
     baseUrl: &#39;./Assets/Scripts/&#39;,
     pluginPath: &#39;plugins&#39;,
     paths: {
@@ -144,7 +145,7 @@ function error (err) {
 
 <p>So within the initialisation stage of the View we do a few things…</p>
 
-<pre><code>initialize: function(){
+<pre><code class="language-javascript">initialize: function(){
     // Self explanatory: stores all mandatory fields
     this.mandatory_fields = $(&#39;.js-mandatory-field&#39;);
 
@@ -170,7 +171,7 @@ function error (err) {
 
 <p>The <code>get_template</code> method is called immediately but later on we also check to see if we need to try calling it again (e.g. when the user actually submits the form we check to see if <code>this.template</code> holds any value and if it does then we use it, otherwise we call <code>get_template</code> again to grab the data) so this is why we check within that method for a <code>callback</code> to be provided (when the template is loaded we want to continue on and process the errors found)</p>
 
-<pre><code>get_template: function (callback) {
+<pre><code class="language-javascript">get_template: function (callback) {
     $.ajax({
         url: &#39;Assets/Templates/FormErrors.txt&#39;,
         dataType: &#39;html&#39;,
@@ -187,7 +188,7 @@ function error (err) {
 
 <p>We then listen out for the form submission event to happen and call the <code>validate</code> method to handle the event…</p>
 
-<pre><code>events: {
+<pre><code class="language-javascript">events: {
     &#39;submit&#39;: &#39;validate&#39;
 }
 </code></pre>
@@ -198,7 +199,7 @@ function error (err) {
 
 <p>After we&#39;ve been through all the mandatory fields we check to see if the <code>errors</code> Array has any items, if it does then we know we need to process some errors and call <code>this.process_errors</code> and pass the <code>errors</code> Array through to that method.</p>
 
-<pre><code>validate: function(){
+<pre><code class="language-javascript">validate: function(){
     var errors = [];
     var method;
 
@@ -255,7 +256,7 @@ function error (err) {
 
 <p>Finally we check if the template file has been loaded already or not. If it hasn&#39;t then we load it via ajax and then call the <code>display_errors</code> method.</p>
 
-<pre><code>process_errors: function (errors) {
+<pre><code class="language-javascript">process_errors: function (errors) {
     /*
         Clean the errors list so we only have unique data.
         This happens for things like the postcode validation (no point showing the postcode field error message twice)
@@ -296,7 +297,7 @@ function error (err) {
 
 <p>I know some people will disagree with doing that and would prefer to display an error next to each field but I find that makes the design of the page a lot more complicated, especially when dealing with multiple screen dimensions. I personally prefer to have a single place to display all errors.</p>
 
-<pre><code>display_errors: function (data) {
+<pre><code class="language-javascript">display_errors: function (data) {
     // First remove any errors that might already be on the page
     var existing_list = $(&#39;#js-formerrors&#39;);
     if (existing_list.length) {
@@ -320,7 +321,7 @@ function error (err) {
 
 <p>The full module code is as follows...</p>
 
-<pre><code>define([&#39;../Utils/Templating/hogan&#39;], function (hogan) {
+<pre><code class="language-javascript">define([&#39;../Utils/Templating/hogan&#39;], function (hogan) {
 
     var Validation = Backbone.View.extend({
         initialize: function(){
@@ -607,6 +608,7 @@ function error (err) {
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>A guide to getting started with Vim</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -280,7 +281,7 @@ Typically developers find another editor.</p>
 
 <p>If you open the yaml file you&#39;ll see it has a basic example set-up ready for you to configure…</p>
 
-<pre><code>name: test-project
+<pre><code class="language-ini">name: test-project
 root: ~/Code/news/workspace/
 
 windows:
@@ -349,7 +350,7 @@ vundle.git
 
 <p>Let&#39;s open our <code>.vimrc</code> file and add some plug-ins we&#39;re going to need (code comments start with &quot;)…</p>
 
-<pre><code>set rtp+=$HOME/.vim/bundle/vundle
+<pre><code class="language-ini">set rtp+=$HOME/.vim/bundle/vundle
 call vundle#rc()
 Bundle &#39;gmarik/vundle&#39;
 filetype plugin indent on
@@ -507,7 +508,7 @@ Bundle &#39;vim-scripts/The-NERD-tree&#39;
 
 <p>For example…</p>
 
-<pre><code>Line 1  
+<pre><code class="language-ini">Line 1  
 Line 2  
 Line 3  
 Line 4  
@@ -649,7 +650,7 @@ Line 10
 
 <p><code>Ctrl+v</code> puts us into Visual Block mode which allows us to select single columns and make multiple changes. So for example if you have a long list of items such as…</p>
 
-<pre><code>_List Item 1  
+<pre><code class="language-ini">_List Item 1  
 _List Item 2  
 _List Item 3  
 _List Item 4  
@@ -712,7 +713,7 @@ _List Item 5
 
 <p>Let&#39;s now take a quick look at some configuration options we can add to our <code>.vimrc</code> file…</p>
 
-<pre><code>&quot; switch syntax highlighting on, when the terminal has colors
+<pre><code class="language-ini">&quot; switch syntax highlighting on, when the terminal has colors
 syntax on
 
 &quot; use vim, not vi api
@@ -860,6 +861,7 @@ autocmd BufWritePre * :%s/\s\+$//e
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

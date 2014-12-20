@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Unix Commands</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -175,7 +176,7 @@
 
 <p>The most common pattern is to search for a particular file (or file type) within a project folder. Imagine you want to find a file called <code>package.json</code> within your project directory which is inside your home directory. Here is how we&#39;d use the <code>find</code> command to do that:</p>
 
-<pre><code># first we&#39;ll set-up the project directory and some files...
+<pre><code class="language-bash"># first we&#39;ll set-up the project directory and some files...
 
 cd ~/ # move in to the user&#39;s home directory
 mkdir project-foobar # make our project directory
@@ -210,7 +211,7 @@ find ./project-foobar -name &#39;*.json&#39;
 
 <h3>Finding files over a certain size</h3>
 
-<pre><code># all files greater than 1mb
+<pre><code class="language-bash"># all files greater than 1mb
 find $HOME/. -size +1024k 
 
 # all files inside current directory greater than 500k
@@ -257,7 +258,7 @@ find . -size 0 -o -atime +365
 
 <p>So imagine you have the following <code>test.txt</code> file…</p>
 
-<pre><code>This is my first line
+<pre><code class="language-ini">This is my first line
 This is my second line
 This is my third line
 </code></pre>
@@ -266,7 +267,7 @@ This is my third line
 
 <p>Which would display the following content on your screen… </p>
 
-<pre><code>Line 1: first
+<pre><code class="language-ini">Line 1: first
 Line 2: second
 Line 3: third
 </code></pre>
@@ -332,7 +333,7 @@ Line 3: third
 
 <p>Here are three real world examples I&#39;ve used recently…</p>
 
-<pre><code>phantomjs 2&gt;&amp;1 network-test.js | tee log.txt
+<pre><code class="language-bash">phantomjs 2&gt;&amp;1 network-test.js | tee log.txt
 </code></pre>
 
 <p>In this example I&#39;m executing a <a href="http://phantomjs.org/">PhantomJS</a> script <code>network-test.js</code> but I wanted to capture both the results of the script (which just logs out DNS information into the terminal) and any errors that may have occurred into a log text file.</p>
@@ -351,7 +352,7 @@ Line 3: third
 
 <p>We then pipe the <code>stdout</code> through to the <code>tee</code> command which copies it into a file called <code>log.txt</code>.</p>
 
-<pre><code>ls File-* | sed &#39;s/\(File-[^-]*\)-\(.*\)/mv &amp; \1\2/&#39; | sh
+<pre><code class="language-bash">ls File-* | sed &#39;s/\(File-[^-]*\)-\(.*\)/mv &amp; \1\2/&#39; | sh
 </code></pre>
 
 <p>In this example I&#39;m trying to remove a hyphen <code>-</code> from some file names.</p>
@@ -370,7 +371,7 @@ Line 3: third
 
 <p>Note: whenever you write a shell script, you would store it (for example) inside a file with the extension of <code>sh</code> and then you&#39;d use the terminal command <code>sh</code> to execute that shell script.</p>
 
-<pre><code>tmux ls | cut -d : -f 1 | xargs -I {} tmux kill-session -t {}
+<pre><code class="language-bash">tmux ls | cut -d : -f 1 | xargs -I {} tmux kill-session -t {}
 </code></pre>
 
 <p>So in this example I wanted an easy way to destroy all my tmux sessions. </p>
@@ -487,7 +488,7 @@ Line 3: third
 
 <p>The <code>tr</code> command stands for &#39;translate characters&#39; and it allows you to change the characters in a string of text into a different set of characters. For example...</p>
 
-<pre><code>echo &quot;foo\nbar\nbaz&quot; | tr &quot;bf&quot; &quot;\!&quot;
+<pre><code class="language-bash">echo &quot;foo\nbar\nbaz&quot; | tr &quot;bf&quot; &quot;\!&quot;
 </code></pre>
 
 <p>...here we&#39;re saying: &quot;any occurance of the letters &#39;b&#39; and &#39;f&#39; that are found in the string &#39;foo\nbar\n\baz&#39;&quot; should be replaced with a <code>!</code>. </p>
@@ -496,43 +497,43 @@ Line 3: third
 
 <p>The result would be...</p>
 
-<pre><code>!oo
+<pre><code class="language-bash">!oo
 !ar
 !az
 </code></pre>
 
 <p>We can also invert the translation; so we can say &quot;any occurance of a letter that ISN&#39;T &#39;b&#39; or &#39;f&#39; then translate them into an &#39;!&#39;&quot;. For example,</p>
 
-<pre><code>echo &quot;foo\nbar\nbaz&quot; | tr -c &quot;bf&quot; &quot;\!&quot;
+<pre><code class="language-bash">echo &quot;foo\nbar\nbaz&quot; | tr -c &quot;bf&quot; &quot;\!&quot;
 </code></pre>
 
 <p>This is done using the <code>-c</code> flag/option. But now if we look at the result you&#39;ll find it hasn&#39;t quite done what we&#39;d expect&quot;</p>
 
-<pre><code>f!!!b!!!b!!!%
+<pre><code class="language-bash">f!!!b!!!b!!!%
 </code></pre>
 
 <p>As you can see we&#39;ve not catered for our <code>\n</code> new lines that were within our original string. The <code>tr</code> command has seen the new lines and replaced them with an <code>!</code> because as far as it&#39;s concerned a new line isn&#39;t either a &#39;b&#39; or &#39;f&#39; character.</p>
 
 <p>So we&#39;ll need to tweak our command slightly to accommodate our need to keep the new lines:</p>
 
-<pre><code>echo &quot;foo\nbar\nbaz&quot; | tr -c &quot;bf\n&quot; &quot;\!&quot;
+<pre><code class="language-bash">echo &quot;foo\nbar\nbaz&quot; | tr -c &quot;bf\n&quot; &quot;\!&quot;
 </code></pre>
 
 <p>Which result in:</p>
 
-<pre><code>f!!
+<pre><code class="language-bash">f!!
 b!!
 b!!
 </code></pre>
 
 <p>The last thing I want to show you is the &#39;squeeze&#39; command which you use by adding the <code>-s</code> flag/option. What this does is any consecutive letters (e.g. the &#39;o&#39; in &quot;fooobar&quot; is repeated consecutively) will be reduced to a single replacement. For example,</p>
 
-<pre><code>echo &quot;fooobar&quot; | tr -s &quot;o&quot; &quot;\!&quot;
+<pre><code class="language-bash">echo &quot;fooobar&quot; | tr -s &quot;o&quot; &quot;\!&quot;
 </code></pre>
 
 <p>Results in:</p>
 
-<pre><code>f!bar
+<pre><code class="language-bash">f!bar
 </code></pre>
 
 <p>Where as if we didn&#39;t use the squeeze command we would&#39;ve seen <code>f!!!bar</code> instead (notice the &#39;o&#39; was translated multiple times)..</p>
@@ -541,14 +542,14 @@ b!!
 
 <p>The <code>du</code> command stands for &quot;disk usage&quot; and it will display the amount of space a directory occupies:</p>
 
-<pre><code>du -s -k ~/*
+<pre><code class="language-bash">du -s -k ~/*
 </code></pre>
 
 <p>The <code>-s</code> flag displays an entry for each specified file, while the <code>-k</code> flag displays block counts in 1024-byte (1-Kbyte) blocks.</p>
 
 <p>Meaning running the above command will result in the following output (for me anyway):</p>
 
-<pre><code>0/Users/markmcdonnell/Applications
+<pre><code class="language-bash">0/Users/markmcdonnell/Applications
 1355232/Users/markmcdonnell/Box Documents (backup)
 6987864/Users/markmcdonnell/Box Sync
 1931180/Users/markmcdonnell/Code
@@ -571,7 +572,7 @@ b!!
 
 <p>If we modify the command to pipe over to the <code>sort</code> command, like so <code>du -s -k ~/* | sort -k1nr | less</code>, then we can make the feedback a little bit more useful (i.e. the directories are sorted by overall size!):</p>
 
-<pre><code>du: 
+<pre><code class="language-bash">du: 
 38075864        /Users/markmcdonnell/VirtualBox VMs
 17253304        /Users/markmcdonnell/Library
 13070884        /Users/markmcdonnell/Documents
@@ -619,6 +620,7 @@ b!!
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

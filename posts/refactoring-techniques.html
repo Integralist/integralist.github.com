@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Refactoring Techniques</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -168,14 +169,14 @@
 
 <p>For example:</p>
 
-<pre><code>unless &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?
+<pre><code class="language-ruby">unless &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?
   puts &quot;capitalised text was found&quot;
 end
 </code></pre>
 
 <p>Should be:</p>
 
-<pre><code>caps_not_found = &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?
+<pre><code class="language-ruby">caps_not_found = &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?
 
 unless caps_not_found
   puts &quot;capitalised text was found&quot;
@@ -198,7 +199,7 @@ end
 
 <p>For example:</p>
 
-<pre><code>def add_stuff
+<pre><code class="language-ruby">def add_stuff
     1 + 1
 end
 
@@ -210,7 +211,7 @@ end
 
 <p>Should be:</p>
 
-<pre><code>def add_stuff
+<pre><code class="language-ruby">def add_stuff
     1 + 1
 end
 
@@ -233,13 +234,13 @@ end
 
 <p><strong>For example</strong>: (this is a daft example, but what the heck)</p>
 
-<pre><code>temp = 2 * (height + width)
+<pre><code class="language-ruby">temp = 2 * (height + width)
 temp = height * width
 </code></pre>
 
 <p><strong>Becomes</strong>:</p>
 
-<pre><code>perimeter = 2 * (height + width)
+<pre><code class="language-ruby">perimeter = 2 * (height + width)
 area = height * width
 </code></pre>
 
@@ -255,7 +256,7 @@ area = height * width
 
 <p>For example:</p>
 
-<pre><code>class Box
+<pre><code class="language-ruby">class Box
   attr_reader :length, :width, :height
 
   def initialize length, width, height
@@ -274,7 +275,7 @@ end
 
 <p>Becomes:</p>
 
-<pre><code>class Box
+<pre><code class="language-ruby">class Box
   attr_reader :length, :width, :height
 
   def initialize length, width, height
@@ -318,7 +319,7 @@ end
 
 <p><strong>For example</strong>:</p>
 
-<pre><code>class College
+<pre><code class="language-ruby">class College
     def create_course
         puts &quot;create course&quot;
     end
@@ -337,7 +338,7 @@ temp.add_student
 
 <p><strong>Becomes</strong>:</p>
 
-<pre><code>class College
+<pre><code class="language-ruby">class College
     # static method so can be accessed without creating an instance
     def self.create_course
         college = College.new
@@ -367,7 +368,7 @@ college = College.create_course
 
 <p>For example:</p>
 
-<pre><code>class Foo
+<pre><code class="language-ruby">class Foo
   attr_reader :bar
 
   def initialize bar
@@ -389,7 +390,7 @@ end
 
 <p>Becomes:</p>
 
-<pre><code>class Foo
+<pre><code class="language-ruby">class Foo
   attr_reader :bar
 
   def initialize bar
@@ -435,7 +436,7 @@ end
 
 <p>For example:</p>
 
-<pre><code>class Gear
+<pre><code class="language-ruby">class Gear
     attr_reader :chainring, :cog, :rim, :tire
 
     def initialize (chainring, cog, rim, tire)
@@ -462,7 +463,7 @@ end
 
 <p>Becomes:</p>
 
-<pre><code>class Gear
+<pre><code class="language-ruby">class Gear
     attr_reader :chainring, :cog, :rim, :tire
 
     def initialize (chainring, cog, rim, tire)
@@ -509,7 +510,7 @@ end
 
 <p>For example:</p>
 
-<pre><code>class Foo
+<pre><code class="language-ruby">class Foo
   def bar
     puts &quot;We&#39;re doing some bar stuff&quot;
   end
@@ -532,7 +533,7 @@ end
 
 <p>Becomes:</p>
 
-<pre><code>class Foo
+<pre><code class="language-ruby">class Foo
   def bar
     puts &quot;We&#39;re doing some bar stuff&quot;
   end
@@ -573,7 +574,7 @@ end
 
 <p><strong>For example</strong>:</p>
 
-<pre><code>managers = []
+<pre><code class="language-ruby">managers = []
 employees.each do |e|
     managers &lt;&lt; e if e.manager?
 end
@@ -581,7 +582,7 @@ end
 
 <p><strong>Becomes</strong>:</p>
 
-<pre><code>managers = employees.select { |e| e.manager? }
+<pre><code class="language-ruby">managers = employees.select { |e| e.manager? }
 </code></pre>
 
 <p>Ruby has a few of these types of enumerable methods but other languages such as PHP and JavaScript aren&#39;t so lucky. </p>
@@ -598,7 +599,7 @@ end
 
 <p>For example:</p>
 
-<pre><code>class Person
+<pre><code class="language-ruby">class Person
   attr_reader :first_name, :last_name
 
   def initialize first_name, last_name
@@ -633,7 +634,7 @@ end
 
 <p>Becomes:</p>
 
-<pre><code>class Person
+<pre><code class="language-ruby">class Person
   attr_reader :first_name, :last_name
 
   def initialize first_name, last_name
@@ -674,7 +675,7 @@ the steps.</p>
 <p>Here is a silly example (I’m no good at giving real examples; you may have noticed), here is an
 example of our problematic code…</p>
 
-<pre><code>class Foo; end
+<pre><code class="language-ruby">class Foo; end
 
 class Bar &lt; Foo
   def initialize
@@ -720,7 +721,7 @@ return a specific calculation</p>
 
 <p>…so we can clean up our code a little by abstracting the commonality...</p>
 
-<pre><code>class Foo
+<pre><code class="language-ruby">class Foo
   def initialize(hey=1, hai=1)
     @hey = hey
     @hai = hai
@@ -770,7 +771,7 @@ puts baz.qux
 
 <p>If you find you have different methods which contain almost identical code but with a slight variant in the middle, then pull up the duplicated code into a single method and pass a code block to the newly created method which it yields to in order to execute the unique behaviour...</p>
 
-<pre><code>def do_something
+<pre><code class="language-ruby">def do_something
     puts 1
     yield
     puts 3
@@ -783,7 +784,7 @@ do_something { puts 2 }
 
 <p>Note: JavaScript doesn&#39;t have the ability to pass a code block but it can be replicated by passing a function that acts like a callback...</p>
 
-<pre><code>function doSomething (callback) {
+<pre><code class="language-javascript">function doSomething (callback) {
         console.log(1);
         callback();
         console.log(3);
@@ -808,14 +809,14 @@ doSomething(function(){
 
 <p>For example:</p>
 
-<pre><code>def total
+<pre><code class="language-ruby">def total
   @base_price * (1 + @tax_rate)
 end
 </code></pre>
 
 <p>Becomes:</p>
 
-<pre><code>attr_reader :base_price, :tax_rate
+<pre><code class="language-ruby">attr_reader :base_price, :tax_rate
 
 def total
   base_price * (1 + tax_rate)
@@ -830,7 +831,7 @@ end
 
 <p>Although Ruby supports named parameters...</p>
 
-<pre><code>def turnOnTheTV (channel: 1, volume: 1); end
+<pre><code class="language-ruby">def turnOnTheTV (channel: 1, volume: 1); end
 turnOnTheTV(channel: 101, volume: 10)
 </code></pre>
 
@@ -838,13 +839,13 @@ turnOnTheTV(channel: 101, volume: 10)
 
 <p><strong>For example (JavaScript)</strong>:</p>
 
-<pre><code>function turnOnTheTV(c, v){}
+<pre><code class="language-javascript">function turnOnTheTV(c, v){}
 turnOnTheTV(101, 10);
 </code></pre>
 
 <p><strong>Becomes</strong>:</p>
 
-<pre><code>function turnOnTheTV (config) {
+<pre><code class="language-javascript">function turnOnTheTV (config) {
     // config.channel === 101
     // config.volume  === 10
 }
@@ -869,6 +870,7 @@ turnOnTheTV({ channel: 101, volume: 10 });
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

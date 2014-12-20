@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
         <title>Introduction to Ruby</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
         <style>
             body {
                 min-width: 200px;
@@ -78,30 +79,6 @@
 
 <p>If for some reason you create a <code>.ruby-version</code> file but forget to run the Ruby Build install for the requested version then the Terminal will display a message to let you know that you need to install the requested version of Ruby.</p>
 
-<p>Below are my original notes, but you can ignore these now.</p>
-
-<hr>
-
-<p>~~~OK, this was an absolute bitch to get set-up. Luckily for you, I&#39;ve suffered so you don&#39;t have to (hopefully).~~~</p>
-
-<p>~~~I&#39;m running Mac OSX so your mileage may vary.~~~</p>
-
-<p>~~~If you can get away with it, use the package manager homebrew to install: <code>brew install ruby</code>.~~~</p>
-
-<p>~~~But homebrew didn&#39;t work for me. It said it installed, but I couldn&#39;t get it to switch from the default Ruby 1.8 the Mac has pre-installed. So the next step was to install what is called &#39;rvm&#39; which lets you install and manage multiple versions of Ruby.~~~</p>
-
-<p>~~~The process is as follows (open the Terminal and start typing):~~~</p>
-
-<p>~~~1. <code>bash -s stable &lt; &lt;(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)</code>. After rvm is installed you&#39;ll see a message asking you to to run the following...~~~</p>
-
-<p>~~~2. <code>source /Users/&lt;username&gt;/.rvm/scripts/rvm</code>. Remember to replace <code>&lt;username&gt;</code> with the name of your computer.~~~</p>
-
-<p>~~~3. <code>rvm install 1.9.3 --with-gcc=clang</code>. The <code>--with-gcc=clang</code> was suggested on Stack Overflow to fix issues Mac OSX Lion users were having trying to upgrade to the latest Ruby version 1.9.3. This worked fine at home, but at work it failed so instead I executed… <code>rvm install ruby-1.9.3-p125</code>~~~</p>
-
-<p>~~~4. <code>rvm use 1.9.3 --default</code>. We&#39;re now telling rvm to use version 1.9.3 as the default version of Ruby~~~</p>
-
-<p>~~~5. <code>ruby -v</code> - just check the version quickly to be sure~~~</p>
-
 <h2>The Interactive Ruby Console</h2>
 
 <p>Beginners are advised to use the interactive Ruby console to get to know the language. So to start it up, in your Terminal type: <code>irb</code> (and if you want to quit use: <code>Ctrl+D</code>).</p>
@@ -112,7 +89,7 @@
 
 <p>Take the following example…</p>
 
-<pre><code>5.times {
+<pre><code class="language-ruby">5.times {
     print &quot;This gets written five times&quot;
     sleep 2
 }
@@ -140,7 +117,7 @@
 
 <p>In Ruby you have single line comments <code># this is a comment</code> and multi-line comments:</p>
 
-<pre><code>=begin
+<pre><code class="language-ruby">=begin
     Lots and lots of
     code that I want
     to comment out all at once
@@ -155,7 +132,7 @@
 
 <p>You can assign multiple variables at once like so…</p>
 
-<pre><code>x, y = 1, 2     # which is effectively the same as x = 1, y = 2
+<pre><code class="language-ruby">x, y = 1, 2     # which is effectively the same as x = 1, y = 2
 a, b = b, a     # which switches the values of each variable
 x,y,z = [1,2,3] # assign each array item value to a variable, so x = 1, y = 2, z = 3
 </code></pre>
@@ -168,7 +145,7 @@ x,y,z = [1,2,3] # assign each array item value to a variable, so x = 1, y = 2, z
 
 <p>So for example, if I have a class called &quot;MyClass&quot; and inside of it I set <code>@@my_var</code> to equal 456 instead of 123 then every object created from &quot;MyClass&quot; will have <code>my_var</code> set to 456. Whereas if &quot;MyClass&quot; had <code>@my_var</code> set to 123 and I create a new object from that class and set <code>@my_var</code> to 456 - an &#39;instance variable&#39; - then only that object would see the value of <code>@my_var</code> as 456, all other objects created from the class would still see the value as 123. It sounds tricky but it&#39;s not that bad really. Here is an example of what the above was trying to explain… </p>
 
-<pre><code># Following classes &#39;MyClass&#39; and &#39;MyClass2&#39; demonstrate difference between &#39;class variable&#39; and &#39;instance variable&#39;
+<pre><code class="language-ruby"># Following classes &#39;MyClass&#39; and &#39;MyClass2&#39; demonstrate difference between &#39;class variable&#39; and &#39;instance variable&#39;
 class MyClass
     def initialize
         @@class_var = 123
@@ -244,7 +221,7 @@ objD.showValue # =&gt; 123
 
 <p>If you had lots of hashes (which we&#39;ll come to later) and you have a key/property called &quot;name&quot; then you could write your hash like so…</p>
 
-<pre><code>hash1 = { &quot;name&quot; =&gt; &quot;Mark&quot; }
+<pre><code class="language-ruby">hash1 = { &quot;name&quot; =&gt; &quot;Mark&quot; }
 hash2 = { &quot;name&quot; =&gt; &quot;Brad&quot; }
 hash3 = { &quot;name&quot; =&gt; &quot;Ash&quot; }
 hash4 = { &quot;name&quot; =&gt; &quot;Neil&quot; }
@@ -252,7 +229,7 @@ hash4 = { &quot;name&quot; =&gt; &quot;Neil&quot; }
 
 <p>…but <code>&quot;name&quot;</code> is being re-created in memory every time it&#39;s referenced. It&#39;s much more energy efficient to use a Symbol which looks like a variable but is prefixed with a colon <code>:name</code>…</p>
 
-<pre><code>hash1 = { :name =&gt; &quot;Mark&quot; }
+<pre><code class="language-ruby">hash1 = { :name =&gt; &quot;Mark&quot; }
 hash2 = { :name =&gt; &quot;Brad&quot; }
 hash3 = { :name =&gt; &quot;Ash&quot; }
 hash4 = { :name =&gt; &quot;Neil&quot; }
@@ -266,7 +243,7 @@ hash4 = { :name =&gt; &quot;Neil&quot; }
 
 <p>To define a method the syntax is:</p>
 
-<pre><code>def method_name (arguments)
+<pre><code class="language-ruby">def method_name (arguments)
     // function code
 end
 </code></pre>
@@ -275,7 +252,7 @@ end
 
 <p>As was noted in the above &#39;Variables&#39; section about variables being able to assigned multiple values, this can come in handy with method returning multiple values as well (which is quite interesting as I&#39;m only used to functions in JavaScript returning a single value)… </p>
 
-<pre><code>def myMethod 
+<pre><code class="language-ruby">def myMethod 
     [1, 2] # this being the last expression, this is what&#39;s returned
 end
 
@@ -288,7 +265,7 @@ a, b = myMethod; # =&gt; a = 1, b = 2
 
 <p>So for example, these work…</p>
 
-<pre><code>welcome(&quot;Mark&quot;, 30)
+<pre><code class="language-ruby">welcome(&quot;Mark&quot;, 30)
 welcome&quot;Mark&quot;, 30
 welcome &quot;Mark&quot;, 30
 </code></pre>
@@ -301,7 +278,7 @@ welcome &quot;Mark&quot;, 30
 
 <p>You can specify default values for arguments…</p>
 
-<pre><code>def welcome (name = &quot;World&quot;, age = 1)
+<pre><code class="language-ruby">def welcome (name = &quot;World&quot;, age = 1)
     puts &quot;Hello #{name}!, I see you&#39;re #{age} years old.&quot;
 end
 </code></pre>
@@ -314,7 +291,7 @@ end
 
 <p>You can also add new methods to an existing object just by prefixing the name of the method with the relevant object… </p>
 
-<pre><code>def Math.someNewThing (x) 
+<pre><code class="language-ruby">def Math.someNewThing (x) 
     puts &quot;#{x} was here&quot;
 end
 
@@ -328,7 +305,7 @@ Math.someNewThing(&quot;abc&quot;) # =&gt; abc was here
 
 <p>In a similar example of extending already defined Classes:</p>
 
-<pre><code>class Fixnum
+<pre><code class="language-ruby">class Fixnum
     def seconds
         self
     end
@@ -351,7 +328,7 @@ puts Time.now - 7.days
 
 <p>Note: you might see methods that are called using a ? at the end, these indicate that the method will return a Boolean value (e.g. <code>respond_to?</code> which you&#39;ll see below in the &#39;Classes&#39; section)… </p>
 
-<pre><code>x = []
+<pre><code class="language-ruby">x = []
 x.empty? # =&gt; true (…or x.empty?() if you prefer the use of parenthesis)
 
 x = [1, 2, 3]
@@ -360,7 +337,7 @@ x.empty? # =&gt; false
 
 <p>If you want to know what methods are available to an object/class then look at the <code>class</code> of the object and then inspect the methods available… </p>
 
-<pre><code>my_hash = { :name =&gt; &quot;Mark&quot; }
+<pre><code class="language-ruby">my_hash = { :name =&gt; &quot;Mark&quot; }
 my_hash.class # =&gt; Hash
 Hash.instance_methods # =&gt; [:rehash, :to_hash, :to_a, :inspect, :to_s, :==, :[], :hash, :eql?, :fetch, :[]=, :store, :default, :default=, :default_proc, :default_proc=, :key, :index, :size, :length, :empty?, :each_value, :each_key, :each_pair, :each, :keys, :values, :values_at, :shift, :delete, :delete_if, :keep_if, :select, :select!, :reject, :reject!, :clear, :invert, :update, :replace, :merge!, :merge, :assoc, :rassoc, :flatten, :include?, :member?, :has_key?, :has_value?, :key?, :value?, :compare_by_identity, :compare_by_identity?, :entries, :sort, :sort_by, :grep, :count, :find, :detect, :find_index, :find_all, :collect, :map, :flat_map, :collect_concat, :inject, :reduce, :partition, :group_by, :first, :all?, :any?, :one?, :none?, :min, :max, :minmax, :min_by, :max_by, :minmax_by, :each_with_index, :reverse_each, :each_entry, :each_slice, :each_cons, :each_with_object, :zip, :take, :take_while, :drop, :drop_while, :cycle, :chunk, :slice_before, :nil?, :===, :=~, :!~, :&lt;=&gt;, :class, :singleton_class, :clone, :dup, :initialize_dup, :initialize_clone, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :respond_to_missing?, :extend, :display, :method, :public_method, :define_singleton_method, :object_id, :to_enum, :enum_for, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__, :__id__]
 </code></pre>
@@ -371,7 +348,7 @@ Hash.instance_methods # =&gt; [:rehash, :to_hash, :to_a, :inspect, :to_s, :==, :
 
 <p>When creating a method, if you want to pass a code block in as an argument, you need to prefix the argument name with an ampersand <code>&amp;</code> like so…</p>
 
-<pre><code>def myfn (&amp;code_block)
+<pre><code class="language-ruby">def myfn (&amp;code_block)
     %w(a e I o u).each do |vowel|
         code_block.call(vowel)
     end
@@ -384,7 +361,7 @@ myfn { |x| puts x }
 
 <p>But the above can be simplified...</p>
 
-<pre><code>def myfn
+<pre><code class="language-ruby">def myfn
     %w(a e I o u).each do |vowel|
         yield vowel
     end
@@ -405,7 +382,7 @@ myfn { |x| puts x }
 
 <p>The following is an example of how to use a Proc object instead of Block...</p>
 
-<pre><code>my_proc = Proc.new { |x| puts x }
+<pre><code class="language-ruby">my_proc = Proc.new { |x| puts x }
 
 def myfn proc_obj
     %w(a e I o u).each do |vowel|
@@ -431,7 +408,7 @@ myfn my_proc
 
 <p>The following is an example of how to use a Proc object instead of Block...</p>
 
-<pre><code>my_lambda = lambda { |x| puts x }
+<pre><code class="language-ruby">my_lambda = lambda { |x| puts x }
 
 def myfn lambda_obj
     %w(a e I o u).each do |vowel|
@@ -446,7 +423,7 @@ myfn my_lambda
 
 <p>The following example is modified from a test on RubyMonk but is a good example of using lambdas…</p>
 
-<pre><code>def with_names(fn)
+<pre><code class="language-ruby">def with_names(fn)
   result = []
   [ [&quot;Christopher&quot;, &quot;Alexander&quot;],
     [&quot;John&quot;, &quot;McCarthy&quot;],
@@ -465,7 +442,7 @@ with_names(l)
 
 <p>The Classes syntax is as follows…</p>
 
-<pre><code>class ClassName
+<pre><code class="language-ruby">class ClassName
     def initialize ()
         // code
     end
@@ -477,7 +454,7 @@ end
 
 <p>For example…</p>
 
-<pre><code>class Person
+<pre><code class="language-ruby">class Person
     def initialize (name = &quot;Bob&quot;)
         @name = name
     end
@@ -509,7 +486,7 @@ employee = Person.new(&quot;Mark&quot;)
 
 <p>For example…</p>
 
-<pre><code>class Test
+<pre><code class="language-ruby">class Test
     attr_accessor :user_name
     def initialize (name)
         @user_name = name
@@ -533,7 +510,7 @@ tester = Test.new(&quot;Mark&quot;)
 
 <p>Loops in Ruby are straight forward…</p>
 
-<pre><code>list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+<pre><code class="language-ruby">list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
 
 list.each do |item|
     puts item
@@ -544,7 +521,7 @@ end
 
 <p>One thing to be aware of (and you&#39;ll see this later under the &#39;Numbers&#39; section), you can swap out <code>do…end</code> for normal curly brackets… </p>
 
-<pre><code>list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+<pre><code class="language-ruby">list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
 
 list.each { |item|
     puts item
@@ -555,7 +532,7 @@ list.each { |item|
 
 <p>There is a standard <code>while</code> loop as well within Ruby… </p>
 
-<pre><code>count = 0
+<pre><code class="language-ruby">count = 0
 while count &lt; 10
     puts &quot;count = #{count}&quot;
     count += 1 # Ruby has neither ++ or -- to increment/decrement a value
@@ -564,7 +541,7 @@ end
 
 <p>Also with a <code>while</code> loop (if you&#39;re using a &#39;switch..case&#39; style statement - like you would see in JavaScript) you can explicitly return a value… </p>
 
-<pre><code>def myFunction
+<pre><code class="language-ruby">def myFunction
     xyz = &quot;def&quot;
     while true
         case xyz
@@ -581,7 +558,7 @@ end
 
 <p>There are other types of iterator methods such as <code>map</code>… </p>
 
-<pre><code>myArray = [1, 2, 3, 4]
+<pre><code class="language-ruby">myArray = [1, 2, 3, 4]
 newArray = myArray.map do |x|
     x*x
 end
@@ -593,7 +570,7 @@ end
 
 <p>Ruby is slightly different to other programming languages in that even its syntax is very expression-oriented. So where a control structure like <code>if</code> would be called a &#39;statement&#39; in other languages, in Ruby it is actually an expression which means it can be assigned to a variable like so…</p>
 
-<pre><code>x = 5
+<pre><code class="language-ruby">x = 5
 y = 10
 result = if x &lt; y then 
     x
@@ -613,7 +590,7 @@ result = if x &lt; y then x else y end
 
 <p>For example… </p>
 
-<pre><code>def welcome (name)
+<pre><code class="language-ruby">def welcome (name)
     puts &quot;Hello #{name}!&quot;
 end
 
@@ -622,14 +599,14 @@ welcome(&quot;Mark&quot;)
 
 <p>Multiple arguments work the same way…</p>
 
-<pre><code>def welcome (name, age)
+<pre><code class="language-ruby">def welcome (name, age)
     puts &quot;Hello #{name}!, I see you&#39;re #{age} years old.&quot;
 end
 </code></pre>
 
 <p>You could do the same with simple string concatenation… </p>
 
-<pre><code>puts &quot;Hello&quot; + name + &quot;!, I see you&#39;re &quot; + age + &quot; years old.&quot;
+<pre><code class="language-ruby">puts &quot;Hello&quot; + name + &quot;!, I see you&#39;re &quot; + age + &quot; years old.&quot;
 </code></pre>
 
 <p>…but as you can see it&#39;s not as nice to look at or easy to read and definitely isn&#39;t as maintainable.</p>
@@ -645,7 +622,7 @@ end
 
 <p>For example…</p>
 
-<pre><code>&quot;foobarfoobar&quot;.sub(&#39;bar&#39;,&#39;foo&#39;)
+<pre><code class="language-ruby">&quot;foobarfoobar&quot;.sub(&#39;bar&#39;,&#39;foo&#39;)
 # =&gt; foofoofoobar
 
 &quot;foobarfoobar&quot;.gsub(&#39;bar&#39;,&#39;foo&#39;)
@@ -673,7 +650,7 @@ puts x[2] # =&gt; is
 
 <p>The bitwise operator <code>&lt;&lt;</code> is used to add a new item to an array:</p>
 
-<pre><code>x = []
+<pre><code class="language-ruby">x = []
 x &lt;&lt; &quot;abc&quot;
 </code></pre>
 
@@ -681,7 +658,7 @@ x &lt;&lt; &quot;abc&quot;
 
 <p>Note: Strings also use the <code>&lt;&lt;</code> operator to add content to them:</p>
 
-<pre><code>testString = &quot;this is my string&quot;
+<pre><code class="language-ruby">testString = &quot;this is my string&quot;
 testString &lt;&lt; &quot; that has extra stuff added to it&quot;
 testString # =&gt; &quot;this is my string that has extra stuff added to it&quot; 
 </code></pre>
@@ -692,7 +669,7 @@ testString # =&gt; &quot;this is my string that has extra stuff added to it&quot
 
 <p>If you need to concatenate two Arrays you can use the <code>concat</code> method… </p>
 
-<pre><code>arr = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+<pre><code class="language-ruby">arr = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
 arr.concat([&quot;d&quot;, &quot;e&quot;])
 arr # =&gt; [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;] 
 </code></pre>
@@ -705,7 +682,7 @@ arr # =&gt; [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e
 
 <p>There are many Array methods for inserting new items into an Array, but you can also use Ranges (which normally work like <code>(&#39;A&#39;..&#39;Z&#39;)</code>):</p>
 
-<pre><code>arr = [0, 1, 2, 3, 4, 5, 6]
+<pre><code class="language-ruby">arr = [0, 1, 2, 3, 4, 5, 6]
 arr[1..3] = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
 arr # =&gt; [0, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, 4, 5, 6]
 </code></pre>
@@ -716,7 +693,7 @@ arr # =&gt; [0, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, 4, 5, 6]
 
 <p>So for example to create a hash you would use… </p>
 
-<pre><code>h = { 
+<pre><code class="language-ruby">h = { 
     &quot;a&quot; =&gt; 1, 
     &quot;b&quot; =&gt; 2
 }
@@ -724,7 +701,7 @@ arr # =&gt; [0, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, 4, 5, 6]
 
 <p>…then you can access the relevant key/values (and add new key/values) like so… </p>
 
-<pre><code>h[&quot;a&quot;]     # =&gt; 1
+<pre><code class="language-ruby">h[&quot;a&quot;]     # =&gt; 1
 h[&quot;b&quot;]     # =&gt; 2
 h[&quot;c&quot;] = 3 # create a new key/value
 h[&quot;c&quot;]     # =&gt; 3
@@ -732,7 +709,7 @@ h[&quot;c&quot;]     # =&gt; 3
 
 <p>…and finally you can loop through the hash…</p>
 
-<pre><code>h.each do |key, value|
+<pre><code class="language-ruby">h.each do |key, value|
     puts &quot;The value: #{value} belongs to the key #{key}&quot;
 end
 </code></pre>
@@ -743,7 +720,7 @@ end
 
 <p>To see what keys are available in an object use the <code>keys</code> property:</p>
 
-<pre><code>hash = { :name =&gt; &quot;Mark&quot;, :age =&gt; 30 }
+<pre><code class="language-ruby">hash = { :name =&gt; &quot;Mark&quot;, :age =&gt; 30 }
 hash.keys # =&gt; [:name, :age]
 </code></pre>
 
@@ -755,28 +732,28 @@ hash.keys # =&gt; [:name, :age]
 
 <p>In Ruby, all values are objects. This includes even simple things like numeric literals. So for example you can use a number to help carry out a certain action &#39;x&#39; amount of times…</p>
 
-<pre><code>3.times {
+<pre><code class="language-ruby">3.times {
     puts &quot;This gets written three times&quot;
 }
 </code></pre>
 
 <p>And as explained earlier you can swap curly brackets for <code>do…end</code>…</p>
 
-<pre><code>3.times do
+<pre><code class="language-ruby">3.times do
     puts &quot;This gets written three times&quot;
 end
 </code></pre>
 
 <p>But you can also do…</p>
 
-<pre><code>1.upto(9) { 
+<pre><code class="language-ruby">1.upto(9) { 
     |x| puts x 
 }
 </code></pre>
 
 <p>…which can be interchanged with… </p>
 
-<pre><code>1.upto(9) do |x| 
+<pre><code class="language-ruby">1.upto(9) do |x| 
     puts x 
 end
 </code></pre>
@@ -797,6 +774,7 @@ end
                 <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
             </ul>
         </article>
+        <script src="../scripts/prism.js"></script>
         <script>
             var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
