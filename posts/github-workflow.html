@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>GitHub Workflow (used by Frameworks team at BBC News)</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>GitHub Workflow (used by Frameworks team at BBC News)</h1>
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Rebase before merge</a></li>
+<li><a href="#3">Example</a></li>
+<li><a href="#4">(Bonus) Modifying content within an interactive rebase</a></li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>This is a quick post to cover a GitHub workflow that is utilised by our specific team (Frameworks) here at BBC News. The basis of our workflow is this:</p>
+
+<ul>
+<li>Open a GitHub PR (Pull Request) by creating a new feature branch from <code>master</code></li>
+<li>Make feature specific changes and request a code review</li>
+<li>If given a &quot;thumbs up&quot;, this means the PR author is allowed to handle merging the PR</li>
+<li>The merge process requires a set of sub steps (see below)</li>
+</ul>
+
+<div id="2"></div>
+
+<h2>Rebase before merge</h2>
+
+<p>At this point the PR author has been given a &quot;thumbs up&quot; and is preparing their PR to be merged back into the <code>master</code> branch. The steps (in summary) are:</p>
+
+<ul>
+<li>Interactively rebase <code>master</code> onto the feature branch</li>
+<li>Squash all feature commits into a single commit:
+
+<ul>
+<li>we&#39;ll see an example of this later (as this isn&#39;t <em>exactly</em> a <code>squash</code>)</li>
+<li>the first line of the commit message should be the same as the GitHub PR title</li>
+</ul></li>
+<li>As part of the rebase ensure:
+
+<ul>
+<li>the author(s) is mentioned in the commit message</li>
+<li>the PR is mentioned (and any associated issues as well)</li>
+</ul></li>
+<li>Move back to the <code>master</code> branch and <code>cherry-pick</code> in the newly squashed feature commit</li>
+</ul>
+
+<div id="3"></div>
+
+<h2>Example</h2>
+
+<p>Below is an example set of commits we&#39;ll be working from. I create a master branch and then branch off from that with a new <code>feature</code> branch:</p>
+
+<pre><code class="language-bash">git init
+touch test.txt
+git commit -am &quot;Initial file&quot;
+
+[master (root-commit) 85919e1] Initial file
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 test.txt
+
+git checkout -b feature
+Switched to a new branch &#39;feature&#39;
+
+echo foo &gt;&gt; test.txt
+git commit -am &quot;Foo&quot;
+
+echo bar &gt;&gt; test.txt
+git commit -am &quot;Bar&quot;
+
+echo baz &gt;&gt; test.txt
+git commit -am &quot;Baz&quot;
+
+# Check commits we now have in this feature branch
+# Note: this is a custom shell alias
+git lg
+
+* 62d4c80 - Baz (HEAD, feature)
+* a5827db - Bar
+* ae1a4a5 - Foo
+</code></pre>
+
+<p>At this point, let&#39;s imagine our <code>feature</code> PR has been approved to be merged:</p>
+
+<pre><code class="language-bash"># Make sure master is up to date
+git checkout master
+git pull --rebase origin master
+
+# Carry out the interactive rebase
+git checkout feature
+git rebase -i master
+</code></pre>
+
+<p>Now at this point you should see something like the following in your terminal:</p>
+
+<pre><code class="language-git">pick ae1a4a5 Foo
+pick a5827db Bar
+pick 62d4c80 Baz
+
+# Rebase 85919e1..62d4c80 onto 85919e1
+#
+# Commands:
+#  p, pick = use commit
+#  r, reword = use commit, but edit the commit message
+#  e, edit = use commit, but stop for amending
+#  s, squash = use commit, but meld into previous commit
+#  f, fixup = like &quot;squash&quot;, but discard this commit&#39;s log message
+#  x, exec = run command (the rest of the line) using shell
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out
+</code></pre>
+
+<p>We&#39;re now ready to modify our git history. So let&#39;s squash all our commits down into a single commit:</p>
+
+<pre><code class="language-git">reword ae1a4a5 Foo
+fixup a5827db Bar
+fixup 62d4c80 Baz
+</code></pre>
+
+<blockquote>
+<p>Note: we don&#39;t use <code>squash</code> as that automatically uses the existing commit message from the commit we&#39;re squashing other commits into (but our requirements mean we wish to modify that commit message); so we use <code>reword</code> and <code>fixup</code> instead</p>
+</blockquote>
+
+<p>Let&#39;s apply these changes by executing <code>:wq</code>. Once you do this, Git will carry out the rebase and then drop you back to the <code>COMMIT_EDITMSG</code> screen. You can now modify the commit message so it is the same as the title of your GitHub PR (and you can inform GitHub of what PR to automatically close when this commit arrives in <code>master</code> by using the keyword: <a href="https://help.github.com/articles/closing-issues-via-commit-messages/">closes</a>; you&#39;ll notice there is the keyword <code>fixes</code> which indicates a GitHub issue to close).</p>
+
+<pre><code class="language-git">New Feature X
+
+Closes #1 and Fixes #11
+Authors @integralist @stevenjack
+# Please enter the commit message for your changes. Lines starting
+# with &#39;#&#39; will be ignored, and an empty message aborts the commit.
+#
+# Date:      Sat Dec 27 16:19:54 2014 +0000
+#
+# rebase in progress; onto 85919e1
+# You are currently editing a commit while rebasing branch &#39;feature&#39; on &#39;85919e1&#39;.
+#
+# Changes to be committed:
+#   modified:   test.txt
+#
+</code></pre>
+
+<p>We can now see (when executing <code>git log</code>) that the three individual feature commits are now a single commit with a commit hash of <code>68f5bee</code>. We can move back to <code>master</code> (i.e. <code>git checkout master</code>) and then <code>cherry-pick</code> the squashed commit into it:</p>
+
+<pre><code class="language-bash">git checkout master
+git cherry-pick 68f5bee
+git branch -D feature
+git push origin master
+</code></pre>
+
+<div id="4"></div>
+
+<h2>(Bonus) Modifying content within an interactive rebase</h2>
+
+<p>One aspect of carrying out an interactive rebase that seems to confuse a lot of users is the ability to edit the content of a specific commit.</p>
+
+<p>I think the reason being is that when you select a commit to <code>edit</code>, the interactive rebase drops you at that specific commit, so you&#39;ll find there aren&#39;t any files in the staging area.</p>
+
+<p>To make edits at that point you need to undo the commit, so the files end up back in the staging area, ready to be modified and a new commit made.</p>
+
+<p>Let&#39;s take a look at an example, using our earlier example:</p>
+
+<pre><code class="language-bash">git lg
+
+* 76c99a2 - New Feature X (HEAD, master)
+* 85919e1 - Initial file
+</code></pre>
+
+<p>Let&#39;s say we want to make an edit to the commit <code>76c99a2</code>. To do that we&#39;ll need to start up an interactive rebase like so (we specify the commit before the one we want to edit):</p>
+
+<pre><code class="language-bash">git rebase -i 85919e1
+
+Stopped at 76c99a27e64b5f749ac8e3d3c7032f53954c760a... New Feature X
+You can amend the commit now, with
+
+        git commit --amend 
+
+Once you are satisfied with your changes, run
+
+        git rebase --continue
+</code></pre>
+
+<p>At this point we want to execute the following command, which will undo the commit (but keeps the changes from that commit) and place the files back into the staging area:</p>
+
+<pre><code class="language-bash">git reset --mixed 85919e1
+
+Unstaged changes after reset:
+M       test.txt
+</code></pre>
+
+<p>Now if you check the diff on the files you&#39;ll see the changes from that commit have been made and are waiting to be committed again:</p>
+
+<pre><code class="language-bash">git diff
+
+diff --git a/test.txt b/test.txt
+index e69de29..86e041d 100644
+--- a/test.txt
++++ b/test.txt
+@@ -0,0 +1,3 @@
++foo
++bar
++baz
+</code></pre>
+
+<p>So you can now modify the <code>test.txt</code> file as necessary and create a new commit. When you create the new commit you finish the rebase by using the <code>--continue</code> feature (as seen in the above output when initially starting the rebase):</p>
+
+<pre><code class="language-bash">echo qux &gt;&gt; test.txt
+git commit -am &quot;New Feature X&quot;
+git rebase --continue
+</code></pre>
+
+<blockquote>
+<p>Note: if you forget where you are then running <code>git status</code> should give you the information you need to help you either continue rebasing or to abort the rebase</p>
+</blockquote>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
