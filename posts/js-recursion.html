@@ -82,9 +82,9 @@ sum(1, 10); // =&gt; 11
 
 <p>Recursion in the form we&#39;ve written it above requires many stacks to be created because of how the function is calling itself. </p>
 
-<p>The first call to the <code>sum</code> function (i.e. <code>sum(1, 10)</code>) doesn&#39;t complete until the very <em>last</em> call to <code>sum</code> returns the value of <code>x</code> (i.e. <code>sum(0, 99999)</code>). When the final call to <code>sum</code> occurs and we discover that <code>y</code> is no longer greater than <code>x</code> we return the accumulated value which has for each recursive call been stored inside the argument <code>x</code>. That returned value needs to then be passed back through each function execution context (effectively closing each stack) until we reach the very first function execution context that was opened when we ran <code>sum(1, 10)</code>.</p>
+<p>The first call to the <code>sum</code> function (i.e. <code>sum(1, 100000)</code>) doesn&#39;t complete until the very <em>last</em> call to <code>sum</code> returns the value of <code>x</code> (i.e. <code>sum(0, 99999)</code> is technically the final execution). When the final call to <code>sum</code> occurs and we discover that <code>y</code> is no longer greater than zero, we return the accumulated value which has (for each recursive call) been stored inside the argument <code>x</code>. That returned value needs to then be passed back through each function execution context (effectively closing each stack) until we reach the very first function execution context that was opened when we ran <code>sum(1, 100000)</code>.</p>
 
-<p>If we create a stack deep enough (e.g. <code>sum(1, 100000)</code>) then the JavaScript engine will throw a <code>Maximum call stack size exceeded</code> error. </p>
+<p>If we create a stack deep enough (such as we did with <code>sum(1, 100000)</code>) then the JavaScript engine will throw a <code>Maximum call stack size exceeded</code> error. </p>
 
 <p>This problem can occur very easily (as we&#39;ve seen in this simple code example).</p>
 
