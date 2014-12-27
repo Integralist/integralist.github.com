@@ -139,13 +139,11 @@ Foo.bar # =&gt; im public
 Foo.baz # =&gt; im private
 </code></pre>
 
-<p>Notice that although we&#39;ve specified <code>def self.baz</code> to be <code>private</code> it is still accessible directly. This is because <code>private</code> only applies to instance methods (where as Singleton/Class methods are instance methods of the Eigenclass).</p>
+<p>Notice that although we&#39;ve specified <code>def self.baz</code> to be <code>private</code> it is still accessible directly. This is because <code>private</code> only applies to instance methods; and although Singleton/Class methods are instance methods (of the Eigenclass!), in the above example the <code>private</code> method actually applies to the <code>Foo</code> class and not the Eigenclass, and so the class level methods aren&#39;t affected by the <code>private</code> method.</p>
 
 <blockquote>
-<p>Note: <code>private</code> is actually a method and not a directive or special syntax.</p>
+<p>Note: <code>private</code> is a method and not a directive or special syntax.</p>
 </blockquote>
-
-<p>In the above example the <code>private</code> method goes through the <code>Foo</code> class, and so its class level methods aren&#39;t affected by the <code>private</code> method.</p>
 
 <p>Now that we&#39;ve seen the problem, let&#39;s see how to fix this by taking advantage of the Eigenclass:</p>
 
