@@ -1,0 +1,316 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Thread Safe Concurrency</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism-twilight.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>Thread Safe Concurrency</h1>
+
+<ul>
+<li><a href="#1">Introduction</a>
+
+<ul>
+<li><a href="#2">Shared Memory</a></li>
+<li><a href="#3">Message Passing</a></li>
+</ul></li>
+<li><a href="#4">Various options</a>
+
+<ul>
+<li><a href="#5">Mutexes/Semaphores</a></li>
+<li><a href="#6">STM</a></li>
+<li><a href="#7">Actors</a></li>
+<li><a href="#8">CSP</a></li>
+</ul></li>
+<li><a href="#9">Conclusion</a></li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>Concurrency is a difficult concept. Regardless of programming language or idiom that you use, the practice of programming a &quot;thread-safe&quot; application can be harder than you think.</p>
+
+<p>There are two fundamental models of concurrency:</p>
+
+<ol>
+<li>Shared Memory</li>
+<li>Message Passing</li>
+</ol>
+
+<p>In the first, we have concepts such as Threads, Locks and Mutexes. In the latter we have patterns such as Actors and CSP, which rely on the mantra of...</p>
+
+<blockquote>
+<p>&quot;don&#39;t communicate by sharing memory; share memory by communicating&quot;</p>
+</blockquote>
+
+<div id="2"></div>
+
+<h3>Shared Memory</h3>
+
+<p>The following diagram is an extremely simplistic view of how CPUs, Processes and Threads interact but should help us to better understand why code can become <strong>NON</strong> thread-safe (as far as the &quot;Shared Memory&quot; model is concerned; we&#39;ll see shortly that the &quot;message passing&quot; model side steps this issue):</p>
+
+<p><a href="../images/cpu-processes-and-threads.png">
+    <img src="../images/cpu-processes-and-threads.png">
+</a></p>
+
+<p>...for those of you who cannot see the image, effectively a process can spawn multiple threads and each thread belonging to a specific process shares the memory related to the process.</p>
+
+<p>Meaning if your software process creates two threads, then both threads have access to the same memory space and thus can manipulate the same chunk of memory (and by memory, I&#39;m specifically referring to data the application creates/has access to).</p>
+
+<p>This means, if your software creates some mutable data (e.g. in Ruby this could look something like <code>foo = &quot;bar&quot;</code> - a <code>foo</code> variable that holds the String value <code>bar</code>) and you want to modify the value of the variable, then multiple threads could manipulate the value in an unexpected order and subsequently cause a difficult to locate bug.</p>
+
+<p>Any time you create a new Thread and within that Thread you modify a mutable piece of data you should be concerned about how &quot;thread-safe&quot; that data is.</p>
+
+<blockquote>
+<p>Note: if you&#39;re also utilising immutable data structures (as found in more functional languages, but also languages such as Go where they &quot;pass by value&quot; rather than &quot;pass by reference&quot;) then this also makes code less prone to thread-safety concerns (but that&#39;s a discussion for another day)</p>
+</blockquote>
+
+<div id="3"></div>
+
+<h3>Message Passing</h3>
+
+<p>The message passing model relies on no data being shared, but rather communication between processes happening via either a message bus or by piping messages down a channel (depending on which style is implemented in your programming language of choice).</p>
+
+<p>As well as avoiding the issue of data being shared, it also avoids the issue of trying to recover from failures (which thread/process is the correct one); which is a hard problem to reason about.</p>
+
+<div id="4"></div>
+
+<h2>Various options</h2>
+
+<p>There are four main types of solutions to the problem of thread-safe concurrency:</p>
+
+<ol>
+<li>Mutexes/Semaphores</li>
+<li>Software Transactional Memory (STM)</li>
+<li>The &quot;Actors&quot; pattern</li>
+<li>Communicating Sequential Processes (CSP)</li>
+</ol>
+
+<p>Let&#39;s investigate each of these in turn:</p>
+
+<div id="5"></div>
+
+<h3>Mutexes/Semaphores</h3>
+
+<p>We&#39;ll be discussing specifically &quot;mutexes&quot; rather than &quot;semaphores&quot; (they have very similar purposes - in that they control access to specific data - although a mutex offers some additional guarantees which we won&#39;t go into here).</p>
+
+<p>When using a mutex, you can &quot;lock&quot; a piece of data so only that specific Thread has access to the data. When done manipulating the data you can &quot;unlock&quot; it, thus allowing another Thread to use a mutex to &quot;lock&quot; the data so it can make its own changes.</p>
+
+<p>Let&#39;s take a look at an example (in Ruby):</p>
+
+<pre><code class="language-ruby">def update
+  mutex = Mutex.new
+  data  = 0
+
+  Thread.new { mutex.synchronize { data += 1} }.join
+end
+</code></pre>
+
+<blockquote>
+<p>Note: for the full Mutex API see <a href="http://www.ruby-doc.org/core-2.1.5/Mutex.html">http://www.ruby-doc.org/core-2.1.5/Mutex.html</a></p>
+</blockquote>
+
+<p>This particular solution is the simplest of the three. It doesn&#39;t take into account any logic for handling unexpected changes to data (we&#39;ll see what that means in the next section).</p>
+
+<div id="6"></div>
+
+<h3>STM</h3>
+
+<p>Software Transactional Memory is known as being an &quot;optimistic&quot; process. Compare this to the lock-synchronisation mechanism of a Mutex, which implies the onus of whether a write action will succeed, should be on the &quot;writer&quot; (i.e. the &quot;writer&quot; locks the data, writes the data, then releases the lock). </p>
+
+<p>The STM on the other hand doesn&#39;t care what happens in another Thread, it instead records all the changes in a log file and then just before it confirms the write (referred to as a &quot;commit&quot; in STM terminology) it verifies the data we&#39;re modifying hasn&#39;t changed, and if it hasn&#39;t we go ahead and commit the change made by our Thread.</p>
+
+<p>If a change has been made to the shared data source, then the transation will start over; but this time using the latest copy of the data we&#39;re modifying (note: this can in some cases cause a deadlock to occur).</p>
+
+<p>The following example uses the Clojure programming language to implement a thead-safe modification via the STM (specifically the <code>ensure</code> function allows us to tell the STM what shared memory to watch for changes while our transaction is ongoing). </p>
+
+<p>The requirement in the code is that the two bank accounts must have at least 1000 in total between them. If we try to remove an amount from either account which results in the total amount falling below 1000 then we should not complete that transaction:</p>
+
+<pre><code class="language-scheme">(def current-account (ref 500))
+(def savings-account (ref 600))
+
+(defn withdraw [from constraint amount]
+  (dosync
+    (let [total (+ @from (ensure constraint))]
+      (Thread/sleep 1000) ; allows for a more visible context switch
+      (if (&gt;= (- total amount) 1000)
+        (alter from - amount)
+        (println &quot;Sorry, can&#39;t withdraw due to constraint violation&quot;)))))
+
+(println &quot;STATE BEFORE MODIFYING&quot;)
+(println &quot;Current Account balance is&quot; @current-account)
+(println &quot;Savings Account balance is&quot; @savings-account)
+(println &quot;Total balance is&quot; (+ @current-account @savings-account))
+
+(future (withdraw current-account savings-account 100))
+(future (withdraw savings-account current-account 100))
+
+(Thread/sleep 4000)
+
+(println &quot;STATE AFTER MODIFYING&quot;)
+(println &quot;Current Account balance is&quot; @current-account)
+(println &quot;Savings Account balance is&quot; @savings-account)
+(println &quot;Total balance is&quot; (+ @current-account @savings-account))
+</code></pre>
+
+<p>The output of the above code could look like the following (but refer to the below note which explains why in some instances, because the transaction can fail and automatically retry, you could possibly see the failure message informing the user that the transaction failed even when it was successful):</p>
+
+<pre><code class="language-scheme">(load-file &quot;test.clj&quot;)
+
+current-account:clojure.lang.Ref@330ff9eb
+savings-account:clojure.lang.Ref@a5ec812
+
+STATE BEFORE MODIFYING
+Current Account balance is 500
+Savings Account balance is 600
+Total balance is 1100
+
+STATE AFTER MODIFYING
+Current Account balance is 500
+Savings Account balance is 500
+Total balance is 1000
+</code></pre>
+
+<blockquote>
+<p>Note: <code>println</code> is sending data to <em>stdout</em> (defined as a thread-local dynamic variable). This variable is binded to the current Thread by default (meaning values don&#39;t cross over into other Threads).  </p>
+
+<p>A <code>future</code> creates a new Thread, but the binding of <em>stdout</em> is inherited by the <code>future</code>&#39;s parent process (i.e. any <code>println</code> calls within the <code>withdraw</code> function - which runs in the parent process - can appear in the <code>future</code>&#39;s thread); meaning the output sent by <code>println</code> doesn&#39;t necessarily reflect the correct state.</p>
+
+<p>For example, even when the transaction completes successfully, you might see the failure message printed - at some point in <em>stdout</em> - because the failing message is coming from an earlier transaction that indeed failed. But after a retry the transaction passed and so the message you see in <em>stdout</em> doesn&#39;t reflect the latest status of the application.</p>
+
+<p>I would suggest that the <code>println</code> message be moved outside of the transaction and that you add additional logic after the transaction code (this means after the transaction has completed; inc. retries) as a way to work around this issue with printing messages to <em>stdout</em> prematurely after a failed transaction. </p>
+
+<p>I didn&#39;t bother implementing this within my example, as it wasn&#39;t essential to understanding the code.</p>
+</blockquote>
+
+<div id="7"></div>
+
+<h3>Actors</h3>
+
+<p>The basic premise of the Actors pattern is built upon it being a form of &quot;message bus&quot;. The philosophy of the pattern is that everything is an Actor. An Actor receives messages and based on its state can determine whether it wants to handle the task defined in the message it has received, or to delegate the task off to other subordinates. An Actor can also create more Actors dynamically.</p>
+
+<p>The use of messages allows communication to become asynchronous and loosely coupled from the rest of the system. But this can result in non-sequential message order (unless you have an Actor whose role is to ensure ordering via some form of Queue).</p>
+
+<p>The Actor pattern has been made popular via Erlang and Scala (in the form of the <a href="http://akka.io/">Akka</a> framework)</p>
+
+<blockquote>
+<p>Note: Akka has bindings for other JVM based languages (Clojure, JRuby, Groovy): <a href="http://doc.akka.io/docs/akka/2.3.4/additional/language-bindings.html">http://doc.akka.io/docs/akka/2.3.4/additional/language-bindings.html</a></p>
+</blockquote>
+
+<p>I&#39;ve yet to get around to writing any Scala code and so because Scala is the defacto example of the Akka framework I&#39;ve decided to borrow an example from the official Akka site:</p>
+
+<pre><code class="language-scala">case class Greeting(who: String)
+
+class GreetingActor extends Actor with ActorLogging {
+  def receive = {
+    case Greeting(who) ⇒ log.info(&quot;Hello &quot; + who)
+  }
+}
+
+val system = ActorSystem(&quot;MySystem&quot;)
+val greeter = system.actorOf(Props[GreetingActor], name = &quot;greeter&quot;)
+greeter ! Greeting(&quot;Charlie Parker&quot;)
+</code></pre>
+
+<div id="8"></div>
+
+<h2>CSP</h2>
+
+<p>Communicating Sequential Processes is an alternative mechanism for expressing concurrency, which has been popularized by recent languages <a href="http://clojure.org/">Clojure</a> and <a href="http://golang.org/">Go</a>. It also is based on the idea of message passing, similar to the Actor pattern.</p>
+
+<p>Some of the fundamental differences between this and the Actor pattern are:</p>
+
+<ul>
+<li>Messages are sequential</li>
+<li>Communication is synchronous</li>
+<li>Communication happens via defined &quot;channels&quot;</li>
+<li>Processes are anonymous 
+
+<ul>
+<li>i.e. Actors know who to communicate with</li>
+<li>Where as Channels are pipes with messages going in and listeners the other end</li>
+</ul></li>
+</ul>
+
+<p>You also have the option of applying other patterns such as multiplexing multiple channels down into one, think &quot;fan-in&quot;, which can help in certain scenarios where you want to accept lots of messages comming in (the reverse is also possible, i.e. &quot;fan-out&quot;).</p>
+
+<p>Picking one model over another (Actor vs CSP) will be determined by the level of complexity you feel is inherently added by either solution and/or model your language of choice supports.</p>
+
+<p>The following is an extremely simple demonstration of the CSP/channel model written in Go (there is a channel which accepts an infinite number of messages; and our <code>main</code> function will take the messages from the channel as they become available):</p>
+
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;math/rand&quot;
+    &quot;time&quot;
+)
+
+func main() {
+    c := createChannel(&quot;hello&quot;)
+
+    for i := 0; i &lt; 5; i++ {
+        fmt.Printf(&quot;You say: %q\n&quot;, &lt;-c)
+    }
+
+    fmt.Println(&quot;OK, we&#39;ve received enough messages; stopping now&quot;)
+}
+
+func createChannel(msg string) &lt;-chan string {
+    c := make(chan string)
+
+    // endlessly fire messages onto our channel
+    go func() {
+        for i := 0; ; i++ {
+            c &lt;- fmt.Sprintf(&quot;%s %d&quot;, msg, i)
+            time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)
+        }
+    }()
+
+    return c
+}
+</code></pre>
+
+<p>Again, it&#39;s important to realise that Channels are synchronous and can block/cause deadlocks. In Go you can implement a timeout as a way of avoiding deadlocks. I&#39;m not currently sure if Clojure has a similar work-around built into the language or whether you have to manually implement that yourself.</p>
+
+<div id="9"></div>
+
+<h2>Conclusion</h2>
+
+<p>As mentioned at the start of this post: solving the problem of thread-safe concurrency isn&#39;t necessarily as straight forward as you would have hoped (if you&#39;re new to the concepts). Throw in distributed systems and the problem is conflated even further.</p>
+
+<p>But with that being said, we can clearly see there are quite a few different options available to us already - albeit with differing levels of complexity depending on the problem we&#39;re trying to solve. This is a good thing because you shouldn&#39;t always reach for a more complex solution if it&#39;s not necessary. If the problem is a small one and a simple mutex resolves it then maybe that&#39;s OK. Don&#39;t over engineer your system.</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
