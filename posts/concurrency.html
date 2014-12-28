@@ -257,24 +257,24 @@ import (
 )
 
 func main() {
-    c := createChannel(&quot;hello&quot;)
+    c := createChannel(&quot;hello&quot;, 5)
 
-    for i := 0; i &lt; 5; i++ {
-        fmt.Printf(&quot;You say: %q\n&quot;, &lt;-c)
+    for i := range c {
+        fmt.Printf(&quot;You say: %q\n&quot;, i)
     }
 
-    fmt.Println(&quot;OK, we&#39;ve received enough messages; stopping now&quot;)
+    fmt.Println(&quot;I&#39;m done.&quot;)
 }
 
-func createChannel(msg string) &lt;-chan string {
-    c := make(chan string)
+func createChannel(msg string, size int) &lt;-chan string {
+    c := make(chan string, size)
 
-    // endlessly fire messages onto our channel
     go func() {
-        for i := 0; ; i++ {
+        for i := 1; i &lt;= size; i++ {
             c &lt;- fmt.Sprintf(&quot;%s %d&quot;, msg, i)
             time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)
         }
+        close(c)
     }()
 
     return c
