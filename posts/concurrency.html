@@ -127,6 +127,10 @@ end
 
 <p>This particular solution is the simplest of the three. BUT it doesn&#39;t take into account any logic for handling unexpected changes to data (we&#39;ll see what that means in the next section).</p>
 
+<h4>Atomic operations</h4>
+
+<p>Locks and mutexes allow operations to become <em>atomic</em>, meaning that the change happens &quot;as a whole&quot;. Meaning it becomes thread safe because another thread can&#39;t accidentally read a piece of data/state/memory that is half done (e.g. <code>+=</code> in the above Ruby example would not be thread safe without the Mutex because a thread could read the value of <code>data</code> inbetween the read and the assignment that <code>+=</code> carries out).</p>
+
 <div id="6"></div>
 
 <h3>STM</h3>
@@ -135,7 +139,15 @@ end
 
 <p>The STM on the other hand doesn&#39;t care what happens in another Thread, it instead records all the changes in a log file and then just before it confirms the write (referred to as a &quot;commit&quot; in STM terminology) it verifies the data we&#39;re modifying hasn&#39;t changed, and if it hasn&#39;t we go ahead and commit the change made by our Thread.</p>
 
-<p>If a change has been made to the shared data source, then the transation will start over; but this time using the latest copy of the data we&#39;re modifying (note: this can in some cases cause a deadlock to occur).</p>
+<p>If a change has been made to the shared data source, then the transation will start over; but this time using the latest copy of the data we&#39;re modifying (this can in some cases cause a deadlock to occur).</p>
+
+<p>We should ensure that code within a transaction is idempotent and side effect free.</p>
+
+<blockquote>
+<p>Note: the STM is best used for applications that have frequent reads and can allow for low to medium write collisions. If you expect lots of write collisions then it may be best to opt for another pattern, such as the <a href="#7">Actors</a> pattern discussed in the following section.</p>
+</blockquote>
+
+<h4>Clojure example</h4>
 
 <p>The following example uses the Clojure programming language to implement a thead-safe modification via the STM (specifically the <code>ensure</code> function allows us to tell the STM what shared memory to watch for changes while our transaction is ongoing). </p>
 
@@ -170,7 +182,7 @@ end
 
 <p>The output of the above code could look like the following (but refer to the below note which explains why in some instances, because the transaction can fail and automatically retry, you could possibly see the failure message informing the user that the transaction failed even when it was successful):</p>
 
-<pre><code class="language-scheme">STATE BEFORE MODIFYING
+<pre><code class="language-bash">STATE BEFORE MODIFYING
 Current Account balance is 500
 Savings Account balance is 600
 Total balance is 1100
@@ -193,11 +205,114 @@ Total balance is 1000
 <p>I didn&#39;t bother implementing this within my example, as it wasn&#39;t essential to understanding the code.</p>
 </blockquote>
 
+<h4>JRuby example</h4>
+
+<p>If Clojure is a bit too much of a head spin (Lisp based languages can be quite confusing if you&#39;re new to the syntax/concepts) then let&#39;s see a similar example written in JRuby.</p>
+
+<blockquote>
+<p>Note: because JRuby runs on the JVM, like Clojure, we take advantage of that fact and import Clojure&#39;s STM functionality for us to utilise within our Ruby code</p>
+</blockquote>
+
+<p>In the following example we have downloaded the Clojure runtime as a jar (from <a href="http://clojure.org/downloads">http://clojure.org/downloads</a>) and are adding its location to the Java <code>$CLASSPATH</code> environment variable so when we try to <code>java_import</code> the relevant libraries, Java will be able to locate them.</p>
+
+<p>Within our code you&#39;ll see we&#39;re using methods that correlate to what would be recognisable to Clojure&#39;s environment: <code>LockingTransaction.run_in_transaction</code>, <code>@balance.set</code> and <code>@balance.deref</code>.</p>
+
+<pre><code class="language-ruby">$CLASSPATH &lt;&lt; &quot;clojure-1.6.0/clojure-1.6.0.jar&quot;
+
+require &quot;java&quot;
+java_import &quot;clojure.lang.Ref&quot;
+java_import &quot;clojure.lang.LockingTransaction&quot;
+
+class Account
+  attr_reader :name
+
+  def initialize(name, initial_balance)
+    @name    = name
+    @balance = Ref.new initial_balance
+  end
+
+  def balance
+    @balance.deref
+  end
+
+  def deposit(amount)
+    LockingTransaction.run_in_transaction do
+      if amount &gt; 0
+        @balance.set @balance.deref + amount
+        p &quot;Deposited $#{amount} into account #{@name}&quot;
+      else
+        raise &quot;The amount must be greater than zero&quot;
+      end
+    end
+  end
+
+  def withdraw(amount)
+    LockingTransaction.run_in_transaction do
+      if amount &gt; 0 &amp;&amp; @balance.deref &gt;= amount
+        @balance.set @balance.deref - amount
+      else
+        raise &quot;Can&#39;t withdraw $#{amount}; balance is $#{@balance.deref}&quot;
+      end
+    end
+  end
+end
+
+def transfer(from, to, amount)
+  LockingTransaction.run_in_transaction do
+    to.deposit amount
+    from.withdraw amount
+  end
+end
+
+def transfer_and_print(from, to, amount)
+  begin
+    transfer from, to, amount
+  rescue StandardError =&gt; e
+    p &quot;Transfer failed: #{e}&quot;
+  end
+
+  p &quot;Balance of &#39;from&#39; account (#{from.name}) is $#{from.balance}&quot;
+  p &quot;Balance of &#39;to&#39; account (#{to.name}) is $#{to.balance}&quot;
+end
+
+account1 = Account.new 1, 2000
+account2 = Account.new 2, 100
+
+p &quot;account1 balance is $#{account1.balance}&quot;
+p &quot;account2 balance is $#{account2.balance}&quot;
+p &quot;---&quot;
+
+transfer_and_print account1, account2, 500
+p &quot;---&quot;
+transfer_and_print account1, account2, 5000
+</code></pre>
+
+<p>The output of the above program is as follows&hellip; (notice that we see the deposit succeeds, but the transaction as a whole fails - i.e. the deposit is revoked - as we can&#39;t withdraw the requested amount)</p>
+
+<pre><code class=" language-bash ">&quot;account1 balance is $2000&quot;
+&quot;account2 balance is $100&quot;
+&quot;---&quot;
+&quot;Deposited $500 into account 2&quot;
+&quot;Balance of &#39;from&#39; account (1) is $1500&quot;
+&quot;Balance of &#39;to&#39; account (2) is $600&quot;
+&quot;---&quot;
+&quot;Deposited $5000 into account 2&quot;
+&quot;Transfer failed: Can&#39;t withdraw $5000; balance is $1500&quot;
+&quot;Balance of &#39;from&#39; account (1) is $1500&quot;
+&quot;Balance of &#39;to&#39; account (2) is $600&quot;
+</code></pre>
+
 <div id="7"></div>
 
 <h3>Actors</h3>
 
-<p>The basic premise of the Actors pattern is built upon it being a form of &quot;message bus&quot;. The philosophy of the pattern is that everything is an Actor. An Actor receives messages and based on its state can determine whether it wants to handle the task defined in the message it has received, or to delegate the task off to other subordinates. An Actor can also create more Actors dynamically.</p>
+<p>The basic premise of the Actors pattern is built upon it being a form of &quot;message bus&quot;. The philosophy of the pattern is that <em>everything is an Actor</em>. An Actor receives messages and based on its state can determine whether it wants to handle the task defined in the message it has received, or to delegate the task off to other subordinates. An Actor can also create more Actors dynamically.</p>
+
+<p>Each Actor is typically run in their own thread (using a Thread Pool implementation to allow for better resource management/allocation). This also helps to facilitate &quot;isolated mutability&quot;; i.e. mutable state is contained within the Actor but only that actor can modify the state (and as the Actor sits inside it&#39;s own thread its mutable state is safe from other Actors).</p>
+
+<blockquote>
+<p>Note: be very careful using the Actor pattern with languages that do not have native support for immutable data structures as you could open yourself up to hard to debug problems if your language allows mutability (e.g. Clojure supports immutability, but Ruby does not; Ruby does allow you to <code>freeze</code> an object, but that doesn&#39;t include any nested structures). Much like how we&#39;ve utilised Clojure&#39;s STM in the above JRuby example, you can also import its immutable data structures. Although this won&#39;t help you if you&#39;re forced to use a non-JVM language such as MRI (which is the main Ruby interpreter written in C).</p>
+</blockquote>
 
 <p>The use of messages allows communication to become asynchronous and loosely coupled from the rest of the system. But this can result in non-sequential message order (unless you have an Actor whose role is to ensure ordering via some form of Queue).</p>
 
@@ -222,9 +337,45 @@ val greeter = system.actorOf(Props[GreetingActor], name = &quot;greeter&quot;)
 greeter ! Greeting(&quot;Charlie Parker&quot;)
 </code></pre>
 
+<h4>Transactions and Actors?</h4>
+
+<p>Actors can also coordinate more safely by combining themselves via STM transactions. These are typically referred to as &quot;transactors&quot;. The benefits of wrapping messages within a transaction is that we eliminate synchronisation concerns (changes within a transaction are <em>atomic</em>).</p>
+
+<h4>Actors in Clojure</h4>
+
+<p>Clojure does not support Actors, although it does have a mechanism known as &quot;<a href="http://clojure.org/agents">agents</a>&quot;. An agent provides access to shared mutable state, but does so asynchronously (much like an Actor). Where an Actor receives a &quot;message&quot;, an agent accepts an <code>action</code>.</p>
+
+<p>Where as the STM provides coordinated access to data (i.e. atomic - verifies no changes to shared data, otherwise fails the entire transaction). Agents are independent; meaning that actions run concurrently (the call to <code>action</code> returns immediately), but the actions are executed sequentially via a thread selected from a pre-defined thread pool.</p>
+
+<p>So once the agent&#39;s state is changed, the next action is applied to the agent (now using the latest state it points to).</p>
+
+<h4>Limitations</h4>
+
+<p>The Actor pattern does have some limitations:</p>
+
+<ul>
+<li>Languages that do not enforce immutability are more prone to thread safety bugs</li>
+<li>Actors can be left starving if a dependant Actor fails (they&#39;ll be left waiting for a message that will never arrive)
+
+<ul>
+<li>This means we should program defensively and raise exceptions to the waiting Actors</li>
+</ul></li>
+<li>The Actors pattern does not prevent a dead/livelock scenario (two Actors waiting on each other for messages)
+
+<ul>
+<li>Again, we should program defensively by using timeouts to break a livelock</li>
+</ul></li>
+<li>Actors can only handle one message at a time, meaning we should be careful to not cause delays for messages that are only trying to &quot;read&quot; a value from inside the Actor</li>
+<li>The Actor pattern works best when problems can be divided into sections that do not rely on each other
+
+<ul>
+<li>i.e. communication can be sporadic. If frequent interaction is needed or each section has a dependency on each other to coordinate the task then choose an alternative combination of concurrency models</li>
+</ul></li>
+</ul>
+
 <div id="8"></div>
 
-<h2>CSP</h2>
+<h3>CSP</h3>
 
 <p>Communicating Sequential Processes is an alternative mechanism for expressing concurrency, which has been popularized by recent languages <a href="http://clojure.org/">Clojure</a> and <a href="http://golang.org/">Go</a>. It also is based on the idea of message passing, similar to the Actor pattern.</p>
 
