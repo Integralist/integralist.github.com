@@ -35,7 +35,8 @@
 <li><a href="#7">Actors</a></li>
 <li><a href="#8">CSP</a></li>
 </ul></li>
-<li><a href="#9">Conclusion</a></li>
+<li><a href="#9">Threads</a></li>
+<li><a href="#10">Conclusion</a></li>
 </ul>
 
 <div id="1"></div>
@@ -435,6 +436,48 @@ func createChannel(msg string, size int) &lt;-chan string {
 <p>Again, it&#39;s important to realise that Channels are synchronous and can block/cause deadlocks. In Go you can implement a timeout as a way of avoiding deadlocks. I&#39;m not currently sure if Clojure has a similar work-around built into the language or whether you have to manually implement that yourself.</p>
 
 <div id="9"></div>
+
+<h2>Threads</h2>
+
+<p>Threads are prevalent across both the &quot;shared memory&quot; and &quot;message passing&quot; models. The discussion of how many threads to create is an important one and depends on the type of tasks your application is expected to handle: CPU bound or I/O bound. In the following sections we&#39;ll cover this topic, as well as describing an algorithm for calculating this.</p>
+
+<h3>CPU vs I/O</h3>
+
+<p>A CPU/Processor can contain one or more cores. For example, a quad core processor that runs at speed of 3GHz will have 4 cores running at that speed.</p>
+
+<p>I/O, whether a file system interaction or a network request - e.g. HTTP, TCP or Socket based - can block other processes; and so if the application is designed to work concurrently (e.g. there are other threads the CPU can jump to in the mean time) then the current thread will be left to finish and another thread will be picked up instead (this is how concurrency works - the CPU interleaves between threads - this should also clarify how concurrency <em>is not</em> the same thing as paralleism).</p>
+
+<p>For computational intensive operations you&#39;ll want the number of threads to be equal to the number of cores available.</p>
+
+<p>For I/O intensive operations you&#39;ll want more threads than available cores. This is because (as explained above) the CPU/Processor will &quot;context switch&quot; to another thread when the current thread is blocked (hence it is better to have more threads than cores for I/O).</p>
+
+<h3>Calculating The Number of Threads</h3>
+
+<p>To calculate how many more threads than cores you&#39;ll need for an intensive set of I/O operations, use the following algorithm: </p>
+
+<pre><code class=" language-ini ">Number of Threads = Number of Available Cores / (1 - Blocking Coefficient)
+</code></pre>
+
+<blockquote>
+<p>Note: the blocking coefficient (coefficient being a fancy word that means: a value used as a multiplier) is different depending on the operation. For a computational operation it is 0, where as a fully blocking operation it is 1.</p>
+</blockquote>
+
+<p>An example of a blocking coefficient would be: <code>0.9</code> - which means a task blocks 90% (<code>0.9</code>) of the time &amp; works only 10% (<code>0.1</code>) of the time. Meaning, if you had 2 cores then you&#39;d want 20 threads.</p>
+
+<pre><code class=" language-ini ">2 / (1 - 0.9) = 20
+</code></pre>
+
+<h3>Even Workload Distribution</h3>
+
+<p>If you have two cores and a very large queue of messages to process, then your initial thought would maybe be to split the queue (i.e. the tasks) into two. This would mean you could have two threads running (i.e. utilising both cores); the first thread processing the first queue data and the second thread handling the other half of the queue data.</p>
+
+<p>The problem with this solution is that is doesn&#39;t necessarily guarantee even distribution of the tasks across your available cores. If our queue data consisted of a computational task such as calculating prime numbers then the first half of the queue would take a lot less time to process because the smaller prime numbers would take less time to calculate than the other queue (which if evenly split in two would mean the other queue would have the much larger prime numbers to calculate).</p>
+
+<p>This means one core will be sitting idle while the other core is still processing data.</p>
+
+<p>What would be better is to have more <em>parts</em> than threads/cores. So if one &quot;part&quot; finishes more quickly than expected, then another part can be picked up. Simply diving our tasks into two parts means one core will likely be sitting idle for longer than the other core. But if we divide our tasks into more granular parts, then we can aim to utilise as much of each core as possible. </p>
+
+<div id="10"></div>
 
 <h2>Conclusion</h2>
 
