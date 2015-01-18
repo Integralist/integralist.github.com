@@ -27,15 +27,34 @@
 <li><a href="#2">Shared Memory</a></li>
 <li><a href="#3">Message Passing</a></li>
 </ul></li>
-<li><a href="#4">Various options</a>
+<li><a href="#4">Various options</a></li>
+<li><a href="#5">Mutexes/Semaphores</a>
 
 <ul>
-<li><a href="#5">Mutexes/Semaphores</a></li>
-<li><a href="#6">STM</a></li>
-<li><a href="#7">Actors</a></li>
-<li><a href="#8">CSP</a></li>
+<li><a href="#5-1">Atomic operations</a></li>
 </ul></li>
-<li><a href="#9">Threads</a></li>
+<li><a href="#6">STM</a>
+
+<ul>
+<li><a href="#6-1">Clojure example</a></li>
+<li><a href="#6-2">JRuby example</a></li>
+</ul></li>
+<li><a href="#7">Actors</a>
+
+<ul>
+<li><a href="#7-1">Transactions and Actors?</a></li>
+<li><a href="#7-2">Actors in Clojure</a></li>
+<li><a href="#7-3">Differences between Agents and Erlang Actors</a></li>
+<li><a href="#7-4">Limitations</a></li>
+</ul></li>
+<li><a href="#8">CSP</a></li>
+<li><a href="#9">Threads</a>
+
+<ul>
+<li><a href="#9-1">CPU vs I/O</a></li>
+<li><a href="#9-2">Calculating the number of Threads</a></li>
+<li><a href="#9-3">Even workload distribution</a></li>
+</ul></li>
 <li><a href="#10">Conclusion</a></li>
 </ul>
 
@@ -105,7 +124,7 @@
 
 <div id="5"></div>
 
-<h3>Mutexes/Semaphores</h3>
+<h2>Mutexes/Semaphores</h2>
 
 <p>We&#39;ll be discussing specifically &quot;mutexes&quot; rather than &quot;semaphores&quot; (they have very similar purposes - in that they control access to specific data - although a mutex offers some additional guarantees which we won&#39;t go into here).</p>
 
@@ -128,13 +147,15 @@ end
 
 <p>This particular solution is the simplest of the three. BUT it doesn&#39;t take into account any logic for handling unexpected changes to data (we&#39;ll see what that means in the next section).</p>
 
-<h4>Atomic operations</h4>
+<div id="5-1"></div>
+
+<h3>Atomic operations</h3>
 
 <p>Locks and mutexes allow operations to become <em>atomic</em>, meaning that the change happens &quot;as a whole&quot;. Meaning it becomes thread safe because another thread can&#39;t accidentally read a piece of data/state/memory that is half done (e.g. <code>+=</code> in the above Ruby example would not be thread safe without the Mutex because a thread could read the value of <code>data</code> inbetween the read and the assignment that <code>+=</code> carries out).</p>
 
 <div id="6"></div>
 
-<h3>STM</h3>
+<h2>STM</h2>
 
 <p>Software Transactional Memory is known as being an &quot;optimistic&quot; process. Compare this to the lock-synchronisation mechanism of a Mutex, which implies the onus of whether a write action will succeed, should be on the &quot;writer&quot; (i.e. the &quot;writer&quot; locks the data, writes the data, then releases the lock). </p>
 
@@ -142,15 +163,57 @@ end
 
 <p>If a change has been made to the shared data source, then the transation will start over; but this time using the latest copy of the data we&#39;re modifying (this can in some cases cause a deadlock to occur).</p>
 
-<p>We should ensure that code within a transaction is idempotent and side effect free.</p>
+<p>Because the STM retries transactions when they fail, we should ensure that code within a transaction is idempotent and side effect free. Otherwise if the code isn&#39;t idempotent, then that code will be run again and might mean data is changed or recorded in ways you didn&#39;t expect (e.g. a call to log some data within a transaction could be called multiple times!)</p>
 
 <blockquote>
 <p>Note: the STM is best used for applications that have frequent reads and can allow for low to medium write collisions. If you expect lots of write collisions then it may be best to opt for another pattern, such as the <a href="#7">Actors</a> pattern discussed in the following section.</p>
 </blockquote>
 
-<h4>Clojure example</h4>
+<p>In the Clojure programming language you&#39;ll also find that the STM facilitates &quot;embedded transactions&quot;, which allows for greater atomicity. What this means in pratice, is that if there is a transaction that contains a sub-transaction, then in some implementations of the STM a failed transaction won&#39;t necessarily cause the sub-transaction to fail. But in Clojure it will. Meaning that it&#39;s definitely an atomic operation (all or nothing).</p>
+
+<div id="6-1"></div>
+
+<h3>Clojure example</h3>
 
 <p>The following example uses the Clojure programming language to implement a thead-safe modification via the STM (specifically the <code>ensure</code> function allows us to tell the STM what shared memory to watch for changes while our transaction is ongoing). </p>
+
+<hr>
+
+<p>A quick detour before continuing onto the example code... </p>
+
+<p>Clojure provides quite a few different mechanisms and functions for handling concurrency.</p>
+
+<p>The two main mechanisms are:</p>
+
+<ul>
+<li><code>atom</code></li>
+<li><code>ref</code></li>
+</ul>
+
+<p>A <code>ref</code> provides synchronised access to shared mutable state in a coordinated fashion (using the STM). Where as an <code>atom</code> is similiar, but differs in that it works like a straight forward CAS (compare and swap) operation. So an <code>atom</code> is <em>un-coordinated</em>.</p>
+
+<ul>
+<li><code>ref-set</code></li>
+<li><code>alter</code></li>
+<li><code>ensure</code></li>
+<li><code>commute</code></li>
+</ul>
+
+<blockquote>
+<p>Note: all these functions <em>must</em> be called from within a transaction</p>
+</blockquote>
+
+<p>The first function <code>ref-set</code> allows you to change the value of a reference directly (i.e. specifying a value rather than using a function).</p>
+
+<p>The second function <code>alter</code> applies a user specified function to the reference. The transaction itself will be retried if any reference written to within the transaction has changed outside of that transaction.</p>
+
+<p>The third function <code>ensure</code> helps to resolve a problem that arises when using <code>alter</code>. The <code>alter</code> function only retries the transaction when references are written to; this means it doesn&#39;t check references that are used within the transaction and <em>haven&#39;t</em> been written to. We can work around this issue and ensure (no pun intended) that any reference used within the transaction - written to or just read - would cause the transaction to restart.</p>
+
+<p>The fourth function <code>commute</code> increases concurrency for references that you want to monitor for changes but don&#39;t really care for their consistency; when you&#39;re really only interested in getting the latest value. It helps to increase the concurrency by running the function applied to <code>commute</code> at least twice (maybe more). This means if you have multiple threads running transactions then whichever transaction changes the value at the point of a commit wins (i.e. last-one-in-wins behavior).</p>
+
+<p>OK, with that out of the way let&#39;s consider the example code...</p>
+
+<hr>
 
 <p>The requirement in the code is that the two bank accounts must have at least 1000 in total between them. If we try to remove an amount from either account which results in the total amount falling below 1000 then we should not complete that transaction:</p>
 
@@ -206,7 +269,9 @@ Total balance is 1000
 <p>I didn&#39;t bother implementing this within my example, as it wasn&#39;t essential to understanding the code.</p>
 </blockquote>
 
-<h4>JRuby example</h4>
+<div id="6-2"></div>
+
+<h3>JRuby example</h3>
 
 <p>If Clojure is a bit too much of a head spin (Lisp based languages can be quite confusing if you&#39;re new to the syntax/concepts) then let&#39;s see a similar example written in JRuby.</p>
 
@@ -305,7 +370,7 @@ transfer_and_print account1, account2, 5000
 
 <div id="7"></div>
 
-<h3>Actors</h3>
+<h2>Actors</h2>
 
 <p>The basic premise of the Actors pattern is built upon it being a form of &quot;message bus&quot;. The philosophy of the pattern is that <em>everything is an Actor</em>. An Actor receives messages and based on its state can determine whether it wants to handle the task defined in the message it has received, or to delegate the task off to other subordinates. An Actor can also create more Actors dynamically.</p>
 
@@ -338,19 +403,47 @@ val greeter = system.actorOf(Props[GreetingActor], name = &quot;greeter&quot;)
 greeter ! Greeting(&quot;Charlie Parker&quot;)
 </code></pre>
 
-<h4>Transactions and Actors?</h4>
+<div id="7-1"></div>
 
-<p>Actors can also coordinate more safely by combining themselves via STM transactions. These are typically referred to as &quot;transactors&quot;. The benefits of wrapping messages within a transaction is that we eliminate synchronisation concerns (changes within a transaction are <em>atomic</em>).</p>
+<h3>Transactions and Actors?</h3>
 
-<h4>Actors in Clojure</h4>
+<p>Actors can also coordinate more safely by combining themselves via STM transactions. These are typically referred to as &quot;transactors&quot;. The benefits of wrapping messages within a transaction is that we eliminate synchronisation concerns (i.e. as changes within a transaction are purposely <em>atomic</em>).</p>
+
+<blockquote>
+<p>Note: in Clojure, when sending an action to an agent from inside a transaction, the call is still non-blocking and yet it also still abides by the STM rules (i.e. the action is <em>held</em> until the transaction commits)</p>
+</blockquote>
+
+<div id="7-2"></div>
+
+<h3>Actors in Clojure</h3>
 
 <p>Clojure does not support Actors, although it does have a mechanism known as &quot;<a href="http://clojure.org/agents">agents</a>&quot;. An agent provides access to shared mutable state, but does so asynchronously (much like an Actor). Where an Actor receives a &quot;message&quot;, an agent accepts an <code>action</code>.</p>
 
-<p>Where as the STM provides coordinated access to data (i.e. atomic - verifies no changes to shared data, otherwise fails the entire transaction). Agents are independent; meaning that actions run concurrently (the call to <code>action</code> returns immediately), but the actions are executed sequentially via a thread selected from a pre-defined thread pool.</p>
+<p>Where as the STM provides coordinated access to data (i.e. atomic - it verifies that there are no changes to shared data writtent to; otherwise it&#39;ll cause the entire transaction to fail). Agents are independent; meaning that actions run concurrently (the call to <code>action</code> returns immediately), but the actions are executed sequentially via a separate thread. So where a transaction is a synchronous operation, an action handled by an agent is <em>asynchronous</em>.</p>
 
-<p>So once the agent&#39;s state is changed, the next action is applied to the agent (now using the latest state it points to).</p>
+<blockquote>
+<p>Note: the agent API in Clojure provides two methods: <code>send-off</code> and <code>send</code>. The former creates a new thread specifically for that agent; where as the latter selects a thread from a pre-defined thread pool. The problem with <code>send</code> is that agents fight for an available thread and so if your action does blocking I/O then you&#39;ll delay other agents from working (and thus reducing the extra concurrency benefits of using a thread pool)</p>
+</blockquote>
 
-<h4>Limitations</h4>
+<p>Once the agent&#39;s state is changed, the next action is applied to the agent (now using the latest state it points to).</p>
+
+<div id="7-3"></div>
+
+<h3>Differences between Agents and Erlang Actors</h3>
+
+<p>There is one distinctive difference between Erlang&#39;s Actor and Clojure&#39;s Agent, which is that an Agents &quot;action&quot; doesn&#39;t block additional value request calls like an Erlang &quot;message&quot;. This is demonstrated in the following image, but in summary: requests to an Actor are blocked until a response to the previous message can be provided; where as Clojure Agents allow multiple <code>@deref</code> calls to be made and processed:</p>
+
+<p><a href="../images/actors-vs-agents.png">
+    <img src="../images/actors-vs-agents.png">
+</a></p>
+
+<blockquote>
+<p>Note: in the above image we have two simultaneous requests to &quot;increment&quot; the value held by the Actor/Agent. One can succeed, the other goes onto a queue and is applied after the first call finishes.</p>
+</blockquote>
+
+<div id="7-4"></div>
+
+<h3>Limitations</h3>
 
 <p>The Actor pattern does have some limitations:</p>
 
@@ -376,7 +469,7 @@ greeter ! Greeting(&quot;Charlie Parker&quot;)
 
 <div id="8"></div>
 
-<h3>CSP</h3>
+<h2>CSP</h2>
 
 <p>Communicating Sequential Processes is an alternative mechanism for expressing concurrency, which has been popularized by recent languages <a href="http://clojure.org/">Clojure</a> and <a href="http://golang.org/">Go</a>. It also is based on the idea of message passing, similar to the Actor pattern.</p>
 
@@ -441,6 +534,8 @@ func createChannel(msg string, size int) &lt;-chan string {
 
 <p>Threads are prevalent across both the &quot;shared memory&quot; and &quot;message passing&quot; models. The discussion of how many threads to create is an important one and depends on the type of tasks your application is expected to handle: CPU bound or I/O bound. In the following sections we&#39;ll cover this topic, as well as describing an algorithm for calculating this.</p>
 
+<div id="9-1"></div>
+
 <h3>CPU vs I/O</h3>
 
 <p>A CPU/Processor can contain one or more cores. For example, a quad core processor that runs at speed of 3GHz will have 4 cores running at that speed.</p>
@@ -451,7 +546,9 @@ func createChannel(msg string, size int) &lt;-chan string {
 
 <p>For I/O intensive operations you&#39;ll want more threads than available cores. This is because (as explained above) the CPU/Processor will &quot;context switch&quot; to another thread when the current thread is blocked (hence it is better to have more threads than cores for I/O).</p>
 
-<h3>Calculating The Number of Threads</h3>
+<div id="9-2"></div>
+
+<h3>Calculating the number of Threads</h3>
 
 <p>To calculate how many more threads than cores you&#39;ll need for an intensive set of I/O operations, use the following algorithm: </p>
 
@@ -467,7 +564,9 @@ func createChannel(msg string, size int) &lt;-chan string {
 <pre><code class=" language-ini ">2 / (1 - 0.9) = 20
 </code></pre>
 
-<h3>Even Workload Distribution</h3>
+<div id="9-3"></div>
+
+<h3>Even workload distribution</h3>
 
 <p>If you have two cores and a very large queue of messages to process, then your initial thought would maybe be to split the queue (i.e. the tasks) into two. This would mean you could have two threads running (i.e. utilising both cores); the first thread processing the first queue data and the second thread handling the other half of the queue data.</p>
 
