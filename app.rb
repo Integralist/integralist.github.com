@@ -54,7 +54,7 @@ def index_markdown
 <<-eos
 # Integralist
 
-> Tech Lead/Prinicipal Engineer for Frameworks [@BBCNews](http://m.bbc.co.uk/news/)<br>
+> Tech Lead/Principal Engineer for Frameworks [@BBCNews](http://m.bbc.co.uk/news/)<br>
 > Works with distributed & concurrent systems.<br>
 > Author of [Pro Vim @Apress](http://www.amazon.co.uk/Pro-Vim-Mark-McDonnell/dp/1484202511/ref=sr_1_1)
 
