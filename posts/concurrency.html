@@ -37,6 +37,7 @@
 
 <ul>
 <li><a href="#6-1">Clojure example</a></li>
+<li><a href="#6-1-1">Quick Clojure Concurrency Detour</a></li>
 <li><a href="#6-2">JRuby example</a></li>
 </ul></li>
 <li><a href="#7">Actors</a>
@@ -179,18 +180,29 @@ end
 
 <hr>
 
+<div id="6-1-1"></div>
+
+<h4>Quick Clojure Concurrency Detour</h4>
+
 <p>A quick detour before continuing onto the example code... </p>
 
 <p>Clojure provides quite a few different mechanisms and functions for handling concurrency.</p>
 
-<p>The two main mechanisms are:</p>
+<p>The three core mechanisms are:</p>
 
 <ul>
 <li><code>atom</code></li>
+<li><code>agent</code></li>
 <li><code>ref</code></li>
 </ul>
 
-<p>A <code>ref</code> provides synchronised access to shared mutable state in a coordinated fashion (using the STM). Where as an <code>atom</code> is similiar, but differs in that it works like a straight forward CAS (compare and swap) operation. So an <code>atom</code> is <em>un-coordinated</em>.</p>
+<p>A <code>ref</code> provides synchronised access to shared mutable state in a <em>coordinated</em> fashion (i.e. it uses the STM to ensure multiple references are coordinated before applying changes). Where as an <code>atom</code> is similiar, but differs in that it works like a straight forward CAS (compare and swap) operation. So an <code>atom</code> is considered <em>un-coordinated</em>. An <code>agent</code> is the same as an <code>atom</code> with the exception that it can be run asynchronously.</p>
+
+<blockquote>
+<p>Note: Clojure&#39;s atom provides a validator function (pass <code>:validator</code> argument followed by a validating function), which prevents invalid values being set; similar to a function&#39;s pre/post assertion conditions. You are also able to &quot;watch&quot; atoms for state changes via <code>add-watch</code></p>
+</blockquote>
+
+<p>Now let&#39;s consider the following functions:</p>
 
 <ul>
 <li><code>ref-set</code></li>
@@ -199,9 +211,7 @@ end
 <li><code>commute</code></li>
 </ul>
 
-<blockquote>
-<p>Note: all these functions <em>must</em> be called from within a transaction</p>
-</blockquote>
+<p>All of these functions <em>must</em> be called from within a transaction (e.g. this is achieved by calling them from within a <code>dosync</code> block).</p>
 
 <p>The first function <code>ref-set</code> allows you to change the value of a reference directly (i.e. specifying a value rather than using a function).</p>
 
@@ -211,7 +221,7 @@ end
 
 <p>The fourth function <code>commute</code> increases concurrency for references that you want to monitor for changes but don&#39;t really care for their consistency; when you&#39;re really only interested in getting the latest value. It helps to increase the concurrency by running the function applied to <code>commute</code> at least twice (maybe more). This means if you have multiple threads running transactions then whichever transaction changes the value at the point of a commit wins (i.e. last-one-in-wins behavior).</p>
 
-<p>OK, with that out of the way let&#39;s consider the example code...</p>
+<p>OK, with that out of the way let&#39;s now review the example code...</p>
 
 <hr>
 
@@ -419,7 +429,13 @@ greeter ! Greeting(&quot;Charlie Parker&quot;)
 
 <p>Clojure does not support Actors, although it does have a mechanism known as &quot;<a href="http://clojure.org/agents">agents</a>&quot;. An agent provides access to shared mutable state, but does so asynchronously (much like an Actor). Where an Actor receives a &quot;message&quot;, an agent accepts an <code>action</code>.</p>
 
+<blockquote>
+<p>Note: Actors and Agents have some surface similarities, but ultimately are different beasts. Actors &quot;encapsulates&quot; state and provides no means to access it from the outside. Where as Agents contain a single value that can be retrieved and manipulated (via <code>send</code> or <code>send-off</code> - see below for details). Actors also encapsulate behaviour, where as an Agent is provided the function that affects its value. Actors can be distributed, where as Actors cannot</p>
+</blockquote>
+
 <p>Where as the STM provides coordinated access to data (i.e. atomic - it verifies that there are no changes to shared data writtent to; otherwise it&#39;ll cause the entire transaction to fail). Agents are independent; meaning that actions run concurrently (the call to <code>action</code> returns immediately), but the actions are executed sequentially via a separate thread. So where a transaction is a synchronous operation, an action handled by an agent is <em>asynchronous</em>.</p>
+
+<p>In Clojure, agents are transaction aware (where as atoms are not) and the <code>!</code> at end of function name is an indicator of this: <code>swap!</code> (not coordinated) vs <code>send</code>.</p>
 
 <blockquote>
 <p>Note: the agent API in Clojure provides two methods: <code>send-off</code> and <code>send</code>. The former creates a new thread specifically for that agent; where as the latter selects a thread from a pre-defined thread pool. The problem with <code>send</code> is that agents fight for an available thread and so if your action does blocking I/O then you&#39;ll delay other agents from working (and thus reducing the extra concurrency benefits of using a thread pool)</p>
