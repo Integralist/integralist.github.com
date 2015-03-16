@@ -433,7 +433,7 @@ greeter ! Greeting(&quot;Charlie Parker&quot;)
 <p>Note: Actors and Agents have some surface similarities, but ultimately are different beasts. Actors &quot;encapsulates&quot; state and provides no means to access it from the outside. Where as Agents contain a single value that can be retrieved and manipulated (via <code>send</code> or <code>send-off</code> - see below for details). Actors also encapsulate behaviour, where as an Agent is provided the function that affects its value. Actors can be distributed, where as Agents cannot</p>
 </blockquote>
 
-<p>Where as the STM provides coordinated access to data (i.e. atomic - it verifies that there are no changes to shared data writtent to; otherwise it&#39;ll cause the entire transaction to fail). Agents are independent; meaning that actions run concurrently (the call to <code>action</code> returns immediately), but the actions are executed sequentially via a separate thread. So where a transaction is a synchronous operation, an action handled by an agent is <em>asynchronous</em>.</p>
+<p>Where as the STM provides coordinated access to data (i.e. atomic - it verifies that there are no changes to shared data that has been written to; otherwise it&#39;ll cause the entire transaction to fail). Agents are independent; meaning that actions run concurrently (the call to <code>action</code> returns immediately), but the actions are executed sequentially via a separate thread. So where a transaction is a synchronous operation, an action handled by an agent is <em>asynchronous</em>.</p>
 
 <p>In Clojure, agents are transaction aware (where as atoms are not) and the <code>!</code> at end of function name is an indicator of this: <code>swap!</code> (not coordinated) vs <code>send</code>.</p>
 
