@@ -198,8 +198,10 @@ end
 
 <p>A <code>ref</code> provides synchronised access to shared mutable state in a <em>coordinated</em> fashion (i.e. it uses the STM to ensure multiple references are coordinated before applying changes). Where as an <code>atom</code> is similiar, but differs in that it works like a straight forward CAS (compare and swap) operation. So an <code>atom</code> is considered <em>un-coordinated</em>. An <code>agent</code> is the same as an <code>atom</code> with the exception that it can be run asynchronously.</p>
 
+<p>Clojure&#39;s atom provides a validator function (pass <code>:validator</code> argument followed by a validating function), which prevents invalid values being set; similar to a function&#39;s pre/post assertion conditions. You are also able to &quot;watch&quot; atoms for state changes via <code>add-watch</code>.</p>
+
 <blockquote>
-<p>Note: Clojure&#39;s atom provides a validator function (pass <code>:validator</code> argument followed by a validating function), which prevents invalid values being set; similar to a function&#39;s pre/post assertion conditions. You are also able to &quot;watch&quot; atoms for state changes via <code>add-watch</code></p>
+<p>Note: there is also <code>Var</code> type which is a mutable variable and is created via the <code>def</code> form. A variable is &quot;thread-local&quot; meaning it isn&#39;t shared across threads (where as <code>atom</code>, <code>agent</code> and <code>ref</code> are all accessible across threads)</p>
 </blockquote>
 
 <p>Now let&#39;s consider the following functions:</p>
