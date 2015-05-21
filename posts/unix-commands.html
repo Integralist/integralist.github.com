@@ -246,6 +246,23 @@ find . -size 0 -o -atime +365
 
 <p>This replaces the first occurrence of &#39;day&#39; to &#39;night&#39;. If we wanted to replace multiple occurrences then you would need to pass a <code>g</code> flag (meaning global) to the regular expression like so: <code>sed s/day/night/g novel.txt</code></p>
 
+<p>Sed is very powerful and there are many features of the syntax that I don&#39;t use. One that&#39;s interesting is that you can use regular expressions to match a pattern and then do stuff with the matches, such as deleting the line or duplicating it.</p>
+
+<p>Consider the following example:</p>
+
+<pre><code class="language-bash">echo &quot;hi there\nmark\nit&#39;s nice to\nmeet you&quot; &gt; test.txt
+</code></pre>
+
+<p>If we now run the following sed command we should see the line that has the word <code>mark</code> is deleted:</p>
+
+<pre><code class="language-bash">cat test.txt | sed &#39;/mark/d&#39;
+</code></pre>
+
+<p>If we run the following sed command we should see any lines that start with <code>i</code> are duplicated (remove the carrot symbol <code>^</code> to see any lines that have the character <code>i</code> duplicated; regardless of whether they&#39;re at the start of the line or not):</p>
+
+<pre><code class="language-bash">cat test.txt | sed &#39;/^i/p&#39;
+</code></pre>
+
 <div id="6"></div>
 
 <h2>Awk (Looping Logic)</h2>
