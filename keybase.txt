@@ -1,0 +1,67 @@
+==================================================================
+https://keybase.io/integralist
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://integralist.co.uk
+  * I am integralist (https://keybase.io/integralist) on keybase.
+  * I have a public key with fingerprint 88D4 D9FC E949 AEFE F8BD  920C A719 7D36 D30F 65D1
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "fingerprint": "88d4d9fce949aefef8bd920ca7197d36d30f65d1",
+            "host": "keybase.io",
+            "key_id": "a7197d36d30f65d1",
+            "kid": "0101bd626d3135ec2fa65873325ad0d561862a297fef8312d2af89f735d5214e67f90a",
+            "uid": "6b4f41e6b68994127ebd6aacffbe0419",
+            "username": "integralist"
+        },
+        "service": {
+            "hostname": "integralist.co.uk",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1432819545,
+    "expire_in": 157680000,
+    "prev": "fe42128173a92c1418dfda540ecc0711df66c0ecd46cdfef71a47db5d08a7e30",
+    "seqno": 3,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: Keybase OpenPGP v2.0.8
+Comment: https://keybase.io/crypto
+
+yMIgAnicbZJdSBRRFMd3NdMsyUyQMh8aiLIWmTvfs0niB5UPBUpBhrTcmXtnd9p1
+Ztud1UwkLOnBTFADAxGJgsoooiBUWEuzzKQHLbSysA8ToihqK/pQ647UU92Xyznn
+f37ngzOYEu9Idjp80X03YlfGnSP92yOO3d6MshpKMVE15a6h/Hjh03TDi0PBkG5Y
+lJuSJMQhWVOxzMkQa1iTFCQztApFIIuIFRBLawKPAOWifGbYziAYBYZxjm4SHzE8
+OiLe/+j9CwEa0EBBAkMigOWxymhQ4CWRZRkeIhrxApAEBjKyaNdmAYMYqEmyJrI8
+4hnAYUHUZBoSXGQBJyicxgEsKIIkyxxgREzgEKqapmCaA7ItDOOQASswUZMZsTcE
+AzrpvNZFkUClrmJ7C/Yw/4pyVDMn4ieMYMi0TNUMkLDPsoJuO9uqDtryKqx4/oA8
+im4gsk6SUIlDYd00KDcgStXSbTLgWEYCMs/xLgofDOoh7NFtBS8KEk2eXQZXEqSG
+OQYQqchCmVEBBySkIchzNFZVWgQAaYKgEgNxgorInkQAOREpPKIlKGKWpuzRDhgm
+5WZJm9BLkGHda0ArEsJU7cDN8kUOZ7JjcUKcfRCO5CWpf8+k+FXiL308LrZx989D
+SZ8/6OabC1+H7h95XzrzKWNdVn3aYPXia7s+FPn2NB7Ob2r2FMSXFviOP307HVf/
+LS97/5nHq6ai66f37ihzvpx1bCnI7F5d4soenYkNKz9GzyV9WdqxsXnGWnU0c4XR
+P7bZ4LqWdz3Pq5vLKJl/1zi1c/J834k76WuazvqvS52FE1kZVQ1JHZt7H5xO7F0/
+ubanWnZl9fU0dLcsvSnkz6Z+DIx4OmedK+v6bj3BxUVDadHhk2ePvRh9fenhPOjZ
+diXhdmZC6/exy+mFm2oCLW2XLl6ddAvPBjbcfZTSnrtsdFO0s21r1+clrZVH763O
+bhdPxSrKU+dyJ1IiRb8BxO0vrw==
+=Raia
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/integralist
+
+==================================================================
