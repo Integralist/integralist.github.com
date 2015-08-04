@@ -10,10 +10,11 @@ You can find me on [Twitter](http://www.twitter.com/integralist) and [GitHub](ht
 - Clojure, Go, Ruby and other languages
 - Problems around concurrency and distributed systems
 
-I'm a published author of two books (both through Apress):
+I'm a published author of three books (two through Apress and one self-published via Leanpub):
 
 - [Pro Vim](http://www.amazon.co.uk/Pro-Vim-Mark-McDonnell/dp/1484202511/ref=sr_1_1)
 - [tmux Taster](http://www.amazon.co.uk/tmux-Taster-Mark-McDonnell-ebook/dp/B00OPTU7LY/ref=sr_1_1)
+- [Programming in Clojure](https://leanpub.com/programming-clojure/)
 
 My colleagues at BBC News found me fit to win the following awards:
 
