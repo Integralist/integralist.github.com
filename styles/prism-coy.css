@@ -1,4 +1,4 @@
-/* http://prismjs.com/download.html?themes=prism-coy&languages=markup+css+css-extras+clike+javascript+java+php+php-extras+scss+bash+c+python+sql+http+ruby+gherkin+go+scala+ini+apacheconf+git+scheme+perl+erlang+rust */
+/* http://prismjs.com/download.html?themes=prism-coy&languages=markup+css+clike+javascript+actionscript+apacheconf+applescript+aspnet+bash+c+csharp+cpp+coffeescript+css-extras+dart+erlang+fsharp+gherkin+git+go+haml+handlebars+haskell+http+ini+jade+java+latex+less+makefile+markdown+objectivec+perl+php+php-extras+powershell+python+r+jsx+rest+ruby+rust+sass+scss+scala+scheme+smalltalk+sql+stylus+swift+typescript+wiki+yaml&plugins=line-numbers */
 /**
  * prism.js Coy theme for JavaScript, CoffeeScript, CSS and HTML
  * Based on https://github.com/tshedor/workshop-wp-theme (Example: http://workshop.kansan.com/category/sessions/basics or http://workshop.timshedor.com/category/sessions/basics);
@@ -8,7 +8,7 @@
 code[class*="language-"],
 pre[class*="language-"] {
 	color: black;
-	font-family: Consolas, Monaco, 'Andale Mono', monospace;
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 	direction: ltr;
 	text-align: left;
 	white-space: pre;
@@ -171,6 +171,13 @@ pre[class*="language-"]:after {
 	font-weight: normal;
 }
 
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
 .token.entity {
 	cursor: help;
 }
@@ -210,3 +217,57 @@ pre[class*="language-"].line-numbers .line-numbers-rows {
 	left: 0;
 }
 
+/* Plugin styles: Line Highlight */
+pre[class*="language-"][data-line] {
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+}
+pre[data-line] code {
+	position: relative;
+	padding-left: 4em;
+}
+pre .line-highlight {
+	margin-top: 0;
+}
+
+pre.line-numbers {
+	position: relative;
+	padding-left: 3.8em;
+	counter-reset: linenumber;
+}
+
+pre.line-numbers > code {
+	position: relative;
+}
+
+.line-numbers .line-numbers-rows {
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	font-size: 100%;
+	left: -3.8em;
+	width: 3em; /* works for line-numbers below 1000 lines */
+	letter-spacing: -1px;
+	border-right: 1px solid #999;
+
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+}
+
+	.line-numbers-rows > span {
+		pointer-events: none;
+		display: block;
+		counter-increment: linenumber;
+	}
+
+		.line-numbers-rows > span:before {
+			content: counter(linenumber);
+			color: #999;
+			display: block;
+			padding-right: 0.8em;
+			text-align: right;
+		}
