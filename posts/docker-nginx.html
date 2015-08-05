@@ -233,7 +233,7 @@ http {
 
 <p>This will display a <code>403</code> error page, which is to be expected because we&#39;ve not mounted a folder that has a <code>index.html</code> file. Our mounted directory only contained a <code>test.html</code> file, so if we try to access that instead, then we&#39;ll see it&#39;ll be loaded without a problem:</p>
 
-<pre><code class="language-bash">curl -I http://$(boot2docker ip):32781/test.html
+<pre><code class="language-bash">curl http://$(boot2docker ip):32781/test.html
 </code></pre>
 
 <p>If you were following along at home then you would have noticed that this returns the following HTML content:</p>
@@ -456,6 +456,10 @@ RUN ln -sf /dev/stderr /var/log/nginx/error.log
 EXPOSE 80 443
 CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
 </code></pre>
+
+<blockquote>
+<p>Note: some bright chap by the name of <a href="https://twitter.com/stevenjack85">Steven Jack</a> suggested setting <code>ENTRYPOINT</code> in the Dockerfile to <code>nginx</code> and have the two options (<code>-g</code> and <code>daemon off</code>) left in the <code>CMD</code>. Doing this means if you wanted to pass other options to nginx you wouldn&#39;t have to duplicate all of your CMD</p>
+</blockquote>
 
 <p>So from the root of our project directory, let&#39;s complete the next step and build our new Docker images (technically you don&#39;t have to rebuild the Ruby application as there has been no changes to the <code>Dockerfile</code>, but just for completion I&#39;ll demonstrate the build command again).</p>
 
