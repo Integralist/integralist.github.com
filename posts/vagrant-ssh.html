@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>SSH into Vagrant using a private ip</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism-default.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+
+            pre[class*="language-"] {
+              border: 1px dashed #AAA;
+              margin-bottom: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>SSH into Vagrant using a private ip</h1>
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Set-up</a></li>
+<li><a href="#3">Example</a></li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>I&#39;ve recently been looking at using netcat and also understanding how SSH tunelling works. In order to play around with tunelling specifically, I needed an environment that I could SSH into (e.g. so I could proxy a connection through to).</p>
+
+<p>My initial thought was to use <a href="https://docs.docker.com/examples/running_ssh_service/">Docker</a> and setting it up with an SSH daemon. Annoyingly I couldn&#39;t get it to let me SSH into the running Docker container. So due to a lack of time allowance dedicated to this problem, I decided to work around this by using <a href="http://docs.vagrantup.com/v2/networking/private_network.html">Vagrant</a> instead.</p>
+
+<div id="2"></div>
+
+<h2>Set-up</h2>
+
+<p>Now Vagrant automatically sets you up with a <code>vagrant ssh</code> command, but I still needed an actual dedicated ip that I could use to SSH into the running Vagrant VM. So the solution requires the following items:</p>
+
+<ul>
+<li>A <code>Vagrantfile</code></li>
+<li>A custom SSH config file</li>
+</ul>
+
+<h3>Vagrantfile</h3>
+
+<pre><code class="language-ruby">VAGRANTFILE_API_VERSION = &quot;2&quot;
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = &quot;ubuntu/trusty64&quot;
+  config.vm.network &quot;private_network&quot;, ip: &quot;192.168.50.4&quot;
+end
+</code></pre>
+
+<p>As you can see, we&#39;re building a Ubuntu 14.04.2 VM, and we&#39;ve defined a private ip address (<code>192.168.50.4</code>); although this probably should be somewhere within the private ip range (e.g. <code>172.xx.xx.xxx</code>) instead.</p>
+
+<h3>SSH Config</h3>
+
+<pre><code class="language-bash">Host 192.168.50.4
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+  IdentitiesOnly yes
+  User vagrant
+  IdentityFile /path/to/user/directory/vagrant-ssh/.vagrant/machines/default/virtualbox/private_key
+  PasswordAuthentication no
+</code></pre>
+
+<blockquote>
+<p>Note: the <code>IdentityFile</code> value can be retrieved from <code>vagrant ssh-config</code></p>
+</blockquote>
+
+<div id="3"></div>
+
+<h2>Example</h2>
+
+<p>Now we have the set-up in place, we can build the VM:</p>
+
+<pre><code class="language-bash">vagrant up --provider virtualbox
+</code></pre>
+
+<p>Once the VM is created and running we can SSH into the box directly using our defined private ip:</p>
+
+<pre><code class="language-bash">ssh -F ./ssh-config vagrant@192.168.50.4
+</code></pre>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
