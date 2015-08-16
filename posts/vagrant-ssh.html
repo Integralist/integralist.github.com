@@ -60,7 +60,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 end
 </code></pre>
 
-<p>As you can see, we&#39;re building a Ubuntu 14.04.2 VM, and we&#39;ve defined a private ip address (<code>192.168.50.4</code>); although this probably should be somewhere within the private ip range (e.g. <code>172.xx.xx.xxx</code>) instead.</p>
+<p>As you can see, we&#39;re building a Ubuntu 14.04.2 VM, and we&#39;ve defined a private ip address (<code>192.168.50.4</code>); although this could be any <a href="https://en.wikipedia.org/wiki/IP_address#Private_addresses">private ip range</a> (e.g. <code>172.xx.xx.xxx</code>) instead.</p>
+
+<blockquote>
+<p>Note: as noted by <a href="https://twitter.com/sthulb">Simon Thulbourn</a> 192.168/16 is used more for home/small networks</p>
+</blockquote>
 
 <h3>SSH Config</h3>
 
