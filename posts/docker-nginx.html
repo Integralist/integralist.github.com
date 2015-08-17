@@ -87,7 +87,7 @@
 
 <p>Executing this resulted in the following output:</p>
 
-<pre><code class="language-bash">&lt;!DOCTYPE html&gt;
+<pre><code class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
 &lt;title&gt;Welcome to nginx!&lt;/title&gt;
@@ -495,34 +495,37 @@ CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
 <p>The final step is to verify that everything worked as expected (i.e. we should be able to make a request to our Boot2Docker VM&#39;s localhost and have it proxy the request through to our Ruby application server). But let&#39;s do it in stages, so the first stage is to hit the root of localhost:</p>
 
 <blockquote>
-<p>Note: in the following example you&#39;ll need to get the dynamically allocated port number for the nginx container. You can do this by running <code>docker ps</code> and extracting the port number from there</p>
+<p>Note: in the following example you&#39;ll need to get the dynamically allocated port number for the nginx container. You can do this by running <code>docker ps</code> and extracting the port number from the output provided</p>
 </blockquote>
 
 <pre><code class="language-bash">curl http://$(boot2docker ip):&lt;dynamic_port_number&gt;
+</code></pre>
 
-# Results in...
+<p>This <code>curl</code> request will result in the following output to stdout...</p>
 
-&lt;h1&gt;Welcome&lt;/h1&gt;
+<pre><code class="language-markup">&lt;h1&gt;Welcome&lt;/h1&gt;
 &lt;p&gt;This is my home page&lt;/p&gt;
 </code></pre>
 
 <p>The second stage is to hit the <code>/test.html</code> endpoint for localhost and make sure nginx is still serving back our static files correctly:</p>
 
 <pre><code class="language-bash">curl http://$(boot2docker ip):&lt;dynamic_port_number&gt;/test.html
+</code></pre>
 
-# Results in...
+<p>This <code>curl</code> request will result in the following output to stdout...</p>
 
-&lt;h1&gt;Hey there!&lt;/h1&gt;
+<pre><code class="language-markup">&lt;h1&gt;Hey there!&lt;/h1&gt;
 &lt;p&gt;Here is my test HTML file&lt;/p&gt;
 </code></pre>
 
 <p>Looking good. OK the third and final stage is to now try to hit the <code>/app/</code> endpoint for localhost and make sure nginx is proxying the request through to our Ruby backend application server (and also sending the result back again!):</p>
 
 <pre><code class="language-bash">curl http://$(boot2docker ip):32785/app/
+</code></pre>
 
-# Results in...
+<p>This <code>curl</code> request will result in the following output to stdout...</p>
 
-&lt;!DOCTYPE html&gt;
+<pre><code class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
   &lt;style type=&quot;text/css&quot;&gt;
@@ -548,10 +551,11 @@ end
 <p>Ewww? OK so we can see nginx <em>is</em> proxying through to our Ruby application server, but the server doesn&#39;t seem to know how to handle the request <code>/app/</code>? Maybe it&#39;s something to do with the extra forward slash on the end of the request? If I change it to <code>/app</code> instead we&#39;ll see what that does:</p>
 
 <pre><code class="language-bash">curl http://$(boot2docker ip):32785/app
+</code></pre>
 
-# Results in...
+<p>This <code>curl</code> request will result in the following output to stdout...</p>
 
-&lt;html&gt;
+<pre><code class="language-markup">&lt;html&gt;
 &lt;head&gt;&lt;title&gt;301 Moved Permanently&lt;/title&gt;&lt;/head&gt;
 &lt;body bgcolor=&quot;white&quot;&gt;
 &lt;center&gt;&lt;h1&gt;301 Moved Permanently&lt;/h1&gt;&lt;/center&gt;
