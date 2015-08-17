@@ -631,6 +631,10 @@ openssl enc -d -aes-256-cbc -in SECRET_FILE.enc -out SECRET_FILE -pass file:./ke
 
 <p>The reason I&#39;m not going to do that is because Ivan Ristić (author of &quot;Bulletproof SSL and TLS&quot;) has already done the leg work and has made it freely available in his ebook &quot;OpenSSL Cookbook&quot;. Which you can get here <a href="https://www.feistyduck.com/books/openssl-cookbook/">https://www.feistyduck.com/books/openssl-cookbook/</a></p>
 
+<blockquote>
+<p>Note: although, if you want a super quick run down you can generate a CSR (Certificate Signing Request; which you send to a CA to approve) using <code>openssl req -sha256 -new -key my-private-key.pem -out csr.pem</code>. You can then self-sign that certificate (while you wait for the CA to officially create you a cert and sign it) using <code>openssl x509 -req -days 365 -in csr.pem -signkey my-private-key.pem -out my-certificate.pem</code></p>
+</blockquote>
+
 <div id="9"></div>
 
 <h2>Conclusion</h2>
