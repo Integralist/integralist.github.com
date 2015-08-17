@@ -571,6 +571,34 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 <pre><code class="language-bash">gpg -o output_file -d some_encrypted_file.gpg
 </code></pre>
 
+<p>If you don&#39;t want to encrypt a file using your own key pair, you can use standard symmetrical encryption:</p>
+
+<pre><code class="language-bash">gpg --symmetric secrets.txt
+</code></pre>
+
+<p>You&#39;ll be asked to enter a passphrase to complete the encryption. Then if you want to decrypt the file you simply run:</p>
+
+<pre><code class="language-bash">gpg secrets.txt.gpg
+</code></pre>
+
+<p>It&#39;ll ask for the passphrase and then it&#39;ll extract the file to the current directory.</p>
+
+<p>You can also add a MAC (remember we looked at this earlier when discussing PKI; this is the digital signature) by adding the <code>--sign</code> flag:</p>
+
+<pre><code class="language-bash">gpg --default-key email@domain.com --symmetric --sign secrets.txt
+</code></pre>
+
+<blockquote>
+<p>Note: I added <code>--default-key &lt;email&gt;</code> because for me the default key wasn&#39;t the key I wanted to use for the signature</p>
+</blockquote>
+
+<p>When you decrypt the gpg file (e.g. <code>gpg secrets.txt.gpg</code>) you&#39;ll now see (after you enter the relevant passphrase) the following signature output:</p>
+
+<pre><code class="language-bash">gpg: Signature made Mon 17 Aug 17:37:58 2015 BST using RSA key ID BAE1D7F0
+gpg: Good signature from &quot;Mark McDonnell (Integralist) &lt;email@domain.com&gt;&quot;
+gpg: WARNING: message was not integrity protected
+</code></pre>
+
 <h3>OpenSSL encryption</h3>
 
 <p>The easiest way to encrypt a file using OpenSSL is like so (the password for the file is <code>foobar</code> and is specified at the end of the command; you&#39;ll also see we&#39;re using a <a href="https://en.wikipedia.org/wiki/Salt_(cryptography)"><code>-salt</code></a> with the password to help improve the security):</p>
