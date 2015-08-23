@@ -547,6 +547,10 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 
 <h3>GPG encryption</h3>
 
+<p>GPG offers two forms of encryption: asymmetrical and symmetrical...</p>
+
+<h4>Asymmetrical encryption</h4>
+
 <p>With GPG you&#39;ll need the recipients public key in order to encrypt files. So once you have the recipients public key you&#39;ll need to import it into GPG so you can reference it. To do that you&#39;ll use the following command:</p>
 
 <pre><code class="language-bash">gpg --import public.key
@@ -570,6 +574,8 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 
 <pre><code class="language-bash">gpg -o output_file -d some_encrypted_file.gpg
 </code></pre>
+
+<h4>Symmetrical encryption</h4>
 
 <p>If you don&#39;t want to encrypt a file using your own key pair, you can use standard symmetrical encryption:</p>
 
