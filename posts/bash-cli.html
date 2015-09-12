@@ -46,6 +46,10 @@ echo &quot;hello $1&quot;
 
 <p>As you can see the file specifies the <code>bash</code> binary as the executable to use when the user executes this script, followed by the special variable <code>$1</code> which refers to the first argument provided by the user (e.g. <code>&lt;your_command&gt; arg1 arg2 arg3</code>).</p>
 
+<blockquote>
+<p>Note: you can use the bash default-value syntax <code>${1:-foo}</code> where this equates to: if a <code>$1</code> value hasn&#39;t been provided, then use the value <code>foo</code></p>
+</blockquote>
+
 <p>We&#39;ll save this file as <code>testz</code> (no file extension) into the folder <code>/usr/local/bin</code>, which is accessible from our <code>$PATH</code>. We can see this by running <code>echo $PATH</code>.</p>
 
 <p>Because we save the file into a location accessible to <code>$PATH</code> it means we can just reference the name of the file and it&#39;ll be found and executed (hence we specify in the file what type of binary should be used to execute the file).</p>
