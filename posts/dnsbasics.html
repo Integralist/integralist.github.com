@@ -64,14 +64,16 @@
 <li><a href="#25">MX</a></li>
 <li><a href="#26">SOA</a></li>
 <li><a href="#27">SRV</a></li>
+<li><a href="#28">PTR</a></li>
+<li><a href="#29">TXT</a></li>
 </ul></li>
-<li><a href="#28">TTL (Time to Live)</a>
+<li><a href="#30">TTL (Time to Live)</a>
 
 <ul>
-<li><a href="#29">Local Caching</a></li>
+<li><a href="#31">Local Caching</a></li>
 </ul></li>
-<li><a href="#30">References</a></li>
-<li><a href="#31">Conclusion</a></li>
+<li><a href="#32">References</a></li>
+<li><a href="#33">Conclusion</a></li>
 </ul>
 
 <div id="1"></div>
@@ -217,6 +219,10 @@
 <li>The resolver can now provide those details back to the application who originated the request</li>
 </ul>
 
+<blockquote>
+<p>Note: so far we&#39;ve spoken about name servers that run DNS software. There are many DNS software programs available (some paid, some free), but the most popular is <a href="https://www.isc.org/downloads/bind/">BIND</a>. We&#39;ll see references to it throughout this article</p>
+</blockquote>
+
 <div id="8"></div>
 
 <h2>DNS Structure</h2>
@@ -288,6 +294,31 @@ fred   IN  A      192.168.0.4
 <p>The zonefile is effectively the mapping between a domain name and its associated ip address (as you&#39;ll see later on, the use of tools such as <code>dig</code> return us similar output). </p>
 
 <p>In the above example zonefile we can see that we have a few records defined, such as an &#39;A&#39; record (e.g. <code>ns1</code>, <code>www</code>, <code>bill</code> and <code>fred</code>) and a &#39;CNAME&#39; record (<code>ftp</code>), as well as a couple of &#39;NS&#39; records and a &#39;MX&#39; record. We&#39;ll take a look at what these records really represent later on in this article.</p>
+
+<p>The format for these records is as follows:</p>
+
+<pre><code class="language-ini">name ttl class rr ...
+</code></pre>
+
+<blockquote>
+<p>Note: where <code>...</code> represents specific arguments for the <em>type</em> of RR being created</p>
+</blockquote>
+
+<p>The reason I mention this syntax structure is because there are some nuances regarding this zonefile that tie into the syntax structure but might not be immediately clear:</p>
+
+<ol>
+<li>Anything starting with a <code>$</code> is referred to as a &#39;directive&#39; and affects processing of the zonefile (e.g. <code>$TTL</code> defines the default ttl for the entire zone; this can be overridden by a ttl set within a RR).</li>
+<li>The SOA record needs to be the first record defined</li>
+<li>The SOA record replaces <code>@</code> with the value assigned to <code>$ORIGIN</code></li>
+<li>The <code>$ORIGIN</code> directive is not mandatory. If not provided, then BIND (the DNS server software) will acquire a value from the configuration file <code>named.conf</code> (but generally it&#39;s more portable to provide one in your zonefile)</li>
+<li>The SOA could be made into a one liner, but uses parentheses to indicate &#39;multi-line&#39;</li>
+<li>Not all arguments are mandatory and so can be left blank, by way of a space or a tab (known as a &#39;field separator&#39;)</li>
+<li>Most RR&#39;s utilise <code>IN</code> as the &#39;class&#39; value (which stands for &#39;Internet&#39;). There are other values but they&#39;re very rarely used</li>
+<li>The &#39;name&#39; used for most of the RR&#39;s in the above example aren&#39;t considered &quot;fully qualified domain names&quot;. I discuss what this means below, but for now you should know that the rule is: if the name doesn&#39;t end with a dot <code>.</code> then the <code>$ORIGIN</code> is appended to the name (see next section for more details)</li>
+<li>With RRs you can have the same ip assigned to multiple names (as the one host could potentially be serving up different services, such as a DNS as well as a web server)</li>
+<li>You can simplify the creation of multiple records of the same RR type by omitting their value (see above example zonefile). For example, if no value for <code>rr</code> is found then it&#39;ll use the value from the previous record</li>
+<li>You can provide very basic DNS &#39;load balancing&#39; by creating multiple A records and pointing them to different ips. BIND will handle requests by carrying out either a round-robin process or a random selection (depending on the <a href="http://www.zytrax.com/books/dns/ch7/queries.html#rrset-order">rrset-order</a> setting inside the configuration <code>named.conf</code>; round-robin being the default)</li>
+</ol>
 
 <hr>
 
@@ -1218,6 +1249,73 @@ but otherwise there isn&#39;t any other structure or restrictions I know of</p>
 
 <div id="28"></div>
 
+<h3>PTR</h3>
+
+<p>The PTR record is surprisingly complex in its implementation and yet fairly simple with regards to its purpose and set-up. In short you use the PTR to do a <em>reverse-mapping</em>, which is the process of forwarding an ip to a hostname (the typical RR process is known as <em>forward-mapping</em>, where by you forward a hostname onto an ip).</p>
+
+<p>The purpose of a PTR record is traditionally for authentication/security reasons. Think of mail servers that try to prevent spam messages being sent from what looks like valid hosts. In this scenario the mail server will attempt to verify that the host/ip match both ways: forward and reverse. If they don&#39;t match then the mail is rejected.</p>
+
+<blockquote>
+<p>Note: in the past when I&#39;ve had clients complain their emails are being rejected by their intended recipient, you&#39;ll find they&#39;re missing a PTR record in their DNS. The recipient&#39;s email provider will nearly always request we add a PTR record to our client&#39;s DNS</p>
+</blockquote>
+
+<p>I won&#39;t go into the implementation details here, as I mentioned earlier it&#39;s quite complex, but in essence there is another top level domain called <code>arpa</code> with a sub level domain <code>in-addr</code>. </p>
+
+<p>This new domain works in a similar way to gTLD and ccTLDs in the sense that it has third level domains, but the difference is that the order is reversed from this point. So if your web server&#39;s ip was <code>185.31.19.133</code> then the third level domain would use <code>185</code> as the name. These third level domains will also have their own zonefiles that describe the DNS at that level.</p>
+
+<p>In the zonefile you would see something like the following (notice the ip address we mentioned above has been reversed due to the standard DNS hierarchy structure):</p>
+
+<pre><code class="language-ini">$ORIGIN 19.31.185.IN-ADDR.ARPA.
+</code></pre>
+
+<blockquote>
+<p>Note: convention states that although domains are case-insensitive, the <code>in-addr.arpa.</code> should be capitalised</p>
+</blockquote>
+
+<p>As far as the PTR record is concerned, you now take the last part of your ip and use that as the name of your PTR record. For example, if you had the ip <code>185.31.19.133</code> then <code>133</code> would be the name of the PTR record, while its value would be a fully qualified domain such as <code>www.example.com.</code>:</p>
+
+<pre><code class="language-ini">133      IN    PTR    www.example.com.
+</code></pre>
+
+<blockquote>
+<p>Note: because we&#39;ve defined an <code>$ORIGIN</code> in our zonefile that is an arpa address we&#39;d typically use fully qualified domain names for all other RRs (such as we have in the above PTR example)</p>
+</blockquote>
+
+<p>This now means that the DNS can carry out a reverse-lookup, and for the ip <code>185.31.19.133</code> it&#39;ll locate the <code>133</code> PTR record and see that is resolves to <code>www.example.com.</code> which when doing a forward-mapping DNS request results in the ip <code>185.31.19.133</code> thus providing reasonable authentication that the queries are related and not being spoofed.</p>
+
+<div id="29"></div>
+
+<h3>TXT</h3>
+
+<p>The TXT record simply provides a description for the domain being queried. You must also wrap the description in double quotes (if you&#39;re adding this record via a DNS provider then they might do this for you as you&#39;ll likely be typing the value of this record into a HTML input field).</p>
+
+<p>Let&#39;s see a real-world example of this record using both <code>dig</code> and <code>host</code> commands:</p>
+
+<pre><code class="language-bash">dig txt my-service-description.integralist.co.uk +short
+host -t txt my-service-description.integralist.co.uk
+</code></pre>
+
+<p>This query should return a response similar to the following (it&#39;ll be slightly different for the <code>host</code> command as it has no comparible flag to <code>dig</code>&#39;s <code>+short</code> flag): </p>
+
+<pre><code class="language-bash">&quot;integralist.co.uk is a tech blog&quot;
+</code></pre>
+
+<blockquote>
+<p>Note: if no TXT record is found then <code>dig</code> will return nothing, where as <code>host</code> will return <code>integralist.co.uk has no TXT record</code></p>
+</blockquote>
+
+<p>When I initially set-up the TXT record, it wasn&#39;t available via my local DNS resolver and so in the following example I query one of the authoritative name servers as well as a Google server to see the new TXT record before it has propagated around the internet:</p>
+
+<pre><code class="language-bash">dig txt my-service-description.integralist.co.uk @ns.123-reg.co.uk. +short
+dig txt my-service-description.integralist.co.uk @8.8.8.8 +short
+</code></pre>
+
+<blockquote>
+<p>Note: <code>8.8.8.8</code> is one of Google&#39;s own DNS name servers and although not an authoritative name server for my domain, it was very fast at getting the new record</p>
+</blockquote>
+
+<div id="30"></div>
+
 <h2>TTL (Time to Live)</h2>
 
 <p>Every resource record (e.g. A, MX, CNAME etc) has a TTL set for it. When you make a request for a record, it will be cached for the length of time that the TTL is set. This is both good and a bad thing (as is usually the case with caching scenarios) as you need to find a good balance between a TTL that&#39;s too high (meaning you lose the &#39;freshness&#39; for DNS updates) and a TTL that&#39;s too low (and subsequently ends up affecting the performance of your server).</p>
@@ -1237,7 +1335,7 @@ bbc.co.uk.      300 IN  MX  20 cluster1a.eu.messagelabs.com.
 
 <p>So if you make a change to your DNS and are wondering why it hasn&#39;t taken effect, this might be because it&#39;s cached and waiting to expire before the new changes are visible.</p>
 
-<div id="29"></div>
+<div id="31"></div>
 
 <h3>Local Caching</h3>
 
@@ -1250,7 +1348,7 @@ bbc.co.uk.      300 IN  MX  20 cluster1a.eu.messagelabs.com.
 
 <p>If after executing the query the response is the one you expect, then it means the record has been updated in your DNS provider&#39;s system but the changes still need to propagate.</p>
 
-<div id="30"></div>
+<div id="32"></div>
 
 <h2>References</h2>
 
@@ -1260,7 +1358,7 @@ bbc.co.uk.      300 IN  MX  20 cluster1a.eu.messagelabs.com.
 <li><a href="http://www.slashroot.in/what-dns-zone-file-complete-tutorial-zone-file-and-its-contents">What is a DNS ZONE file</a></li>
 </ul>
 
-<div id="31"></div>
+<div id="33"></div>
 
 <h2>Conclusion</h2>
 
