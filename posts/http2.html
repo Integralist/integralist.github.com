@@ -1,0 +1,278 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>HTTP/2</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism-default.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+
+            pre[class*="language-"] {
+              border: 1px dashed #AAA;
+              margin-bottom: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>HTTP/2</h1>
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Persistent Connections</a></li>
+<li><a href="#3">Multiplexing</a></li>
+<li><a href="#4">Compression</a></li>
+<li><a href="#5">Prioritization</a></li>
+<li><a href="#6">SSL/TLS</a></li>
+<li><a href="#7">Server Push</a></li>
+<li><a href="#8">Implementations</a>
+
+<ul>
+<li><a href="#9">Nginx</a></li>
+<li><a href="#10">Go</a></li>
+</ul></li>
+<li><a href="#11">References</a></li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>This is a super quick post for demonstrating how to utilise the new HTTP/2 protocol. If you&#39;re unfamiliar with it, then let me spend a brief few moments discussing some of the highlights:</p>
+
+<ul>
+<li><a href="#2">Single, persistent connection</a></li>
+<li><a href="#3">Multiplexing</a></li>
+<li><a href="#4">Header compression</a></li>
+<li><a href="#5">Prioritization</a></li>
+<li><a href="#6">Encryption</a></li>
+<li><a href="#7">Server Push</a></li>
+</ul>
+
+<p>If none of these features make sense, then allow me to clarify further...</p>
+
+<div id="2"></div>
+
+<h2>Persistent Connections</h2>
+
+<p>When using HTTP/1.x each resource your web page specified would need its own connection. If you had three images on a page then that would be three separate connections.</p>
+
+<p>With HTTP/2 the situation is improved by utilising a single connection which supports the concept of a &#39;stream&#39;. A stream is effectively a two way channel, so information flows up and down it; and a single connection will be able to manage as many streams as necessary.</p>
+
+<p>This removes the need for previous &#39;performance&#39; techniques such as:</p>
+
+<ul>
+<li>domain sharding: a way to side step the problem of browsers only being able to parallelize a limited number of connections to the same domain</li>
+<li>image spriting: combining multiple images into one to reduce multiple connections to the server</li>
+<li>concatenating css/js: combining multiples stylesheets or javascript files into a single file to reduce multiple connections to the server</li>
+</ul>
+
+<p>This also means that the browser is able to more accurately cache resources as there is no need to have to bundle all your static assets together. This also avoids the user downloading assets for a page that they will never visit.</p>
+
+<div id="3"></div>
+
+<h2>Multiplexing</h2>
+
+<p>This simply means that multiple resources can be loaded in parallel over a single connection. Just to be clear: this is a very good performance boost and facilitates the ability to transfer lots of resources in a much more efficient manner than HTTP/1.x </p>
+
+<div id="4"></div>
+
+<h2>Compression</h2>
+
+<p>Header information will no longer be sent over the wire in plaintext format. It&#39;ll now be compressed, making it smaller and the responses subsequently quicker to receive (although admittedly this is only a marginal gain).</p>
+
+<p>This also means we should be less concerned about having to serve static assets from a cookie-less domain, which was a problem because the size of the static resources would all become larger due to cookie data being associated with them.</p>
+
+<div id="5"></div>
+
+<h2>Prioritization</h2>
+
+<p>Because all connections are multiplexed into a single connection, we need a way to prioritize certain requests over others in order to ensure the fastest possible overall response. HTTP/2 supports the concept of &#39;weighting&#39; each &#39;stream&#39; (see &quot;Persistent Connections&quot; above for details of what a stream is).</p>
+
+<p>I wont dive into the specifics of how this has been designed, suffice to say, if you want the gory details then I recommend you read the specification document here: <a href="http://http2.github.io/http2-spec/#rfc.section.5.3.2">http2.github.io/http2-spec</a></p>
+
+<div id="6"></div>
+
+<h2>SSL/TLS</h2>
+
+<p>The above highlights also suggest a reduction in the overall time cost associated with the SSL/TLS &#39;handshake&#39; process. Here&#39;s why:</p>
+
+<ul>
+<li>A single connection will minimize SSL handshaking back and forth between the client/server</li>
+<li>Multiplexing allows requests to be handled asynchronously</li>
+<li>Compressing the HTTP headers will make the connection smaller (and subsequently faster)</li>
+<li>Prioritized connections means allowing relevant requests to be handled in an appropriate order</li>
+</ul>
+
+<div id="7"></div>
+
+<h2>Server Push</h2>
+
+<p>In HTTP/2 the server now has the ability to send additional information along with the initial HTTP request made by the client. Now it&#39;s important to realise that the concept of &#39;server push&#39; isn&#39;t the same thing as <a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events">Server-Sent Events</a>.</p>
+
+<p>Server-Sent Events allows the server to push updates to the client and as long as the client is listening for the relevant event, the client will be able to receive the pushed notification.</p>
+
+<p>Server Push isn&#39;t the same thing and was designed to solve a different use case. With HTTP/2 the server is able to send the client additional resources, even though the client hadn&#39;t explicitly requested them. </p>
+
+<p>A typical example given is when the client requests a HTTP page and that page has some static resources like CSS and JavaScript. In HTTP/1.x the client would request a web page, and then start parsing it only to discover the page includes CSS and JavaScript resources. The client would then have to make additional requests for those static resources.</p>
+
+<p>But with HTTP/2 the server can save the client from making multiple requests by sending all the other static resources in parallel for the client&#39;s initial request for the main page/document.</p>
+
+<div id="8"></div>
+
+<h2>Implementations</h2>
+
+<p>Im not sure exactly how many implementations are available for the HTTP/2 specification out in the wild, but there are two that we&#39;ll look at here in this article: <a href="https://www.nginx.com/">nginx</a> and <a href="https://golang.org/">Go</a>. </p>
+
+<p>If you&#39;re interested in other implementations then you can find a list of alternative options here: <a href="https://github.com/http2/http2-spec/wiki/Implementations">github.com/http2/http2-spec/wiki/Implementations</a>.</p>
+
+<div id="9"></div>
+
+<h3>Nginx</h3>
+
+<p>The latest release of nginx (both its open-source and paid for models) has good support for HTTP/2, but (for the moment at least) it doesn&#39;t support Server Push. I&#39;m going to presume that you&#39;re already familiar with nginx and how it works, so I won&#39;t bother explaining things a basic nginx user would already know.</p>
+
+<p>Below is a snippet from a <code>nginx.conf</code> file that has enabled HTTP/2 support:</p>
+
+<pre><code class="language-apacheconf">http {
+  server {
+    listen *:443 ssl http2;
+    server_name integralist.co.uk;
+
+    ssl_certificate         /etc/nginx/certs/server.crt;
+    ssl_certificate_key     /etc/nginx/certs/server.key;
+    ssl_trusted_certificate /etc/nginx/certs/ca.crt;
+  }
+}
+</code></pre>
+
+<p>As you can see, the <code>listen</code> directive specifies <code>http2</code>. In essence this is all you would need to enable HTTP/2 using nginx. The reason we&#39;re restricting nginx to listening on port <code>443</code> and enabling <code>ssl</code> (+ specifying SSL certificates) is because the majority of web browsers require TLS in order to support HTTP/2, and also nginx&#39;s implementation relies upon TLS (see below for details).</p>
+
+<blockquote>
+<p>Note: currently Opera and Safari 9 supports HTTP/2 without TLS</p>
+</blockquote>
+
+<p>Nginx is a reverse proxy and so because the client doesn&#39;t have direct access to the back-end services/applications, nginx is able to translate HTTP/2 into HTTP/1.x which also allows those services to not have to be rearchitected. </p>
+
+<p>When a client communicates with nginx it&#39;ll typically pass a list of protocols it supports along with the request. Nginx will attempt to identify the <code>h2</code> protocol within that list, which indicates HTTP/2 support (specifically nginx implements the <a href="https://tools.ietf.org/html/rfc7301">Application Layer Protocol Negotiation</a> extension for TLS). If HTTP/2 isn&#39;t supported then nginx falls back to HTTP/1.x instead.</p>
+
+<div id="10"></div>
+
+<h3>Go</h3>
+
+<p>If you&#39;re not using a load balancer or a reverse proxy (such as nginx), then you might still be able to implement HTTP/2 support via your application server. One such example is with the Go programming language.</p>
+
+<p>Below is an example application which demonstrates how to enable HTTP/2 support. Because we&#39;re not utilising a reverse proxy we don&#39;t have SSL termination handled automatically for us, and so our application will need to handle the TLS handshake process:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;fmt&quot;
+  &quot;html&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+
+  &quot;golang.org/x/net/http2&quot;
+)
+
+func main() {
+  var server http.Server
+
+  http2.VerboseLogs = true
+  server.Addr = &quot;:8080&quot;
+
+  http2.ConfigureServer(&amp;server, nil)
+
+  http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, &quot;URL: %q\n&quot;, html.EscapeString(r.URL.Path))
+    ShowRequestInfoHandler(w, r)
+  })
+
+  log.Fatal(server.ListenAndServeTLS(&quot;localhost.cert&quot;, &quot;localhost.key&quot;))
+}
+func ShowRequestInfoHandler(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set(&quot;Content-Type&quot;, &quot;text/plain&quot;)
+
+  fmt.Fprintf(w, &quot;Method: %s\n&quot;, r.Method)
+  fmt.Fprintf(w, &quot;Protocol: %s\n&quot;, r.Proto)
+  fmt.Fprintf(w, &quot;Host: %s\n&quot;, r.Host)
+  fmt.Fprintf(w, &quot;RemoteAddr: %s\n&quot;, r.RemoteAddr)
+  fmt.Fprintf(w, &quot;RequestURI: %q\n&quot;, r.RequestURI)
+  fmt.Fprintf(w, &quot;URL: %#v\n&quot;, r.URL)
+  fmt.Fprintf(w, &quot;Body.ContentLength: %d (-1 means unknown)\n&quot;, r.ContentLength)
+  fmt.Fprintf(w, &quot;Close: %v (relevant for HTTP/1 only)\n&quot;, r.Close)
+  fmt.Fprintf(w, &quot;TLS: %#v\n&quot;, r.TLS)
+  fmt.Fprintf(w, &quot;\nHeaders:\n&quot;)
+
+  r.Header.Write(w)
+}
+</code></pre>
+
+<blockquote>
+<p>Note: the above code has been slightly modified from an example originally conceived by <a href="https://plus.google.com/111824860449692850794/posts">Kim Ilyong</a></p>
+</blockquote>
+
+<p>If you stick the above code into a file called <code>http2.go</code>, run the program and visit <code>https://localhost:8080/</code> in your browser (using one that supports HTTP/2 obviously), then you should see the following output (or something similar):</p>
+
+<pre><code class="language-http">URL: &quot;/&quot;
+Method: GET
+Protocol: HTTP/2.0
+Host: localhost:8080
+RemoteAddr: [::1]:63555
+RequestURI: &quot;/&quot;
+URL: &amp;url.URL{Scheme:&quot;&quot;, Opaque:&quot;&quot;, User:(*url.Userinfo)(nil), Host:&quot;&quot;, Path:&quot;/&quot;, RawPath:&quot;&quot;, RawQuery:&quot;&quot;, Fragment:&quot;&quot;}
+Body.ContentLength: 0 (-1 means unknown)
+Close: false (relevant for HTTP/1 only)
+TLS: &amp;tls.ConnectionState{Version:0x303, HandshakeComplete:true, DidResume:false, CipherSuite:0xc02f, NegotiatedProtocol:&quot;h2&quot;, NegotiatedProtocolIsMutual:true, ServerName:&quot;localhost&quot;, PeerCertificates:[]*x509.Certificate(nil), VerifiedChains:[][]*x509.Certificate(nil), SignedCertificateTimestamps:[][]uint8(nil), OCSPResponse:[]uint8(nil), TLSUnique:[]uint8{0xf6, 0xb, 0xf8, 0x95, 0x6f, 0x73, 0x4f, 0x26, 0x8f, 0x72, 0x26, 0xab}}
+
+Headers:
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: en-US,en;q=0.8
+Cache-Control: max-age=0
+Cookie: _chartbeat2=CAgQSrCqRzJnCmxa4b.1434983427317.1434983759085.1
+Dnt: 1
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36
+</code></pre>
+
+<p>You&#39;ll notice the <code>Protocol: HTTP/2.0</code> which indicates we&#39;re handling HTTP/2 now. If you&#39;re using the Chrome web browser you can also download an extension called &quot;HTTP/2 and SPDY indicator&quot; which will display a blue lightning bolt on any site that is serving content via the HTTP/2 protocol.</p>
+
+<div id="11"></div>
+
+<h2>References</h2>
+
+<ul>
+<li><a href="https://http2.github.io/faq/">HTTP/2 FAQ</a></li>
+<li><a href="https://github.com/http2/http2-spec/wiki/Implementations">HTTP/2 Implementations</a></li>
+<li><a href="https://http2.golang.org/">Go HTTP/2 Demo Page</a></li>
+<li><a href="https://github.com/bradfitz/http2/tree/master/h2demo">Go HTTP/2 Example Code</a></li>
+</ul>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
