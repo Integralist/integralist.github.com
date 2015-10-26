@@ -536,6 +536,21 @@ fi
 
 <p>After that we&#39;re working around an issue where the container is unable to verify the host is safe to communicate with by disabling <code>StrictHostKeyChecking</code> whilst trying to ssh into the GitHub domain using the standard <code>git</code> user. It&#39;s a dirty hack, but it works.</p>
 
+<h3>Baking in Certificates</h3>
+
+<p>If you need to include a certificate within your Docker image, then there is one way to achieve this reasonably safely and that is to create an image from an already running container.</p>
+
+<p>To create an image from a running container you must give the container a name (e.g. using <code>docker run --name</code>) and then use <code>docker commit</code> along with the name of the running container.</p>
+
+<p>Finally, you pass the result of that operation to <code>docker tag</code>, which will push the resulting image up to your registry.</p>
+
+<pre><code class="language-bash">docker run --name foo -v /path/to/cert/on/host:/cert.pem centos:centos6
+docker tag $(docker commit foo) my-registry.domain.com/foo:1.0.0
+docker push my-registry.domain.com/foo:1.0.0
+</code></pre>
+
+<p>In the above example snippet you&#39;ll see we&#39;ve run a container and mounted our certificate into the container. We then tag the current commit for foo and push that tag up to our registry</p>
+
 <div id="9"></div>
 
 <h2>Configuring Vim</h2>
