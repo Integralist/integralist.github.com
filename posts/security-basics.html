@@ -322,6 +322,189 @@ SHA: the hash function for a digital signature
 
 <p>Here we can see the server has sent back its random data (used to construct the premaster secret) and also we can see which cipher suite it has selected to be used.</p>
 
+<h3>Verify SSL</h3>
+
+<p>Sometimes you might need to debug an issue with your SSL connection. In order to do that you&#39;ll want to utilise the OpenSSL utility command <code>s_client</code>. This will allow you to open a connection to your host using the SSL/TLS protocol of your choice and control the various different configuration settins.</p>
+
+<p>A basic example would be as follows:</p>
+
+<pre><code class="language-bash">openssl s_client -connect google.com:443 -showcerts
+</code></pre>
+
+<p>You&#39;ll see we&#39;re connecting to Google (which is secured using SSL/TLS) and we also specify the <code>-showcerts</code> flag, which allows the response to display all certificates provided within the chain.</p>
+
+<p>The response looks something like the following:</p>
+
+<pre><code class="language-bash">CONNECTED(00000003)
+depth=2 /C=US/O=GeoTrust Inc./CN=GeoTrust Global CA
+verify error:num=20:unable to get local issuer certificate
+verify return:0
+---
+Certificate chain
+ 0 s:/C=US/ST=California/L=Mountain View/O=Google Inc/CN=*.google.com
+   i:/C=US/O=Google Inc/CN=Google Internet Authority G2
+-----BEGIN CERTIFICATE-----
+MIIHjTCCBnWgAwIBAgIIGo+tp3jIDvEwDQYJKoZIhvcNAQELBQAwSTELMAkGA1UE
+BhMCVVMxEzARBgNVBAoTCkdvb2dsZSBJbmMxJTAjBgNVBAMTHEdvb2dsZSBJbnRl
+cm5ldCBBdXRob3JpdHkgRzIwHhcNMTUxMDE1MTY0MTE2WhcNMTYwMTEzMDAwMDAw
+WjBmMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwN
+TW91bnRhaW4gVmlldzETMBEGA1UECgwKR29vZ2xlIEluYzEVMBMGA1UEAwwMKi5n
+b29nbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApCZxkmtf
+Au04O0RjThQnFAzC27w9VlfAoQrgqPtarJIvQDw4G8NZEUSWIlPr0nGr5z3CicxY
+ddO2+U8vz/aEltcIUDqNNsdordbLLl7zBS2zkDnSZEmJcM5wYM8biJ3FSU3WzRmN
+o8px1LCj49dpQButCJ7FCDIU3eaxZRYZaEiO2UCR7BT8wdyE9O49YKcDUycTgaNu
+pM5oTFPqqj+3mDLZsB8BjIssboE8dutdU0TTY4SJ3EPFsSeVTOFu7WY+s628hwMw
+kw5sy9viYUZf11RL0zleKarvdQ+oE6gK59ilknrrRXONpepKX6cBGwF/cF+Xl4y4
+tjvbvWfNETvmPQIDAQABo4IEWjCCBFYwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsG
+AQUFBwMCMIIDJgYDVR0RBIIDHTCCAxmCDCouZ29vZ2xlLmNvbYINKi5hbmRyb2lk
+LmNvbYIWKi5hcHBlbmdpbmUuZ29vZ2xlLmNvbYISKi5jbG91ZC5nb29nbGUuY29t
+ghYqLmdvb2dsZS1hbmFseXRpY3MuY29tggsqLmdvb2dsZS5jYYILKi5nb29nbGUu
+Y2yCDiouZ29vZ2xlLmNvLmlugg4qLmdvb2dsZS5jby5qcIIOKi5nb29nbGUuY28u
+dWuCDyouZ29vZ2xlLmNvbS5hcoIPKi5nb29nbGUuY29tLmF1gg8qLmdvb2dsZS5j
+b20uYnKCDyouZ29vZ2xlLmNvbS5jb4IPKi5nb29nbGUuY29tLm14gg8qLmdvb2ds
+ZS5jb20udHKCDyouZ29vZ2xlLmNvbS52boILKi5nb29nbGUuZGWCCyouZ29vZ2xl
+LmVzggsqLmdvb2dsZS5mcoILKi5nb29nbGUuaHWCCyouZ29vZ2xlLml0ggsqLmdv
+b2dsZS5ubIILKi5nb29nbGUucGyCCyouZ29vZ2xlLnB0ghIqLmdvb2dsZWFkYXBp
+cy5jb22CDyouZ29vZ2xlYXBpcy5jboIUKi5nb29nbGVjb21tZXJjZS5jb22CESou
+Z29vZ2xldmlkZW8uY29tggwqLmdzdGF0aWMuY26CDSouZ3N0YXRpYy5jb22CCiou
+Z3Z0MS5jb22CCiouZ3Z0Mi5jb22CFCoubWV0cmljLmdzdGF0aWMuY29tggwqLnVy
+Y2hpbi5jb22CECoudXJsLmdvb2dsZS5jb22CFioueW91dHViZS1ub2Nvb2tpZS5j
+b22CDSoueW91dHViZS5jb22CFioueW91dHViZWVkdWNhdGlvbi5jb22CCyoueXRp
+bWcuY29tggthbmRyb2lkLmNvbYIEZy5jb4IGZ29vLmdsghRnb29nbGUtYW5hbHl0
+aWNzLmNvbYIKZ29vZ2xlLmNvbYISZ29vZ2xlY29tbWVyY2UuY29tggp1cmNoaW4u
+Y29tggh5b3V0dS5iZYILeW91dHViZS5jb22CFHlvdXR1YmVlZHVjYXRpb24uY29t
+MGgGCCsGAQUFBwEBBFwwWjArBggrBgEFBQcwAoYfaHR0cDovL3BraS5nb29nbGUu
+Y29tL0dJQUcyLmNydDArBggrBgEFBQcwAYYfaHR0cDovL2NsaWVudHMxLmdvb2ds
+ZS5jb20vb2NzcDAdBgNVHQ4EFgQUpypq8xCS2PlWTuyHYX7xgHb9UgwwDAYDVR0T
+AQH/BAIwADAfBgNVHSMEGDAWgBRK3QYWG7z2aLV29YG2u2IaulqBLzAhBgNVHSAE
+GjAYMAwGCisGAQQB1nkCBQEwCAYGZ4EMAQICMDAGA1UdHwQpMCcwJaAjoCGGH2h0
+dHA6Ly9wa2kuZ29vZ2xlLmNvbS9HSUFHMi5jcmwwDQYJKoZIhvcNAQELBQADggEB
+AFRzPPSVNMFRDoePYeOs7awHmRpp79v7loOBMO7ctrTjpfhVjPsQmvzDlfEken2q
+HMs/r76I0s7E4hk6v2ZNFiDjSnnHvjIGG1PydfEVovL/FqsX3kUaWqqCeymGcwRC
+ld2F6XqgKkPRf00DjbnFmDKGpRyEMQd91HoutzSMSypPqFCNSpVGuPFP32D1+/Vh
+oukY3gGUlNGukoJ2e/VNnRrU7NBvyGkW83CGPMR2iwwa0/7aVGs1iy4aypaBo+0q
+QxFmxwn1AWJYyhFbsdfrhf3ux8KEQGDEIHOSa9+SjL/GYQENXGfkVIj/OG1KV0CB
+K8pC8t/AFLMrBFjS1gbkE7U=
+-----END CERTIFICATE-----
+ 1 s:/C=US/O=Google Inc/CN=Google Internet Authority G2
+   i:/C=US/O=GeoTrust Inc./CN=GeoTrust Global CA
+-----BEGIN CERTIFICATE-----
+MIID8DCCAtigAwIBAgIDAjqDMA0GCSqGSIb3DQEBCwUAMEIxCzAJBgNVBAYTAlVT
+MRYwFAYDVQQKEw1HZW9UcnVzdCBJbmMuMRswGQYDVQQDExJHZW9UcnVzdCBHbG9i
+YWwgQ0EwHhcNMTMwNDA1MTUxNTU2WhcNMTYxMjMxMjM1OTU5WjBJMQswCQYDVQQG
+EwJVUzETMBEGA1UEChMKR29vZ2xlIEluYzElMCMGA1UEAxMcR29vZ2xlIEludGVy
+bmV0IEF1dGhvcml0eSBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+AJwqBHdc2FCROgajguDYUEi8iT/xGXAaiEZ+4I/F8YnOIe5a/mENtzJEiaB0C1NP
+VaTOgmKV7utZX8bhBYASxF6UP7xbSDj0U/ck5vuR6RXEz/RTDfRK/J9U3n2+oGtv
+h8DQUB8oMANA2ghzUWx//zo8pzcGjr1LEQTrfSTe5vn8MXH7lNVg8y5Kr0LSy+rE
+ahqyzFPdFUuLH8gZYR/Nnag+YyuENWllhMgZxUYi+FOVvuOAShDGKuy6lyARxzmZ
+EASg8GF6lSWMTlJ14rbtCMoU/M4iarNOz0YDl5cDfsCx3nuvRTPPuj5xt970JSXC
+DTWJnZ37DhF5iR43xa+OcmkCAwEAAaOB5zCB5DAfBgNVHSMEGDAWgBTAephojYn7
+qwVkDBF9qn1luMrMTjAdBgNVHQ4EFgQUSt0GFhu89mi1dvWBtrtiGrpagS8wDgYD
+VR0PAQH/BAQDAgEGMC4GCCsGAQUFBwEBBCIwIDAeBggrBgEFBQcwAYYSaHR0cDov
+L2cuc3ltY2QuY29tMBIGA1UdEwEB/wQIMAYBAf8CAQAwNQYDVR0fBC4wLDAqoCig
+JoYkaHR0cDovL2cuc3ltY2IuY29tL2NybHMvZ3RnbG9iYWwuY3JsMBcGA1UdIAQQ
+MA4wDAYKKwYBBAHWeQIFATANBgkqhkiG9w0BAQsFAAOCAQEAqvqpIM1qZ4PtXtR+
+3h3Ef+AlBgDFJPupyC1tft6dgmUsgWM0Zj7pUsIItMsv91+ZOmqcUHqFBYx90SpI
+hNMJbHzCzTWf84LuUt5oX+QAihcglvcpjZpNy6jehsgNb1aHA30DP9z6eX0hGfnI
+Oi9RdozHQZJxjyXON/hKTAAj78Q1EK7gI4BzfE00LshukNYQHpmEcxpw8u1VDu4X
+Bupn7jLrLN1nBz/2i8Jw3lsA5rsb0zYaImxssDVCbJAJPZPpZAkiDoUGn8JzIdPm
+X4DkjYUiOnMDsWCOrmji9D6X52ASCWg23jrW4kOVWzeBkoEfu43XrVJkFleW2V40
+fsg12A==
+-----END CERTIFICATE-----
+ 2 s:/C=US/O=GeoTrust Inc./CN=GeoTrust Global CA
+   i:/C=US/O=Equifax/OU=Equifax Secure Certificate Authority
+-----BEGIN CERTIFICATE-----
+MIIDfTCCAuagAwIBAgIDErvmMA0GCSqGSIb3DQEBBQUAME4xCzAJBgNVBAYTAlVT
+MRAwDgYDVQQKEwdFcXVpZmF4MS0wKwYDVQQLEyRFcXVpZmF4IFNlY3VyZSBDZXJ0
+aWZpY2F0ZSBBdXRob3JpdHkwHhcNMDIwNTIxMDQwMDAwWhcNMTgwODIxMDQwMDAw
+WjBCMQswCQYDVQQGEwJVUzEWMBQGA1UEChMNR2VvVHJ1c3QgSW5jLjEbMBkGA1UE
+AxMSR2VvVHJ1c3QgR2xvYmFsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+CgKCAQEA2swYYzD99BcjGlZ+W988bDjkcbd4kdS8odhM+KhDtgPpTSEHCIjaWC9m
+OSm9BXiLnTjoBbdqfnGk5sRgprDvgOSJKA+eJdbtg/OtppHHmMlCGDUUna2YRpIu
+T8rxh0PBFpVXLVDviS2Aelet8u5fa9IAjbkU+BQVNdnARqN7csiRv8lVK83Qlz6c
+JmTM386DGXHKTubU1XupGc1V3sjs0l44U+VcT4wt/lAjNvxm5suOpDkZALeVAjmR
+Cw7+OC7RHQWa9k0+bw8HHa8sHo9gOeL6NlMTOdReJivbPagUvTLrGAMoUgRx5asz
+PeE4uwc2hGKceeoWMPRfwCvocWvk+QIDAQABo4HwMIHtMB8GA1UdIwQYMBaAFEjm
+aPkr0rKV10fYIyAQTzOYkJ/UMB0GA1UdDgQWBBTAephojYn7qwVkDBF9qn1luMrM
+TjAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjA6BgNVHR8EMzAxMC+g
+LaArhilodHRwOi8vY3JsLmdlb3RydXN0LmNvbS9jcmxzL3NlY3VyZWNhLmNybDBO
+BgNVHSAERzBFMEMGBFUdIAAwOzA5BggrBgEFBQcCARYtaHR0cHM6Ly93d3cuZ2Vv
+dHJ1c3QuY29tL3Jlc291cmNlcy9yZXBvc2l0b3J5MA0GCSqGSIb3DQEBBQUAA4GB
+AHbhEm5OSxYShjAGsoEIz/AIx8dxfmbuwu3UOx//8PDITtZDOLC5MH0Y0FWDomrL
+NhGc6Ehmo21/uBPUR/6LWlxz/K7ZGzIZOKuXNBSqltLroxwUCEm2u+WR74M26x1W
+b8ravHNjkOR/ez4iyz0H7V84dJzjA1BOoa+Y7mHyhD8S
+-----END CERTIFICATE-----
+---
+Server certificate
+subject=/C=US/ST=California/L=Mountain View/O=Google Inc/CN=*.google.com
+issuer=/C=US/O=Google Inc/CN=Google Internet Authority G2
+---
+No client certificate CA names sent
+---
+SSL handshake has read 4021 bytes and written 456 bytes
+---
+New, TLSv1/SSLv3, Cipher is AES128-SHA
+Server public key is 2048 bit
+Secure Renegotiation IS supported
+Compression: NONE
+Expansion: NONE
+SSL-Session:
+    Protocol  : TLSv1
+    Cipher    : AES128-SHA
+    Session-ID: C9BC3D21CD96713FA4EA7C21D60FF2F5DDBC6C2D2C68543652E9790C7A98DC58
+    Session-ID-ctx: 
+    Master-Key: AE3A9EBD53ED49E4FDAABBCF6EA3B4096D9248127BC056CFB1F8981F2A3AB4E8779DC8195241A9A3A25DB03EDAED6077
+    Key-Arg   : None
+    Start Time: 1445868754
+    Timeout   : 300 (sec)
+    Verify return code: 0 (ok)
+---
+</code></pre>
+
+<p>What might not be clear at this point is you&#39;re still sitting in an interactive mode within the shell and so you can issue additional requests like so:</p>
+
+<pre><code class="language-bash">HEAD / HTTP/1.0
+Host: www.google.com
+</code></pre>
+
+<blockquote>
+<p>Note: remember to press <code>&lt;Enter&gt;</code> twice to send the request</p>
+</blockquote>
+
+<p>The above sends a request for just the headers for the specified host, and so the response looks something like the following:</p>
+
+<pre><code class="language-bash">HTTP/1.0 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Location: https://www.google.co.uk/?gfe_rd=cr&amp;ei=wzUuVtGjLLDj8wek176wCQ
+Content-Length: 262
+Date: Mon, 26 Oct 2015 14:16:35 GMT
+Server: GFE/2.0
+Alternate-Protocol: 443:quic,p=1
+Alt-Svc: quic=&quot;www.google.com:443&quot;; p=&quot;1&quot;; ma=600,quic=&quot;:443&quot;; p=&quot;1&quot;; ma=600
+</code></pre>
+
+<p>The following is another example (a non-working example unfortunately), but this time the service we&#39;re querying is utilising self-signed certificates, and so we&#39;re required to provide the CA as well as our own client certificate for authentication:</p>
+
+<pre><code class="language-bash">openssl s_client \
+  -connect my-fake-service.com:443 \
+  -CAfile /Users/Integralist/.pki/custom-ca.pem \
+  -cert /Users/Integralist/.pki/Certificate.pem \
+  -key /Users/Integralist/.pki/Certificate.key \
+  -showcerts
+</code></pre>
+
+<p>The last example I want to show you is where we try and verify if a particular cipher is disabled (in this case the insecure <code>RC4</code> cipher):</p>
+
+<pre><code class="language-bash">openssl s_client -connect blog.mozilla.org:443 -showcerts -cipher RC4-SHA
+</code></pre>
+
+<p>Mozilla released a <a href="https://blog.mozilla.org/security/2015/09/11/deprecating-the-rc4-cipher/">blog post</a> recently that stated they&#39;ve discontinued support for this particular cipher. So the above command will return the following output, which indicates a <code>SSL handshake failure</code>:</p>
+
+<pre><code class="language-bash">57533:error:14077410:SSL routines:SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure:/BuildRoot/Library/Caches/com.apple.xbs/Sources/OpenSSL098/OpenSSL098-59/src/ssl/s23_clnt.c:593:
+</code></pre>
+
 <h3>Certificate signature</h3>
 
 <p>One way the client and server can authenticate each other&#39;s identities is via the MAC they send during the SSL handshake. But the client first verifies the server&#39;s identity by checking the certificate provided by the server (also done at the very beginning of the SSL handshake) has not only been signed by a CA we trust, but has also not been modified at any point along the way from the server to the client.</p>
@@ -681,6 +864,10 @@ openssl enc -d -aes-256-cbc -in SECRET_FILE.enc -out SECRET_FILE -pass file:./ke
 <p>Note: create key pair + cert in a one liner<br>
 <code>openssl req -nodes -new -x509 -keyout server.key -out server.cert</code></p>
 </blockquote>
+
+<h3>UPDATE</h3>
+
+<p>OK so I ended up writing about this any way here: http://www.integralist.co.uk/posts/clientcertauth.html &lt;- this was while I was discussing how to handle Client Certificate Authentication using Docker.</p>
 
 <div id="9"></div>
 
