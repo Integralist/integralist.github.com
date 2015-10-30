@@ -232,6 +232,8 @@ find ./project-foobar -name &#39;*.json&#39;
 <p>Note: where <code>{}</code> is a placeholder for the file path</p>
 </blockquote>
 
+<p>You&#39;ll see the <code>\;</code> at the end indicates the end of the command. You need to escape the <code>;</code> otherwise it won&#39;t work. Also you can replace it with <code>\+</code> which <em>appends</em> file paths. The reason you&#39;d use this is if you want to execute your specified utility command once and have all matching file paths added as arguments. Where as <code>\;</code> means it&#39;ll execute the command once for each file matched.</p>
+
 <h3>Finding files over a certain size</h3>
 
 <pre><code class="language-bash"># all files greater than 1mb
@@ -284,6 +286,11 @@ find . -size 0 -o -atime +365
 <p>If we run the following sed command we should see any lines that start with <code>i</code> are duplicated (remove the carrot symbol <code>^</code> to see any lines that have the character <code>i</code> duplicated; regardless of whether they&#39;re at the start of the line or not):</p>
 
 <pre><code class="language-bash">cat test.txt | sed &#39;/^i/p&#39;
+</code></pre>
+
+<p>You can also &#39;edit in place&#39; if you&#39;re feeling brave:</p>
+
+<pre><code class="language-bash">find . -name &#39;*.go&#39; -exec sed -i &#39;&#39; &#39;s/&lt;patten&gt;/&lt;replacement&gt;/&#39; {} \;
 </code></pre>
 
 <div id="6"></div>
