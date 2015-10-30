@@ -214,6 +214,24 @@ find ./project-foobar -name &#39;*.json&#39;
 <li><code>&#39;*.json&#39;</code> we&#39;ve used a wildcard (asterisk <code>*</code>) to indicate we&#39;re interested in &quot;any&quot; json file</li>
 </ul>
 
+<h3>Recursive searching</h3>
+
+<p>To recursively search for content you need to quote the glob you use:</p>
+
+<pre><code class="language-bash">find . -name &#39;*.go&#39;
+</code></pre>
+
+<h3>Process results</h3>
+
+<p>If you want to process the results you get, without a pipe, then use <code>-exec &lt;utility&gt; \;</code></p>
+
+<pre><code class="language-bash">find . -name &#39;*.go&#39; -exec grep &#39;my_pattern_im_searching_for&#39; {} \;
+</code></pre>
+
+<blockquote>
+<p>Note: where <code>{}</code> is a placeholder for the file path</p>
+</blockquote>
+
 <h3>Finding files over a certain size</h3>
 
 <pre><code class="language-bash"># all files greater than 1mb
