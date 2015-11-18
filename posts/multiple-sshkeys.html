@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Multiple SSH Keys for different GitHub accounts</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism-default.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+
+            pre[class*="language-"] {
+              border: 1px dashed #AAA;
+              margin-bottom: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>Multiple SSH Keys for different GitHub accounts</h1>
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">The Problem?</a></li>
+<li><a href="#3">The Solution</a></li>
+<li><a href="#4">Creating a new Key</a></li>
+<li><a href="#5">SSH Config</a></li>
+<li><a href="#6">Optional Shell Function</a></li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>I recently had an issue with my GitHub set-up which has since prompted me to write this post. The issue I had was dealing with multiple GitHub accounts via SSH on a single laptop.</p>
+
+<p>So I have a GitHub account under the username <a href="https://github.com/Integralist">Integralist</a>. This is a personal account, and up until recently I was also using it to access my work&#39;s private repos (<a href="https://github.com/bbc">BBC</a> and <a href="https://github.com/BBC-News">BBC-News</a>).</p>
+
+<p>When cloning a repo from GitHub you will typically create an <a href="http://www.integralist.co.uk/posts/security-basics.html#6">SSH Key Pair</a> and paste the contents of the public key into your GitHub account via their web site. When you come to clone a repo you&#39;ll also typically use the SSH variation of the path:</p>
+
+<pre><code class="language-bash">git@github.com:Integralist/Go-Requester.git
+</code></pre>
+
+<p>The problem occurred when I had to remove my personal account from the BBC/BBC-News repos and replace them with a generic <a href="https://github.com/BBCMarkMcDonnell">BBCMarkMcDonnell</a> account.</p>
+
+<div id="2"></div>
+
+<h2>The Problem?</h2>
+
+<p>So the first thing I did was create myself a new SSH Key, upload the public key to my new GitHub account. </p>
+
+<p>I then added the private key to my laptop&#39;s SSH-Agent:</p>
+
+<pre><code class="language-bash">ssh-add -K ~/.ssh/github_bbc_rsa
+</code></pre>
+
+<p>I then tried to clone one of the BBC&#39;s private repos. This is where I discovered I didn&#39;t have authorisation to clone the private repo. </p>
+
+<p>It turns out that although I had both SSH Key Pairs loaded within my SSH-Agent...</p>
+
+<pre><code class="language-bash">ssh-add -l
+
+# Returns something like...
+#
+# 4096 SHA256:xxxx /Users/M/.ssh/github_rsa (RSA)
+# 4096 SHA256:xxxx /Users/M/.ssh/github_bbc_rsa (RSA)
+</code></pre>
+
+<p>...it was using the first key it came across for the host <code>github.com</code>, so it used my personal account to try and access the private BBC repositories (which obviously it&#39;s no longer authorised to do). </p>
+
+<p>This is a problem because I have two separate keys for the same host, and I work on both BBC and personal code from my work laptop; so I needed to figure out how to get around this issue.</p>
+
+<div id="3"></div>
+
+<h2>The Solution</h2>
+
+<p>The solution turned out to be pretty straight forward, if not immediately obvious. I would need to modify my <code>~/.ssh/config</code> file (you&#39;ll need to create that file if you don&#39;t already have one).</p>
+
+<p>Then when cloning a private BBC repo I simply modify the clone command slightly. So where I would normally use:</p>
+
+<pre><code class="language-bash">git clone git@github.com:bbc/mozart.git
+</code></pre>
+
+<p>I would now use:</p>
+
+<pre><code class="language-bash">git clone git@BBCMarkMcDonnell:bbc/mozart.git
+</code></pre>
+
+<p>So let&#39;s take a look at how&#39;s this is done.</p>
+
+<div id="4"></div>
+
+<h2>Creating a new Key</h2>
+
+<p>First things first, create a new SSH Key Pair and name it something relevant (e.g. I used <code>github_bbc_rsa</code>):</p>
+
+<pre><code class="language-bash">ssh-keygen -t rsa -b 4096 -C &quot;you@example.com&quot;
+</code></pre>
+
+<p>Next, paste the public key part into your GitHub account and add the private key to your SSH-Agent:</p>
+
+<pre><code class="language-bash">eval &quot;$(ssh-agent -s)&quot;
+ssh-add -K ~/.ssh/github_bbc_rsa
+</code></pre>
+
+<blockquote>
+<p>Note: <code>ssh-add -l</code> will show you what keys have been added to the agent</p>
+</blockquote>
+
+<div id="5"></div>
+
+<h2>SSH Config</h2>
+
+<p>Now create the file <code>~/.ssh/config</code> (or modify the existing one you have):</p>
+
+<pre><code class="language-ini">Host BBCMarkMcDonnell
+  User git
+  HostName github.com
+  IdentityFile ~/.ssh/github_bbc_rsa
+
+Host Integralist
+  User git
+  HostName github.com
+  IdentityFile ~/.ssh/github_rsa
+</code></pre>
+
+<p>As you can see I&#39;ve created two hosts:</p>
+
+<ol>
+<li>BBCMarkMcDonnell</li>
+<li>Integralist</li>
+</ol>
+
+<blockquote>
+<p>Note: you can call them whatever you like, I opted for the username for each account</p>
+</blockquote>
+
+<p>The keys within these two hosts are exactly the same. They state for the user <code>git</code>, and the hostname <code>github.com</code> make sure you use the specified <code>IdentityFile</code>.</p>
+
+<p>So if I want to access the BBC private repos then I&#39;ll use the following modified <code>git clone</code> command:</p>
+
+<pre><code class="language-bash">git clone git@BBCMarkMcDonnell:bbc/mozart.git
+</code></pre>
+
+<p>Where you can see the host section (<code>github.com</code>) has been replaced with <code>BBCMarkMcDonnell</code> which maps to the host block defined inside my <code>~/.ssh/config</code> file. So it&#39;ll use the relevant identity file needed to authorise successfully with.</p>
+
+<p>Now the second <code>Host</code> (Integralist) is actually redundant for my use case because if I want to clone one of my own repos (which are all public) then I&#39;d execute something like <code>git@github.com:Integralist/Go-Requester.git</code> (this being the same command I&#39;ve always run; no modification to it).</p>
+
+<p>What happens is SSH-Agent will do what it did before, which is look through the list of signatures within the SSH Agent and pick the first one that matches, which happens to be my personal Integralist account any way. But it works either way, I can either leave it up to the SSH Agent to locate my personal account or I could explicitly specify it like so:</p>
+
+<pre><code class="language-bash">git@Integralist:Integralist/Go-Requester.git
+</code></pre>
+
+<div id="6"></div>
+
+<h2>Optional Shell Function</h2>
+
+<p>The last thing I did was to create a quick shell function that allowed me to update my global git settings. By default they&#39;re set to the following:</p>
+
+<pre><code class="language-ini">git config --global user.name &quot;Integralist&quot;
+git config --global user.email &quot;mark@integralist.co.uk&quot;
+</code></pre>
+
+<p>But this means if I&#39;m pushing code for a work project then it&#39;ll show those details for the author information. I&#39;d rather it show more BBC specific details. So whenever I&#39;m working on a BBC project I&#39;ll execute:</p>
+
+<pre><code class="language-bash">switch_github BBCMarkMcDonnell mark.mcdonnell@bbc.co.uk
+</code></pre>
+
+<p>This will change the above details to the one&#39;s provided. I can then execute it again whenever I switch backed to a personal project, like so:</p>
+
+<pre><code class="language-bash">switch_github Integralist mark@integralist.co.uk
+</code></pre>
+
+<p>The function is added to my <code>~/.zshrc</code> file:</p>
+
+<pre><code class="language-bash">function switch_github() {
+  git config --global user.name $1
+  git config --global user.email $2
+
+  # print updated values just to be sure
+  echo &quot;git config --global user.name: $(git config --global user.name)&quot;
+  echo &quot;git config --global user.email: $(git config --global user.email)&quot;
+}
+</code></pre>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
