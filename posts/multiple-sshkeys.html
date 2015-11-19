@@ -32,6 +32,7 @@
 <li><a href="#4">Creating a new Key</a></li>
 <li><a href="#5">SSH Config</a></li>
 <li><a href="#6">Optional Shell Function</a></li>
+<li><a href="#7">Alternatives?</a></li>
 </ul>
 
 <div id="1"></div>
@@ -188,6 +189,55 @@ git config --global user.email &quot;mark@integralist.co.uk&quot;
   echo &quot;git config --global user.email: $(git config --global user.email)&quot;
 }
 </code></pre>
+
+<div id="7"></div>
+
+<h2>Alternatives?</h2>
+
+<p>So <a href="https://twitter.com/sthulb">Simon Thulbourn</a> informed me that he personally would&#39;ve used <code>GIT_SSH</code> as a simpler alternative to the above modification I made to my <code>~/.ssh/config</code> file. Now the following might not actually be the way he was thinking to do this, but it seems to be the most common route people take using <code>GIT_SSH</code>, so that&#39;s the one I&#39;m covering.</p>
+
+<p>The way <a href="https://www.kernel.org/pub/software/scm/git/docs/#_other"><code>GIT_SSH</code></a> works is like so:</p>
+
+<blockquote>
+<p>When set git fetch and git push will use the specified command<br>
+instead of ssh when they need to connect to a remote system</p>
+</blockquote>
+
+<p>So one way we could use this environment variable is like so:</p>
+
+<p>Create the following script file <code>~/.ssh/git.sh</code>:</p>
+
+<pre><code class="language-bash">#!/bin/sh
+
+if [ -z &quot;$PKEY&quot; ]; then
+  ssh &quot;$@&quot; # if PKEY is not specified, run ssh using default keyfile
+else
+  ssh -i &quot;$PKEY&quot; &quot;$@&quot;
+fi
+</code></pre>
+
+<blockquote>
+<p>Note: script originally written by <a href="https://alvinabad.wordpress.com/2013/03/23/how-to-specify-an-ssh-key-file-with-the-git-command/">Alvin Abad</a></p>
+</blockquote>
+
+<p>Next we&#39;ll need to make this custom script executable:</p>
+
+<pre><code class="language-bash">chmod +x ~/.ssh/git.sh
+</code></pre>
+
+<p>Now we&#39;ll need to set <code>GIT_SSH</code> to point to this script:</p>
+
+<pre><code class="language-bash">export GIT_SSH=~/ssh-git.sh
+</code></pre>
+
+<p>Finally we can execute our git clone command and specify the key would like it to use:</p>
+
+<pre><code class="language-bash">PKEY=~/.ssh/github_bbc_rsa git clone git@github.com:bbc/mozart.git
+</code></pre>
+
+<p>Personally I prefer the <code>~/.ssh/config</code> solution as it feels a little cleaner to me, as apposed to using a custom user script and then still having to specify your key manually every time you git clone. The config route seems simpler.</p>
+
+<p>Although that being said, there are quite a few different ways <code>GIT_SSH</code> can be used (see Alvin Abad&#39;s blog post for more ideas). But now you know about <code>GIT_SSH</code>, maybe you&#39;ll find a variation that suits you or you&#39;ll decide to just create your own. Enjoy</p>
 
             <hr>
             <h2>Links</h2>
