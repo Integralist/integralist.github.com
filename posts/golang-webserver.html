@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Understanding Golang&#39;s func type</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism-default.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+
+            pre[class*="language-"] {
+              border: 1px dashed #AAA;
+              margin-bottom: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>Understanding Golang&#39;s func type</h1>
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Why are there two functions?</a></li>
+<li><a href="#3">How does it work?</a></li>
+<li><a href="#4">Why is this interesting?</a></li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>As of November 2015, I&#39;m still fairly new to the <a href="https://golang.org/">Go programming language</a> and have been slowly learning all the different aspects of the language as time allows. One recent item that caught my attention was regarding Go&#39;s web server implementation; specifically the functions <code>Handle</code> and <code>HandleFunc</code>.</p>
+
+<p>I was interested to know why there were two functions that seemingly achieved the same thing and then understand how exactly they worked. The first question was easy enough to understand, but the latter required me to understand more about Go&#39;s <code>func</code> type (something I wasn&#39;t overly familiar with before).</p>
+
+<blockquote>
+<p>Note: although this article is aimed at programmers new to Go (like myself), it still requires a basic understanding of Go primitives and data structures in order to follow along</p>
+</blockquote>
+
+<p>Before we jump into the why and the how, let&#39;s see an example of what the code looks like. Below is an example that uses <code>Handle</code>:</p>
+
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;net/http&quot;
+)
+
+type Foo string
+
+func (s Foo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprint(w, s)
+}
+
+type Bar struct {
+    Greeting string
+    Punct    string
+    Who      string
+}
+
+func (s Bar) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprint(w, s.Greeting, s.Punct, s.Who)
+}
+
+func main() {
+    http.Handle(&quot;/string&quot;, Foo(&quot;I&#39;m a frayed knot.&quot;))
+    http.Handle(&quot;/struct&quot;, &amp;Bar{&quot;Hello&quot;, &quot;:&quot;, &quot;Gophers!&quot;})
+    http.ListenAndServe(&quot;localhost:4000&quot;, nil)
+}
+</code></pre>
+
+<p>The next example demonstrates the use of <code>HandleFunc</code> instead:</p>
+
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;net/http&quot;
+)
+
+func handler(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, &quot;Hi there, I love %s!&quot;, r.URL.Path[1:])
+}
+
+func main() {
+    http.HandleFunc(&quot;/&quot;, handler)
+    http.ListenAndServe(&quot;:8080&quot;, nil)
+}
+</code></pre>
+
+<div id="2"></div>
+
+<h2>Why are there two functions?</h2>
+
+<p>The first example uses the function (<code>Handle</code>), which allows us to register a URL &quot;path&quot; (e.g. <code>/foo/bar</code>) as a field/key inside of a struct and assign that path a function for its value. Meaning when an incoming web server request occurs, the given URL will be looked up in the struct, and if an appropriate match is found, the associated function will be executed.</p>
+
+<p>The second example uses the function (<code>HandleFunc</code>), which does effectively the same thing, but instead it simplifies the requirements slightly. By this I mean, with <code>Handle</code> you need to provide a type that has a <code>ServeHTTP</code> method associated with it (it can be any type - as we can see in the example code above - we used a String type and a Struct type; it didn&#39;t matter, just as long as the <code>ServeHTTP</code> function was available). </p>
+
+<p>The <code>ServeHTTP</code> method is effectively what&#39;s executed when a URL path is matched.</p>
+
+<p>The primary difference between these two functions is that with <code>HandleFunc</code> you&#39;re able to pass in a function that has no associated <code>ServeHTTP</code> method. So <code>HandleFunc</code> will resolve this failure to match the required interface by acting like an adapter layer that sets things up internally to allow your user defined function to be used as the handler for the relevant matched URL path.</p>
+
+<div id="3"></div>
+
+<h2>How does it work?</h2>
+
+<p>The way <code>HandleFunc</code> solves this requirement is by internally calling the <em>other</em> function <code>Handle</code>, and passing it the required type (i.e. it passes a type that satisfies the interface requirement that the <code>Handle</code> function has).</p>
+
+<p>Let&#39;s look back at the two functions and their respective signatures:</p>
+
+<ul>
+<li><code>func Handle(pattern string, handler Handler)</code></li>
+<li><code>func HandleFunc(pattern string, handler func(ResponseWriter, *Request))</code></li>
+</ul>
+
+<p>We can see the <code>Handle</code> signature requires a type that satisfies the <code>Handler</code> interface (which is defined as follows):</p>
+
+<pre><code class="language-go">type Handler interface {
+  ServeHTTP(ResponseWriter, *Request)
+}
+</code></pre>
+
+<p>In other words, as long as you pass in a type that has a <code>ServeHTTP</code> method then the <code>Handle</code> function will be happy. So <code>HandleFunc</code> facilitates this requirement by taking your user defined function and converting it into a type that happens to have <code>ServeHTTP</code> available.</p>
+
+<p>The way it does this is by first defining a <code>func</code> type like so:</p>
+
+<pre><code class="language-go">type HandlerFunc func(ResponseWriter, *Request)
+</code></pre>
+
+<p>This says that for a function to match this type it should have the same signature (e.g. <code>ResponseWriter, *Request</code>).</p>
+
+<p>Inside the <code>HandleFunc</code> function you&#39;ll see it actually calls this <code>func</code> type and passes it your user defined function. This will look something like the following in the Go implementation source code:</p>
+
+<pre><code class="language-go">func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+    mux.Handle(pattern, HandlerFunc(handler))
+}
+</code></pre>
+
+<p>Notice the call of <code>HandlerFunc(handler)</code> (where <code>handler</code> is your user defined function you passed into <code>HandleFunc</code> from your application code). This is the conversion of your function into the <code>HandlerFunc</code> type. You&#39;re now effectively passing a <code>HandlerFunc</code> into the internal function <code>mux.Handle</code>.</p>
+
+<p>So let&#39;s now take a quick look at that <code>mux.Handle</code> function to see what it expects:</p>
+
+<pre><code class="language-go">func (mux *ServeMux) Handle(pattern string, handler Handler) {
+    ...
+}
+</code></pre>
+
+<p>As we can see it expects a type of <code>Handler</code> to be provided. What is <code>Handler</code>? Well remember from earlier this is an interface which states there should be a <code>ServeHTTP</code> function available:</p>
+
+<pre><code class="language-go">type Handler interface {
+  ServeHTTP(ResponseWriter, *Request)
+}
+</code></pre>
+
+<p>We already know that we&#39;ve converted our own user defined function which has been adapted to support this requirement. So all is well and the code can continue to execute.</p>
+
+<div id="4"></div>
+
+<h2>Why is this interesting?</h2>
+
+<p>If you&#39;re wondering why this should even be remotely interesting to you, it&#39;s because it demonstrates in relatively simple way (once you get the hang of the different levels of indirection) the concept of interfaces and types and how flexible they can allow your code to be when used in an indiomatic way.</p>
+
+<p>Up until this point in time, I had not really understood the purpose of the <code>func</code> type and so sifting through this existing Go source code helped me to realise its potential. I can now better appreciate why lots of long time Gophers recommend reading the Go source code as it can be quite enlightening.</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
