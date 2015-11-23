@@ -153,7 +153,16 @@ func main() {
 
 <p>Notice the call of <code>HandlerFunc(handler)</code> (where <code>handler</code> is your user defined function you passed into <code>HandleFunc</code> from your application code). This is the conversion of your function into the <code>HandlerFunc</code> type. You&#39;re now effectively passing a <code>HandlerFunc</code> into the internal function <code>mux.Handle</code>.</p>
 
-<p>So let&#39;s now take a quick look at that <code>mux.Handle</code> function to see what it expects:</p>
+<p>After the definition of the <code>HandlerFunc</code> func type, you&#39;ll also find the following snippet of code:</p>
+
+<pre><code class="language-go">func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *Request) {
+  f(w, r)
+}
+</code></pre>
+
+<p>This associates the required <code>ServeHTTP</code> function with the <code>HandlerFunc</code> type.</p>
+
+<p>Let&#39;s now take a quick look at that <code>mux.Handle</code> function to see what it expects:</p>
 
 <pre><code class="language-go">func (mux *ServeMux) Handle(pattern string, handler Handler) {
   ...
@@ -167,7 +176,7 @@ func main() {
 }
 </code></pre>
 
-<p>We already know that we&#39;ve converted our own user defined function which has been adapted to support this requirement. So all is well and the code can continue to execute.</p>
+<p>We already know that our own user defined function has been adapted to support this interface (as it was converted into a <code>HandlerFunc</code> type; and that type has a <code>ServeHTTP</code> function associated to it). So all is well and the code can continue to execute.</p>
 
 <div id="4"></div>
 
