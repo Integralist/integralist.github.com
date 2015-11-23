@@ -85,17 +85,17 @@ func main() {
 <pre><code class="language-go">package main
 
 import (
-    &quot;fmt&quot;
-    &quot;net/http&quot;
+  &quot;fmt&quot;
+  &quot;net/http&quot;
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, &quot;Hi there, I love %s!&quot;, r.URL.Path[1:])
+  fmt.Fprintf(w, &quot;Hi there, I love %s!&quot;, r.URL.Path[1:])
 }
 
 func main() {
-    http.HandleFunc(&quot;/&quot;, handler)
-    http.ListenAndServe(&quot;:8080&quot;, nil)
+  http.HandleFunc(&quot;/&quot;, handler)
+  http.ListenAndServe(&quot;:8080&quot;, nil)
 }
 </code></pre>
 
@@ -147,7 +147,7 @@ func main() {
 <p>Inside the <code>HandleFunc</code> function you&#39;ll see it actually calls this <code>func</code> type and passes it your user defined function. This will look something like the following in the Go implementation source code:</p>
 
 <pre><code class="language-go">func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
-    mux.Handle(pattern, HandlerFunc(handler))
+  mux.Handle(pattern, HandlerFunc(handler))
 }
 </code></pre>
 
@@ -156,7 +156,7 @@ func main() {
 <p>So let&#39;s now take a quick look at that <code>mux.Handle</code> function to see what it expects:</p>
 
 <pre><code class="language-go">func (mux *ServeMux) Handle(pattern string, handler Handler) {
-    ...
+  ...
 }
 </code></pre>
 
