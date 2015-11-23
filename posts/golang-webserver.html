@@ -49,30 +49,30 @@
 <pre><code class="language-go">package main
 
 import (
-    &quot;fmt&quot;
-    &quot;net/http&quot;
+  &quot;fmt&quot;
+  &quot;net/http&quot;
 )
 
 type Foo string
 
 func (s Foo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprint(w, s)
+  fmt.Fprint(w, s)
 }
 
 type Bar struct {
-    Greeting string
-    Punct    string
-    Who      string
+  One   string
+  Two   string
+  Three string
 }
 
 func (s Bar) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprint(w, s.Greeting, s.Punct, s.Who)
+  fmt.Fprint(w, s.One, &quot; &quot;, s.Two, &quot; &quot;, s.Three)
 }
 
 func main() {
-    http.Handle(&quot;/string&quot;, Foo(&quot;I&#39;m a frayed knot.&quot;))
-    http.Handle(&quot;/struct&quot;, &amp;Bar{&quot;Hello&quot;, &quot;:&quot;, &quot;Gophers!&quot;})
-    http.ListenAndServe(&quot;localhost:4000&quot;, nil)
+  http.Handle(&quot;/string&quot;, Foo(&quot;I&#39;m a string&quot;))
+  http.Handle(&quot;/struct&quot;, &amp;Bar{&quot;I&#39;m&quot;, &quot;A&quot;, &quot;Struct&quot;})
+  http.ListenAndServe(&quot;localhost:4000&quot;, nil)
 }
 </code></pre>
 
