@@ -44,7 +44,7 @@
 <p>Note: although this article is aimed at programmers new to Go (like myself), it still requires a basic understanding of Go primitives and data structures in order to follow along</p>
 </blockquote>
 
-<p>Before we jump into the why and the how, let&#39;s see an example of what the code looks like. Below is an example that uses <code>Handle</code>:</p>
+<p>Before we jump into the why and the how, let&#39;s see an example of what the code looks like. Below is an example that uses <code>Handle</code>; it allows you to visit the URLs <code>/string</code> and <code>/struct</code> and to see an appropriate response:</p>
 
 <pre><code class="language-go">package main
 
@@ -76,7 +76,11 @@ func main() {
 }
 </code></pre>
 
-<p>The next example demonstrates the use of <code>HandleFunc</code> instead:</p>
+<blockquote>
+<p>Note: <code>Handle</code> allows you to build up quite complex handlers based off of different data structures</p>
+</blockquote>
+
+<p>The next example demonstrates the use of <code>HandleFunc</code> instead and in essence it allows you to visit a URL such as <code>/pugs</code> and you&#39;ll be shown the response <code>Hi there, I love pugs!</code>:</p>
 
 <pre><code class="language-go">package main
 
@@ -94,6 +98,10 @@ func main() {
     http.ListenAndServe(&quot;:8080&quot;, nil)
 }
 </code></pre>
+
+<blockquote>
+<p>Note: <code>HandleFunc</code> is more simplistic, and allows you to quickly utilise a basic function for handling a specific URL request</p>
+</blockquote>
 
 <div id="2"></div>
 
