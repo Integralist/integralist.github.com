@@ -27,8 +27,8 @@
 
 <ul>
 <li><a href="#1">Introduction</a></li>
-<li><a href="#2">Why are there two functions?</a></li>
-<li><a href="#3">How does it work?</a></li>
+<li><a href="#2">Four ways to skin a cat</a></li>
+<li><a href="#3">How does the adapter work?</a></li>
 <li><a href="#4">Why is this interesting?</a></li>
 </ul>
 
@@ -36,51 +36,7 @@
 
 <h2>Introduction</h2>
 
-<p>As of November 2015, I&#39;m still fairly new to the <a href="https://golang.org/">Go programming language</a> and have been slowly learning all the different aspects of the language as time allows. One recent item that caught my attention was regarding Go&#39;s web server implementation; specifically the functions <code>Handle</code> and <code>HandleFunc</code>.</p>
-
-<p>I was interested to know why there were two functions that seemingly achieved the same thing and then understand how exactly they worked. The first question was easy enough to understand, but the latter required me to understand more about Go&#39;s <code>func</code> type (something I wasn&#39;t overly familiar with before).</p>
-
-<blockquote>
-<p>Note: although this article is aimed at programmers new to Go (like myself), it still requires a basic understanding of Go primitives and data structures in order to follow along</p>
-</blockquote>
-
-<p>Before we jump into the why and the how, let&#39;s see an example of what the code looks like. Below is an example that uses <code>Handle</code>; it allows you to visit the URLs <code>/string</code> and <code>/struct</code> and to see an appropriate response:</p>
-
-<pre><code class="language-go">package main
-
-import (
-  &quot;fmt&quot;
-  &quot;net/http&quot;
-)
-
-type Foo string
-
-func (s Foo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprint(w, s)
-}
-
-type Bar struct {
-  One   string
-  Two   string
-  Three string
-}
-
-func (s Bar) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprint(w, s.One, &quot; &quot;, s.Two, &quot; &quot;, s.Three)
-}
-
-func main() {
-  http.Handle(&quot;/string&quot;, Foo(&quot;I&#39;m a string&quot;))
-  http.Handle(&quot;/struct&quot;, &amp;Bar{&quot;I&#39;m&quot;, &quot;A&quot;, &quot;Struct&quot;})
-  http.ListenAndServe(&quot;localhost:4000&quot;, nil)
-}
-</code></pre>
-
-<blockquote>
-<p>Note: <code>Handle</code> allows you to build up quite complex handlers based off of different data structures</p>
-</blockquote>
-
-<p>The next example demonstrates the use of <code>HandleFunc</code> instead and in essence it allows you to visit a URL such as <code>/pugs</code> and you&#39;ll be shown the response <code>Hi there, I love pugs!</code>:</p>
+<p>Here is some code that demonstrates the typical &#39;hello world&#39; for a Go based web server:</p>
 
 <pre><code class="language-go">package main
 
@@ -90,38 +46,301 @@ import (
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, &quot;Hi there, I love %s!&quot;, r.URL.Path[1:])
+  fmt.Fprintf(w, &quot;Hello %s&quot;, r.URL.Path[1:])
 }
 
 func main() {
-  http.HandleFunc(&quot;/&quot;, handler)
+  http.HandleFunc(&quot;/World&quot;, handler)
   http.ListenAndServe(&quot;:8080&quot;, nil)
 }
 </code></pre>
 
 <blockquote>
-<p>Note: <code>HandleFunc</code> is more simplistic, and allows you to quickly utilise a basic function for handling a specific URL request</p>
+<p>Note: <code>http://localhost:8080/World</code> will return <code>Hello World</code></p>
 </blockquote>
+
+<p>For most people, setting up a web server to handle incoming HTTP requests is considered a quick and simple introduction to the <a href="https://golang.org/">Go programming language</a>, and looking at the above code it&#39;s easy to see why that would be the case. But further investigation can yield some nice learnings about Go&#39;s built-in <code>func</code> type and how it is used as an adapter layer.</p>
+
+<p>In this blog post I will demonstrate a few different ways of creating a web server and then I&#39;ll clarify how some of the functionality (specifically <code>http.HandleFunc</code>) works. What initially drove me to look into this was my curiosity as to why I would always insert <code>nil</code> to the <code>http.ListenAndServe</code> function by default when setting up a basic web server (see above code example). </p>
+
+<p>It was never really that clear to me and so it&#39;s just something I &#39;cargo cult&#39;ed and subsequently replicated every single time I needed a web server. I realised I needed to know what its purpose was in order to feel like I wasn&#39;t going through the motions unnecessarily or missing out on additional functionality (which it turns out I was).</p>
 
 <div id="2"></div>
 
-<h2>Why are there two functions?</h2>
+<h2>Four ways to skin a cat</h2>
 
-<p>The first example uses the function (<code>Handle</code>), which allows us to register a URL &quot;path&quot; (e.g. <code>/foo/bar</code>) as a field/key inside of a struct and assign that path a function for its value. Meaning when an incoming web server request occurs, the given URL will be looked up in the struct, and if an appropriate match is found, the associated function will be executed.</p>
+<p>There are currently four ways, that I know of, to create a web server with Go (well, actually only three - the first two examples are effectively the same - but we add a little more code to demonstrate different ways incoming requests can be handled).</p>
 
-<p>The second example uses the function (<code>HandleFunc</code>), which does effectively the same thing, but instead it simplifies the requirements slightly. By this I mean, with <code>Handle</code> you need to provide a type that has a <code>ServeHTTP</code> method associated with it (it can be any type - as we can see in the example code above - we used a String type and a Struct type; it didn&#39;t matter, just as long as the <code>ServeHTTP</code> function was available). </p>
+<p>Each of the variations ultimately revolve around what we send to <code>http.ListenAndServe</code> as its second argument (and this &#39;thing&#39; we send also ultimately should have a <code>ServeHTTP</code> method; we&#39;ll see shortly how this is achieved in different ways).</p>
 
-<p>The <code>ServeHTTP</code> method is effectively what&#39;s executed when a URL path is matched.</p>
+<p>So here are each of the variations:</p>
 
-<p>The primary difference between these two functions is that with <code>HandleFunc</code> you&#39;re able to pass in a function that has no associated <code>ServeHTTP</code> method. So <code>HandleFunc</code> will resolve this failure to match the required interface by acting like an adapter layer that sets things up internally to allow your user defined function to be used as the handler for the relevant matched URL path.</p>
+<ol>
+<li>No request parsing (serve same content regardless of request)</li>
+<li>Manual request parsing</li>
+<li>Multiplexer</li>
+<li>Global multiplexer</li>
+</ol>
+
+<h3>No request parsing</h3>
+
+<p>The most basic implementation (and by basic I don&#39;t mean &#39;simplest&#39;, more... &#39;raw&#39;) is demonstrated in the below code sample, which calls <code>ListenAndServe</code> and passes in <code>db</code> as its second argument.</p>
+
+<blockquote>
+<p>Note: although I wrote this blog post back in October 2015, I&#39;ve rewritten the below examples based off inspiration from &quot;The Go Programming&quot; book I&#39;ve been reading recently</p>
+</blockquote>
+
+<p>This first section will give us enough background and grounding to build upon in the latter sections:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+)
+
+type pounds float32
+
+func (p pounds) String() string {
+  return fmt.Sprintf(&quot;£%.2f&quot;, p)
+}
+
+type database map[string]pounds
+
+func (d database) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+  for item, price := range d {
+    fmt.Fprintf(w, &quot;%s: %s\n&quot;, item, price)
+  }
+}
+
+func main() {
+  db := database{
+    &quot;foo&quot;: 1,
+    &quot;bar&quot;: 2,
+  }
+
+  log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, db))
+}
+</code></pre>
+
+<p>We can see from the above code sample that <code>db</code> is an instance of our custom <code>database</code> type, which states it should be a map data structure consisting of strings for keys and <code>pounds</code> for values.</p>
+
+<p>We can also see that <code>pounds</code> is itself a type of <code>float32</code> and has a custom <code>String</code> method attached, allowing us to modify its output when converted into a string value. Similarly the <code>database</code> type has a method attached, but this time it is a <code>ServeHTTP</code> method. </p>
+
+<p>The <code>ServeHTTP</code> is required in order to satisfy the <code>ListenAndServe</code> method signature, which states the second argument should be a type of <code>Handler</code>:</p>
+
+<pre><code class="language-go">func ListenAndServe(addr string, handler Handler) error
+</code></pre>
+
+<blockquote>
+<p>Documentation: <code>godoc net/http ListenAndServe | less</code></p>
+</blockquote>
+
+<p>If we look at the source code for the <code>Handler</code> type (below) we can clearly see it requires a <code>ServeHTTP</code> method to be available (hence why our <code>database</code> type associates its own <code>ServeHTTP</code> method):</p>
+
+<pre><code class="language-go">type Handler interface {
+    ServeHTTP(ResponseWriter, *Request)
+}
+</code></pre>
+
+<blockquote>
+<p>Documentation: <code>godoc net/http Handler | less</code></p>
+</blockquote>
+
+<p>The above sample web server code will always serve the same response regardless of the URL that was specified. So for example...</p>
+
+<ul>
+<li><code>http://localhost:8000/</code></li>
+<li><code>http://localhost:8000/abc</code></li>
+<li><code>http://localhost:8000/xyz</code></li>
+</ul>
+
+<p>...will all serve back the response:</p>
+
+<pre><code class="language-ini">foo: £1.00
+bar: £2.00
+</code></pre>
+
+<h3>Manual request parsing</h3>
+
+<p>OK, so now we&#39;ve got the above example written. Let&#39;s enhance it by allowing our application to handle different routes as apposed to serving the same content all the time. To do this we&#39;ll modify our <code>ServeHTTP</code> method to interrogate the incoming request object and parse out the URL, as demonstrated in the below code sample:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+)
+
+type pounds float32
+
+func (p pounds) String() string {
+  return fmt.Sprintf(&quot;£%.2f&quot;, p)
+}
+
+type database map[string]pounds
+
+func (d database) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+  switch r.URL.Path {
+  case &quot;/foo&quot;:
+    fmt.Fprintf(w, &quot;foo: %s\n&quot;, d[&quot;foo&quot;])
+  case &quot;/bar&quot;:
+    fmt.Fprintf(w, &quot;bar: %s\n&quot;, d[&quot;bar&quot;])
+  default:
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintf(w, &quot;No page found for: %s\n&quot;, r.URL)
+  }
+}
+
+func main() {
+  db := database{
+    &quot;foo&quot;: 1,
+    &quot;bar&quot;: 2,
+  }
+
+  log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, db))
+}
+</code></pre>
+
+<p>Nothing else to say about this, other than we&#39;ve implemented what we set out to do by utilising a simple <code>switch</code> statement that checks for known paths and writes to the <code>http.ResponseWriter</code> a different response depending on the request. If we can&#39;t match the URL then we&#39;ll instead send a <code>404</code> status code (<code>StatusNotFound</code>) followed by a message to notify the user we couldn&#39;t identify their request.</p>
+
+<blockquote>
+<p>Documentation: <code>godoc -src net/http WriteHeader | less</code></p>
+</blockquote>
+
+<h3>Multiplexer</h3>
+
+<p>So writing the above example demonstrates a bit of a code smell. We could extract each case&#39;s block into separate functions but it&#39;s still an ever growing switch statement. We&#39;re also confined to using objects that implement the required interface (e.g. if you don&#39;t provide an object that has a <code>ServeHTTP</code> method then you&#39;re not going to have much success). </p>
+
+<p>Instead it would be nice if you could just pick an arbitrary function and allow it to be used as a handler! That&#39;s exactly what <code>ServeMux</code> provides to us via its <code>HandleFunc</code> function (which is really just a convenience method on top of <code>http.HandlerFunc</code>).</p>
+
+<blockquote>
+<p>Documentation: <code>godoc net/http ServeMux | less</code></p>
+</blockquote>
+
+<p>The following code sample demonstrates this in action, by removing the <code>ServeHTTP</code> method from the <code>database</code> type and instead implementing individual methods for our defined routes to call.</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+)
+
+type pounds float32
+
+func (p pounds) String() string {
+  return fmt.Sprintf(&quot;£%.2f&quot;, p)
+}
+
+type database map[string]pounds
+
+func (d database) foo(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;foo: %s\n&quot;, d[&quot;foo&quot;])
+}
+
+func (d database) bar(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;bar: %s\n&quot;, d[&quot;bar&quot;])
+}
+
+func (d database) baz(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;baz: %s\n&quot;, d[&quot;baz&quot;])
+}
+
+func main() {
+  db := database{
+    &quot;foo&quot;: 1,
+    &quot;bar&quot;: 2,
+    &quot;baz&quot;: 3,
+  }
+
+  mux := http.NewServeMux()
+
+  mux.Handle(&quot;/foo&quot;, http.HandlerFunc(db.foo))
+  mux.Handle(&quot;/bar&quot;, http.HandlerFunc(db.bar))
+
+  // Convenience method for longer form mux.Handle
+  mux.HandleFunc(&quot;/baz&quot;, db.baz)
+
+  log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, mux))
+}
+</code></pre>
+
+<p>As we can see, we create a new <code>ServeMux</code> instance using <code>http.NewServeMux</code> and then register our <code>database</code> methods as handlers for each of the route&#39;s we want to match them against. The <code>ServeMux</code> instance is a multiplexer, meaning we can pass it as the second argument to <code>http.ListenAndServe</code>.</p>
+
+<blockquote>
+<p>Note: you can also see we demonstrate the shorthand <code>mux.HandleFunc</code> which is really a convenience method over both <code>mux.Handle</code> and <code>http.HandlerFunc</code></p>
+</blockquote>
+
+<p>So how does <code>http.HandlerFunc</code> and <code>mux.HandleFunc</code> allow us to use an arbitrary function (as none of those database functions have access to a <code>ServeHTTP</code> function as required by <code>ListenAndServe</code>)? We&#39;ll come back to the answer in a little bit. Let&#39;s quickly review the last variation of how to run a web server first...</p>
+
+<h3>Global multiplexer</h3>
+
+<p>Typically you&#39;ll have your code split up into separate packages. So in order to setup your routing handlers, you would need to pass around your <code>ServeMux</code> instance to each of these packages. Instead, you can just utilise Go&#39;s global <code>DefaultServeMux</code>. To do that you pass <code>nil</code> as the second argument to <code>http.ListenAndServe</code>.</p>
+
+<blockquote>
+<p>Documentation: <code>godoc -src net/http DefaultServeMux | less</code></p>
+</blockquote>
+
+<p>The following code sample demonstrates this:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+)
+
+type pounds float32
+
+func (p pounds) String() string {
+  return fmt.Sprintf(&quot;£%.2f&quot;, p)
+}
+
+type database map[string]pounds
+
+func (d database) foo(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;foo: %s\n&quot;, d[&quot;foo&quot;])
+}
+
+func (d database) bar(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;bar: %s\n&quot;, d[&quot;bar&quot;])
+}
+
+func (d database) baz(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;baz: %s\n&quot;, d[&quot;baz&quot;])
+}
+
+func main() {
+  db := database{
+    &quot;foo&quot;: 1,
+    &quot;bar&quot;: 2,
+    &quot;baz&quot;: 3,
+  }
+
+  http.HandleFunc(&quot;/foo&quot;, db.foo)
+  http.HandleFunc(&quot;/bar&quot;, db.bar)
+  http.HandleFunc(&quot;/baz&quot;, db.baz)
+
+  log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, nil))
+}
+</code></pre>
+
+<p>Again, we have a convenience method <code>HandleFunc</code> which allows an arbitrary function to be adapted so it fits the interface requirements that <code>ListenAndServe</code>&#39;s second argument enforces.</p>
 
 <div id="3"></div>
 
-<h2>How does it work?</h2>
+<h2>How does the adapter work?</h2>
 
-<p>The way <code>HandleFunc</code> solves this requirement is by internally calling the <em>other</em> function <code>Handle</code>, and passing it the required type (i.e. it passes a type that satisfies the interface requirement that the <code>Handle</code> function has).</p>
+<p>The &#39;adapter&#39; here being the <code>http.HandleFunc</code> function. How does it take an arbitrary function and enable it to support the relevant interface so it can be passed to <code>ListenAndServe</code>?</p>
 
-<p>Let&#39;s look back at the two functions and their respective signatures:</p>
+<p>The way <code>http.HandleFunc</code> solves this requirement is by internally calling its <em>other</em> function <code>http.Handle</code>, and passing it the required type (i.e. it passes a type that satisfies the interface requirement that the <code>Handle</code> function has).</p>
+
+<p>OK, let&#39;s look back at the two functions and their respective signatures to refresh our memory as to what&#39;s required:</p>
 
 <ul>
 <li><code>func Handle(pattern string, handler Handler)</code></li>
@@ -137,30 +356,30 @@ func main() {
 
 <p>In other words, as long as you pass in a type that has a <code>ServeHTTP</code> method then the <code>Handle</code> function will be happy. So <code>HandleFunc</code> facilitates this requirement by taking your user defined function and converting it into a type that happens to have <code>ServeHTTP</code> available.</p>
 
-<p>The way it does this is by first defining a <code>func</code> type like so:</p>
+<p>So how does it do that conversion? Firstly it defines a <code>func</code> type called <code>http.HandlerFunc</code>, like so:</p>
 
 <pre><code class="language-go">type HandlerFunc func(ResponseWriter, *Request)
 </code></pre>
 
 <p>This says that for a function to match this type it should have the same signature (e.g. <code>ResponseWriter, *Request</code>).</p>
 
-<p>Inside the <code>HandleFunc</code> function you&#39;ll see it actually calls this <code>func</code> type and passes it your user defined function. This will look something like the following in the Go implementation source code:</p>
+<p>Inside the <code>HandleFunc</code> function you&#39;ll see it actually <em>calls</em> this <code>func</code> type and passes it your user defined function. This will look something like the following in the Go implementation source code:</p>
 
 <pre><code class="language-go">func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
   mux.Handle(pattern, HandlerFunc(handler))
 }
 </code></pre>
 
-<p>Notice the call of <code>HandlerFunc(handler)</code> (where <code>handler</code> is your user defined function you passed into <code>HandleFunc</code> from your application code). This is the conversion of your function into the <code>HandlerFunc</code> type. You&#39;re now effectively passing a <code>HandlerFunc</code> into the internal function <code>mux.Handle</code>.</p>
+<p>Notice the call of <code>HandlerFunc(handler)</code> (where <code>handler</code> is your user defined function you passed into <code>HandleFunc</code> from your application code). This is the <em>conversion</em> of your function into the <code>HandlerFunc</code> type. You&#39;re now effectively passing a <code>HandlerFunc</code> into the internal function <code>mux.Handle</code>.</p>
 
-<p>After the definition of the <code>HandlerFunc</code> func type, you&#39;ll also find the following snippet of code:</p>
+<p>So how does that help us? Well, after the definition of the <code>HandlerFunc</code> func type, you&#39;ll also find the following snippet of code:</p>
 
 <pre><code class="language-go">func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *Request) {
   f(w, r)
 }
 </code></pre>
 
-<p>This associates the required <code>ServeHTTP</code> function with the <code>HandlerFunc</code> type.</p>
+<p>This associates the required <code>ServeHTTP</code> function with the <code>HandlerFunc</code> type. So if you convert your function to a <code>HandlerFunc</code> it will gain access to a <code>ServeHTTP</code> function! </p>
 
 <p>Let&#39;s now take a quick look at that <code>mux.Handle</code> function to see what it expects:</p>
 
@@ -176,15 +395,15 @@ func main() {
 }
 </code></pre>
 
-<p>We already know that our own user defined function has been adapted to support this interface (as it was converted into a <code>HandlerFunc</code> type; and that type has a <code>ServeHTTP</code> function associated to it). So all is well and the code can continue to execute.</p>
+<p>We know now that we&#39;ve utilised Go&#39;s <code>func</code> type to adapt/transform our incoming function into a type that has the required method <code>ServeHTTP</code> associated with it, thus allowing it to pass the <code>Handler</code> interface requirement.</p>
 
 <div id="4"></div>
 
 <h2>Why is this interesting?</h2>
 
-<p>If you&#39;re wondering why this should even be remotely interesting to you, it&#39;s because it demonstrates in relatively simple way (once you get the hang of the different levels of indirection) the concept of interfaces and types and how flexible they can allow your code to be when used in an indiomatic way.</p>
+<p>Really understanding what initially looked to be a simple web server abstraction ended up being a complex mix of types and interfaces that work together to allow seemingly incompatible types to be adapted to fit. Demonstrating how flexible and dynamic your code can be when working in an idiomatic way with the Go principles.</p>
 
-<p>Up until this point in time, I had not really understood the purpose of the <code>func</code> type and so sifting through this existing Go source code helped me to realise its potential. I can now better appreciate why lots of long time Gophers recommend reading the Go source code as it can be quite enlightening.</p>
+<p>I now have a much better appreciation of why lots of long time Gophers will routinely recommend sifting through the official Go source code, as it can indeed be quite enlightening.</p>
 
             <hr>
             <h2>Links</h2>
