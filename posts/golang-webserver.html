@@ -214,7 +214,7 @@ func main() {
 
 <p>So writing the above example demonstrates a bit of a code smell. We could extract each case&#39;s block into separate functions but it&#39;s still an ever growing switch statement. We&#39;re also confined to using objects that implement the required interface (e.g. if you don&#39;t provide an object that has a <code>ServeHTTP</code> method then you&#39;re not going to have much success). </p>
 
-<p>Instead it would be nice if you could just pick an arbitrary function and allow it to be used as a handler! That&#39;s exactly what <code>ServeMux</code> provides to us via its <code>HandleFunc</code> function (which is really just a convenience method on top of <code>http.HandlerFunc</code>).</p>
+<p>Instead it would be nice if you could just pick an arbitrary function and allow it to be used as a handler. That&#39;s exactly what <code>ServeMux</code> provides to us via its <code>HandleFunc</code> function (which is really just a convenience method on top of <code>http.HandlerFunc</code>).</p>
 
 <blockquote>
 <p>Documentation: <code>godoc net/http ServeMux | less</code></p>
@@ -380,6 +380,8 @@ func main() {
 </code></pre>
 
 <p>This associates the required <code>ServeHTTP</code> function with the <code>HandlerFunc</code> type. So if you convert your function to a <code>HandlerFunc</code> it will gain access to a <code>ServeHTTP</code> function! </p>
+
+<p>Also remember that when you associate a method with a type/object the receiver is also available to you. So in this case we can see the <code>f</code> is actually your user defined function you passed in to be converted. So when you convert that user defined function into a <code>HandlerFunc</code> you get the <code>ServeHTTP</code> method which internally is calling your original user defined function.</p>
 
 <p>Let&#39;s now take a quick look at that <code>mux.Handle</code> function to see what it expects:</p>
 
