@@ -372,7 +372,7 @@ func main() {
 
 <p>Notice the call of <code>HandlerFunc(handler)</code> (where <code>handler</code> is your user defined function you passed into <code>HandleFunc</code> from your application code). This is the <em>conversion</em> of your function into the <code>HandlerFunc</code> type. You&#39;re now effectively passing a <code>HandlerFunc</code> into the internal function <code>mux.Handle</code>.</p>
 
-<p>So how does that help us? How does passing in a function that <em>looks</em> like a <code>HandlerFunc</code> type into <code>mux.Handle</code> help us solve the problem that we&#39;re still passing in a function that has no <code>ServeHTTP</code> method available (and so should fail the interface requirement that <code>mux.Handle</code> has?</p>
+<p>So how does that help us? How does passing in a function that <em>looks</em> like a <code>HandlerFunc</code> type into <code>mux.Handle</code> help us solve the problem that we&#39;re still passing in a function that has no <code>ServeHTTP</code> method available (and so should fail the interface requirement that <code>mux.Handle</code> has)?</p>
 
 <p>Well, once you convert your user defined function into a <code>HandlerFunc</code> you&#39;ll find it now <em>does</em> have a <code>ServeHTTP</code> method available. If we look at the Go source code, just after the definition of the <code>HandlerFunc</code> func type, you&#39;ll also find the following snippet of code:</p>
 
