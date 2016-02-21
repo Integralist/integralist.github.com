@@ -1,0 +1,477 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>RPC variations in Go</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism-default.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+
+            pre[class*="language-"] {
+              border: 1px dashed #AAA;
+              margin-bottom: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>RPC variations in Go</h1>
+
+<ul>
+<li><a href="#1">Introduction</a>
+
+<ul>
+<li><a href="#2">Outline</a></li>
+<li><a href="#3">Variations</a></li>
+<li><a href="#4">Requirements</a></li>
+</ul></li>
+<li><a href="#5">RPC over HTTP</a></li>
+<li><a href="#6">RPC over TCP</a></li>
+<li><a href="#7">JSON</a></li>
+<li><a href="#8">Calling from Ruby</a></li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>Let&#39;s begin by understanding what an RPC (Remote Procedure Call) actually is:</p>
+
+<blockquote>
+<p>RPC is a way of connecting two separate services via a raw TCP socket</p>
+</blockquote>
+
+<div id="2"></div>
+
+<h3>Outline</h3>
+
+<p>The fundamental principle behind RPC is to create a service that exposes a function behind that service.</p>
+
+<p>The steps typically look something like:</p>
+
+<ul>
+<li>Write a function</li>
+<li>Add some RPC configuration</li>
+<li>Register our function as part of our RPC service</li>
+<li>Start the service and have it listen for messages on a specific port</li>
+</ul>
+
+<p>From here we would need to have a client that calls the RPC service:</p>
+
+<ul>
+<li>Write code which calls RPC function</li>
+<li>Call the function via a TCP socket with a specific ip/port</li>
+<li>The resulting &#39;message&#39; can be passed back in different formats (e.g. JSON)</li>
+</ul>
+
+<div id="3"></div>
+
+<h3>Variations</h3>
+
+<p>With this understanding we can now start to look at the <a href="https://golang.org/">Go</a> programming language and the different variations of its RPC package(s) that it offers. Effectively they consist of behaviour such as:</p>
+
+<ul>
+<li>RPC over HTTP</li>
+<li>RPC over TCP</li>
+</ul>
+
+<p>The latter variation allows the use of either the standard <code>net/rpc</code> package or a JSON formatted version found under <code>net/rpc/jsonrpc</code>. In this post we&#39;ll take a look at code examples for each of these packages.</p>
+
+<p>When utilising RPC you&#39;ll typically find there are three &#39;<em>parts</em>&#39;:</p>
+
+<ol>
+<li>Backend (the RPC function)</li>
+<li>Service (exposes the RPC)</li>
+<li>Client (calls the RPC) </li>
+</ol>
+
+<p>In most cases the backend will be unaffected. By this I mean, it&#39;s just a package with a set of behaviours/functionality which are being remotely exposed. The actual use of the <code>net/rpc</code> and <code>net/rpc/jsonrpc</code> packages are typically used within the Service and Client packages †</p>
+
+<blockquote>
+<p>† unless the client is implemented in another language,<br>
+then you&#39;ll use whatever is best suited to that language</p>
+</blockquote>
+
+<div id="4"></div>
+
+<h3>Requirements</h3>
+
+<p>Only methods that satisfy the following criteria will be made available for remote access, all other methods will be ignored (so if you hit a problem in the below code, chances are you&#39;re not exporting the expected items):</p>
+
+<ul>
+<li>the method&#39;s type is exported</li>
+<li>the method is exported</li>
+<li>the method has two arguments, both exported</li>
+<li>the method&#39;s second argument is a pointer</li>
+<li>the method has return type error</li>
+</ul>
+
+<div id="5"></div>
+
+<h2>RPC over HTTP</h2>
+
+<p>I&#39;ve yet to find a justification for using HTTP over TCP, but <em>you</em> may have your reasons. If that&#39;s the case, then here is an example of how to achieve this in Go.</p>
+
+<p>First, here&#39;s the directory structure I&#39;m using:</p>
+
+<pre><code class="language-ini">├── remote
+│   ├── rpc-html-backend.go
+├── rpc-html-client.go
+├── rpc-html-service.go
+</code></pre>
+
+<h3>rpc-html-backend.go</h3>
+
+<p>As mentioned earlier, the backends responsibility is to <em>define</em> a specific function or behaviour (see the code comments for additional information):</p>
+
+<pre><code class="language-go">package remote
+
+import &quot;fmt&quot;
+
+// Args is a data structure for the incoming arguments
+// This needs to be exported for the RPC to be valid/work
+type Args struct {
+  A, B int
+}
+
+// Arith is our functions return type
+// This also needs to be exported
+type Arith int
+
+// Multiply does simply multiplication on provided arguments
+// This also needs to be exported
+func (t *Arith) Multiply(args *Args, reply *int) error {
+  fmt.Printf(&quot;Args received: %+v\n&quot;, args)
+  *reply = args.A * args.B
+  return nil
+}
+</code></pre>
+
+<h3>rpc-html-service.go</h3>
+
+<p>The service&#39;s responsibility is to <em>expose</em> the specific function. Below we do this using RPC over HTTP, so you&#39;ll notice the use of <code>rpc.HandleHTTP</code> for setting up a HTTP based handler and <code>http.Serve</code> for serving back a response to the client:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;log&quot;
+  &quot;net&quot;
+  &quot;net/http&quot;
+  &quot;net/rpc&quot;
+
+  &quot;github.com/integralist/rpc/remote&quot;
+)
+
+func main() {
+  arith := new(remote.Arith)
+
+  rpc.Register(arith)
+  rpc.HandleHTTP()
+
+  l, e := net.Listen(&quot;tcp&quot;, &quot;:1234&quot;)
+  if e != nil {
+    log.Fatal(&quot;listen error:&quot;, e)
+  }
+
+  for {
+    http.Serve(l, nil)
+  }
+}
+</code></pre>
+
+<blockquote>
+<p>Note: I was a little confused originally about having to manually open a TCP socket. I just assumed that in using HTTP, that step would&#39;ve been abstracted away for me. But it&#39;s not, oh well</p>
+</blockquote>
+
+<h3>rpc-html-client.go</h3>
+
+<p>The client&#39;s responsibility is to connect to the remote service and call its exposed function. As our service is using RPC over HTTP you&#39;ll notice our client uses <code>rpc.DialHTTP</code> to create the TCP socket connection, just before calling the remote function via the returned client instance:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/rpc&quot;
+)
+
+type args struct {
+  A, B int
+}
+
+func main() {
+  client, err := rpc.DialHTTP(&quot;tcp&quot;, &quot;localhost:1234&quot;)
+  if err != nil {
+    log.Fatal(&quot;dialing:&quot;, err)
+  }
+
+  var reply int
+
+  e := client.Call(&quot;Arith.Multiply&quot;, &amp;args{4, 2}, &amp;reply)
+  if e != nil {
+    log.Fatalf(&quot;Something went wrong: %s&quot;, err.Error())
+  }
+
+  fmt.Printf(&quot;The reply pointer value has been changed to: %d&quot;, reply)
+}
+</code></pre>
+
+<p>The output of the following program is as follows:</p>
+
+<pre><code class="language-ini">Args received: &amp;{A:4 B:2}
+The reply pointer value has been changed to: 8
+</code></pre>
+
+<div id="6"></div>
+
+<h2>RPC over TCP</h2>
+
+<p>Most of the time when you&#39;re exposing functionality and behaviour remotely, you&#39;ll want to have the least amount of overhead as possible and so you&#39;ll resort to stripping out the HTTP application layer and moving down to using just the TCP layer.</p>
+
+<p>First, here&#39;s the directory structure I&#39;m using:</p>
+
+<pre><code class="language-ini">├── remote
+│   ├── rpc-tcp-backend.go
+├── rpc-tcp-client.go
+├── rpc-tcp-service.go
+</code></pre>
+
+<h3>rpc-tcp-backend.go</h3>
+
+<p>As before, the backend&#39;s repsonsibility is to define a set of behaviours and functions (as mentioned above in the HTTP example, we need to export certain items in order for the RPC to be valid and work):</p>
+
+<pre><code class="language-go">package remote
+
+import &quot;fmt&quot;
+
+// TCPArgs is structured around the client&#39;s provided parameters
+// The struct&#39;s fields need to be exported too!
+type TCPArgs struct {
+  Foo string
+  Bar string
+}
+
+// Compose is our RPC functions return type
+type Compose string
+
+// Details is our exposed RPC function
+func (c *Compose) Details(args *TCPArgs, reply *string) error {
+  fmt.Printf(&quot;Args received: %+v\n&quot;, args)
+  *c = &quot;some value&quot;
+  *reply = &quot;Blah!&quot;
+  return nil
+}
+</code></pre>
+
+<h3>rpc-tcp-service.go</h3>
+
+<p>Our service will now expose the above behaviour by using <code>rpc.Register</code> along with <code>rpc.Accept</code>. This is the simplest implementation possible. The call to <code>rpc.Accept</code> is just a helper for directly accepting and serving an incoming request:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;net&quot;
+  &quot;net/rpc&quot;
+
+  &quot;github.com/integralist/rpc/remote&quot;
+)
+
+func main() {
+  compose := new(remote.Compose)
+
+  rpc.Register(compose)
+
+  listener, err := net.Listen(&quot;tcp&quot;, &quot;:8080&quot;)
+  if err != nil {
+    // handle error
+  }
+
+  rpc.Accept(listener)
+}
+</code></pre>
+
+<p>If on the other hand you wish to interrogate the request (or at the very least, execute some other behaviour in-between the request being accepted and it being served) you can change the code as follows to swap out <code>rpc.Accept</code> for a <code>for</code> loop which calls <code>Accept</code> on the listener instance instead and then manually execute <code>rpc.ServeConn</code> (but remember to do this via a goroutine because it&#39;s a blocking call):</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;net&quot;
+  &quot;net/rpc&quot;
+
+  &quot;github.com/integralist/rpc/remote&quot;
+)
+
+func main() {
+  compose := new(remote.Compose)
+
+  rpc.Register(compose)
+
+  listener, err := net.Listen(&quot;tcp&quot;, &quot;:8080&quot;)
+  if err != nil {
+    // handle error
+  }
+
+  for {
+    conn, err := listener.Accept()
+    if err != nil {
+      // handle error
+    }
+
+    go rpc.ServeConn(conn)
+  }
+}
+</code></pre>
+
+<h3>rpc-tcp-client.go</h3>
+
+<p>Lastly, as we already know, the client&#39;s responsibility is to call the exposed function. This time we use the <code>rpc.Dial</code> function instead of <code>rpc.DialHTTP</code>:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/rpc&quot;
+)
+
+type args struct {
+  Foo, Bar string
+}
+
+func main() {
+  client, err := rpc.Dial(&quot;tcp&quot;, &quot;localhost:8080&quot;)
+  if err != nil {
+    log.Fatal(&quot;dialing:&quot;, err)
+  }
+
+  var reply string
+
+  e := client.Call(&quot;Compose.Details&quot;, &amp;args{&quot;Foo!&quot;, &quot;Bar!&quot;}, &amp;reply)
+  if e != nil {
+    log.Fatalf(&quot;Something went wrong: %v&quot;, e.Error())
+  }
+
+  fmt.Printf(&quot;The &#39;reply&#39; pointer value has been changed to: %s&quot;, reply)
+}
+</code></pre>
+
+<p>But if you want to implement a timeout (to prevent a call from taking too long), then you&#39;ll want to change <code>rpc.Dial</code> for <code>net.DialTimeout</code> (notice they&#39;re separate packages: <code>rpc</code> vs <code>net</code>). Also be aware that the returned type isn&#39;t a client any more (as it is in the previous example); instead it is a &#39;connection&#39;. </p>
+
+<p>Once you have the connection you can then pass that to <code>rpc.NewClient</code>. Once you have your &#39;client&#39; you&#39;ll notice that the rest of the code is the same as before (i.e. the calling of the exposed function via the client):</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net&quot;
+  &quot;net/rpc&quot;
+  &quot;time&quot;
+)
+
+type args struct {
+  Foo, Bar string
+}
+
+func main() {
+  conn, err := net.DialTimeout(&quot;tcp&quot;, &quot;localhost:8080&quot;, time.Minute)
+  if err != nil {
+    log.Fatal(&quot;dialing:&quot;, err)
+  }
+
+  client := rpc.NewClient(conn)
+
+  var reply string
+
+  e := client.Call(&quot;Compose.Details&quot;, &amp;args{&quot;Foo!&quot;, &quot;Bar!&quot;}, &amp;reply)
+  if e != nil {
+    log.Fatalf(&quot;Something went wrong: %v&quot;, e.Error())
+  }
+
+  fmt.Printf(&quot;The &#39;reply&#39; pointer value has been changed to: %s&quot;, reply)
+}
+</code></pre>
+
+<p>The output of the following program is as follows:</p>
+
+<pre><code class="language-ini">Args received: &amp;{Foo:Foo! Bar:Bar!}
+The &#39;reply&#39; pointer value has been changed to: Blah!
+</code></pre>
+
+<div id="7"></div>
+
+<h2>JSON</h2>
+
+<p>There is another option available when creating an RPC and that is to expose a JSON formatted variation (which is <em>required</em>† if you&#39;re planning on using a different programming language to communicate with your Go RPC service - as we&#39;ll see below when we write a client using the Ruby programming language).</p>
+
+<blockquote>
+<p>† The standard net/rpc package uses https://golang.org/pkg/encoding/gob/<br>
+Which is a Go specific streaming binary format<br>
+If your client isn&#39;t Go then it&#39;ll have a hard time communicating</p>
+</blockquote>
+
+<p>If we look back at our TCP example from earlier (the one which utilised <code>rpc.ServeConn</code>), we can switch that over to being JSON formatted by just using the same code but making some minor changes:</p>
+
+<ul>
+<li>In both the service and the client: swap <code>net/rpc</code> to <code>net/rpc/jsonrpc</code></li>
+<li>In the service: swap <code>rpc.ServeConn</code> to <code>jsonrpc.ServeConn</code></li>
+<li>In the client: swap <code>rpc.Dial</code> to <code>jsonrpc.Dial</code></li>
+</ul>
+
+<div id="8"></div>
+
+<h2>Calling from Ruby</h2>
+
+<p>If you want to utilise a client written in another programming language (such as Ruby), you&#39;ll need to have the Go service setup to use <code>net/rpc/jsonrpc</code>. Once that&#39;s done, your client can connect via a raw TCP socket and pass over JSON data, as shown in the below example:</p>
+
+<pre><code class="language-ruby">require &quot;socket&quot;
+require &quot;json&quot;
+
+socket = TCPSocket.new &quot;localhost&quot;, &quot;8080&quot;
+
+# Details of JSON structure can be found here:
+# https://golang.org/src/net/rpc/jsonrpc/client.go#L45
+# Thanks to Albert Hafvenström (@albhaf) for his help
+b = {
+  :method =&gt; &quot;Compose.Details&quot;,
+  :params =&gt; [{ :Foo =&gt; &quot;Foo!&quot;, :Bar =&gt; &quot;Bar!&quot; }],
+  :id     =&gt; &quot;0&quot; # id is just echo&#39;ed back to the client
+}
+
+socket.write(JSON.dump(b))
+
+p JSON.load(socket.readline)
+</code></pre>
+
+<p>The output from this program would be:</p>
+
+<pre><code class="language-ruby">{&quot;id&quot;=&gt;&quot;0&quot;, &quot;result&quot;=&gt;&quot;Blah!&quot;, &quot;error&quot;=&gt;nil}
+</code></pre>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/Resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
