@@ -37,6 +37,7 @@
 <li><a href="#6">RPC over TCP</a></li>
 <li><a href="#7">JSON</a></li>
 <li><a href="#8">Calling from Ruby</a></li>
+<li><a href="#9">gRPC</a></li>
 </ul>
 
 <div id="1"></div>
@@ -455,6 +456,20 @@ p JSON.load(socket.readline)
 
 <pre><code class="language-ruby">{&quot;id&quot;=&gt;&quot;0&quot;, &quot;result&quot;=&gt;&quot;Blah!&quot;, &quot;error&quot;=&gt;nil}
 </code></pre>
+
+<div id="9"></div>
+
+<h2>gRPC</h2>
+
+<p>Google has started work on a new package called gRPC which, as per the site: <a href="http://www.grpc.io/">grpc.io</a>, states...</p>
+
+<blockquote>
+<p>is a high performance, open source, general RPC framework that puts mobile and HTTP/2 first</p>
+</blockquote>
+
+<p>They currently support C++, Java, Objective-C, Python, Ruby, Go, C#, Node.js, and PHP. You can either go to the main GitHub repo (<a href="https://github.com/grpc">github.com/grpc</a>) or if you&#39;re only interested in the Go version, then you can find it here: <a href="https://github.com/grpc/grpc-go">github.com/grpc/grpc-go</a></p>
+
+<p>I&#39;ve not tried it yet, but it looks interesting.</p>
 
             <hr>
             <h2>Links</h2>
