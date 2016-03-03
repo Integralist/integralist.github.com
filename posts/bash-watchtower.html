@@ -163,6 +163,13 @@ parse results.txt
 
 <p>The <code>cleanup</code> and <code>display</code> functions aren&#39;t of any special interest, so we&#39;ll focus primarily on <code>pull</code> and <code>parse</code>.</p>
 
+<blockquote>
+<p>Note: most of the time the <code>man &lt;command&gt;</code> will help you locate information<br>
+But with builtin commands (those that are part of the shell environment itself)<br>
+you need to use: <code>help &lt;command&gt;</code> (e.g. <code>help trap</code> or <code>help wait</code>)<br>
+Failing that you could search inside <code>man bash</code> but that&#39;s lunacy! </p>
+</blockquote>
+
 <h3>Pull</h3>
 
 <p>First we take in two arguments, the first we store in a local variable called <code>base</code> while the other is stored in a variable called <code>urls</code>. You&#39;ll notice we&#39;ve had to convert the second argument into an Array by assigning something that resembles an Array (e.g. the parentheses <code>(...)</code>) and then expand the incoming string of elements inside it (<code>(&quot;${!2}&quot;)</code>).</p>
