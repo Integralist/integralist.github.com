@@ -80,10 +80,8 @@ I couldn&#39;t be bothered with that for this quick hack</p>
 <p>So here is the code:</p>
 
 <pre><code class="language-bash">function cleanup() {
-  local file=$1
-  if [ -f $file ]; then
-    rm $file
-  fi
+  rm results.txt
+  rm temp.txt
 }
 
 function pull() {
@@ -120,7 +118,6 @@ function parse() {
   wait
 
   display temp.txt
-  cleanup temp.txt
 }
 
 function display() {
@@ -128,6 +125,8 @@ function display() {
   cat $1
   printf &quot;\n\n&quot;
 }
+
+trap cleanup EXIT
 
 endpoints=(
   /newsbeat
@@ -138,8 +137,7 @@ endpoints=(
   /newsbeat/article/32792353/im-engaged-but-will-i-ever-be-able-to-marry-my-boyfriend
 )
 
-cleanup results.txt
-pull http://bbc.co.uk endpoints[@] &gt;&gt; results.txt
+pull http://bbc.co.uk endpoints[@] &gt; results.txt
 display results.txt
 parse results.txt
 </code></pre>
@@ -155,13 +153,20 @@ parse results.txt
 <p>The script is broken out into functions:</p>
 
 <ul>
-<li><code>cleanup</code>: removes specified file</li>
+<li><code>cleanup</code>: removes specified files</li>
 <li><code>pull</code>: gets our endpoints (only the HTTP headers)</li>
 <li><code>parse</code>: looks for non-200 status code and sends notification</li>
 <li><code>display</code>: prints specified file</li>
 </ul>
 
-<p>The <code>cleanup</code> and <code>display</code> functions aren&#39;t of any special interest, so we&#39;ll focus primarily on <code>pull</code> and <code>parse</code>.</p>
+<p>The <code>cleanup</code> and <code>display</code> functions aren&#39;t of any special interest, so we&#39;ll focus primarily on <code>pull</code> and <code>parse</code>. The only thing I will say is that previously I was manually calling <code>cleanup</code> twice (the function was originally written to take an argument - a file path - and remove the specified file if it indeed existed); this has since changed to not take an argument but instead explictly remove the two files I know I create within this script.</p>
+
+<p>I also now automatically run the <code>cleanup</code> function when the shell exits. I do this using:</p>
+
+<pre><code class="language-bash">trap cleanup EXIT
+</code></pre>
+
+<p>If you&#39;ve not seen this before then please refer to <code>help trap</code> for more details.</p>
 
 <blockquote>
 <p>Note: most of the time the <code>man &lt;command&gt;</code> will help you locate information<br>
