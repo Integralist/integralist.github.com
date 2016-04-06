@@ -33,6 +33,7 @@
 <li><a href="#5">SSH Config</a></li>
 <li><a href="#6">Optional Shell Function</a></li>
 <li><a href="#7">Alternatives?</a></li>
+<li><a href="#8">Another Alternative</a></li>
 </ul>
 
 <div id="1"></div>
@@ -238,6 +239,26 @@ fi
 <p>Personally I prefer the <code>~/.ssh/config</code> solution as it feels a little cleaner to me, as apposed to using a custom user script and then still having to specify your key manually every time you git clone. The config route seems simpler.</p>
 
 <p>Although that being said, there are quite a few different ways <code>GIT_SSH</code> can be used (see Alvin Abad&#39;s blog post for more ideas). But now you know about <code>GIT_SSH</code>, maybe you&#39;ll find a variation that suits you or you&#39;ll decide to just create your own. Enjoy</p>
+
+<div id="8"></div>
+
+<h2>Another Alternative</h2>
+
+<p>I&#39;ve found all sorts of issues recently with my original solution with things like Ruby&#39;s bundler or cli scripts that are hardcoded to use <code>git@github.com</code> where I can&#39;t change it to be a different host.</p>
+
+<p>The solution is a manual step and is a bit crap but at the same time, it takes not a lot longer than when I was retyping the host name and it actually works across everything (so far).</p>
+
+<p>Simply have the following inside your ssh config (comment it out by default):</p>
+
+<pre><code class="language-bash">Host github.com
+  User git
+  HostName github.com
+  IdentityFile ~/.ssh/github_bbc_rsa
+</code></pre>
+
+<p>Then if you have a project that requires you to use your work ssh keys then uncomment it so it becomes active.</p>
+
+<p>That&#39;s it. Seems to work fine for me.</p>
 
             <hr>
             <h2>Links</h2>
