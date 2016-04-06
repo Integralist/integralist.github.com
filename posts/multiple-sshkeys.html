@@ -246,9 +246,11 @@ fi
 
 <p>I&#39;ve found all sorts of issues recently with my original solution with things like Ruby&#39;s bundler or cli scripts that are hardcoded to use <code>git@github.com</code> where I can&#39;t change it to be a different host.</p>
 
-<p>The solution is a manual step and is a bit crap but at the same time, it takes not a lot longer than when I was retyping the host name and it actually works across everything (so far).</p>
+<p>The solution is a manual step but as I&#39;ve managed to automate the process (see below), it&#39;s faster than what I was using before and doesn&#39;t require me to export any variables or retype the host name AND it actually works across everything (so far).</p>
 
-<p>Simply have the following inside your ssh config (comment it out by default):</p>
+<p>The downside is that it only works with one other key. If you had to switch between three keys (work, home, other) then you&#39;d need to find a different solution (or use the initial solution I defined at the start of this post).</p>
+
+<p>Simply add the following inside your ssh config (I comment it out by default):</p>
 
 <pre><code class="language-bash"># switch
 Host github.com
@@ -256,6 +258,10 @@ Host github.com
   HostName github.com
   IdentityFile ~/.ssh/github_bbc_rsa
 </code></pre>
+
+<blockquote>
+<p>Note: obviously change the IdentifyFile to point to your own private key</p>
+</blockquote>
 
 <p>Then if you have a project that requires you to use your work ssh keys then uncomment it so it becomes active.</p>
 
