@@ -714,13 +714,22 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 
 <p>If you want to see your public key, then use the following command (notice I&#39;ve specified the same name as seen from the above output from <code>--list-keys</code>; if I tried to specify something else then it wouldn&#39;t find any key to export):</p>
 
-<pre><code class="language-bash">gpg --export -a &quot;Mark McDonnell&quot; | xargs -I {} echo {} &gt; gpg_public.key
+<pre><code class="language-bash">gpg --export -a &quot;Mark McDonnell&quot; &gt; gpg_public.key
 </code></pre>
 
 <p>To get the private key, you&#39;ll use a slightly different flag, but effectively it&#39;s the same thing:</p>
 
-<pre><code class="language-bash">gpg --export-secret-key -a &quot;Mark McDonnell&quot; | xargs -I {} echo {} &gt; gpg_private.key
+<pre><code class="language-bash">gpg --export-secret-key -a &quot;Mark McDonnell&quot; &gt; gpg_private.key
 </code></pre>
+
+<p>If you have multiple keys under the same name then you&#39;ll find that it&#39;ll typically export the key for the <em>first</em> name it finds. To work around this you can specify the email address instead:</p>
+
+<pre><code class="language-bash">gpg --export -a my.email@gmail.com
+</code></pre>
+
+<blockquote>
+<p>Note: by default it prints to stdout</p>
+</blockquote>
 
 <div id="7"></div>
 
