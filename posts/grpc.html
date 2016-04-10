@@ -441,7 +441,7 @@ s.run_till_terminated
 
 <p>So same set of dependencies pulled in, like with the client. But this time we&#39;re creating a new instance of a class that inherits from our <code>Requester::Requester::Service</code> auto-generated class.</p>
 
-<p>This in similar in essence to the Template Method Pattern, where we&#39;re now able to define the implementation of the method type <code>process</code>. But one thing to remember is that you need the 2nd argument <code>_unused_call</code> that&#39;s passed into the <code>process</code> method. Remove it and things will break.</p>
+<p>This is similar in essence to the Template Method Pattern, where we&#39;re now able to define the implementation of the method type <code>process</code>. But one thing to remember is that you need the 2nd argument <code>_unused_call</code> that&#39;s passed into the <code>process</code> method. Remove it and things will break.</p>
 
 <p>Why? I&#39;ve actually no idea. I&#39;ve found nothing in the documentation that explains this, and I&#39;ve sifted through the source code and nothing I could grok to understand why this second (seemingly pointless) argument is there.</p>
 
