@@ -59,9 +59,13 @@
 <p>A high performance, open source, general RPC framework that puts mobile and HTTP/2 first</p>
 </blockquote>
 
-<p>You can define and codify your service requirements via a <code>.proto</code> file, which is based on another concept they&#39;ve been working on known as <a href="https://developers.google.com/protocol-buffers/docs/overview">Protocol Buffers</a>. Protocol buffers are an open source mechanism for serializing structured data.</p>
+<h3>How does it work?</h3>
 
-<p>Once you have your service defined, you can utilise a command line compiler to generate stubs and code in multiple programming languages. So you can generate a client and server with the Go programming language, and then using the same <code>.proto</code> file generate a client/server with Ruby. Very powerful and very cool.</p>
+<p>One of the initial benefits is the ability to be able to define and codify your service requirements via a <code>.proto</code> file. The proto file is based around another concept Google have been working on known as <a href="https://developers.google.com/protocol-buffers/docs/overview">Protocol Buffers</a>. </p>
+
+<p>In essence, protocol buffers are an open-source mechanism for serializing structured data.</p>
+
+<p>Once you have your service <em>defined</em>, you can utilise a command line compiler to generate stubs and code in multiple programming languages. So you can generate a client and server with the Go programming language, and then using the same <code>.proto</code> file generate a client/server with Ruby. Very powerful and very cool.</p>
 
 <p>Google have built gRPC ontop of the <a href="https://http2.github.io/">HTTP/2 standard</a>, meaning you get features such as bidirectional streaming, flow control, header compression and multiplexing requests over a single TCP connection.</p>
 
