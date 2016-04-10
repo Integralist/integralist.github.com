@@ -471,7 +471,9 @@ msg = stub.process(Requester::Config.new(name: &quot;Mark&quot;)).message
 p &quot;Greeting: #{msg}&quot;
 </code></pre>
 
-<p>Here we&#39;re loading our grpc dependency and the service stub that was auto-generated for us. Notice that because my protocol buffer definition file specified the package as <code>requester</code> and the file itself was called <code>requester</code> I&#39;ve now got this ugly namespace <code>Requester::Requester</code>. Again, just be aware of what you&#39;re naming things because to be honest that double named module is annoying for me to look at. I left it like that to demonstrate why it&#39;s important to name things well.</p>
+<p>Here we&#39;re loading our grpc dependency and the service stub that was auto-generated for us. Notice that because my protocol buffer definition file specified the package as <code>requester</code> and the file itself was called <code>requester</code> I&#39;ve now got this ugly namespace <code>Requester::Requester</code>. </p>
+
+<p>Again, just be aware of what you&#39;re naming things because to be honest that double named module is annoying for me to look at. I left it like that to demonstrate why it&#39;s important to name things well.</p>
 
 <p>You&#39;ll notice that we pass in <code>:this_channel_is_insecure</code> to the <code>Stub.new</code> method. This isn&#39;t an arbitrary value, it needs to be exactly that value otherwise you&#39;ll see errors. I&#39;ve yet to look into using HTTPS/TLS but if you&#39;re interested, then you can find the relevant details on the <a href="http://www.grpc.io/docs/guides/auth.html">authentication documentation</a>.</p>
 
