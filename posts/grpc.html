@@ -162,7 +162,7 @@ message Response {
 
 <p>In Go, the other language we&#39;re using, the <code>package</code> value is used (conveniently) as the name of the Go package. Which makes sense as there is a closer correlation in the design of Protocol Buffers and Go vs a dynamic language such as Ruby.</p>
 
-<p>Inside of the <code>service</code> statement we state that we want an rpc service that has a <code>Process</code> method and that method accepts something of type <code>Config</code> and returns something of type <code>Response</code>. We can then define what <code>Config</code> and <code>Message</code> look like, which we do using the <code>message</code> statement.</p>
+<p>Inside of the <code>service</code> statement we state that we want an RPC service that has a <code>Process</code> method and that method accepts something of type <code>Config</code> and returns something of type <code>Response</code>. We can then define what <code>Config</code> and <code>Response</code> look like, which we do using the <code>message</code> statement.</p>
 
 <p>So to keep things simple I&#39;ve only used a single property setting for each message, but there is a rich selection of data types you can utilise. In my simple example both properties have a <code>string</code> type. </p>
 
