@@ -23,4 +23,4 @@ I've won the following awards whilst working at BBC News:
 - Most innovative use of Technology 2014 (team award)
 - Developer of the Year 2013
 
-For more details please refer to my [resume](http://www.integralist.co.uk/Resume/)
+For more details please refer to my [resume](http://www.integralist.co.uk/resume/)
