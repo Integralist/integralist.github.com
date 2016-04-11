@@ -501,11 +501,11 @@ bundle exec ruby client.rb
 <p>We&#39;ve used the <code>protoc</code> compiler to auto-generate some code stubs for us, which handle the setting up of the service. So let&#39;s see how we consume that from Go, we&#39;re going to need the following files:</p>
 
 <ul>
-<li><code>server.rb</code></li>
-<li><code>client.rb</code></li>
+<li><code>server.go</code></li>
+<li><code>client.go</code></li>
 </ul>
 
-<h3>server.rb</h3>
+<h3>server.go</h3>
 
 <pre><code class="language-go">package main
 
@@ -550,7 +550,7 @@ func main() {
 <pre><code class="language-bash">go run server.go
 </code></pre>
 
-<h3>client.rb</h3>
+<h3>client.go</h3>
 
 <pre><code class="language-go">package main
 
