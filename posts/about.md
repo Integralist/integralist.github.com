@@ -18,6 +18,7 @@ I'm a published author of three books (two through Apress and one self-published
 
 I've won the following awards whilst working at BBC News:
 
+- Best use of Technology (for Docker) 2015
 - Best Public Relations of 2014
 - Most innovative use of Technology 2014 (team award)
 - Developer of the Year 2013
