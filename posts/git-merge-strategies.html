@@ -242,7 +242,7 @@ To check out the original branch and stop rebasing, run &quot;git rebase --abort
 * 75eb1cb - (origin/master) README
 </code></pre>
 
-<p>This shows that the changes from <code>feat/foo</code> where replayed directly on top of <code>75eb1cb</code>. Otherwise if we didn&#39;t use git&#39;s rebase feature, we could&#39;ve ended up with a git history that looked like the following:</p>
+<p>This shows that the changes from <code>feat/foo</code> where replayed directly on top of <code>75eb1cb</code>. Otherwise if we didn&#39;t use git&#39;s rebase feature but a standard <code>git merge</code>, we could&#39;ve ended up with a git history that looked like the following:</p>
 
 <pre><code class="language-ini">* 41d4115 - (origin/feat/foo, feat/foo) Add C (also revert A)
 * 9e5626c - Modify A
@@ -251,7 +251,7 @@ To check out the original branch and stop rebasing, run &quot;git rebase --abort
 * 75eb1cb - (origin/master) README
 </code></pre>
 
-<p>Notice the <code>feat/foo</code> commits are on top of the <code>A to 9</code> commit and that might no necessarily be what we want to have happen.</p>
+<p>Notice the <code>feat/foo</code> commits are on top of the <code>A to 9</code> commit and that might not necessarily be what we want to have happen.</p>
 
 <div id="5"></div>
 
