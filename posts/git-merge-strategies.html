@@ -44,6 +44,11 @@
 <pre><code class="language-ini">75eb1cb - (origin/master) README
 </code></pre>
 
+<p>This is a single <code>README.md</code> file with the following content:</p>
+
+<pre><code class="language-ini">- A: 1
+</code></pre>
+
 <p>Now imagine I have a branch from <code>master</code> called <code>feat/foo</code> and in that branch I&#39;ve made 3 additional commits:</p>
 
 <pre><code class="language-ini">* 41d4115 - Add C (also revert A)
@@ -51,7 +56,14 @@
 * 8e7965e - Add B
 </code></pre>
 
-<p>You&#39;ll notice throughout this post that I use the command <code>git lg</code> which is an alias I have set within my <code>~/.gitconfig</code>:  </p>
+<p>The contents of the <code>README.md</code> file is now:    </p>
+
+<pre><code class="language-ini">- A: 1
+- B: 2
+- C: 3
+</code></pre>
+
+<p>Just to quickly clarify, you&#39;ll notice throughout this post that I use the command <code>git lg</code> which is actually an alias I have set within my <code>~/.gitconfig</code> that uses <code>git log</code> but modifies its behaviour with some additional git flags:  </p>
 
 <pre><code class="language-ini">log --graph --pretty=format:&#39;%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset&#39; --abbrev-commit --date=relative
 </code></pre>
