@@ -28,11 +28,12 @@
 <ul>
 <li><a href="#1">Introduction</a></li>
 <li><a href="#2">git merge</a></li>
-<li><a href="#3">git merge --squash</a></li>
-<li><a href="#4">git rebase</a></li>
-<li><a href="#5">git rebase --interactive</a></li>
-<li><a href="#6">git rebase --onto</a></li>
-<li><a href="#6">Conclusion</a></li>
+<li><a href="#3">git merge --no-ff --edit</a></li>
+<li><a href="#4">git merge --squash</a></li>
+<li><a href="#5">git rebase</a></li>
+<li><a href="#6">git rebase --interactive</a></li>
+<li><a href="#7">git rebase --onto</a></li>
+<li><a href="#8">Conclusion</a></li>
 </ul>
 
 <div id="1"></div>
@@ -92,6 +93,8 @@
 <p>Note: you might not realise that there is a short cut to checking out a branch and then merging another branch into it: <code>git merge &lt;source&gt; &lt;destination&gt;</code>, which is the same as doing <code>git checkout &lt;destination&gt;</code> followed by <code>git merge &lt;source&gt;</code></p>
 </blockquote>
 
+<div id="3"></div>
+
 <h2><code>git merge --no-ff --edit</code></h2>
 
 <p>Let&#39;s say you wanted a &quot;merge commit&quot; to happen (i.e. merge commits typically only occur if there has been a divergence between the branches which means git has to resolve the problem for you), then you can force git to use a &quot;merge commit&quot; even when there is no need for one (as is the case for me here).</p>
@@ -129,7 +132,7 @@
 
 <p>We can see all the commits from <code>feat/foo</code> were replayed onto <code>master</code> successfully, but now you&#39;re able to more easily distinguish the three commits came from another branch (if using my <code>git lg</code> alias).</p>
 
-<div id="3"></div>
+<div id="4"></div>
 
 <h2><code>git merge --squash</code></h2>
 
@@ -145,7 +148,7 @@
 <pre><code class="language-git">git commit -m &quot;your own custom commit message&quot;
 </code></pre>
 
-<div id="4"></div>
+<div id="5"></div>
 
 <h2><code>git rebase</code></h2>
 
@@ -253,7 +256,7 @@ To check out the original branch and stop rebasing, run &quot;git rebase --abort
 
 <p>Notice the <code>feat/foo</code> commits are on top of the <code>A to 9</code> commit and that might not necessarily be what we want to have happen.</p>
 
-<div id="5"></div>
+<div id="6"></div>
 
 <h2><code>git rebase --interactive</code></h2>
 
@@ -351,7 +354,7 @@ Add C (also revert A)
 | +- C: 3
 </code></pre>
 
-<div id="6"></div>
+<div id="7"></div>
 
 <h2><code>git rebase --onto</code></h2>
 
@@ -392,7 +395,7 @@ Add C (also revert A)
 <li><a href="https://git-scm.com/docs/git-rebase">git-scm.com/docs/git-rebase</a></li>
 </ul>
 
-<div id="7"></div>
+<div id="8"></div>
 
 <h2>Conclusion</h2>
 
