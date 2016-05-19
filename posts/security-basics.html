@@ -192,7 +192,7 @@
 
 <h3>Certificate Revocation List (CRLs)</h3>
 
-<p>Certificates are issued with a validity period (expiration date). Every time your browser interrogates a site&#39;s certificate to see if it&#39;s valid will check the validity period. If the date has passed then the browser will warn you about the certificate now been expired.</p>
+<p>Certificates are issued with a validity period (expiration date). Every time your browser interrogates a site&#39;s certificate, it is checking the certs validity period. If the date for the validity period has passed, then the browser will warn you that the certificate is now expired.</p>
 
 <p>At the same time though, if the certificate hasn&#39;t expired, then your browser will consult its Certificate Revocation List to see if the certificate has been revoked. This CRL is downloaded by your browser/operating system on a regular basis and there in lies the problem with CRLs: they&#39;re not real-time results.</p>
 
