@@ -737,6 +737,14 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 <p>Note: by default it prints to stdout</p>
 </blockquote>
 
+<p>In the following sections we&#39;ll see more of how to use GPG, but it&#39;s worth mentioning now that all the settings you use in the command line tool can be set as defaults in a dotfile: <code>~/.gnu/gpg.conf</code></p>
+
+<p>For example, if on the command line you used <code>--default-key</code>, then you could set the following within your <code>gpg.conf</code>:</p>
+
+<pre><code class="language-ini">default-key 62DBDF62           # Personal
+default-recipient some-user-id # In case you happen to only ever communicate with one person
+</code></pre>
+
 <div id="7"></div>
 
 <h2>How to encrypt data using GPG, OpenSSL and Keybase</h2>
@@ -793,6 +801,37 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 
 <p>It&#39;ll ask for the passphrase and then it&#39;ll extract the file to the current directory.</p>
 
+<p>You can also modify the default cipher encryption algorithm, then use the <code>--cipher-algo</code> flag:</p>
+
+<pre><code class="language-bash">gpg --verbose --cipher-algo AES256 --symmetric secrets.txt
+</code></pre>
+
+<blockquote>
+<p>Note: use <code>--verbose</code> without <code>--cipher-algo</code> to see GPG&#39;s default algorithm</p>
+</blockquote>
+
+<p>To see a list of available cipher algorithms, then execute the following command and look for the section <code>Cipher</code>:</p>
+
+<pre><code class="language-bash">gpg --version
+</code></pre>
+
+<p>So for me this outputs:</p>
+
+<pre><code class="language-bash">gpg (GnuPG) 1.4.20
+Copyright (C) 2015 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Home: ~/.gnupg
+Supported algorithms:
+Pubkey: RSA, RSA-E, RSA-S, ELG-E, DSA
+Cipher: IDEA, 3DES, CAST5, BLOWFISH, AES, AES192, AES256, TWOFISH,
+        CAMELLIA128, CAMELLIA192, CAMELLIA256
+Hash: MD5, SHA1, RIPEMD160, SHA256, SHA384, SHA512, SHA224
+Compression: Uncompressed, ZIP, ZLIB, BZIP2
+</code></pre>
+
 <h4>Digital Signatures</h4>
 
 <p>You can also add a MAC (remember we looked at this earlier when discussing PKI; this is the digital signature) by adding the <code>--sign</code> flag:</p>
@@ -806,7 +845,7 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 
 <p>Once the file has been signed (it&#39;ll encrypt the file as well as if you&#39;d used <code>-e</code> or <code>--encrypt</code>), then you can verify the signature using the following:</p>
 
-<pre><code class="language-bash">gpg --verify secret.txt.gpg
+<pre><code class="language-bash">gpg --verify secrets.txt.gpg
 </code></pre>
 
 <p>This will output the following:</p>
