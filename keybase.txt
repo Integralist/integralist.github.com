@@ -4,59 +4,60 @@ https://keybase.io/integralist
 
 I hereby claim:
 
-  * I am an admin of http://integralist.co.uk
+  * I am an admin of http://www.integralist.co.uk
   * I am integralist (https://keybase.io/integralist) on keybase.
-  * I have a public key with fingerprint 88D4 D9FC E949 AEFE F8BD  920C A719 7D36 D30F 65D1
+  * I have a public key with fingerprint 83D5 A027 2410 DA15 FCAB  5F43 9B19 190C 6118 B673
 
 To do so, I am signing this object:
 
 {
     "body": {
         "key": {
-            "fingerprint": "88d4d9fce949aefef8bd920ca7197d36d30f65d1",
+            "eldest_kid": "010154d8c3ff5ca85365025f608fe924a35b3ad9654e170c1745e9bc9d4f79625f2e0a",
+            "fingerprint": "83d5a0272410da15fcab5f439b19190c6118b673",
             "host": "keybase.io",
-            "key_id": "a7197d36d30f65d1",
-            "kid": "0101bd626d3135ec2fa65873325ad0d561862a297fef8312d2af89f735d5214e67f90a",
+            "key_id": "9b19190c6118b673",
+            "kid": "010154d8c3ff5ca85365025f608fe924a35b3ad9654e170c1745e9bc9d4f79625f2e0a",
             "uid": "6b4f41e6b68994127ebd6aacffbe0419",
             "username": "integralist"
         },
         "service": {
-            "hostname": "integralist.co.uk",
+            "hostname": "www.integralist.co.uk",
             "protocol": "http:"
         },
         "type": "web_service_binding",
         "version": 1
     },
-    "ctime": 1432819545,
+    "ctime": 1464453550,
     "expire_in": 157680000,
-    "prev": "fe42128173a92c1418dfda540ecc0711df66c0ecd46cdfef71a47db5d08a7e30",
-    "seqno": 3,
+    "prev": "b6a12ab4314ea75e0e3bf0f44669df9ed20e7d144c5b12e2a9ca3881d2d660a9",
+    "seqno": 11,
     "tag": "signature"
 }
 
 which yields the signature:
 
 -----BEGIN PGP MESSAGE-----
-Version: Keybase OpenPGP v2.0.8
+Version: Keybase OpenPGP v2.0.53
 Comment: https://keybase.io/crypto
 
-yMIgAnicbZJdSBRRFMd3NdMsyUyQMh8aiLIWmTvfs0niB5UPBUpBhrTcmXtnd9p1
-Ztud1UwkLOnBTFADAxGJgsoooiBUWEuzzKQHLbSysA8ToihqK/pQ647UU92Xyznn
-f37ngzOYEu9Idjp80X03YlfGnSP92yOO3d6MshpKMVE15a6h/Hjh03TDi0PBkG5Y
-lJuSJMQhWVOxzMkQa1iTFCQztApFIIuIFRBLawKPAOWifGbYziAYBYZxjm4SHzE8
-OiLe/+j9CwEa0EBBAkMigOWxymhQ4CWRZRkeIhrxApAEBjKyaNdmAYMYqEmyJrI8
-4hnAYUHUZBoSXGQBJyicxgEsKIIkyxxgREzgEKqapmCaA7ItDOOQASswUZMZsTcE
-AzrpvNZFkUClrmJ7C/Yw/4pyVDMn4ieMYMi0TNUMkLDPsoJuO9uqDtryKqx4/oA8
-im4gsk6SUIlDYd00KDcgStXSbTLgWEYCMs/xLgofDOoh7NFtBS8KEk2eXQZXEqSG
-OQYQqchCmVEBBySkIchzNFZVWgQAaYKgEgNxgorInkQAOREpPKIlKGKWpuzRDhgm
-5WZJm9BLkGHda0ArEsJU7cDN8kUOZ7JjcUKcfRCO5CWpf8+k+FXiL308LrZx989D
-SZ8/6OabC1+H7h95XzrzKWNdVn3aYPXia7s+FPn2NB7Ob2r2FMSXFviOP307HVf/
-LS97/5nHq6ai66f37ihzvpx1bCnI7F5d4soenYkNKz9GzyV9WdqxsXnGWnU0c4XR
-P7bZ4LqWdz3Pq5vLKJl/1zi1c/J834k76WuazvqvS52FE1kZVQ1JHZt7H5xO7F0/
-ubanWnZl9fU0dLcsvSnkz6Z+DIx4OmedK+v6bj3BxUVDadHhk2ePvRh9fenhPOjZ
-diXhdmZC6/exy+mFm2oCLW2XLl6ddAvPBjbcfZTSnrtsdFO0s21r1+clrZVH763O
-bhdPxSrKU+dyJ1IiRb8BxO0vrw==
-=Raia
+yMItAnicrZJPSBVBHMeflkX2ByusDAvdECvksbM7M7v7zCyo/FNEpGFB9ZjZmdXN
+19vXvtVXieGfQ1iQaWJ5CvFgdChEOjwU0qhQ+kNElyiy6NShPwplxYualYIOHZvL
+MDOf32e+v2HuLp0XyEwrbIkkvYvdhWkPxgcaAjUVkzeaJOqwU1KoSarncxOPMB73
+wvU2k0KSDGSAINNN1bKQSXSkYiQryMKybnFDgURFVCXMwAhyoMkm0CDiBjUNBi3N
+wIJUuEykIsmyo7Xcjbl21BNaXWWIyIqmQCAzApBlEoosqBoUGMCQTQyATrGmisI6
+J+5XiHCUxHnQdsSeWITn4v2D/8+5G+Z0mEILAo4p1g0DAkXjlGFCTMuiXIbA8ME4
+d6PkOBe06JHXuiRii+TNRZI4aLRN7r+t38xvKJFIBP8Cg6YTbKgXnpjreI7pRARS
+53mxkG/wTsXmSjgN/5aFqR1l4klFQSN347YTlUJAkKZn+3YAMYRIRUgukvjJmO3y
+sO0TSMO6LIZ/DW8USooJUAiFKoCcaIjLXKWWbEGIscEsgzNF5hoDEJqIAoUrxDCJ
+quuAKQxjmfiNx/mJqCPcQOQktcIZt2ujxGtwudR8Z+zw/EBaZmBBRrr/1wKZi7L+
+/MC2/oU/K3rsnNnt00tKmyrpkq3Jjs0/cqZbaqqXX09Ob9vcm1rcdK3w/O7RT7Mf
+hmFf88ZDR4+NFhyp/p7Pyionw/lbzrwuLkn1vfkyXuEq5enJwdYNrfuSUyuW3eyJ
+FtTkfvtShdpzxxL2+hNdL/qNu4uvsYOPnn3O6/02tGvgXHZVWfts0emrQ49zyKu+
+0+va9q+b+bq+Y8+i7gUzGZEUHvy+NjvY9XZe4kgX7JpY82TVSOeOrP5LT0cjnXn3
+LsSHWx9nvzz7/HI4NDIV+/Hx/abKDyXFJWB7+uqJ8amZh/Ozb98/k5Wx98Y4yjt5
+bGXurUDqaDEvvZIae+e2le8ssA6U9vG6NVW/AKMLP04=
+=5Jja
 -----END PGP MESSAGE-----
 
 And finally, I am proving ownership of this host by posting or
