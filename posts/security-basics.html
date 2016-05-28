@@ -757,6 +757,10 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 <pre><code class="language-bash">gpg -e -u &quot;Sender User Name&quot; -r &quot;Receiver User Name&quot; somefile
 </code></pre>
 
+<blockquote>
+<p>Note: it can sometimes be better to use the <code>pub</code> identifier number (especially when you have multiple keys with the same email). So if your pub id is <code>1234A/BC56D7E5</code> then you&#39;d use <code>-u BC56D7E5</code></p>
+</blockquote>
+
 <p>To decrypt a GPG encrypted file, the person sending you the encrypted file would have used your public key to encrypt the data. So the following command will locate your private key automatically (if you have multiple secret keys it&#39;ll ask for the password):</p>
 
 <pre><code class="language-bash">gpg -d some_encrypted_file.gpg
@@ -765,6 +769,11 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 <p>In the above example, it&#39;ll display the contents of the file in stdout; so you&#39;ll need to redirect it to a file or alternatively use:</p>
 
 <pre><code class="language-bash">gpg -o output_file -d some_encrypted_file.gpg
+</code></pre>
+
+<p>If someone sends you an encrypted file using your Keybase public key, then you&#39;d decrypt the file with:</p>
+
+<pre><code class="language-bash">keybase pgp decrypt -i some_encrypted_file.gpg
 </code></pre>
 
 <h4>Symmetrical encryption</h4>
