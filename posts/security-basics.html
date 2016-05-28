@@ -793,21 +793,29 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 
 <p>It&#39;ll ask for the passphrase and then it&#39;ll extract the file to the current directory.</p>
 
+<h4>Digital Signatures</h4>
+
 <p>You can also add a MAC (remember we looked at this earlier when discussing PKI; this is the digital signature) by adding the <code>--sign</code> flag:</p>
 
-<pre><code class="language-bash">gpg --default-key email@domain.com --symmetric --sign secrets.txt
+<pre><code class="language-bash">gpg --default-key email@domain.com --sign secrets.txt
 </code></pre>
 
 <blockquote>
 <p>Note: I added <code>--default-key &lt;email&gt;</code> because for me the default key wasn&#39;t the key I wanted to use for the signature</p>
 </blockquote>
 
-<p>When you decrypt the gpg file (e.g. <code>gpg secrets.txt.gpg</code>) you&#39;ll now see (after you enter the relevant passphrase) the following signature output:</p>
+<p>Once the file has been signed (it&#39;ll encrypt the file as well as if you&#39;d used <code>-e</code> or <code>--encrypt</code>), then you can verify the signature using the following:</p>
+
+<pre><code class="language-bash">gpg --verify secret.txt.gpg
+</code></pre>
+
+<p>This will output the following:</p>
 
 <pre><code class="language-bash">gpg: Signature made Mon 17 Aug 17:37:58 2015 BST using RSA key ID BAE1D7F0
 gpg: Good signature from &quot;Mark McDonnell (Integralist) &lt;email@domain.com&gt;&quot;
-gpg: WARNING: message was not integrity protected
 </code></pre>
+
+<p>But if you want to decrypt the file as well, then use the standard <code>gpg secrets.txt.gpg</code></p>
 
 <div id="7.2"></div>
 
