@@ -32,7 +32,13 @@
 <li><a href="#4">OpenSSL vs OpenSSH</a></li>
 <li><a href="#5">What is GPG?</a></li>
 <li><a href="#6">Creating your own keys</a></li>
-<li><a href="#7">How to encrypt data using GPG, OpenSSL and Keybase</a></li>
+<li><a href="#7">How to encrypt data using GPG, OpenSSL and Keybase</a>
+
+<ul>
+<li><a href="#7.1">GPG encryption</a></li>
+<li><a href="#7.2">OpenSSL encryption</a></li>
+<li><a href="#7.3">Keybase</a></li>
+</ul></li>
 <li><a href="#8">Creating, self-signing, issuing and revoking certificates</a></li>
 <li><a href="#9">Conclusion</a></li>
 </ul>
@@ -737,6 +743,8 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 
 <p>Outside of PKI and SSL/TLS, the most common task people are interested in is encrypting specific files that contain sensitive information that they would prefer to be protected either from everyone or allow only a select few people to be able to access. The interface for encrypting data is different for each tool used and so we&#39;ll be looking at those we&#39;ve discussed so far: GPG and OpenSSL</p>
 
+<div id="7.1"></div>
+
 <h3>GPG encryption</h3>
 
 <p>GPG offers two forms of encryption: asymmetrical and symmetrical...</p>
@@ -801,6 +809,8 @@ gpg: Good signature from &quot;Mark McDonnell (Integralist) &lt;email@domain.com
 gpg: WARNING: message was not integrity protected
 </code></pre>
 
+<div id="7.2"></div>
+
 <h3>OpenSSL encryption</h3>
 
 <p>The easiest way to encrypt a file using OpenSSL is like so (the password for the file is <code>foobar</code> and is specified at the end of the command; you&#39;ll also see we&#39;re using a <a href="https://en.wikipedia.org/wiki/Salt_(cryptography)"><code>-salt</code></a> with the password to help improve the security):</p>
@@ -849,9 +859,11 @@ openssl rsautl -decrypt -inkey id_rsa.pem -in key.bin.enc -out key.bin
 openssl enc -d -aes-256-cbc -in SECRET_FILE.enc -out SECRET_FILE -pass file:./key.bin
 </code></pre>
 
+<div id="7.3"></div>
+
 <h3>Keybase</h3>
 
-<p><a href="https://keybase.io/">Keybase</a> was mentioned earlier when we were discussing the problem of &#39;authentication&#39; and that there are many public repositories where you can locate a person&#39;s public key. <a href="https://keybase.io/">Keybase</a> is a very recent attempt at trying to solve this problem in a modern way using modern technology.</p>
+<p><a href="https://keybase.io/">Keybase</a> was mentioned earlier when we were discussing the problem of &#39;authentication&#39; and that there are many public repositories where you can locate a person&#39;s public key. <a href="https://keybase.io/">Keybase</a> is a recent attempt at trying to solve this problem in a modern way.</p>
 
 <p>I wont cover all the details of getting setup with Keybase (plus it&#39;s invitation only at the moment), but in essence you need to download their command line tool:</p>
 
@@ -863,19 +875,88 @@ openssl enc -d -aes-256-cbc -in SECRET_FILE.enc -out SECRET_FILE -pass file:./ke
 <pre><code class="language-bash">keybase login
 </code></pre>
 
-<p>Now if someone sends you an encrypted file using your Keybase public key, then you&#39;d decrypt the file with:</p>
+<p>At this point you can use either the website or the command line tool to generate a keypair for your account. If using the command line, then execute the following:</p>
+
+<pre><code class="language-bash">keybase pgp gen
+</code></pre>
+
+<p>Alternatively you might want to use an already existing private key:</p>
+
+<pre><code class="language-bash">keybase pgp select
+</code></pre>
+
+<blockquote>
+<p>Note: the <code>keybase</code> program will push the public key part of your PGP or GPG key pair to the Keybase website and associate it with your Keybase account</p>
+</blockquote>
+
+<p>The point of Keybase is to help you verify the person you want to communicate with is who they say they are. So Keybase let&#39;s users prove who they are by authenticating with their social accounts. For example, if I search for a friend of mine on Keybase:</p>
+
+<pre><code class="language-bash">keybase search sthulb
+</code></pre>
+
+<p>Then this will display the following output:</p>
+
+<pre><code class="language-bash">sthulb twitter:sthulb github:sthulb dns://thulbourn.com
+</code></pre>
+
+<p>Now I know that he is <code>sthulb</code> on GitHub so if the user <code>sthulb</code> was able to verify the GitHub account of the same user to Keybase then I&#39;m pretty sure this is a legit setup and that I&#39;m OK to communicate with this Keybase user.</p>
+
+<p>Now if I wanted to encrypt a file for my friend, then I would do:</p>
+
+<pre><code class="language-bash">keybase encrypt -i secrets.txt -o secrets.txt.asc sthulb
+</code></pre>
+
+<p>This will then display the following:</p>
+
+<pre><code class="language-bash">▶ INFO Identifying recipient sthulb
+✔ public key fingerprint: D38B 2537 67F4 1E59 DFE6 7879 EDD0 4A02 7DD5 BD7A
+✔ admin of DNS zone thulbourn.com: found TXT entry keybase-site-verification=JVupJZY1EQbjTiYiLc6JSVNcOWACdBEq9WfuJJWT0qg
+✔ &quot;sthulb&quot; on twitter: https://twitter.com/sthulb/status/692285366053834753
+✔ &quot;sthulb&quot; on github: https://gist.github.com/13a7654d90750bf154c3
+</code></pre>
+
+<blockquote>
+<p>Note: <code>.asc</code> is a convention to indicate a file has been encrypted</p>
+</blockquote>
+
+<p>My friend would then be able to decrypt the encrypted file I send to him with:</p>
+
+<pre><code class="language-bash">keybase decrypt -i secrets.txt.asc -o secrets.txt
+</code></pre>
+
+<p>But if someone sends you an encrypted file using your Keybase public key but is encrypted via a different tool, such as their own local GPG or PGP, then you&#39;d decrypt the file with (for example):</p>
 
 <pre><code class="language-bash">keybase pgp decrypt -i some_encrypted_file.gpg
 </code></pre>
 
-<p>If you want to encrypt a file for someone, then you would do:</p>
+<p>If you want to encrypt a file for someone who doesn&#39;t use Keybase (e.g. they use their own local GPG installation), then you can export your public/private key from Keybase using the command line tool and then import them into your local GPG so you can utilise GPG to encrypt your data and specify the user&#39;s public key:</p>
 
-<pre><code class="language-bash">keybase encrypt -i secret_stuff.txt integralist
+<pre><code class="language-bash">keybase pgp export -o keybase.public.key
+keybase pgp export -s -o keybase.private.key
+gpg --import keybase.public.key
+gpg --allow-secret-key-import --import keybase.private.key
 </code></pre>
 
 <blockquote>
-<p>Note: remember to swap <code>integralist</code> for whatever your Keybase username is</p>
+<p>Notice the use of <code>-s</code> to export the private key</p>
 </blockquote>
+
+<p>Now you can encrypt data via GPG using your Keybase private key:</p>
+
+<pre><code class="language-bash">echo foobar &gt; secret.txt
+gpg -e -u 123 -r 456 secret.txt
+</code></pre>
+
+<blockquote>
+<p>Note: <code>123</code> being your keybase identifier inside GPG and<br>
+<code>456</code> being the recipient identifier<br>
+(assuming you&#39;ve imported their public key already)</p>
+</blockquote>
+
+<p>The recipient can now decrypt the file:</p>
+
+<pre><code class="language-bash">gpg -d secret.txt.gpg
+</code></pre>
 
 <h3>Which <em>should</em> I use?</h3>
 
