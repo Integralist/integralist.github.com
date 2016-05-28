@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
-        <title>Security basics with GPG, OpenSSH and OpenSSL</title>
+        <title>Security basics with GPG, OpenSSH, OpenSSL and Keybase</title>
         <link rel="stylesheet" href="../styles/github-markdown.css">
         <link rel="stylesheet" href="../styles/prism-default.css">
         <style>
@@ -23,7 +23,7 @@
     <body>
         <article class="markdown-body">
 
-<h1>Security basics with GPG, OpenSSH and OpenSSL</h1>
+<h1>Security basics with GPG, OpenSSH, OpenSSL and Keybase</h1>
 
 <ul>
 <li><a href="#1">Introduction</a></li>
@@ -32,7 +32,7 @@
 <li><a href="#4">OpenSSL vs OpenSSH</a></li>
 <li><a href="#5">What is GPG?</a></li>
 <li><a href="#6">Creating your own keys</a></li>
-<li><a href="#7">How to encrypt data using GPG and OpenSSL</a></li>
+<li><a href="#7">How to encrypt data using GPG, OpenSSL and Keybase</a></li>
 <li><a href="#8">Creating, self-signing, issuing and revoking certificates</a></li>
 <li><a href="#9">Conclusion</a></li>
 </ul>
@@ -62,7 +62,7 @@
 <li>OpenSSL vs OpenSSH</li>
 <li>What is GPG</li>
 <li>Creating your own keys</li>
-<li>How to encrypt data using GPG and OpenSSL</li>
+<li>How to encrypt data using GPG, OpenSSL and Keybase</li>
 </ul>
 
 <p>...and a lot more inbetween.</p>
@@ -577,7 +577,7 @@ Alt-Svc: quic=&quot;www.google.com:443&quot;; p=&quot;1&quot;; ma=600,quic=&quot
 
 <p>I&#39;m going to quickly run through each utility (OpenSSH, OpenSSL and GPG) and explain how you can create your own keys for each of them. I wont go into great detail the flags/settings used in each example command as that is what the <code>man</code> command is for (i.e. I&#39;ll leave investigation of these settings as an exercise for the reader).</p>
 
-<p>Also, generating keys is one thing. But for the OpenSSL and GPG utilities, it&#39;s not until we need to actually encrypt some data (see the next section &quot;<a href="#7">How to encrypt data using GPG and OpenSSL</a>&quot;) that these keys can become useful (OpenSSH is another beast altogether).</p>
+<p>Also, generating keys is one thing. But for the OpenSSL and GPG utilities, it&#39;s not until we need to actually encrypt some data (see the next section &quot;<a href="#7">How to encrypt data using GPG, OpenSSL and Keybase</a>&quot;) that these keys can become useful (OpenSSH is another beast altogether).</p>
 
 <p>So let&#39;s begin...</p>
 
@@ -733,7 +733,7 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 
 <div id="7"></div>
 
-<h2>How to encrypt data using GPG and OpenSSL</h2>
+<h2>How to encrypt data using GPG, OpenSSL and Keybase</h2>
 
 <p>Outside of PKI and SSL/TLS, the most common task people are interested in is encrypting specific files that contain sensitive information that they would prefer to be protected either from everyone or allow only a select few people to be able to access. The interface for encrypting data is different for each tool used and so we&#39;ll be looking at those we&#39;ve discussed so far: GPG and OpenSSL</p>
 
@@ -769,11 +769,6 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 <p>In the above example, it&#39;ll display the contents of the file in stdout; so you&#39;ll need to redirect it to a file or alternatively use:</p>
 
 <pre><code class="language-bash">gpg -o output_file -d some_encrypted_file.gpg
-</code></pre>
-
-<p>If someone sends you an encrypted file using your Keybase public key, then you&#39;d decrypt the file with:</p>
-
-<pre><code class="language-bash">keybase pgp decrypt -i some_encrypted_file.gpg
 </code></pre>
 
 <h4>Symmetrical encryption</h4>
@@ -853,6 +848,34 @@ openssl rsautl -decrypt -inkey id_rsa.pem -in key.bin.enc -out key.bin
 # Bob decrypts the file using his private key
 openssl enc -d -aes-256-cbc -in SECRET_FILE.enc -out SECRET_FILE -pass file:./key.bin
 </code></pre>
+
+<h3>Keybase</h3>
+
+<p><a href="https://keybase.io/">Keybase</a> was mentioned earlier when we were discussing the problem of &#39;authentication&#39; and that there are many public repositories where you can locate a person&#39;s public key. <a href="https://keybase.io/">Keybase</a> is a very recent attempt at trying to solve this problem in a modern way using modern technology.</p>
+
+<p>I wont cover all the details of getting setup with Keybase (plus it&#39;s invitation only at the moment), but in essence you need to download their command line tool:</p>
+
+<pre><code class="language-bash">brew install keybase
+</code></pre>
+
+<p>Once you have that installed you can log into your account:</p>
+
+<pre><code class="language-bash">keybase login
+</code></pre>
+
+<p>Now if someone sends you an encrypted file using your Keybase public key, then you&#39;d decrypt the file with:</p>
+
+<pre><code class="language-bash">keybase pgp decrypt -i some_encrypted_file.gpg
+</code></pre>
+
+<p>If you want to encrypt a file for someone, then you would do:</p>
+
+<pre><code class="language-bash">keybase encrypt -i secret_stuff.txt integralist
+</code></pre>
+
+<blockquote>
+<p>Note: remember to swap <code>integralist</code> for whatever your Keybase username is</p>
+</blockquote>
 
 <h3>Which <em>should</em> I use?</h3>
 
