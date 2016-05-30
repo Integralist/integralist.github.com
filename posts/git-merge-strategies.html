@@ -85,7 +85,7 @@
 <p>What &quot;fast-forward: means is that git will change the <code>HEAD</code> (on the destination branch) to point to the new latest commit, and all the other commits from your source branch will also appear in the git log/history of the destination branch.</p>
 
 <blockquote>
-<p>Note: <code>HEAD</code> is an alias that points to a commit (typically <code>HEAD</code> is the latest commit in your branch). Even the branch name itself is an alias that refers to a commit (<em>most things</em> in git do simply resolve to commits)</p>
+<p>Note: <code>HEAD</code> is an alias that points to a commit (typically <code>HEAD</code> is the latest commit in your branch). Even the branch name itself is an alias that refers to a commit (<em>most things</em> in git do simply resolve to commits). This is why when you have a long branch name, instead of <code>git push origin really-long-branch-name</code> you can just use <code>git push origin head</code> and git will figure out which branch you&#39;re on</p>
 </blockquote>
 
 <p>If you check <code>git lg</code> after doing a <code>git merge feat/foo</code>, you should see something like:</p>
