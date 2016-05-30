@@ -28,7 +28,12 @@
 <ul>
 <li><a href="#1">Introduction</a></li>
 <li><a href="#2">git merge</a></li>
-<li><a href="#3">git merge --no-ff --edit</a></li>
+<li><a href="#3">git merge --no-ff --edit</a>
+
+<ul>
+<li><a href="#3.1">git reset</a></li>
+<li><a href="#3.2">git branch --contains</a></li>
+</ul></li>
 <li><a href="#4">git merge --squash</a></li>
 <li><a href="#5">git rebase</a></li>
 <li><a href="#6">git rebase --interactive</a></li>
@@ -79,6 +84,10 @@
 
 <p>What &quot;fast-forward: means is that git will change the <code>HEAD</code> (on the destination branch) to point to the new latest commit, and all the other commits from your source branch will also appear in the git log/history of the destination branch.</p>
 
+<blockquote>
+<p>Note: <code>HEAD</code> is an alias that points to a commit (typically <code>HEAD</code> is the latest commit in your branch). Even the branch name itself is an alias that refers to a commit (<em>most things</em> in git do simply resolve to commits)</p>
+</blockquote>
+
 <p>If you check <code>git lg</code> after doing a <code>git merge feat/foo</code>, you should see something like:</p>
 
 <pre><code class="language-ini">* 41d4115 - (HEAD -&gt; master, origin/feat/foo, feat/foo) Add C (also revert A)
@@ -99,7 +108,7 @@
 
 <p>Let&#39;s say you wanted a &quot;merge commit&quot; to happen (i.e. merge commits typically only occur if there has been a divergence between the branches which means git has to resolve the problem for you), then you can force git to use a &quot;merge commit&quot; even when there is no need for one (as is the case for me here).</p>
 
-<p>If this happens to you, and you&#39;ve not pushed the branch to a remote, then you can safely go back:</p>
+<p>Using our previous example, which merged cleanly, let&#39;s say that a merge commit is what we wanted to have happen. Assuming you&#39;ve not pushed the branch to a remote, then you can safely go back to before the merge occurred using:</p>
 
 <pre><code class="language-git">git reset --hard 75eb1cb
 </code></pre>
@@ -107,6 +116,30 @@
 <blockquote>
 <p>Note: <code>75eb1cb</code> being my first commit in <code>master</code></p>
 </blockquote>
+
+<div id="3.1"></div>
+
+<h3><code>git reset</code></h3>
+
+<p>It&#39;s important to understand how <code>git reset</code> works, as it has three flags and if not used correctly could have bad side effects. The flags are:</p>
+
+<ul>
+<li><code>--soft</code></li>
+<li><code>--mixed</code></li>
+<li><code>--hard</code></li>
+</ul>
+
+<p>The way reset works is that you use one of the above flags, followed by the commit you want to reset the <code>HEAD</code> back to. So in our case we used the commit <code>75eb1cb</code>, which was our very first commit.</p>
+
+<p>If I had used the <code>--soft</code> flag instead, then it would have reset the <code>HEAD</code> back to the first commit, but any other commits that happened since would have their changes staged together in our git &#39;index&#39; waiting to be committed.</p>
+
+<p>If I had used the <code>--mixed</code> flag instead, then it would have reset the <code>HEAD</code> back to the first commit, but any other commits that happened since would have their changes applied to the working directory, ready for us to choose which changes to be added to the index (i.e. staged) and then finally committed.</p>
+
+<p>When using <code>--hard</code> though, any of the changes that came after the commit being reset to, are lost. They&#39;re not sitting in your staging index, nor are they available within your working directory either.</p>
+
+<p>So be careful whenever using the <code>--hard</code> flag.</p>
+
+<h3>Force the merge commit</h3>
 
 <p>Now we&#39;re back to where we were originally (a separate <code>feat/foo</code> branch and a <code>master</code> branch with a single commit), we can look at how to force a merge commit.</p>
 
@@ -130,7 +163,22 @@
 * 75eb1cb - (origin/master) README
 </code></pre>
 
-<p>We can see all the commits from <code>feat/foo</code> were replayed onto <code>master</code> successfully, but now you&#39;re able to more easily distinguish the three commits came from another branch (if using my <code>git lg</code> alias).</p>
+<p>We can see all the commits from <code>feat/foo</code> were replayed onto <code>master</code> successfully, but now you&#39;re able to more easily distinguish the three commits came from another branch (if using my <code>git lg</code> alias). Which is one of the main reasons to force a merge commit using <code>--no-ff</code> as it really helps keep a varied branch history.</p>
+
+<div id="3.2"></div>
+
+<h3><code>git branch --contains</code></h3>
+
+<p>The following command can be useful in locating where a commit has come from:</p>
+
+<pre><code class="language-git">git branch --contains 9e5626c
+</code></pre>
+
+<p>In our case this will indicate that the commit we specified is part of our <code>master</code> branch. Now when you use <code>--contains</code> with a commit such as <code>9e5626c</code> (which was merged in from our feature branch) you&#39;ll see that git recognises this commit is part of multiple branches †.</p>
+
+<blockquote>
+<p>† until you delete the branch (e.g. <code>git branch -D feat/foo</code>)</p>
+</blockquote>
 
 <div id="4"></div>
 
