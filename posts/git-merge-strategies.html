@@ -33,6 +33,7 @@
 <ul>
 <li><a href="#3.1">git reset</a></li>
 <li><a href="#3.2">git branch --contains</a></li>
+<li><a href="#3.3">Losing useful history</a></li>
 </ul></li>
 <li><a href="#4">git merge --squash</a></li>
 <li><a href="#5">git rebase</a></li>
@@ -179,6 +180,16 @@
 <blockquote>
 <p>† until you delete the branch (e.g. <code>git branch -D feat/foo</code>)</p>
 </blockquote>
+
+<div id="3.3"></div>
+
+<h3>Losing useful history</h3>
+
+<p>It&#39;s also worth mentioning, that even after the <code>feat/foo</code> branch has been deleted, git will still show (via <code>git log --graph</code>) those commits from our <code>feat/foo</code> branch as coming from an alternative path/branch history.</p>
+
+<p>This is a useful bit of information that can be lost when using other tools such as <code>git rebase</code> or <code>git merge --squash</code>, so you should discuss with your team what type of information you feel is useful to have when you look back at a project&#39;s git history before forging ahead with any one of the strategies I cover here.</p>
+
+<p>For example, some teams don&#39;t find being able to see that a set of commits actually came from another branch very useful: considering all commits/features should generally come in from separate branches/Pull Requests. So the use of rebase or squash isn&#39;t a concern for them. For a team like this, an aesthetically &#39;cleaner&#39; git commit history is preferred.</p>
 
 <div id="4"></div>
 
