@@ -201,6 +201,25 @@ Which helps (at a glance) to know more about what commits are inside the merge c
 
 <p>For example, some teams don&#39;t find being able to see that a set of commits actually came from another branch very useful: considering all commits/features should generally come in from separate branches/Pull Requests. So the use of rebase or squash isn&#39;t a concern for them. For a team like this, an aesthetically &#39;cleaner&#39; git commit history is preferred.</p>
 
+<p>Also, in teams where I&#39;ve worked and they&#39;ve utilised a &#39;squash&#39; strategy (see <a href="#4">below</a> for more details), we&#39;ve used the following structure for our commit message so it&#39;s clearer what&#39;s been squashed:</p>
+
+<pre><code class="language-git">Closes #123 - New Feature X
+
+Squashed commit of the following:
+
+commit c7e4145f6e95e51fcff79d6b3476bcb19c058071
+commit 3275f1805c4f82298676aa3c61db8c65ee9f3428
+commit bb50fb69c2d131d0126fa9ae018377e6451678e2
+commit 7ceb49c352d812a91db0e87a8ed4c4cf426c0365
+commit 86d1de3c5133a403edf45343081353055c02b454
+commit 8f48e5b3c43acf71e8abab4b821cfdc66447b732
+commit ed857784feff091ece52d906e311ef7f64a49c3d
+commit a277e60c39333a55134c3e3ef6d97076f9bc8370
+commit dd7e1973fe91f29887928aad9d991be24efb143a
+commit ff7e7dabf745ac4d73b52644c3d29ea05d5c318f
+commit 36f1c5bc5949f01117c1d57e6ab12f05c2a202f5
+</code></pre>
+
 <div id="4"></div>
 
 <h2><code>git merge --squash</code></h2>
