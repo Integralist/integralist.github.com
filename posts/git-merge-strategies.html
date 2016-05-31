@@ -40,7 +40,8 @@
 <li><a href="#5"><code>git rebase</code></a></li>
 <li><a href="#6"><code>git rebase --interactive</code></a></li>
 <li><a href="#7"><code>git rebase --onto</code></a></li>
-<li><a href="#8">Conclusion</a></li>
+<li><a href="#8"><code>git format-patch</code></a></li>
+<li><a href="#9">Conclusion</a></li>
 </ul>
 
 <div id="1"></div>
@@ -168,6 +169,12 @@
 </code></pre>
 
 <p>We can see all the commits from <code>feat/foo</code> were replayed onto <code>master</code> successfully, but now you&#39;re able to more easily distinguish the three commits came from another branch (if using my <code>git lg</code> alias). Which is one of the main reasons to force a merge commit using <code>--no-ff</code> as it really helps keep a varied branch history.</p>
+
+<blockquote>
+<p>Notice <code>git log</code> will also show in its output for the merge commit<br>
+a field like <code>Merge: 75eb1cb 8e7965e 9e5626c 41d4115</code><br>
+Which helps (at a glance) to know more about what commits are inside the merge commit</p>
+</blockquote>
 
 <div id="3.3"></div>
 
@@ -459,11 +466,93 @@ Add C (also revert A)
 
 <div id="8"></div>
 
+<h2><code>git format-patch</code></h2>
+
+<p>At this point you&#39;re likely using a service such as <a href="https://github.com/">GitHub</a> or <a href="https://about.gitlab.com/">GitLab</a> for creating projects and opening pull requests, as apposed to Git&#39;s own native pull request feature which is substantially less feature rich than these commercial abstraction layers.</p>
+
+<p>But sometimes just accepting a &#39;patch&#39; from someone and being able to apply it quickly and easily is what you want to do. So that&#39;s where <code>git format-patch</code> comes in.</p>
+
+<p>Imagine you have a centralised <code>master</code> branch and someone has branched off from its <code>HEAD</code> to a new branch called <code>cool-new-features</code> and they would like you to merge their changes directly with the centralised repository&#39;s <code>master</code> branch.</p>
+
+<p>This person would need to execute the following command:</p>
+
+<pre><code class="language-git">git format-patch master
+</code></pre>
+
+<blockquote>
+<p>Note: you can swap the branch <code>master</code> for any valid commit, alias or range</p>
+</blockquote>
+
+<p>What this will end up doing is generating a &#39;patch&#39; file for each new commit that isn&#39;t available in master. Below is an example patch file generated from a test repo I was messing around with, and which actually generated two patch files for me (this being the first one):</p>
+
+<pre><code class="language-git">From 64a903d2ed6b4280d4a0914aaf50f014ae05cdd3 Mon Sep 17 00:00:00 2001
+From: Integralist &lt;mark.mcdx@gmail.com&gt;
+Date: Tue, 31 May 2016 08:28:56 +0100
+Subject: [PATCH 1/2] G
+
+---
+ foo.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/foo.txt b/foo.txt
+index b1e6722..6f04b1d 100644
+--- a/foo.txt
++++ b/foo.txt
+@@ -1,3 +1,4 @@
+ A
+ B
+ C
++G
+-- 
+2.7.4
+</code></pre>
+
+<blockquote>
+<p>Note: if you want a single patch file you can use<br>
+the <code>--stdout</code> flag and redirect the output to a file<br>
+<code>git format-patch master --stdout &gt; new-feature.patch</code></p>
+</blockquote>
+
+<p>The person who generates the patch file(s) will then need to send them to you (which can be done using <code>git send-email</code>):</p>
+
+<pre><code class="language-git">git send-email -to devlist@example.org 0001-A.patch
+</code></pre>
+
+<p>If it&#39;s you sending the patch via git, then you may need to configure git to use your mail server details:</p>
+
+<pre><code class="language-git">git config --global sendemail.smtpserver smtp.my-isp.com
+git config --global sendemail.smtpserverport 465
+</code></pre>
+
+<p>You, as the recipient of the patch file(s), can then review and apply the patch using:</p>
+
+<pre><code class="language-git">git checkout review-new-feature
+cat new-feature.patch | git am # single patch file
+cat *.patch | git am           # multiple patch files
+</code></pre>
+
+<p>Also of interest, if using GitHub for Pull Requests, is that you can add a <code>.patch</code> extension to the end of a PR path or commit path for it to generate a patch for you! So you can utilise GitHub for some of the nice &#39;review&#39; features, but then utilise classic/traditional communication and application of patches if you so choose (maybe for an older/internal system).</p>
+
+<p>So if you have a GitHub PR URL like <code>https://github.com/my-org/my-repo/pull/123</code>, then you can convert this into a patch file using <code>https://github.com/my-org/my-repo/pull/123.patch</code></p>
+
+<p>Git also offers you the <code>git apply</code> command to use in place of <code>git am</code>. The reason being is that <code>git am</code> actually commits the changes in the patch, where as <code>git apply</code> will only affect your working directory, so you&#39;ll have the opportunity to stage and commit the changes however you like. Unless you use the <code>--cached</code> or <code>--index</code> flags (see <code>man git-apply</code> for details).</p>
+
+<blockquote>
+<p>Note: <code>git apply</code> also has a <code>--reverse</code> flag to manipulate the order when applying multiple patchess</p>
+</blockquote>
+
+<p>The other difference is that <code>git am</code> only accepts patch files, where as <code>git apply</code> accepts patch files and also output from <code>git diff</code>. So you have more options available to you that way. For example:</p>
+
+<pre><code class="language-bash">curl https://gist.githubusercontent.com/anonymous/x/raw/x/test.diff | git apply
+</code></pre>
+
+<div id="9"></div>
+
 <h2>Conclusion</h2>
 
 <p>There are so many aspects to merging commits and dealing with git&#39;s commit history, that it&#39;s difficult to cover everything without people having to mentally store too much information that most of the time you wont utilise.</p>
 
-<p>For example, I&#39;ve not covered anything to do with pulling commits: <code>git pull --strategy</code>, <code>git pull --squash</code>, <code>git pull --rebase</code>, <code>git pull --ff-only</code> and <code>git pull --no-commit</code>. Each have their use cases, but I think sometimes you&#39;re better picking a single strategy and defining it as a standard within your development team.</p>
+<p>For example, I&#39;ve not covered anything to do with pulling commits: <code>git pull --strategy</code>, <code>git pull --squash</code>, <code>git pull --rebase</code>, <code>git pull --ff-only</code> and <code>git pull --no-commit</code>. Each have their use cases, but I think sometimes you&#39;re better picking a single strategy and defining it as a standard within your development team. </p>
 
 <p>If you&#39;re interested in one git workflow approach that utilises git&#39;s rebasing feature, and I&#39;ve used with success in the past at the BBC, then I recommend you have a read of this blog post I wrote a few years ago: <a href="http://www.integralist.co.uk/posts/github-workflow.html">integralist.co.uk/posts/github-workflow</a></p>
 
