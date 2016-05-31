@@ -32,8 +32,9 @@
 
 <ul>
 <li><a href="#3.1">git reset</a></li>
-<li><a href="#3.2">git branch --contains</a></li>
-<li><a href="#3.3">Losing useful history</a></li>
+<li><a href="#3.2">Force the merge commit</a></li>
+<li><a href="#3.3">git branch --contains</a></li>
+<li><a href="#3.4">Losing useful history</a></li>
 </ul></li>
 <li><a href="#4">git merge --squash</a></li>
 <li><a href="#5">git rebase</a></li>
@@ -140,6 +141,8 @@
 
 <p>So be careful whenever using the <code>--hard</code> flag.</p>
 
+<div id="3.2"></div>
+
 <h3>Force the merge commit</h3>
 
 <p>Now we&#39;re back to where we were originally (a separate <code>feat/foo</code> branch and a <code>master</code> branch with a single commit), we can look at how to force a merge commit.</p>
@@ -166,7 +169,7 @@
 
 <p>We can see all the commits from <code>feat/foo</code> were replayed onto <code>master</code> successfully, but now you&#39;re able to more easily distinguish the three commits came from another branch (if using my <code>git lg</code> alias). Which is one of the main reasons to force a merge commit using <code>--no-ff</code> as it really helps keep a varied branch history.</p>
 
-<div id="3.2"></div>
+<div id="3.3"></div>
 
 <h3><code>git branch --contains</code></h3>
 
@@ -181,7 +184,7 @@
 <p>† until you delete the branch (e.g. <code>git branch -D feat/foo</code>)</p>
 </blockquote>
 
-<div id="3.3"></div>
+<div id="3.4"></div>
 
 <h3>Losing useful history</h3>
 
