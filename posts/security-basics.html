@@ -698,6 +698,23 @@ Key is valid for? (0)
 <p>Note: you could also provide all these details via an &#39;input&#39; file (useful if you find yourself generating lots of key pairs), but that&#39;s a bit outside the scope of what we want to focus on here. If you&#39;re interested, you can find the <a href="https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html">details here</a></p>
 </blockquote>
 
+<p>Now before we go any further, it&#39;s important that at this point you now generate a revocation certificate:</p>
+
+<pre><code class="language-bash">gpg --gen-revoke my.email@domain.com
+</code></pre>
+
+<p>You&#39;ll want to put this certificate into a file and store it somewhere very safe in case you need to ever revoke your key pair. Preferably you print it out on paper and put it in a fireproof safe.</p>
+
+<p>If you ever need to, you can then import the certificate into your keyring and that will immediately revoke your key pair:</p>
+
+<pre><code class="language-bash">gpg --import revocation.cert
+</code></pre>
+
+<p>You can then also push up your key identifier to a key server to force it to recognise the key has been revoked:</p>
+
+<pre><code class="language-bash">gpg --keyserver pgp.mit.edu --send-keys 123456
+</code></pre>
+
 <p>Once your key pair has been generated you&#39;ll probably be confused as to where they&#39;re stored? If you were to <code>ls</code> the current directory they wont be there. Instead you&#39;ll need to use the following command to see what public keys you&#39;ve generated:</p>
 
 <pre><code class="language-bash">gpg --list-keys
@@ -720,17 +737,21 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 
 <p>If you want to see your public key, then use the following command (notice I&#39;ve specified the same name as seen from the above output from <code>--list-keys</code>; if I tried to specify something else then it wouldn&#39;t find any key to export):</p>
 
-<pre><code class="language-bash">gpg --export -a &quot;Mark McDonnell&quot; &gt; gpg_public.key
+<pre><code class="language-bash">gpg --export --armor &quot;Mark McDonnell&quot; &gt; gpg_public.key
 </code></pre>
+
+<blockquote>
+<p>Note: <code>--armor</code> creates ASCII armored output (a text format) instead of raw bytes</p>
+</blockquote>
 
 <p>To get the private key, you&#39;ll use a slightly different flag, but effectively it&#39;s the same thing:</p>
 
-<pre><code class="language-bash">gpg --export-secret-key -a &quot;Mark McDonnell&quot; &gt; gpg_private.key
+<pre><code class="language-bash">gpg --export-secret-key --armor &quot;Mark McDonnell&quot; &gt; gpg_private.key
 </code></pre>
 
 <p>If you have multiple keys under the same name then you&#39;ll find that it&#39;ll typically export the key for the <em>first</em> name it finds. To work around this you can specify the email address instead:</p>
 
-<pre><code class="language-bash">gpg --export -a my.email@gmail.com
+<pre><code class="language-bash">gpg --export --armor my.email@gmail.com
 </code></pre>
 
 <blockquote>
@@ -768,9 +789,30 @@ default-recipient some-user-id # In case you happen to only ever communicate wit
 <p>Note: to delete their public key afterwards, run <code>gpg --delete-key &quot;User Name&quot;</code></p>
 </blockquote>
 
-<p>Once you have the public key of your recipient you can encrypt the file like so:</p>
+<p>Before we continue, let&#39;s just consider a real-world scenario:</p>
 
-<pre><code class="language-bash">gpg -e -u &quot;Sender User Name&quot; -r &quot;Receiver User Name&quot; somefile
+<p>Imagine at this point you&#39;re not entirely sure if the public key you&#39;ve been given over the internet is actually from who you were expecting it from (let&#39;s call them &quot;Bob&quot;). Maybe there are some nefarious government types intercepting your communication and the public key you received is theirs and not Bob&#39;s.</p>
+
+<p>You would need to call or find <em>some form</em> of secure communication channel with Bob (or someone who you trust to know bob) to verify the public key really does belong to Bob. But what do you check any way? You could read out the contents of the public key (e.g. <code>cat bobs-public.key</code>) but this would be pain stakingly tedious.</p>
+
+<p>Another way would be to get Bob to give you the shortened &#39;fingerprint&#39; which is derived from his public key. You do that by running the following command and asking Bob if it matches what he&#39;s seeing:</p>
+
+<pre><code class="language-bash">gpg --fingerprint bob@example.org
+</code></pre>
+
+<p>This will return something like:</p>
+
+<pre><code class="language-bash">pub   4096R/DD86E7F5 2016-05-24 [expires: 2017-05-24]
+      Key fingerprint = FDFB E9B5 24BA 6972 A3AA  44B9 A1B1 7E6F DD86 E7F5
+uid                  Mark McDonnell (Personal) &lt;mark.mcdx@gmail.com&gt;
+sub   4096R/A3FDEBC6 2016-05-24 [expires: 2017-05-24]
+</code></pre>
+
+<p>Notice the <code>Key fingerprint</code> section <code>FDFB E9B5 24BA 6972 A3AA  44B9 A1B1 7E6F DD86 E7F5</code>. That&#39;s what I would read out to someone if they called me to say they wanted to verify the public key they had really did belong to me.</p>
+
+<p>Now, once you have the public key of your recipient you can encrypt a file using it, like so:</p>
+
+<pre><code class="language-bash">gpg --encrypt -u &quot;Sender User Name&quot; -r &quot;Receiver User Name&quot; somefile
 </code></pre>
 
 <blockquote>
@@ -832,18 +874,39 @@ Hash: MD5, SHA1, RIPEMD160, SHA256, SHA384, SHA512, SHA224
 Compression: Uncompressed, ZIP, ZLIB, BZIP2
 </code></pre>
 
+<h4>Key Signing</h4>
+
+<p>GPG let&#39;s you &quot;sign&quot; a key, and which tells GPG you <em>trust</em> this key you have been provided (i.e. you have verified it belongs to who you think it should belong to). To sign a key you&#39;ve imported, simply run the following command and change the email to something relevant:</p>
+
+<pre><code class="language-bash">gpg --sign-key bob@example.org
+</code></pre>
+
+<p>The real purpose of this is that if someone else (Alice) sees you&#39;ve &#39;signed&#39; another person&#39;s key (Bob&#39;s), then if Alice trusts you she is more likely to implicitly trust Bob as well. It&#39;s a web of trust.</p>
+
+<p>In order for Bob to benefit from your &#39;trust&#39; you need to send him back the key you&#39;ve signed:</p>
+
+<pre><code class="language-bash">gpg --export --armor bob@example.org
+</code></pre>
+
+<p>This will send their public key to <code>stdout</code> along with your signature and so they can run the following command to import the signed data you&#39;ve provided:</p>
+
+<pre><code class="language-bash">gpg --import &lt;file path&gt;
+</code></pre>
+
 <h4>Digital Signatures</h4>
 
-<p>You can also add a MAC (remember we looked at this earlier when discussing PKI; this is the digital signature) by adding the <code>--sign</code> flag:</p>
+<p>You can also add a MAC (remember we looked at this earlier when discussing PKI; this is the digital signature) by adding the <code>--sign</code> flag, which means you&#39;ve used your private key to guarantee the encrypted file has come from you:</p>
 
-<pre><code class="language-bash">gpg --default-key email@domain.com --sign secrets.txt
+<pre><code class="language-bash">gpg --default-key email@domain.com --sign -r bob@example.org secrets.txt
 </code></pre>
 
 <blockquote>
-<p>Note: I added <code>--default-key &lt;email&gt;</code> because for me the default key wasn&#39;t the key I wanted to use for the signature</p>
+<p>Note: I added <code>--default-key &lt;email&gt;</code> because the default key isn&#39;t always the key I want to use for the signature</p>
 </blockquote>
 
-<p>Once the file has been signed (it&#39;ll encrypt the file as well as if you&#39;d used <code>-e</code> or <code>--encrypt</code>), then you can verify the signature using the following:</p>
+<p>We specify the recipient, but you could also add another <code>-r</code> and specify your own email so you&#39;re able to decrypt the data afterwards (this is because the message will otherwise be encrypted using Bob&#39;s public key).</p>
+
+<p>Once the file has been signed (it&#39;ll encrypt the file as well as if you&#39;d used <code>-e</code> or <code>--encrypt</code>, but you can use that flag as well if you prefer), then you can verify the signature using the following:</p>
 
 <pre><code class="language-bash">gpg --verify secrets.txt.gpg
 </code></pre>
@@ -855,6 +918,22 @@ gpg: Good signature from &quot;Mark McDonnell (Integralist) &lt;email@domain.com
 </code></pre>
 
 <p>But if you want to decrypt the file as well, then use the standard <code>gpg secrets.txt.gpg</code></p>
+
+<h4>Revoking Keys</h4>
+
+<p>If you&#39;ve pulled keys from a public server:</p>
+
+<pre><code class="language-bash">gpg --keyserver pgp.mit.edu  --search-keys bob@example.org
+</code></pre>
+
+<p>Then you want to regularly check those keys are still valid, and haven&#39;t been compromised:</p>
+
+<pre><code class="language-bash">gpg --refresh-keys
+</code></pre>
+
+<blockquote>
+<p>Note: you can specify <code>--keyserver</code> when refreshing key data</p>
+</blockquote>
 
 <div id="7.2"></div>
 
@@ -991,7 +1070,7 @@ gpg --allow-secret-key-import --import keybase.private.key
 <p>Now you can encrypt data via GPG using your Keybase private key:</p>
 
 <pre><code class="language-bash">echo foobar &gt; secret.txt
-gpg -e -u 123 -r 456 secret.txt
+gpg --encrypt -u 123 -r 456 secret.txt
 </code></pre>
 
 <blockquote>
