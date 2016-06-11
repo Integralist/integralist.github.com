@@ -54,9 +54,10 @@ def index_markdown
 <<-eos
 # Integralist
 
-> Principal Software Engineer [@BBCNews](http://m.bbc.co.uk/news/)<br>
+> Senior Software Engineer [@BuzzFeed](https://www.buzzfeed.com/)<br>
+> Ex. Principal Software Engineer [@BBCNews](http://m.bbc.co.uk/news/)<br>
 > Works with distributed & concurrent systems.<br>
-> Author of [Pro Vim @Apress](http://www.amazon.co.uk/Pro-Vim-Mark-McDonnell/dp/1484202511/ref=sr_1_1) and [Programming in Clojure](https://leanpub.com/programming-clojure/)
+> Author: [Pro Vim @Apress](http://www.amazon.co.uk/Pro-Vim-Mark-McDonnell/dp/1484202511/ref=sr_1_1), [Programming in Clojure](https://leanpub.com/programming-clojure/), [Python for Programmers](https://leanpub.com/pythonforprogrammers)
 
 ## Articles
 eos
