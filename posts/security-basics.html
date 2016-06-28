@@ -267,7 +267,7 @@ SHA: the hash function for a digital signature
 <li>Client sends a MAC of the communication so far</li>
 <li>Server creates a MAC and compares with Client MAC (if the same then Server switches to encryption)</li>
 <li>Server tells the client it&#39;s ready for secure messages</li>
-<li>Client sends secure message(s)</li>
+<li>Client sends secure mesage(s)</li>
 </ul>
 
 <h3>Example messages</h3>
@@ -330,7 +330,7 @@ SHA: the hash function for a digital signature
 
 <h3>Verify SSL</h3>
 
-<p>Sometimes you might need to debug an issue with your SSL connection. In order to do that you&#39;ll want to utilise the OpenSSL utility command <code>s_client</code>. This will allow you to open a connection to your host using the SSL/TLS protocol of your choice and control the various different configuration settings.</p>
+<p>Sometimes you might need to debug an issue with your SSL connection. In order to do that you&#39;ll want to utilise the OpenSSL utility command <code>s_client</code>. This will allow you to open a connection to your host using the SSL/TLS protocol of your choice and control the various different configuration settins.</p>
 
 <p>A basic example would be as follows:</p>
 
@@ -581,7 +581,7 @@ Alt-Svc: quic=&quot;www.google.com:443&quot;; p=&quot;1&quot;; ma=600,quic=&quot
 
 <p>OK, up until this point we&#39;ve only been talking in a theorectical sense. Time to see some pratical use cases by demonstrating how to generate your own keys using the three different toolkits we&#39;ve described up until this point (OpenSSH, OpenSSL and GPG).</p>
 
-<p>I&#39;m going to quickly run through each utility (OpenSSH, OpenSSL and GPG) and explain how you can create your own keys for each of them. I won't go into great detail about the flags/settings used in each example command as that is what the <code>man</code> command is for (i.e. I&#39;ll leave investigation of these settings as an exercise for the reader).</p>
+<p>I&#39;m going to quickly run through each utility (OpenSSH, OpenSSL and GPG) and explain how you can create your own keys for each of them. I wont go into great detail the flags/settings used in each example command as that is what the <code>man</code> command is for (i.e. I&#39;ll leave investigation of these settings as an exercise for the reader).</p>
 
 <p>Also, generating keys is one thing. But for the OpenSSL and GPG utilities, it&#39;s not until we need to actually encrypt some data (see the next section &quot;<a href="#7">How to encrypt data using GPG, OpenSSL and Keybase</a>&quot;) that these keys can become useful (OpenSSH is another beast altogether).</p>
 
@@ -692,7 +692,7 @@ Please specify how long the key should be valid.
 Key is valid for? (0)
 </code></pre>
 
-<p>Finally, you&#39;ll need to input some personal details. I won't add those here, I&#39;ll just let you fill those in as needed. It&#39;s also worth being aware that GPG will use your system&#39;s <a href="https://en.wikipedia.org/wiki/Entropy_(computing)">entropy</a> to aid its random number generation, so for a brief moment you&#39;ll see it request that you move your cursor around a bit to help build up the entrophy output.</p>
+<p>Finally, you&#39;ll need to input some personal details. I wont add those here, I&#39;ll just let you fill those in as needed. It&#39;s also worth being aware that GPG will use your system&#39;s <a href="https://en.wikipedia.org/wiki/Entropy_(computing)">entropy</a> to aid its random number generation, so for a brief moment you&#39;ll see it request that you move your cursor around a bit to help build up the entrophy output.</p>
 
 <blockquote>
 <p>Note: you could also provide all these details via an &#39;input&#39; file (useful if you find yourself generating lots of key pairs), but that&#39;s a bit outside the scope of what we want to focus on here. If you&#39;re interested, you can find the <a href="https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html">details here</a></p>
@@ -715,7 +715,7 @@ Key is valid for? (0)
 <pre><code class="language-bash">gpg --keyserver pgp.mit.edu --send-keys 123456
 </code></pre>
 
-<p>Once your key pair has been generated you&#39;ll probably be confused as to where they&#39;re stored? If you were to <code>ls</code> the current directory they won't be there. Instead you&#39;ll need to use the following command to see what public keys you&#39;ve generated:</p>
+<p>Once your key pair has been generated you&#39;ll probably be confused as to where they&#39;re stored? If you were to <code>ls</code> the current directory they wont be there. Instead you&#39;ll need to use the following command to see what public keys you&#39;ve generated:</p>
 
 <pre><code class="language-bash">gpg --list-keys
 </code></pre>
@@ -991,7 +991,7 @@ openssl enc -d -aes-256-cbc -in SECRET_FILE.enc -out SECRET_FILE -pass file:./ke
 
 <p><a href="https://keybase.io/">Keybase</a> was mentioned earlier when we were discussing the problem of &#39;authentication&#39; and that there are many public repositories where you can locate a person&#39;s public key. <a href="https://keybase.io/">Keybase</a> is a recent attempt at trying to solve this problem in a modern way.</p>
 
-<p>I won't cover all the details of getting setup with Keybase (plus it&#39;s invitation only at the moment), but in essence you need to download their command line tool:</p>
+<p>I wont cover all the details of getting setup with Keybase (plus it&#39;s invitation only at the moment), but in essence you need to download their command line tool:</p>
 
 <pre><code class="language-bash">brew install keybase
 </code></pre>
