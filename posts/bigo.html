@@ -130,7 +130,7 @@
 
 <p>&quot;Hey Joe, I don&#39;t think we should use the Simple Search algorithm because it&#39;s <code>O(𝑛)</code>. We&#39;d be better off with a Binary Search as that&#39;s <code>O(Log𝑛(х))</code>&quot;.</p>
 
-<p>Now at the moment that might not mean much to you as you might not know what &quot;Simple Search&quot; or &quot;Binary Search&quot; algorithms look like. So let&#39;s look at those now and then we&#39;ll come back and understand the Big O notation for them and why Big O helps us understand the performance of these algorithms.</p>
+<p>Now at the moment that might not mean much to you as you might not know what &quot;Simple Search&quot; or &quot;Binary Search&quot; algorithms look like. So let&#39;s look at those now and then after we discuss each one you&#39;ll hopefully understand why Big O helps us understand the performance of these algorithms.</p>
 
 <div id="6"></div>
 
@@ -150,7 +150,11 @@
 <pre><code class="language-ini">O(𝑛)
 </code></pre>
 
-<p>This is known as &#39;linear&#39; time. This means the number of operations increase linearly with the number of items in the collection. So in the above example, the number of operations will be 12. But if the collection is 100 items in length, then the number of operations will be 100.</p>
+<h3>What does Big O tell us?</h3>
+
+<p>Big O is telling us that this algorithm performs in &#39;linear&#39; time. This means the number of operations increase linearly with the number of items in the collection. So in the above example, the worst case number of operations will be 12. But if the collection length was 100 items, then the worst case number of operations would be 100.</p>
+
+<p>So in effect, the bigger the collection, the more <em>expensive</em> this algorithm becomes. With a very small collection it&#39;s fast because of its simplicity, but beyond a small collection it&#39;s a poor performing choice of algorithm. This is what Big O is telling us here.</p>
 
 <div id="7"></div>
 
@@ -173,9 +177,13 @@
 <pre><code class="language-ini">O(Log𝑛(х))
 </code></pre>
 
-<p>You can see from this syntax &#39;at a glance&#39; how this algorithm will perform across a wide range of collection sizes (i.e. how the operations <em>grow</em>), but yet (if you want to) you can specifically figure out the number of operations and calculate the speed. </p>
+<h3>What does Big O tell us?</h3>
 
-<p>So for this operation, the number of operations is <code>4</code>. See earlier for explanation of Logarithms and how to apply them to the abstract Big O notation above, which for the record would be <code>O(Log2(12))</code>.</p>
+<p>Big O is telling us that this algorithm works in &#39;log time&#39;, which means the performance improves as the size of the collection increases! You can tell this &#39;at a glance&#39; with Big O syntax (especially as you now know how Logarithms work). This algorithm will perform well across a wide range of collection sizes.</p>
+
+<p>Big O in effect tells us how the operations <em>grow</em>. </p>
+
+<p>So for this particular algorithm example, the worst case number of operations is <code>4</code>. Take a look at our earlier explanation of Logarithms if you&#39;re unsure why that is (in a non-abstract sense this would look like: <code>O(Log2(12))</code>).</p>
 
 <div id="8"></div>
 
