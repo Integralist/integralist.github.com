@@ -1,0 +1,248 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Big O for Beginners</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism-default.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+
+            pre[class*="language-"] {
+              border: 1px dashed #AAA;
+              margin-bottom: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+
+<h1>Big O for Beginners</h1>
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Understanding Big O</a>
+
+<ul>
+<li><a href="#3">Logarithms</a> </li>
+<li><a href="#4">Logarithm Example</a> </li>
+</ul></li>
+<li><a href="#5">Back to Big O</a></li>
+<li><a href="#6">Simple Search</a></li>
+<li><a href="#7">Binary Search</a></li>
+<li><a href="#8">Calculating Operation Speed</a> </li>
+<li><a href="#9">Conclusion</a> </li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>When you first start learning algorithms (Binary Search, Quick Sort, Breadth-first Search etc), you&#39;ll quickly realise that in order to take advantage of them, you need to know how fast they are. </p>
+
+<p>Otherwise, when presented with a programming problem in which you want to select an algorithm to use to solve that problem, how will you know which algorithm is more efficient?</p>
+
+<p>One way to know how fast an algorithm is, would be to use the <a href="https://en.wikipedia.org/wiki/The_Big_O">Big O</a> notation. </p>
+
+<div id="2"></div>
+
+<h2>Understanding Big O</h2>
+
+<p>Big O doesn&#39;t tell you how fast in time (e.g. seconds) an algorithm is. Instead it informs you of the number of <em>operations</em>, and how those operations will grow over time.</p>
+
+<p>Although we&#39;ll see how to calculate the speed of operations later on in this post, the primary benefit is to see &#39;at a glance&#39; the growth of operations as your data becomes larger.</p>
+
+<blockquote>
+<p>So the O in &quot;Big O&quot; means &quot;Operation&quot;</p>
+</blockquote>
+
+<div id="3"></div>
+
+<h3>Logarithms</h3>
+
+<p>In order to understand Big O, you&#39;ll need to understand how <a href="https://en.wikipedia.org/wiki/Logarithm">Logarithms</a> work.</p>
+
+<p>I&#39;m terrible at Math, but luckily the awesome book &quot;<a href="https://www.manning.com/books/grokking-algorithms">Grokking Algorithms: An Illustrated Guide</a>&quot; (which I highly recommend) helped me at least understand the basics of Logarithms; enough so that I could then go on to understand Big O.</p>
+
+<p>In essence the Logarithm notation looks something like:</p>
+
+<pre><code class="language-ini">Log𝑛(х)
+</code></pre>
+
+<p>...where the <code>𝑛</code> is what&#39;s called the &quot;base&quot; and <code>х</code> is the number you&#39;re aiming for. But really what we&#39;re interested in is the <em>result</em> of this calculation.</p>
+
+<div id="4"></div>
+
+<h3>Logarithm Example</h3>
+
+<p>Imagine we have the following Logarthim:</p>
+
+<pre><code class="language-ini">Log5(100)
+</code></pre>
+
+<p>What this is effectively asking is:</p>
+
+<p>&quot;how many times do I need to multiple 5 by itself in order to reach the number 100?&quot;</p>
+
+<p>Let&#39;s find out:</p>
+
+<pre><code class="language-ini">5*5*5 = 125
+</code></pre>
+
+<p>Looks like the result of our Logarithm would&#39;ve been <code>3</code>, because there were three <code>5</code>&#39;s used in order to get to a number that was equal or greater than <code>100</code>. </p>
+
+<p>In this case the calculation wasn&#39;t exactly equal. By that I mean we went <em>past</em> <code>100</code> and ended up at <code>125</code>. But that&#39;s the essence of how to understand what a Logarithm is asking and how to calculate the result. </p>
+
+<p>So we can see the calculation looks like this:</p>
+
+<pre><code class="language-ini">Log5(100) = 3
+</code></pre>
+
+<p>The <code>3</code> is effectively the worst case number of steps involved when calculating that particular item. </p>
+
+<p>The number <code>100</code> in this case represents the number of items we have to execute our algorithm against. So if you were using an algorithm (such as a Binary Search; demonstrated later on below) and it was running over a collection of items, then the length of the items (in the above example Logarithm) would be <code>100</code>.</p>
+
+<p>We&#39;ll see how this is useful in measuring an algorithm&#39;s <em>speed</em> in a later section of this post. But for now let&#39;s go back to Big O...</p>
+
+<div id="5"></div>
+
+<h3>Back to Big O</h3>
+
+<p>So now we understand how Logarithms work we can come back to the Big O notation and understand that it&#39;s really a simple visual wrapper around a calculation.</p>
+
+<pre><code class="language-ini">O(х)
+</code></pre>
+
+<p>Where <code>х</code> is some calculation. Such as:</p>
+
+<pre><code class="language-ini">O(Log𝑛(х))
+</code></pre>
+
+<p>It&#39;s important noting that you&#39;ll never see a specific calculation like <code>Log5(100)</code>. It&#39;ll always be an abstract version like <code>Log𝑛(х)</code> because Big O notation is a way of talking to other people and having a common language.</p>
+
+<p>For example:</p>
+
+<p>&quot;Hey Joe, I don&#39;t think we should use the Simple Search algorithm because it&#39;s <code>O(𝑛)</code>. We&#39;d be better off with a Binary Search as that&#39;s <code>O(Log𝑛(х))</code>&quot;.</p>
+
+<p>Now at the moment that might not mean much to you as you might not know what &quot;Simple Search&quot; or &quot;Binary Search&quot; algorithms look like. So let&#39;s look at those now and then we&#39;ll come back and understand the Big O notation for them and why Big O helps us understand the performance of these algorithms.</p>
+
+<div id="6"></div>
+
+<h2> Simple Search</h2>
+
+<p>Simple Search isn&#39;t even an algorithm. You&#39;ll see what I mean in just a moment. Imagine you have a collection of twelve items (numbers), which are sorted/in order, and you wish to locate a particular item within that collection.</p>
+
+<p>Here is the collection:</p>
+
+<pre><code class="language-py">[1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 21]
+</code></pre>
+
+<p>The Simple Search approach is literally to loop over the collection one item at a time and check whether the current item matches the item you&#39;re looking for.</p>
+
+<p>As I said, hardly an algorithm. But this is still something that we can wrap in Big O so we can understand the speed of this particular <em>algorithm</em>:</p>
+
+<pre><code class="language-ini">O(𝑛)
+</code></pre>
+
+<p>This is known as &#39;linear&#39; time. This means the number of operations increase linearly with the number of items in the collection. So in the above example, the number of operations will be 12. But if the collection is 100 items in length, then the number of operations will be 100.</p>
+
+<div id="7"></div>
+
+<h2>Binary Search</h2>
+
+<p>Consider the same example as before, a collection of 12 items. The Binary Search algorithm is quite straight forward: you set the start and end indexes (usually zero for &#39;start&#39;, and the length of the collection for the &#39;end&#39;). </p>
+
+<p>Now you locate the middle of the collection and check if the value you&#39;re looking for either matches or is too low/high. If it matches, then hey great you&#39;ve just reduced the number of operations by a large amount compared to the Simple Search.</p>
+
+<p>If the middle item (our &#39;guess&#39;) is lower than the actual item we&#39;re looking for, then you reassign the value of &#39;start&#39; to be the middle index (the &#39;end&#39; stays set to the length of the collection). You&#39;ve now reduced the sliding window of items by half.</p>
+
+<p>Alternatively if the middle item was larger than the item we&#39;re looking for, then you reassign the value &#39;end&#39; to be the middle index (the &#39;start&#39; stays set to zero). You&#39;ve again reduced the sliding window of items by half.</p>
+
+<p>From here we &#39;rinse/repeat&#39; until the next &#39;middle of the collection&#39; selection is the item we&#39;re looking for.</p>
+
+<p>This is a much more efficient search algorithm compared to Simple Search. </p>
+
+<p>Let&#39;s see what this looks like in Big O notation...</p>
+
+<pre><code class="language-ini">O(Log𝑛(х))
+</code></pre>
+
+<p>You can see from this syntax &#39;at a glance&#39; how this algorithm will perform across a wide range of collection sizes (i.e. how the operations <em>grow</em>), but yet (if you want to) you can specifically figure out the number of operations and calculate the speed. </p>
+
+<p>So for this operation, the number of operations is <code>4</code>. See earlier for explanation of Logarithms and how to apply them to the abstract Big O notation above, which for the record would be <code>O(Log2(12))</code>.</p>
+
+<div id="8"></div>
+
+<h2>Calculating Operation Speed</h2>
+
+<p>In order to calculate the speed of an algorithm, we need to know the worst case number of operations. This is what Logarithm gives us. So how do we calculate the speed based on the number of operations?</p>
+
+<p>With the understanding that in one second you can execute ten operations:</p>
+
+<pre><code class="language-ini">1/0.1 = 10
+</code></pre>
+
+<p>We can then calculate the <em>time</em> associated with a number of operations.</p>
+
+<p>Imagine we have the following Big O:</p>
+
+<pre><code class="language-ini">O(Log𝑛(х))
+</code></pre>
+
+<p>If this was a collection of 16 items, then the non-abstract version would look something like:</p>
+
+<pre><code class="language-ini">O(Log2(16))
+</code></pre>
+
+<p>We know from our earlier discussions that this would result in a worst case result of <code>4</code> operations to find the item we&#39;re searching for.</p>
+
+<blockquote>
+<p>Remember: <code>2x2x2x2 = 16</code><br>
+That&#39;s <code>4</code> times we multipled <code>2</code> by itself to reach <code>16</code></p>
+</blockquote>
+
+<p>We also now know that a single operation takes <code>0.1</code> of a second.  </p>
+
+<p>So with this in mind we can calculate the speed of <code>O(Log2(16))</code> as being: <code>0.4</code> seconds </p>
+
+<pre><code class="language-ini">0.1 * 4 operations = 0.4
+</code></pre>
+
+<p>If we were using the Simple Search algorithm (which is <code>O(𝑛)</code>) on a collection of 16 items, then we know that this would take <code>1.6</code> seconds to complete:</p>
+
+<pre><code class="language-ini">0.1 * 16 operations = 1.6
+</code></pre>
+
+<div id="9"></div>
+
+<h2>Conclusion</h2>
+
+<p>This is a very basic introduction to the concept of Big O and Logarithms. Hopefully you&#39;ve found it useful and have a greater appreciation for what Big O offers in the way of understanding the performance of a particular algorithm (although we only really looked at two - <code>O(Log𝑛(х))</code> &amp; <code>O(𝑛)</code> - there are many more algorithms with varying Logarithms).</p>
+
+<p>If you notice any mistakes, then please feel free to ping me.</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
