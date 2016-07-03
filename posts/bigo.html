@@ -40,8 +40,10 @@
 <li><a href="#9">The Travelling Salesperson</a></li>
 <li><a href="#10">Calculating Operation Speed</a> </li>
 <li><a href="#11">Arrays vs Linked Lists</a> </li>
-<li><a href="#12">Conclusion</a> </li>
-<li><a href="#13">References</a> </li>
+<li><a href="#12">Selection Sort</a> </li>
+<li><a href="#13">Quick Sort</a> </li>
+<li><a href="#14">Conclusion</a> </li>
+<li><a href="#15">References</a> </li>
 </ul>
 
 <div id="1"></div>
@@ -351,6 +353,55 @@ That&#39;s <code>4</code> times we multipled <code>2</code> by itself to reach <
 
 <div id="12"></div>
 
+<h2>Selection Sort</h2>
+
+<p>The &#39;selection sort&#39; algorithm sorts an unordered list by looping over the list <code>n</code> number of times, and for each loop it identifies either the smallest or largest element (which - smallest/largest - depends on how you&#39;re hoping to sort your list: do you want ascending or descending order). But ultimately you&#39;ll end up constructing a <em>new</em> &#39;ordered&#39; list.</p>
+
+<p>Specifically you loop a number of times to match the collection length. Then you loop the collection looking for smallest/largest item. Then you mutate the collection so it&#39;s smaller by one.</p>
+
+<p>Note: although you&#39;re looping over the collection multiple times, you are in fact looping over a slightly smaller collection each time</p>
+
+<p>This ends up being <code>O(n₂)</code> (n to the power of 2, or <code>O(n * n)</code>).</p>
+
+<p>So if your collection is 10 items long, then it would calculate as follows:</p>
+
+<pre><code class="language-ini">10 * 10 (i.e. 10 to the power of 2) = 100 operations
+0.1 * 100 = 10 seconds
+</code></pre>
+
+<div id="13"></div>
+
+<h2>Quick Sort</h2>
+
+<p>The &#39;quick sort&#39; algorithm achieves the same result as &#39;selection sort&#39;, but is much faster. This particular algorithm sorts an unordered list using recusion instead. </p>
+
+<p>Specifically it uses the D&amp;C (Divide and Conquer) approach to problem solving.</p>
+
+<p>The process is as follows:</p>
+
+<ul>
+<li>You pick a &#39;pivot&#39; (a random array index)</li>
+<li>Loop the array storing items less than the pivot</li>
+<li>Loop the array storing items greater than the pivot</li>
+<li>Assuming the &#39;less&#39; and &#39;greater&#39; collections are already sorted</li>
+<li>You can now return &#39;less&#39; + pivot + &#39;greater&#39;</li>
+</ul>
+
+<p>In reality you&#39;ll use recursion to then sort both the &#39;less&#39; and &#39;greater&#39; arrays using the same algorithm.</p>
+
+<p>This ends upbeing <code>O(n₂)</code> in the worst case, but can be <code>O(n Log₂ n)</code>.</p>
+
+<p>So if your collection is 10 items long, then it would calculate as follows:</p>
+
+<pre><code class="language-ini">10 * 4 (Log₂10 == 2*2*2*2) = 40 operations
+</code></pre>
+
+<blockquote>
+<p>Note: Quick Sort&#39;s performance depends on the pivot you choose (see the example code in the reference list below &quot;Gist: Algorithms in Python&quot;)</p>
+</blockquote>
+
+<div id="14"></div>
+
 <h2>Conclusion</h2>
 
 <p>This has been a very basic introduction to the concept of Big O. Hopefully you&#39;ve found it useful and have a greater appreciation for what Big O offers in the way of understanding the performance of particular algorithms (although we&#39;ve only really looked at three).</p>
@@ -362,11 +413,13 @@ That&#39;s <code>4</code> times we multipled <code>2</code> by itself to reach <
 <li><code>O(n!)</code>: factorial time</li>
 <li><code>O(n)</code>: linear time</li>
 <li><code>O(1)</code>: constant time</li>
+<li><code>O(n * n)</code>: selection sort example</li>
+<li><code>O(n Log n (x))</code>: quick sort example</li>
 </ul>
 
 <p>There are many more algorithms and calculations for Big O, and as I learn them I&#39;ll be sure to update this blog post accordingly. If in the mean time you notice any mistakes, then please feel free to let me know.</p>
 
-<div id="13"></div>
+<div id="15"></div>
 
 <h2>References</h2>
 
