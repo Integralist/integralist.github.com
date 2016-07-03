@@ -39,7 +39,8 @@
 <li><a href="#8">Binary Search</a></li>
 <li><a href="#9">The Travelling Salesperson</a></li>
 <li><a href="#10">Calculating Operation Speed</a> </li>
-<li><a href="#11">Conclusion</a> </li>
+<li><a href="#11">Arrays vs Linked Lists</a> </li>
+<li><a href="#12">Conclusion</a> </li>
 </ul>
 
 <div id="1"></div>
@@ -325,9 +326,38 @@ That&#39;s <code>4</code> times we multipled <code>2</code> by itself to reach <
 
 <div id="11"></div>
 
+<h2>Arrays vs Linked Lists</h2>
+
+<p>Let&#39;s consider what Big O looks like for the Array and Linked List data structures.</p>
+
+<p>An Array supports &#39;index access&#39;, meaning you can jump straight to an Array index. Where as with Linked Lists you have to traverse the entire list in order to locate a specific item.</p>
+
+<blockquote>
+<p>Note: another difference comes in memory management. Arrays required n number of memory &#39;slots&#39; to be next to each other, where as Linked List memory can be sparse and spread out due to how it implements its internal chaining of nodes. This is why Arrays are typically considered to be &#39;fixed size&#39; and not easily expanded, because expansion of the Array&#39;s size could potentially require an expensive movement of the Array to a new location in memory in order to faciliate a new index and yet still have memory slots side-by-side</p>
+</blockquote>
+
+<p>This suggests that Array lookups are <code>O(1)</code>, known as &#39;constant time&#39; because the lookup growth stays the same no matter the length of the collection (i.e. it&#39;s constant).</p>
+
+<p>Linked List lookups on the other hand are <code>O(n)</code>, which we already know is &#39;linear time&#39; (remember this is how the Simple Search algorithm performed).</p>
+
+<p>But what about new data insertions? Well, with an Array you insert new items at the end of the Array, and because of its index access it would indicate <code>O(1)</code>. But if you&#39;re inserting an item into the middle of the Array, then this changes to <code>O(n)</code> because of the internal implementation of Arrays in memory, it means you need to re-order all the following items, which is expensive (hence the side-effect of inserting into the middle is really more like linear time).</p>
+
+<p>Linked List insertions are generally <code>O(1)</code> if inserting at the beginning or end of the list, but more like <code>O(n) + O(1)</code> if inserting into the middle of the list because you have to traverse the list first and then insert your new item.</p>
+
+<div id="12"></div>
+
 <h2>Conclusion</h2>
 
 <p>This has been a very basic introduction to the concept of Big O. Hopefully you&#39;ve found it useful and have a greater appreciation for what Big O offers in the way of understanding the performance of particular algorithms (although we&#39;ve only really looked at three).</p>
+
+<p>We&#39;ve seen the following Big O types:</p>
+
+<ul>
+<li><code>O(Log n (x))</code>: log time</li>
+<li><code>O(n!)</code>: factorial time</li>
+<li><code>O(n)</code>: linear time</li>
+<li><code>O(1)</code>: constant time</li>
+</ul>
 
 <p>There are many more algorithms and calculations for Big O, and as I learn them I&#39;ll be sure to update this blog post accordingly. If in the mean time you notice any mistakes, then please feel free to let me know.</p>
 
