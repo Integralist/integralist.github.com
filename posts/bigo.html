@@ -359,13 +359,15 @@ That&#39;s <code>4</code> times we multipled <code>2</code> by itself to reach <
 
 <p>Specifically you loop a number of times to match the collection length. Then you loop the collection looking for smallest/largest item. Then you mutate the collection so it&#39;s smaller by one.</p>
 
-<p>Note: although you&#39;re looping over the collection multiple times, you are in fact looping over a slightly smaller collection each time</p>
-
 <p>This ends up being <code>O(n₂)</code> (n to the power of 2, or <code>O(n * n)</code>).</p>
+
+<blockquote>
+<p>Note: although you&#39;re looping over the collection multiple times, you are in fact looping over a slightly smaller collection each time. But it&#39;s <em>still</em> considered <code>O(n)</code> for each time you loop over the collection because regardless of how many items are in there you treat it as abstract</p>
+</blockquote>
 
 <p>So if your collection is 10 items long, then it would calculate as follows:</p>
 
-<pre><code class="language-ini">10 * 10 (i.e. 10 to the power of 2) = 100 operations
+<pre><code class="language-ini">10 * 10 (i.e. n₂ meaning: 10 to the power of 2) = 100 operations
 0.1 * 100 = 10 seconds
 </code></pre>
 
@@ -391,15 +393,27 @@ That&#39;s <code>4</code> times we multipled <code>2</code> by itself to reach <
 
 <p>This ends up being <code>O(n₂)</code> in the worst case, but can be <code>O(n Log₂ n)</code> in the better case.</p>
 
-<p>So if your collection is 10 items long, then it would calculate as follows:</p>
+<p>The explanation for this, is that the quicksort function takes in a single collection and loops over it. In the process it then splits the collection into three chunks (less, pivot and greater) and it recursively calls itself (i.e. quicksort calls quicksort) on the &#39;less&#39; and &#39;greater&#39; chunks, subsequently looping over those collections as well.</p>
+
+<p>Big O notation helps us to understand the hidden complexity of the algorithm. If you see something like <code>O(n₂)</code>, then you know that there are nested loops or some kind of recursion happening in order to cause that.</p>
+
+<p>Now it&#39;s worth being aware that Quick Sort&#39;s performance is dependent on the pivot you choose. Take a look at some of the example implementations of the quick sort algorithm in the reference list below <a href="#15">&quot;Gist: Algorithms in Python&quot;</a>. </p>
+
+<p>There you&#39;ll see we have three implementations: one where we pick the first index every time as the pivot, one where we pick the middle index every time and one where we pick an index at random. </p>
+
+<p>Picking an index at random will give you the best chance of high performance. If you, for example, always pick the first index then you&#39;ll have a situation where you&#39;re potentially sorting items unnecessarily.</p>
+
+<p>So in the best case scenario, if your collection is 10 items long, then it would calculate as follows:</p>
 
 <pre><code class="language-ini">10 * 4 (Log₂10 == 2*2*2*2) = 40 operations
 0.1 * 40 = 4 seconds
 </code></pre>
 
-<blockquote>
-<p>Note: Quick Sort&#39;s performance depends on the pivot you choose (see the example code in the reference list below &quot;Gist: Algorithms in Python&quot;)</p>
-</blockquote>
+<p>But in the worst case scenario, if your collection was 10 items long, then it could calculate as follows:</p>
+
+<pre><code class="language-ini">10 * 10 = 100 operations
+0.1 * 100 = 10 seconds
+</code></pre>
 
 <div id="14"></div>
 
@@ -414,7 +428,7 @@ That&#39;s <code>4</code> times we multipled <code>2</code> by itself to reach <
 <li><code>O(n!)</code>: factorial time</li>
 <li><code>O(n)</code>: linear time</li>
 <li><code>O(1)</code>: constant time</li>
-<li><code>O(n * n)</code>: selection sort example</li>
+<li><code>O(n * n)</code> (also known as <code>O(n₂)</code>): selection sort example</li>
 <li><code>O(n Log n (x))</code>: quick sort example</li>
 </ul>
 
