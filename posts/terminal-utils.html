@@ -963,7 +963,7 @@ Sorting:
 <li><code>tcpdump -D</code>: show available network interfaces</li>
 <li><code>tcpdump -i eth0 -c 5</code>: capture n packets from specific network interface</li>
 <li><code>tcpdump -i eth0 -c 5 -w 0001.pcap</code>: send output to pcap file</li>
-<li><code>tcpdump -r 0001.pcap</code>: read back out the pcap file content</li>
+<li><code>tcpdump -r 0001.pcap</code>: read back out the pcap file content for later analysis</li>
 <li><code>tcpdump -n -i eth0 -c 1</code>: converts dns hostnames into ip addresses instead</li>
 <li><code>tcpdump -n -i eth0 -c 10 tcp</code>: capture only tcp packets</li>
 <li><code>tcpdump -n -i eth0 -c 10 port 22 and port 80</code>: capture packets from specific ports</li>
@@ -975,15 +975,21 @@ Sorting:
 </ul>
 
 <blockquote>
-<p>If you run tcpdump on a remote server and you want to use a gui like Wireshark to interrogate the recorded data, then you&#39;ll need to use <code>scp</code> to transfer the file back to your local machine</p>
+<p>If you run tcpdump on a remote server, you&#39;ll want to use the <code>-w</code> flag to record the data into a pcap file, this is so you can scp the file back to your local machine for later aggregation/analysis with either tcpdump itself (<code>-r</code>) or by importing the pcap file into another tool such as <a href="#13"><code>wireshark</code></a> or <a href="#14"><code>tshark</code></a></p>
 </blockquote>
 
 <p>The output of the program may look a little confusing but there is consistent structure you can look out for:</p>
 
-<pre><code class="language-bash">&lt;date_time&gt; &lt;protocol&gt; &lt;src&gt; &gt; &lt;dest&gt;: Flags[&lt;type&gt;] &lt;communication&gt;
+<pre><code class="language-bash">&lt;date_time&gt; &lt;protocol&gt; &lt;src&gt; &gt; &lt;dest&gt;: Flags[&lt;type&gt;] &lt;data&gt;
 </code></pre>
 
+<blockquote>
+<p>Note: the <code>&gt;</code> always sits between <code>src</code> and <code>dest</code> and indicates the direction of the request</p>
+</blockquote>
+
 <h4>Flags</h4>
+
+<p>Flags aren&#39;t always present, depending on the network transfer that has been recorded, but when it is you&#39;ll usually see one of the following:</p>
 
 <ul>
 <li><code>[U] URG</code>: used to identify incoming data as &#39;urgent&#39;. Such incoming segments do not have to wait until the previous segments are consumed by the receiving end but are sent directly and processed immediately</li>
@@ -994,15 +1000,19 @@ Sorting:
 <li><code>[F] FIN</code>: used to tear down the virtual connections created using the previous flag (SYN)</li>
 </ul>
 
-<blockquote>
-<p>Note: you&#39;ll see other information such as <code>win</code> in the communication output, this is a sliding &#39;window&#39; that represents the size of the packets being sent back and forth. Typically an ACK won&#39;t be sent until the relevant packet size has been sent/received. Win is also used for flow control (one end is having trouble keeping up with the number of packets)</p>
-</blockquote>
+<h4>Data</h4>
+
+<p>You&#39;ll typically see more information within the &#39;data&#39; output to indicate information about the packets being passed between hosts. </p>
+
+<p>One such example would be seeing <code>win</code> specified. This is a sliding &#39;window&#39; that represents the size of the packets being sent back and forth. </p>
+
+<p>You&#39;ll also typically see an ACK (acknowledgement packet), and that it won&#39;t be sent until the previous packet has been completely received (this is to help with consistency of specific sequence numbers and the ability to signify packets have been missed). </p>
+
+<p>The <code>win</code> is also used for flow control. An example of this is where one end of the communication is having trouble keeping up with the number of packets and so they modify the window buffer to be a smaller packet size to allow themselves to catch up with their processing of data.</p>
 
 <h4>Last Packet?</h4>
 
-<p>It&#39;s important to realise that <code>FIN</code> wont necessarily be the last packet sent. </p>
-
-<p>For example... </p>
+<p>Although nothing to do with tcpdump, it is worth understanding (for the sake of debugging) that the <code>FIN</code> flag doesn&#39;t necessarily indicate the last packet has just been sent. Here is an example to explain:</p>
 
 <ul>
 <li>Host A receives what it believes to be the last data packet</li>
@@ -1018,13 +1028,72 @@ Sorting:
 
 <p><strong>Summary</strong>: network packet sniffer and analyser (gui)</p>
 
+<p>Wireshark is a network protocol analyzer.<br>
+It lets you see what&#39;s happening on your network at a microscopic level.</p>
+
 <p><a href="../images/shell-wireshark.jpg">
     <img src="../images/shell-wireshark.jpg">
 </a></p>
 
-<p>...</p>
+<p>There&#39;s not a lot I can say about Wireshark other than you really will need to know how certain network protocols (such as TCP) work in order to understand the output that&#39;s being recorded.</p>
 
-<p>create pcaps with tcpdump and analyse with tshark</p>
+<p>The output will look very similar to what <code>tcpdump</code> provides (depending on what network traffic you&#39;re recording), and is a really useful tool for easier interrogation of pcap files created by <code>tcpdump</code>.</p>
+
+<p>This utility isn&#39;t available by default on any OS, so with Mac OS:</p>
+
+<pre><code class="language-bash">brew install wireshark --with-qt5
+</code></pre>
+
+<blockquote>
+<p>Note: sometimes the flags that are available change. So I would suggest running the command <code>brew cat wireshark</code> first to see what&#39;s available first.</p>
+</blockquote>
+
+<p>With Ubuntu:</p>
+
+<pre><code class="language-bash">apt-get update &amp;&amp; apt-get install wireshark
+</code></pre>
+
+<p>With CentOS:</p>
+
+<pre><code class="language-bash">yum install wireshark
+</code></pre>
+
+<p>I typically have only ever used Wireshark with pcap files I&#39;ve created via <code>tcpdump</code> so that&#39;s what I&#39;ll demonstrate here. There are two ways to open the pcap file in Wireshark.</p>
+
+<ol>
+<li><p>execute <code>wireshark</code> from the terminal, which will open the gui, and from the gui interface select &quot;Open Capture File&quot;.</p></li>
+<li><p>execute <code>wireshark -r /path/to/pcap/file</code></p></li>
+</ol>
+
+<blockquote>
+<p>Note: if you just want to use Wireshark to monitor all network traffic, then execute <code>sudo wireshark -i &lt;interface&gt;</code> (use <code>ifconfig</code> or <code>sudo wireshark -D</code> to see what interfaces are available). Once the gui is open it&#39;ll have the specified interface pre-selected, so just double-click on it to start recording its traffic</p>
+</blockquote>
+
+<p>Every time there is (for example) a HTTP request, there might end up being 200 TCP packets recorded, which can be (as you could imagine) difficult to recognize and make sense of manually. </p>
+
+<p>But this problem can be simplified within Wireshark by clicking on &quot;Statistics&quot; and then &quot;Conversations&quot;, where it will organize all these disparate packets into TCP sessions for you. Thus making analysing the data much easier.</p>
+
+<h4>Docker?</h4>
+
+<p>One thing I did notice when trying to use this tool with Docker, was that you must run the container in privileged mode:</p>
+
+<pre><code class="language-bash">docker run --privileged
+</code></pre>
+
+<p>Otherwise you&#39;ll see: </p>
+
+<pre><code class="language-ini">can&#39;t run /usr/sbin/dumpcap: Operation not permitted
+</code></pre>
+
+<p>Apparently <code>--security-opt seccomp:unconfined</code> is an alternative option.</p>
+
+<p>The following is taken and paraphrased from the Docker website:</p>
+
+<blockquote>
+<p>Doing this will allow Docker to access all devices on the host as well as set some configuration to allow the container to nearly all the same access to the host as processes running outside the containers on the host.</p>
+</blockquote>
+
+<p>For more details, please refer to the <a href="https://docs.docker.com/engine/reference/run/#/runtime-privilege-and-linux-capabilities">documentation</a>.</p>
 
 <div id="14"></div>
 
@@ -1032,13 +1101,67 @@ Sorting:
 
 <p><strong>Summary</strong>: network packet sniffer and analyser (cli version of wireshark)</p>
 
+<p>Tshark is a network protocol analyzer, but a terminal based one.<br>
+It lets you see what&#39;s happening on your network at a microscopic level.</p>
+
 <p><a href="../images/shell-tshark.jpg">
     <img src="../images/shell-tshark.jpg">
 </a></p>
 
-<p>...</p>
+<p>As mentioned above in the Wireshark section, to get access to <code>tshark</code> on the Mac OS you need to install Wireshark. There are separate installs though for other OS&#39;.</p>
 
-<p>need sudo for listening on interfaces</p>
+<p>With Ubuntu:</p>
+
+<pre><code class="language-bash">apt-get update &amp;&amp; apt-get install tshark
+</code></pre>
+
+<p>With CentOS:</p>
+
+<pre><code class="language-bash">yum install tshark
+</code></pre>
+
+<p>I&#39;ve only used tshark a few times and typically I find using the Wireshark gui better for interpretting tcpdump data (which has so far been one of my primary use cases; e.g. debugging traffic occuring on a remote server).</p>
+
+<p>But the benefit of tshark, outside of those of us who love living inside the terminal, is the ability to automate analysis without the need for a gui. This means we can write scripts to process the data we&#39;ve recorded and so becomes a very powerful tool.</p>
+
+<p>Similar to Wireshark, if you want to read in a pcap file then you would use the <code>-r</code> flag to point to its location on your file system:</p>
+
+<pre><code class="language-bash">tshark -r /path/to/pcap/file
+</code></pre>
+
+<p>Also you can just run tshark and have it monitor <em>all</em> network traffic on your host machine or just a specific interface (using the <code>-i</code> flag). There is also the <code>-D</code> flag for having it show you all available interfaces you can listen on.</p>
+
+<p>The tshark command knows a lot more about what&#39;s going on inside your TCP packets than tcpdump and so you have more options available to you in order to filter out the data you&#39;re interested in:</p>
+
+<pre><code class="language-bash">sudo tshark -i any \
+            -R &#39;http.request.method == &quot;GET&quot;&#39; \
+            -T fields \
+            -e http.request.method -e http.request.uri -e ip.dst
+</code></pre>
+
+<p>In the above example we&#39;re &#39;explicitly&#39; listening on all interfaces for network traffic. We then filter out all packets except those which are a <code>HTTP GET</code> request.</p>
+
+<p>Now instead of just showing <em>all</em> the data for the <code>HTTP GET</code> requests that come through we use the <code>-T</code> flag to indicate that we&#39;re interested only in &#39;fields&#39; being displayed. We then can use the <code>-e</code> flag to indicate which subset of &#39;fields&#39; we want to show.</p>
+
+<p>In this case we&#39;ve chosen to display the request method (i.e. <code>GET</code>), the URI that was associated with the GET and the ip address associated with it.</p>
+
+<h4>Filtering Example</h4>
+
+<p>One very real example I had recently was the need to inspect DNS traffic and to identify the TTL record values returned by the DNS resolutions happening on port 53.</p>
+
+<p>I had used <code>tcpdump</code> to record the relevant traffic:</p>
+
+<pre><code class="language-bash">tcpdump -vvv -s 0 -l -n port 53 -XX -w dns-traffic.pcap
+</code></pre>
+
+<p>I then was able to pass this into tshark to automate the extraction of useful data, all without having to consult the Wireshark gui (meaning I could do this within the same environment as the data was recorded in if I wanted to):</p>
+
+<pre><code class="language-bash">tshark -r ~/dns-traffic.pcap -T fields -e dns.resp.ttl -e dns.resp.name
+</code></pre>
+
+<p>One useful trick some people aren&#39;t aware of, is that if you are writing automation scripts with tshark but you&#39;re unsure of how to access specific data fields, then just use Wireshark <em>temporarily</em> to figure out the fields you need.</p>
+
+<p>For example, if you open the pcap in wireshark, you can find the filter you need by selecting the data manually via the UI and then right-click&#39;ing the relevant data field and selecting &quot;Prepare a Filter &gt; Selected&quot;. This will generate the exact value you would assign to the tshark <code>-e</code> flag.</p>
 
 <div id="15"></div>
 
@@ -1046,17 +1169,89 @@ Sorting:
 
 <p><strong>Summary</strong>: utility for communicating with another host</p>
 
+<p>Telnet is both a tool <code>telnet</code> <em>and</em> a Network Protocol of the same name: Telnet. The <code>telnet</code> program is used for interactive communication to a remote/external host on a given port. Once the connection to the remote host is established, an HTTP request can be sent to the host by typing it in the prompt.</p>
+
 <p><a href="../images/shell-telnet.jpg">
     <img src="../images/shell-telnet.jpg">
 </a></p>
 
-<p>...</p>
+<p>Telnet&#39;s usage nowadays is a little limited due to the massive success of protocols such as SSH, but it can be interesting to play around with (although I&#39;ve never really had much of a &#39;need&#39; for it myself).</p>
+
+<p>To use the command you type <code>telnet &lt;host&gt; &lt;port&gt;</code>. Once &#39;connected&#39; to the host you need to provide a command to be executed, for example a <code>GET</code> request. </p>
+
+<p>Below is an example of making a GET request. First we must connect:</p>
+
+<pre><code class="language-bash">telnet www.google.com 80
+</code></pre>
+
+<p>We will get the following response:</p>
+
+<pre><code class="language-bash">Trying 87.237.19.30...
+Connected to www.google.com.
+Escape character is &#39;^]&#39;.
+</code></pre>
+
+<p>From here we can provide our request:</p>
+
+<pre><code class="language-bash">GET #q=cars HTTP/1.1
+</code></pre>
+
+<blockquote>
+<p>Note: you need to press <Enter> twice to send the request</p>
+</blockquote>
+
+<p>From here we get the following response:</p>
+
+<pre><code class="language-bash">HTTP/1.1 302 Found
+Location: http://www.google.co.uk/?gws_rd=cr&amp;ei=k7BjV-GbFOLOgAbd3JbADw#q=cars
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+P3P: CP=&quot;This is not a P3P policy! See https://www.google.com/support/accounts/answer/151657?hl=en for more info.&quot;
+Date: Fri, 17 Jun 2016 08:10:59 GMT
+Server: gws
+Content-Length: 268
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Set-Cookie: NID=80=R8K0WhuF432ccZzjpchtEPHx-vv1n-9tuoe8P6V2yyNC2h1sd_JB7Q1afFZPo5W9MjvP8UL1ZZ_8UQDHeb3OpGDRNlSNfPkJWqE9JKa9hAJG02wlk7s8eIRy786p7-8U; expires=Sat, 17-Dec-2016 08:10:59 GMT; path=/; domain=.google.com; HttpOnly
+
+&lt;HTML&gt;&lt;HEAD&gt;&lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html;charset=utf-8&quot;&gt;
+&lt;TITLE&gt;302 Moved&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;
+&lt;H1&gt;302 Moved&lt;/H1&gt;
+The document has moved
+&lt;A HREF=&quot;http://www.google.co.uk/?gws_rd=cr&amp;amp;ei=k7BjV-GbFOLOgAbd3JbADw#q=cars&quot;&gt;here&lt;/A&gt;.
+&lt;/BODY&gt;&lt;/HTML&gt;
+Connection closed by foreign host.
+</code></pre>
+
+<p>If we try a similar request with the BBC site, we&#39;ll see we get a 404 not found:</p>
+
+<pre><code class="language-bash">$ telnet www.bbc.co.uk 80
+Trying 212.58.244.66...
+Connected to www.bbc.net.uk.
+Escape character is &#39;^]&#39;.
+GET /news HTTP/1.1
+
+HTTP/1.1 404 Not Found
+Content-Type: text/html
+Date: Fri, 17 Jun 2016 08:13:29 GMT
+Connection: Keep-Alive
+Content-Length: 50591
+</code></pre>
 
 <div id="16"></div>
 
 <h2>Conclusion</h2>
 
-<p>...</p>
+<p>There you have it. A whirlwind run down of different terminal based debugging tools. The primary one&#39;s (for me) being:</p>
+
+<ul>
+<li><code>strace</code></li>
+<li><code>tcpdump</code></li>
+<li><code>wireshark</code></li>
+<li><code>tshark</code></li>
+</ul>
+
+<p>Obivously they all have their specialisms and unique features. I&#39;ve not even scratched the surface of what they can do. If you know of anything really useful that I&#39;ve missed, then let me know.</p>
 
             <hr>
             <h2>Links</h2>
