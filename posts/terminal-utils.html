@@ -78,6 +78,10 @@
 
 <p>Just be aware that that there will be crossover functionality, and that on occasions certain tools might only have <em>slight</em> additions that could be useful to you depending on the problem you&#39;re trying to debug.</p>
 
+<h4>Deprecated Commands?</h4>
+
+<p>It was brought to my attention by <a href="https://twitter.com/aidylewis">Aidy Lewis</a> that tools such as <code>ifconfig</code> and <code>netstat</code> have since been deprecated in favour of other tools. See <a href="https://dougvitale.wordpress.com/2011/12/21/deprecated-linux-networking-commands-and-their-replacements/">here</a> for the details of what the replacement tools are.</p>
+
 <div id="2"></div>
 
 <h2>Prerequisites</h2>
@@ -310,7 +314,8 @@ But ultimately the examples I give are for Mac OS (unless stated otherwise)</p>
 <p>Finally one other useful thing for non-Mac versions is the ability to kill a process you don&#39;t like the look of:</p>
 
 <ul>
-<li><code>k</code>: followed by PID of process you want to kill</li>
+<li><p><code>k</code>: followed by PID of process you want to kill</p></li>
+<li><p><code>1</code>: toggles a breakdown of the CPU usage (rather than showing aggregated value)</p></li>
 </ul>
 
 <p>I mention the above non-Mac options because when debugging on a remote server, chances are you&#39;ll need some of those details more.</p>
@@ -1163,6 +1168,10 @@ It lets you see what&#39;s happening on your network at a microscopic level.</p>
 
 <p>For example, if you open the pcap in wireshark, you can find the filter you need by selecting the data manually via the UI and then right-click&#39;ing the relevant data field and selecting &quot;Prepare a Filter &gt; Selected&quot;. This will generate the exact value you would assign to the tshark <code>-e</code> flag.</p>
 
+<blockquote>
+<p>Note: the filtering system syntax is called BPF (Berkeley Packet Filter) and you can find <a href="http://biot.com/capstats/bpf.html">documentation here</a></p>
+</blockquote>
+
 <div id="15"></div>
 
 <h2>telnet</h2>
@@ -1176,6 +1185,10 @@ It lets you see what&#39;s happening on your network at a microscopic level.</p>
 </a></p>
 
 <p>Telnet&#39;s usage nowadays is a little limited due to the massive success of protocols such as SSH, but it can be interesting to play around with (although I&#39;ve never really had much of a &#39;need&#39; for it myself).</p>
+
+<blockquote>
+<p>Note: one such tool that is more useful in this respect is <a href="http://nc110.sourceforge.net/"><code>netcat</code></a> which reads and writes data across network connections, using the TCP or UDP protocols</p>
+</blockquote>
 
 <p>To use the command you type <code>telnet &lt;host&gt; &lt;port&gt;</code>. Once &#39;connected&#39; to the host you need to provide a command to be executed, for example a <code>GET</code> request. </p>
 
