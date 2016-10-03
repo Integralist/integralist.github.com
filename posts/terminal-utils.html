@@ -49,7 +49,8 @@
 <li><a href="#14">tshark</a>: network packet sniffer and analyser</li>
 <li><a href="#15">telnet</a>: utility for communicating with another host</li>
 </ul></li>
-<li><a href="#16">Conclusion</a></li>
+<li><a href="#16">Honorable mentions</a></li>
+<li><a href="#17">Conclusion</a></li>
 </ul>
 
 <div id="1"></div>
@@ -816,6 +817,10 @@ default         ip-xx-x-x-x.eu- 0.0.0.0         UG        0 0          0 eth0
 
 <p>Effectively, if you&#39;ve any kind of network issues, then this tool can help you potentially identify where it&#39;s coming from or going (or if it&#39;s not coming from or going to the expected source/destination).</p>
 
+<blockquote>
+<p>Update: an easy way to remember this (thanks Julia Evans - see <a href="#16">honorable mentions</a> is &quot;tuna please&quot; <code>netstat -tunapl</code>). You can use <code>lsof -i -P</code> on Mac OS</p>
+</blockquote>
+
 <div id="9"></div>
 
 <h2>ifconfig</h2>
@@ -1078,6 +1083,10 @@ It lets you see what&#39;s happening on your network at a microscopic level.</p>
 
 <p>But this problem can be simplified within Wireshark by clicking on &quot;Statistics&quot; and then &quot;Conversations&quot;, where it will organize all these disparate packets into TCP sessions for you. Thus making analysing the data much easier.</p>
 
+<blockquote>
+<p>Note: we cover &#39;filtering&#39; more in the next section about tshark, but one simple search for a HTTP GET header in your recorded traffic is <code>frame contains &quot;GET&quot;</code></p>
+</blockquote>
+
 <h4>Docker?</h4>
 
 <p>One thing I did notice when trying to use this tool with Docker, was that you must run the container in privileged mode:</p>
@@ -1252,6 +1261,22 @@ Content-Length: 50591
 </code></pre>
 
 <div id="16"></div>
+
+<h2>Honorable mentions</h2>
+
+<p>A few months after writing this article I stumbled across a similar (but much better) post from <a href="https://twitter.com/b0rk">Julia Evans</a>. I then realised she has written <em>lots</em> of amazing posts, so you should <a href="http://jvns.ca/">check them out</a>.</p>
+
+<p>Here are some tools that she mentions that you should consider looking at:</p>
+
+<ul>
+<li>dstat: prints network/disk usage every second</li>
+<li>opensnoop: prints files being opened (but without strace perf concerns)</li>
+<li>netcat: connect, listen, tunnel with ease</li>
+<li>ngrep: provides grep functionality for the network</li>
+<li>perf: records a program on an interval for later analysis (also <code>perf top</code>)</li>
+</ul>
+
+<div id="17"></div>
 
 <h2>Conclusion</h2>
 
