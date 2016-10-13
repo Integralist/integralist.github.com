@@ -509,7 +509,7 @@ touch certindex.txt
 
 <ul>
 <li><code>PEM pass phrase</code> which I set to <code>pass</code></li>
-<li><code>Country Name</code> which I set to <code>UK</code></li>
+<li><code>Country Name</code> which I set to <code>GB</code></li>
 <li><code>Organization Name</code> which I set to <code>Integralist Ltd</code></li>
 <li><code>Common Name</code> which I set to <code>Integralist</code></li>
 <li><code>Email Address</code> which I set to <code>ca@integralist.com</code></li>
@@ -539,7 +539,7 @@ touch certindex.txt
 
 <ul>
 <li><code>Email Address</code> which I set to <code>server@integralist.com</code></li>
-<li><code>Country Name</code> which I set to <code>UK</code></li>
+<li><code>Country Name</code> which I set to <code>GB</code></li>
 <li><code>Common Name</code> which I set to <code>TheServer</code></li>
 </ul>
 
@@ -573,7 +573,7 @@ Check that the request matches the signature
 Signature ok
 The Subject&#39;s Distinguished Name is as follows
 emailAddress          :IA5STRING:&#39;server@integralist.com&#39;
-countryName           :PRINTABLE:&#39;UK&#39;
+countryName           :PRINTABLE:&#39;GB&#39;
 commonName            :PRINTABLE:&#39;TheServer&#39;
 Certificate is to be certified until Oct  2 14:14:23 2016 GMT (365 days)
 
@@ -592,7 +592,7 @@ Data Base Updated
 <p>If you look at the <code>certindex.txt</code> you&#39;ll see a new record has been added (it wont be identical, but it&#39;ll look something like the following):</p>
 
 <p><code>
-V 161002141423Z   100001  unknown /C=UK/CN=TheServer/emailAddress=server@integralist.com
+V 161002141423Z   100001  unknown /C=GB/CN=TheServer/emailAddress=server@integralist.com
 </code></p>
 
 <p>Notice the number <code>100001</code>. This is the serial number (and name) of the certificate that&#39;s been generated for the server and is used for the purpose of revoking the certificate at a later date (e.g. if the private key becomes compromised).</p>
@@ -628,7 +628,7 @@ V 161002141423Z   100001  unknown /C=UK/CN=TheServer/emailAddress=server@integra
 
 <ul>
 <li><code>Email Address</code> which I set to <code>client@integralist.com</code></li>
-<li><code>Country Name</code> which I set to <code>UK</code></li>
+<li><code>Country Name</code> which I set to <code>GB</code></li>
 <li><code>Common Name</code> which I set to <code>TheClient</code></li>
 </ul>
 
@@ -718,13 +718,13 @@ V 161002141423Z   100001  unknown /C=UK/CN=TheServer/emailAddress=server@integra
 <pre><code class="language-ini">Certificate Revocation List (CRL):
         Version 2 (0x1)
         Signature Algorithm: md5WithRSAEncryption
-        Issuer: /C=UK/O=IntegralistLtd/CN=Integralist/emailAddress=ca@integralist.com
+        Issuer: /C=GB/O=IntegralistLtd/CN=Integralist/emailAddress=ca@integralist.com
         Last Update: Oct  3 14:45:53 2015 GMT
         Next Update: Nov  2 14:45:53 2015 GMT
         CRL extensions:
             X509v3 Authority Key Identifier: 
                 keyid:43:3A:75:41:E1:AE:46:F0:5F:AC:F4:24:6A:3A:DB:D1:31:7E:27:6B
-                DirName:/C=UK/O=IntegralistLtd/CN=Integralist/emailAddress=ca@integralist.com
+                DirName:/C=GB/O=IntegralistLtd/CN=Integralist/emailAddress=ca@integralist.com
                 serial:E0:86:88:E8:CA:0C:7F:29
 
             X509v3 CRL Number: 
@@ -780,7 +780,7 @@ No Revoked Certificates.
 
 <p>This gives us the output as expected:</p>
 
-<pre><code class="language-ini">/C=UK/CN=TheClient/emailAddress=client@integralist.com
+<pre><code class="language-ini">/C=GB/CN=TheClient/emailAddress=client@integralist.com
 </code></pre>
 
 <h3>Revoking Certificates</h3>
@@ -791,8 +791,8 @@ No Revoked Certificates.
 
 <p>In order to revoke the client certificate, I first need to look it up in the <code>certindex.txt</code> file. The contents of that file resembles something like:</p>
 
-<pre><code class="language-ini">V 161002113732Z 100001 unknown /C=UK/CN=TheServer/emailAddress=server@integralist.com
-V 161002113931Z 100002 unknown /C=UK/CN=TheClient/emailAddress=client@integralist.com
+<pre><code class="language-ini">V 161002113732Z 100001 unknown /C=GB/CN=TheServer/emailAddress=server@integralist.com
+V 161002113931Z 100002 unknown /C=GB/CN=TheClient/emailAddress=client@integralist.com
 </code></pre>
 
 <p>I can now easily say to myself &quot;ok, so I know its the &#39;client&#39; who needs their cert revoked; that looks to be cert 100002&quot;, and from there I would execute the following command (make sure you <code>cd</code> into the <code>docker-nginx/CertificateManagement/</code> directory before running the next command):</p>
@@ -810,8 +810,8 @@ Data Base Updated
 
 <p>Now if we look at the <code>certindex.txt</code> file again we&#39;ll see that <code>100002</code> has been revoked:</p>
 
-<pre><code class="language-ini">V 161002113732Z               100001 unknown /C=UK/CN=TheServer/emailAddress=server@integralist.com
-R 161002113931Z 151003114104Z 100002 unknown /C=UK/CN=TheClient/emailAddress=client@integralist.com
+<pre><code class="language-ini">V 161002113732Z               100001 unknown /C=GB/CN=TheServer/emailAddress=server@integralist.com
+R 161002113931Z 151003114104Z 100002 unknown /C=GB/CN=TheClient/emailAddress=client@integralist.com
 </code></pre>
 
 <p>You&#39;ll notice the <code>R</code> for &quot;revoked&quot; has been applied. I&#39;m not entirely sure what the additional reference number <code>151003114104Z</code> means, so if anyone knows then please ping me with that information so I can update this post accordingly.</p>
