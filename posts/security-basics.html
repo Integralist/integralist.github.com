@@ -895,29 +895,112 @@ Compression: Uncompressed, ZIP, ZLIB, BZIP2
 
 <h4>Digital Signatures</h4>
 
-<p>You can also add a MAC (remember we looked at this earlier when discussing PKI; this is the digital signature) by adding the <code>--sign</code> flag, which means you&#39;ve used your private key to guarantee the encrypted file has come from you:</p>
+<p>Earlier, when discussing PKI, we mentioned the use of a MAC which was a form of &#39;digital signature&#39;. The benefit of a signature is to allow you to verify that the file (encrypted <em>or</em> plaintext) was indeed created by the person you think it was.</p>
 
-<pre><code class="language-bash">gpg --default-key email@domain.com --sign -r bob@example.org secrets.txt
+<p>In GPG there are three types of signatures: </p>
+
+<ol>
+<li>clearsigned</li>
+<li>detached</li>
+<li>attached signatures</li>
+</ol>
+
+<p>For the purposes of this demonstration I should clarify that I have multiple GPG profiles on my laptop, but I&#39;ll refer to two of them as &quot;Bob&quot; and &quot;Alice&quot;. The reason I&#39;m mentioning this is that I&#39;ll use Bob to sign stuff and I&#39;ll use Alice for the verification of the signed data.</p>
+
+<p>In order to verify a signature you need to have the public key for the person who signed the data. Hence utilising multiple GPG profiles makes this easier to demonstrate. So let&#39;s start by creating a secret file:</p>
+
+<pre><code class="language-bash">echo foobar &gt; secret.txt
 </code></pre>
+
+<p>OK, so let&#39;s begin with a clearsign signature:</p>
+
+<pre><code class="language-bash">gpg --local-user Bob --clearsign secret.txt 
+</code></pre>
+
+<p>Once we run this command we can see the file <code>secret.txt.asc</code> was created:</p>
+
+<pre><code class="language-bash">$ cat secret.txt.asc
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+foobar
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYIZjsAAoJEMtev7lWHIYbIWkP/jsqtpP7FzWzrS1r4ABgKjG3
+QCME6XtISPo8IC2m0BZ57wJcE+zw86P7TigzwenwwNgcVsIMQi/u5TUA5IEp1sUa
+IBLk5lMFVWhbJryhgWz+qTGUsnnhu9vZUBjJddNe//Jr2sXlJUPxw+dHnOFGtDpR
+90nl+7/gf2+0IdsgX5FstIOfhZLeaeuI4O6NNlwn0GiZW4GirusGpfhP6xrPpYir
+GoK5D5v2A0uKfsmWdFA+1wxrk0H5eVghLKN6Ffy2PHIlQaUSzMlexpwzbls0rLlO
+UK445AlmZHIWWxc42iwCx9hjdtd+lTg4GXWz3r03iwp9L5pJkaqLFBDpLr3MSdm8
+kyMqIevZ9AM3thtQ6T9NFmMVpMGcpjvacy6HxJ0r3eWsQNMXfKcZo1AtcKz0Icqw
+tGaO07gcKBdkdwf2+XwTqm/x4LZZFyKsaXJReuQoEWd2+mJJLqgSy4cgfaBKX1e3
+YF8ES6RSIeDmxcDaUx9exBkRsj1l0Ot7AYCRmCdYo+CYUBARag3OWswGNwPQ2TLd
+c3DoNmbApzPG0V5VTbjarSWuiBCjcY5PfYDGkM2+IOaPL9LmZKDzeEGeaQiJ4k7a
+lBqmqvAB6mQ2ZSHGywCUogbg9pwDV6UY93o10QRR8OapmXqW+H0FRkFsH/Sz1yff
+J4rLy4J820CAFgUKaUfx
+=KdyK
+-----END PGP SIGNATURE-----
+</code></pre>
+
+<p>Alice can now verify the file was signed by Bob (as she has Bob&#39;s public key already):</p>
+
+<pre><code class="language-bash">$ gpg --local-user Alice --verify secret.txt.asc 
+
+gpg: Signature made Tue Nov  8 09:20:44 2016 GMT using RSA key ID 561C861B
+gpg: Good signature from &quot;Profile 1 (Bob) &lt;example@integralist.co.uk&gt;&quot; [ultimate]
+gpg: WARNING: not a detached signature; file &#39;secret.txt&#39; was NOT verified!
+</code></pre>
+
+<p>The downside to using a clearsign signature is that you have modified the file to <em>include</em> the signature. Meaning the file is no longer the same, and when signing data you shouldn&#39;t modify the data in order to do the signing. You now have to separate the file from the signature. The other problem is the file isn&#39;t compressed using clearsign, which reduces the usecase further.</p>
+
+<p>Let&#39;s look at the second type of signature, a &#39;detached signature&#39;:</p>
+
+<pre><code class="language-bash">gpg --local-user Bob --detach-sign secret.txt
+</code></pre>
+
+<p>So once you run this command you&#39;ll find a <code>secret.txt.sig</code> file has been generated (the <code>secret.txt</code> also hasn&#39;t been encrypted). You can&#39;t see the contents of the <code>.sig</code> file as it has been compressed †</p>
 
 <blockquote>
-<p>Note: I added <code>--default-key &lt;email&gt;</code> because the default key isn&#39;t always the key I want to use for the signature</p>
+<p>† this is not the same as being &#39;encrypted&#39;, it is just compressed for the sake of performance and easier transportation</p>
 </blockquote>
 
-<p>We specify the recipient, but you could also add another <code>-r</code> and specify your own email so you&#39;re able to decrypt the data afterwards (this is because the message will otherwise be encrypted using Bob&#39;s public key).</p>
+<p>This is better than <code>--clearsign</code> as the original file hasn&#39;t been modified in order to produce the signature. But this does mean in order for Alice to verify the signature, she needs to have the original plaintext file.</p>
 
-<p>Once the file has been signed (it&#39;ll encrypt the file as well as if you&#39;d used <code>-e</code> or <code>--encrypt</code>, but you can use that flag as well if you prefer), then you can verify the signature using the following:</p>
+<pre><code class="language-bash">$ gpg --local-user Alice --verify secret.txt.sig
 
-<pre><code class="language-bash">gpg --verify secrets.txt.gpg
+gpg: assuming signed data in &#39;secret.txt&#39;
+gpg: Signature made Tue Nov  8 09:26:56 2016 GMT using RSA key ID 561C861B
+gpg: Good signature from &quot;Profile 1 (Bob) &lt;example@integralist.co.uk&gt;&quot; [ultimate]
 </code></pre>
 
-<p>This will output the following:</p>
+<p>Finally, let&#39;s consider &#39;attached signatures&#39;. This mechanism enforces the use of verification before you can use the file (hence why the signature is considered <em>attached</em> to the file). </p>
 
-<pre><code class="language-bash">gpg: Signature made Mon 17 Aug 17:37:58 2015 BST using RSA key ID BAE1D7F0
-gpg: Good signature from &quot;Mark McDonnell (Integralist) &lt;email@domain.com&gt;&quot;
+<p>In order for Bob to attach his signature (and thus making verification mandatory) is by using <code>--sign</code>. The attachment aspect is sort of theorectical in that it works by explicitly specifying <code>--encrypt</code>, and so if you didn&#39;t use that flag then this example becomes much like <code>--clearsign</code> but with the small benefit of being compressed.</p>
+
+<p>But if you do use <code>--encrypt</code> with <code>--sign</code> then Alice can&#39;t just use <code>--verify</code> by itself, she has to usecase <code>--decrypt</code>.</p>
+
+<pre><code class="language-bash">    gpg --local-user Bob --encrypt --recipient Personal --sign secret.txt
 </code></pre>
 
-<p>But if you want to decrypt the file as well, then use the standard <code>gpg secrets.txt.gpg</code></p>
+<p>Again, this generates a <code>secret.txt.gpg</code> file, but this time Alice must enter the passphrase for <em>her</em> private key in order to use the <code>--decrypt</code> flag as the file is no longer just &#39;compressed&#39; it is also &#39;encrypted&#39; as well (<code>--decrypt</code> doesn&#39;t just decrypt the encrypted file but also &#39;verifies&#39; its attached signature):</p>
+
+<pre><code class="language-bash">    gpg --local-user Alice --decrypt secret.txt.gpg_private
+</code></pre>
+
+<p>Which results in the following ouput:</p>
+
+<pre><code class="language-bash">    foobar
+gpg: Signature made Tue Nov  8 10:13:37 2016 GMT using RSA key ID 561C861B
+gpg: Good signature from &quot;Profile 1 (Bob) &lt;example@integralist.co.uk&gt;&quot; [ultimate]
+</code></pre>
+
+<p>All other uses of <code>--decrypt</code> simply meant <em>decompress</em> the file, hence no passphrase was required. This also explains why Bob had to explicitly specify <code>--recipient</code> when using <code>--encrypt</code>.</p>
+
+<blockquote>
+<p>Note: in all these examples I use <code>--local-user</code> to change the GPG profile.<br>
+But you could also use <code>--default-key</code> if you wanted</p>
+</blockquote>
 
 <h4>Revoking Keys</h4>
 
