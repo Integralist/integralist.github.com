@@ -632,3 +632,17 @@
 .markdown-body pre + blockquote {
     margin-top: 1.3em;
 }
+
+/* dark theme override */
+
+body {
+	background: #222;
+}
+
+.markdown-body {
+    color: #CCC;
+}
+
+.markdown-body a {
+	color: #CCAD00;
+}
