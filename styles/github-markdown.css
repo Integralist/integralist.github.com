@@ -647,3 +647,8 @@ body {
 .markdown-body code {
 	color: #CCAD00;
 }
+
+.markdown-body table th,
+.markdown-body table td {
+  color: #333;
+}
