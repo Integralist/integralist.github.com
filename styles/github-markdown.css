@@ -650,5 +650,5 @@ body {
 
 .markdown-body table th,
 .markdown-body table td {
-  color: #333;
+  color: #333 !important;
 }
