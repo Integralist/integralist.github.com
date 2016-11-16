@@ -643,6 +643,7 @@ body {
     color: #CCC;
 }
 
-.markdown-body a {
+.markdown-body a,
+.markdown-body code {
 	color: #CCAD00;
 }
