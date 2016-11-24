@@ -88,7 +88,7 @@
 <p><a href="https://github.com/Integralist/dotfiles/tree/master/terminal-themes">github.com/integralist/dotfiles</a></p>
 
 <blockquote>
-<p>Note: currently using Smyck</p>
+<p>Update: I&#39;m now using my own custom theme <a href="https://github.com/Integralist/mac-os-terminal-theme-integralist">integralist</a></p>
 </blockquote>
 
 <p>To install them, download the <code>.terminal</code> file you want and double click on it.</p>
@@ -136,13 +136,19 @@
 
 <p>In order for the terminal to pick up my actual user configuration for Bash I needed to modify the file <code>~/.bash_profile</code>. The specific change I add to this file is as follows:</p>
 
-<pre><code class="language-bash">if [ -f $HOME/.bashrc ]; then
+<pre><code class="language-bash">#!/usr/bin/env bash
+
+if [ -f &quot;$HOME/.bashrc&quot; ]; then
   source ~/.bashrc
-  cd .
+  cd . || exit
 fi
 </code></pre>
 
-<p>What this will do is check if there is a <code>~/.bashrc</code> file, and if so &#39;source&#39; it into the currently running shell.</p>
+<blockquote>
+<p>Note: I use <code>/usr/bin/env</code> to identify my new brew installed version of Bash</p>
+</blockquote>
+
+<p>What this code will do is check if there is a <code>~/.bashrc</code> file, and if so &#39;source&#39; it into the currently running shell.</p>
 
 <blockquote>
 <p>Note: <code>cd .</code> isn&#39;t necessary, I just like using it<br>
@@ -151,8 +157,8 @@ e.g. each new shell will reset the location back to <code>$HOME</code></p>
 
 <p>One other thing I add to <code>~/.bash_profile</code> is the following snippet of code:</p>
 
-<pre><code class="language-bash">if [ -f $(brew --prefix)/etc/bash_completion ]; then
-  source $(brew --prefix)/etc/bash_completion
+<pre><code class="language-bash">if [ -f &quot;$(brew --prefix)/etc/bash_completion&quot; ]; then
+  source &quot;$(brew --prefix)/etc/bash_completion&quot;
 fi
 </code></pre>
 
@@ -166,33 +172,37 @@ fi
 
 <p>The <code>~/.bashrc</code> file is the main container of our configuration. It&#39;ll determine things like the appearance of the shell&#39;s prompt, keybindings for moving the cursor around, how we handle the shell&#39;s history and many other things.</p>
 
-<p>I&#39;m going to just leave this whole file here and let the comments speak for themselves...</p>
+<p>I&#39;m going to just leave this whole file here and let the comments speak for themselves, but I encourage you to view the <a href="https://github.com/Integralist/dotfiles/blob/master/.bashrc">current version in my dotfiles repo</a> as it&#39;ll be up to date and include any fixes/tweaks...</p>
 
 <blockquote>
 <p>Note: Google is your friend for any Bash voodoo you&#39;re unsure on</p>
 </blockquote>
 
-<pre><code class="language-bash"># download from https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
+<pre><code class="language-bash">#!/usr/bin/env bash
+
+# https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
 source ~/.git-prompt.sh
+
+# https://github.com/jarun/googler/blob/master/auto-completion/bash/googler-completion.bash
+source ~/googler-completion.bash
+
+# https://git.zx2c4.com/password-store/plain/src/completion/pass.bash-completion
+source /usr/local/etc/bash_completion.d/password-store
 
 # tells Readline to perform filename completion in a case-insensitive fashion
 bind &quot;set completion-ignore-case on&quot;
 
-# filename matching during completion 
-# will treat hyphens and underscores as equivalent
+# filename matching during completion will treat hyphens and underscores as equivalent
 bind &quot;set completion-map-case on&quot;
 
-# will get Readline to display all possible matches 
-# for an ambiguous pattern at the 
-# first &lt;Tab&gt; press instead of at the second
+# will get Readline to display all possible matches for an ambiguous pattern at the first &lt;Tab&gt; press instead of at the second
 bind &quot;set show-all-if-ambiguous on&quot;
 
 # no bell sound on error
 bind &quot;set bell-style none&quot;
 
-# enable vi like bindings
-# http://blog.sanctum.geek.nz/vi-mode-in-bash/
-set -o vi
+# enable emacs like bindings (&lt;C-a&gt; and &lt;C-e&gt; for start and end of line shortcuts)
+set -o emacs
 
 # append to the history file, don&#39;t overwrite it
 shopt -s histappend
@@ -216,140 +226,238 @@ shopt -s extglob 2&gt;/dev/null
 # include .files when globbing.
 shopt -s dotglob 2&gt;/dev/null
 
+# case insensitive globbing
+shopt -s nocaseglob 2&gt;/dev/null
+
+# can be useful to utilise the gnu style error message format
+shopt -s gnu_errfmt 2&gt;/dev/null
+
+# ensure SIGHUP is sent to all jobs when an interactive login shell exits
+shopt -s huponexit 2&gt;/dev/null
+
 # specify other paths to look inside of when autocompleting
-CDPATH=&quot;.:~/Projects&quot;
+CDPATH=&quot;.:~/code&quot;
 
 # custom environment variables
 export DROPBOX=&quot;$HOME/Dropbox&quot;
 export GITHUB_USER=&quot;integralist&quot;
-export CERT_PATH=&quot;$HOME/.pki&quot;
 
 # application configuration
+export GOOGLER_COLORS=bjdxxy # https://github.com/jarun/googler/
+export LSCOLORS=&quot;dxfxcxdxbxegedabagacad&quot; # http://geoff.greer.fm/lscolors/
 export GREP_OPTIONS=&quot;--color=auto&quot;
 export GREP_COLOR=&quot;1;32&quot;
 export MANPAGER=&quot;less -X&quot; # Don&#39;t clear the screen after quitting a manual page
-export DOCKER_TLS_VERIFY=1
-export GOPATH=$HOME/Projects/golang
-export PATH=$HOME/Projects/golang/bin/:$HOME/dotvim/voom:$PATH
+export GOPATH=$HOME/code/go
+export PATH=$HOME/code/go/bin:$HOME/dotvim/voom:/usr/local/sbin:$PATH
 export EDITOR=&quot;vim&quot;
-
-# record each line as it gets issued
-export PROMPT_COMMAND=&#39;history -a&#39;
-
-# set a larger history
-export HISTSIZE=500000
-export HISTFILESIZE=100000
-
-# avoid duplicate entries
-export HISTCONTROL=&quot;erasedups:ignoreboth&quot;
-
-# don&#39;t record some commands
-export HISTIGNORE=&quot;&amp;:[ ]*:exit:ls:bg:fg:history&quot;
-
-# useful timestamp format
-export HISTTIMEFORMAT=&#39;%F %T &#39;
+export HOMEBREW_NO_ANALYTICS=1
+export SSH_PUBLIC_KEY=&quot;$HOME/.ssh/github_rsa.pub&quot;
 
 # git specific configurations
 export GIT_PS1_SHOWCOLORHINTS=true
-export GIT_PS1_SHOWDIRTYSTATE=true     # * for unstage changes (+ staged but uncommitted changes)
+export GIT_PS1_SHOWDIRTYSTATE=true     # * for unstaged changes (+ staged but uncommitted changes)
 export GIT_PS1_SHOWSTASHSTATE=true     # $ for stashed changes
 export GIT_PS1_SHOWUNTRACKEDFILES=true # % for untracked files
 export GIT_PS1_SHOWUPSTREAM=&quot;auto&quot;     # &gt; for local commits on HEAD not pushed to upstream
                                        # &lt; for commits on upstream not merged with HEAD
                                        # = HEAD points to same commit as upstream
 
-# Colored man pages
-export LESS_TERMCAP_mb=$&#39;\E[01;31m&#39;
-export LESS_TERMCAP_md=$&#39;\E[01;31m&#39;
-export LESS_TERMCAP_me=$&#39;\E[0m&#39;
-export LESS_TERMCAP_se=$&#39;\E[0m&#39;
-export LESS_TERMCAP_so=$&#39;\E[01;44;33m&#39;
-export LESS_TERMCAP_ue=$&#39;\E[0m&#39;
-export LESS_TERMCAP_us=$&#39;\E[01;32m&#39;
+# history configuration
+history -a # record each line as it gets issued
+export HISTSIZE=500000
+export HISTFILESIZE=100000
+export HISTCONTROL=&quot;erasedups:ignoreboth&quot; # avoid duplicate entries
+export HISTIGNORE=&quot;&amp;:[ ]*:exit:ls:bg:fg:history&quot; # don&#39;t record some commands
+export HISTTIMEFORMAT=&#39;%F %T &#39; # useful timestamp format
 
 # force colours
-force_color_prompt=yes
+export force_color_prompt=yes
 
 # use colour prompt
-color_prompt=yes
+export color_prompt=yes
 
-# display number of backgrounded processes/jobs
-num_jobs=$(jobs | wc -l)
-if [ $num_jobs -eq 0 ]; then
-  num_jobs=&quot;&quot;
-else
-  num_jobs=&quot; (\j)&quot;
-fi
+# \e indicates escape sequence (sometimes you&#39;ll see \033)
+# the m indicates you&#39;ve provided a colour sequence
+#
+# 30: Black
+# 31: Red
+# 32: Green
+# 33: Yellow
+# 34: Blue
+# 35: Purple
+# 36: Cyan
+# 37: White
+#
+# a semicolon allows additional attributes:
+#
+# 0: Normal text
+# 1: Bold or light, depending on terminal
+# 4: Underline text
+#
+# there are also background colours (put before additional attributes with ; separator):
+#
+# 40: Black background
+# 41: Red background
+# 42: Green background
+# 43: Yellow background
+# 44: Blue background
+# 45: Purple background
+# 46: Cyan background
+# 47: White background
 
 function prompt_right() {
-  # need the correct number of spaces after \A to allow for 00:00 time display
-  # echo -e &quot;\e[0;36m\A   \e[0m&quot;
   echo -e &quot;&quot;
 }
+
 function prompt_left() {
-  # __git_ps1 function sourced from ~/.git-prompt.sh
-  echo -e &quot;\e[33m\]\u. \[\e[37m\]\w\[\e[00m\]$num_jobs\e[31m\]$(__git_ps1)\e[00m\] \e[0;32m\A\e[0m&quot;
+  num_jobs=$(jobs | wc -l)
+
+  if [ &quot;$num_jobs&quot; -eq 0 ]; then
+    num_jobs=&quot;&quot;
+  else
+    num_jobs=&quot; (\j)&quot;
+  fi
+
+  echo -e &quot;\e[33m\]\u. \[\e[37m\]\w\[\e[00m\]$num_jobs\e[31m\]$(__git_ps1)\e[00m\] \e[0;37m(\A)\e[0m&quot;
 }
 
-# the prompt will look something like:
-# &lt;user&gt; &lt;current_path&gt; &lt;git_branch&gt; &lt;current_time&gt;
 function prompt() {
-    compensate=11
-    PS1=$(printf &quot;%*s\r%s\n\$ &quot; &quot;$(($(tput cols)+${compensate}))&quot; &quot;$(prompt_right)&quot; &quot;$(prompt_left)&quot;)
+  compensate=11
+  unset PS1
+  PS1=$(printf &quot;%*s\r%s\n\$ &quot; &quot;$(($(tput cols)+compensate))&quot; &quot;$(prompt_right)&quot; &quot;$(prompt_left)&quot;)
 }
 
-# override builtin cd command so it resets command prompt when changing directories
-function cd {
-  builtin cd &quot;$@&quot;
-  RET=$?
-
-  PROMPT_COMMAND=prompt
-
-  # After each command, append to the history file and reread it
-  export PROMPT_COMMAND=&quot;${PROMPT_COMMAND:+$PROMPT_COMMAND$&#39;\n&#39;}history -a; history -c; history -r&quot;
-
-  return $RET
-}
-
-# run a Rubocop Docker container
-# https://github.com/bbatsov/rubocop
 function rubo() {
   docker run \
     --cpu-shares 1024 \
     --rm=true \
-    --volume $(pwd):/app \
+    --volume &quot;$(pwd):/app&quot; \
     bbcnews/rubocop-config --format simple --fail-level F | grep &#39;^F:\|==&#39;
 }
 
-# list all dotfiles
+function toggle_hidden() {
+  setting=$(defaults read com.apple.finder AppleShowAllFiles)
+
+  if [ &quot;$setting&quot; == &quot;NO&quot; ]; then
+    echo &quot;Enabling hidden files&quot;
+    defaults write com.apple.finder AppleShowAllFiles YES
+  else
+    echo &quot;Disabling hidden files&quot;
+    defaults write com.apple.finder AppleShowAllFiles NO
+  fi
+
+  killall Finder
+}
+
+function gms() {
+  git merge --squash &quot;$1&quot;
+}
+
+function dash {
+  local docs=$1
+  local query=$2
+  open &quot;dash://$docs:$query&quot;
+}
+
+function gc {
+  if [ -z &quot;$1&quot; ]; then
+    printf &quot;\n\tUse: gc some-existing-branch-name\n&quot;
+  else
+    git checkout &quot;$1&quot;
+  fi
+}
+
+function gcb {
+  if [ -z &quot;$1&quot; ]; then
+    printf &quot;\n\tUse: gcb some-new-branch-name (branch will be created)\n&quot;
+  else
+    git checkout -b &quot;$1&quot;
+  fi
+}
+
+# We use _ to indicate an unused variable
+# Otherwise shellcheck will kick up a stink
+# shellcheck disable=SC2034
+read -r -d &#39;&#39; git_icons &lt;&lt;- EOF
+* unstaged changes
++ staged but uncommitted changes
+$ stashed changes
+% untracked files
+&gt; local commits on HEAD not pushed to upstream
+&lt; commits on upstream not merged with HEAD
+= HEAD points to same commit as upstream
+EOF
+
+# use `type &lt;alias&gt;` to see what is assigned to an alias/fn/builtin/keyword
+alias c=&quot;clear&quot;
 alias dotfiles=&quot;ls -a | grep &#39;^\.&#39; | grep --invert-match &#39;\.DS_Store\|\.$&#39;&quot;
-
-# get the latest git commit hash
 alias getcommit=&quot;git log -1 | cut -d &#39; &#39; -f 2 | head -n 1 | pbcopy&quot;
-
-# generate a ssh key pair
-alias sshkey=&quot;ssh-keygen -t rsa -b 4096 -C &#39;foobar@example.com&#39;&quot;
-
-# simpler than typing irssi
+alias sshkey=&quot;ssh-keygen -t rsa -b 4096 -C &#39;mark.mcdx@gmail.com&#39;&quot;
 alias irc=&quot;irssi&quot;
-
-# more descriptive ls and ll commands
 alias ls=&quot;ls -GpF&quot;
-alias ll=&quot;ls -laGpF&quot;
-
-# make it easier to update the current shell with new changes
+alias ll=&quot;ls -laGpFHh&quot;
 alias r=&quot;source ~/.bashrc&quot;
-
-# some basic git shortcuts
 alias cm=&quot;git checkout master&quot;
 alias c-=&quot;git checkout -&quot;
+alias gb=&quot;git branch&quot;
+alias gbd=&quot;git branch -D&quot;
+alias gcp=&quot;git cherry-pick -&quot;
+alias gpr=&quot;git pull --rebase origin master&quot;
+alias wat=&#39;echo &quot;$git_icons&quot;&#39;
+alias wut=&#39;echo &quot;$git_icons&quot;&#39;
+alias gitupstream=&quot;echo git branch -u origin/\&lt;branch\&gt;&quot;
+alias sshconfig=&#39;nvim -c &quot;norm 12ggVjjjgc&quot; -c &quot;wq&quot; ~/.ssh/config &amp;&amp; cat ~/.ssh/config | awk &quot;/switch/ {for(i=0; i&lt;=3; i++) {getline; print}}&quot;&#39;
+alias copy=&quot;tr -d &#39;\n&#39; | pbcopy&quot; # e.g. echo $DEV_CERT_PATH | copy
+alias be=&quot;bundle exec&quot;
+alias sshvm=&quot;ssh rig.dev&quot;
+alias drm=&#39;docker rm $(docker ps -a -q)&#39;
+alias drmi=&#39;docker rmi $(docker images -q)&#39;
+alias dns=&quot;scutil --dns | grep &#39;nameserver\[[0-9]*\]&#39;&quot;
+alias nvimupdate=&quot;brew reinstall --HEAD neovim&quot;
+alias pipall=&quot;pip freeze --local | grep -v &#39;^\-e&#39; | cut -d = -f 1  | xargs -n1 pip install -U&quot;
+alias uid=&#39;echo $(uuidgen)&#39;
+alias datesec=&#39;date +%s&#39;
 
-# use rbenv for managing my Ruby versions
-# https://github.com/rbenv/rbenv
 eval &quot;$(rbenv init -)&quot;
+eval &quot;$(pyenv init -)&quot;
 
-# use Docker Machine to manage my containers
-eval &quot;$(docker-machine env dev)&quot;
+# lazyload nvm
+# all props goes to http://broken-by.me/lazy-load-nvm/
+# grabbed from reddit @ https://www.reddit.com/r/node/comments/4tg5jg/lazy_load_nvm_for_faster_shell_start/
+
+lazynvm() {
+  unset -f nvm node npm
+  export NVM_DIR=~/.nvm
+  [ -s &quot;$NVM_DIR/nvm.sh&quot; ] &amp;&amp; . &quot;$NVM_DIR/nvm.sh&quot;  # This loads nvm
+}
+
+nvm() {
+  lazynvm
+  nvm &quot;$@&quot;
+}
+
+node() {
+  lazynvm
+  node &quot;$@&quot;
+}
+
+npm() {
+  lazynvm
+  npm &quot;$@&quot;
+}
+
+# Setup File Search AutoComplete (Ctrl-f, type to filter, arrow to look inside folders)
+[[ -s &quot;$HOME/.qfc/bin/qfc.sh&quot; ]] &amp;&amp; source &quot;$HOME/.qfc/bin/qfc.sh&quot;
+
+# https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh
+source ~/.bash-preexec.sh
+
+# preexec executes just BEFORE a command is executed
+# preexec() { echo &quot;just typed $1&quot;; }
+
+# precmd executes just AFTER a command is executed, but before the prompt is shown
+precmd() { prompt; }
 </code></pre>
 
 <p>All things considered, this covers a lot of ground for me. There&#39;s just one other piece I like to utilise...</p>
@@ -462,6 +570,10 @@ filetype plugin indent on
 
 <p>The configuration for all my plugins are placed directly inside my <code>~/.vimrc</code> file (shown below) along with all my other Vim settings. Again, I won&#39;t bother to detail every single item in my <code>~/.vimrc</code>; hopefully the comments will suffice. Otherwise Google anything you&#39;re unsure about:</p>
 
+<blockquote>
+<p>Note: again see my <a href="https://github.com/Integralist/dotfiles/blob/master/.vimrc">dotfiles repo for latest version</a></p>
+</blockquote>
+
 <pre><code class="language-ini">&quot; Use the system clipboard
 set clipboard+=unnamed
 
@@ -474,7 +586,6 @@ set nocompatible
 &quot; Disable Mouse (this is something that only recently affected me within NeoVim)
 &quot; Seemed using the mouse to select some text would make NeoVim jump into VISUAL mode?
 set mouse=
-
 &quot; No backup files
 set nobackup
 
@@ -566,6 +677,12 @@ set lazyredraw
 &quot; Highlight a matching [{()}] when cursor is placed on start/end character
 set showmatch
 
+&quot; &lt;C-x&gt;&lt;C-k&gt; for word autocomplete
+set dictionary=/usr/share/dict/words
+
+&quot; Use Ag for :grep command (would use Sift but it doesn&#39;t work well)
+set grepprg=ag\ --nogroup\ --nocolor
+
 &quot; Set built-in file system explorer to use layout similar to the NERDTree plugin
 &quot; P opens file in previously focused window
 &quot; o opens file in new horizontal split window
@@ -576,8 +693,50 @@ let g:netrw_liststyle=3
 execute pathogen#infect()
 filetype plugin indent on
 
-&quot; set background=dark
-colorscheme github
+let g:default_theme=&quot;gruvbox&quot;
+
+set background=dark
+execute &#39;colorscheme &#39; . g:default_theme
+
+&quot; http://pep8.readthedocs.io/en/latest/intro.html#error-codes
+&quot; https://github.com/PyCQA/pep8-naming
+let g:neomake_python_flake8_args = neomake#makers#ft#python#flake8()[&#39;args&#39;] + [&#39;--ignore&#39;, &#39;N802&#39;]
+
+&quot; http://pylint-messages.wikidot.com/all-codes
+&quot; http://pylint-messages.wikidot.com/all-messages
+let g:neomake_python_pylint_args = neomake#makers#ft#python#pylint()[&#39;args&#39;] + [&#39;-d&#39;, &#39;missing-docstring,invalid-name&#39;]
+
+&quot; Enable both default Python linters
+let g:neomake_python_enabled_makers = [&#39;flake8&#39;, &#39;pylint&#39;]
+
+&quot; https://github.com/koalaman/shellcheck/wiki/SC1091
+let g:neomake_sh_shellcheck_args = neomake#makers#ft#sh#shellcheck()[&#39;args&#39;] + [&#39;-e&#39;, &#39;SC1090,SC1091&#39;]
+let g:neomake_bash_enabled_makers = [&#39;shellcheck&#39;]
+
+let g:neomake_c_enabled_makers = [&#39;clang&#39;]
+
+let g:neomake_js_enabled_makers = [&#39;eslint&#39;]
+let g:neomake_js_eslint_args = [&#39;--config&#39;, &#39;~/eslint.config.js&#39;]
+
+&quot; General Neomake configuration
+let g:neomake_open_list=2
+let g:neomake_list_height=5
+let g:neomake_verbose=3
+
+&quot; Run Neomake whenever we enter or write a buffer
+autocmd BufWritePost,BufWinEnter * silent Neomake
+
+&quot; The following configuration is useful if you don&#39;t like
+&quot; the icons (which are provided by default) for highlighting errors/warnings
+&quot;
+&quot; let g:neomake_warning_sign = {
+&quot;   \ &#39;text&#39;: &#39;W&#39;,
+&quot;   \ &#39;texthl&#39;: &#39;WarningMsg&#39;,
+&quot;   \ }
+&quot; let g:neomake_error_sign = {
+&quot;   \ &#39;text&#39;: &#39;E&#39;,
+&quot;   \ &#39;texthl&#39;: &#39;ErrorMsg&#39;,
+&quot;   \ }
 
 &quot; vim-go
 let g:go_fmt_command = &quot;goimports&quot;
@@ -609,7 +768,10 @@ let g:ackprg = &#39;ag --nogroup --nocolor --column&#39;
 runtime macros/matchit.vim
 
 &quot; vim-commentary
-map &lt;leader&gt;&lt;leader&gt;&lt;leader&gt; gcc
+xmap &lt;leader&gt;&lt;leader&gt;&lt;leader&gt; &lt;Plug&gt;Commentary
+nmap &lt;leader&gt;&lt;leader&gt;&lt;leader&gt; &lt;Plug&gt;Commentary
+omap &lt;leader&gt;&lt;leader&gt;&lt;leader&gt; &lt;Plug&gt;Commentary
+nmap &lt;leader&gt;&lt;leader&gt;&lt;leader&gt; &lt;Plug&gt;CommentaryLine
 
 &quot; gist
 let g:github_user = $GITHUB_USER
@@ -624,8 +786,15 @@ sunmap w
 sunmap b
 sunmap e
 
+&quot; nofrils
+let g:nofrils_strbackgrounds=1 &quot; enable highlighting of strings and mispellings
+
 &quot; NeoVim shortcut for quick terminal exit
 :silent! tnoremap &lt;Esc&gt; &lt;C-\&gt;&lt;C-n&gt;
+
+&quot; Allow substitutions to dynamically be represented in the buffer
+&quot; https://asciinema.org/a/92207
+:silent! set inccommand=nosplit
 
 fun! StripTrailingWhitespace()
   &quot; Don&#39;t strip on these filetypes
@@ -636,13 +805,28 @@ fun! StripTrailingWhitespace()
 endfun
 autocmd BufWritePre * call StripTrailingWhitespace()
 
-autocmd Filetype gitcommit setlocal spell textwidth=72
-autocmd Filetype markdown setlocal wrap linebreak nolist textwidth=0 wrapmargin=0 &quot; http://vim.wikia.com/wiki/Word_wrap_without_line_breaks
+autocmd FileType gitcommit setlocal spell textwidth=72
+autocmd FileType markdown setlocal wrap linebreak nolist textwidth=0 wrapmargin=0 &quot; http://vim.wikia.com/wiki/Word_wrap_without_line_breaks
 autocmd FileType sh,cucumber,ruby,yaml,zsh,vim setlocal shiftwidth=2 tabstop=2 expandtab
+autocmd FileType php,python setlocal shiftwidth=4 tabstop=4 expandtab
+
+&quot; See `:h fo-table` for details of formatoptions `t` to force wrapping of text
+autocmd FileType python,ruby,go,sh,javascript setlocal textwidth=79 formatoptions+=t
+
+&quot; Set different colorscheme for Bash and VimL scripts
+autocmd BufEnter *.sh,*.vimrc,*.txt colorscheme github
+autocmd BufLeave *.sh,*.vimrc,*.txt execute &#39;set background=dark&#39; | execute &#39;colorscheme &#39; . g:default_theme
 
 &quot; Specify syntax highlighting for specific files
 autocmd Bufread,BufNewFile *.spv set filetype=php
 autocmd Bufread,BufNewFile *.md set filetype=markdown &quot; Vim interprets .md as &#39;modula2&#39; otherwise, see :set filetype?
+
+&quot; Run Goyo plugin on Markdown files for when I&#39;m writing blog posts
+autocmd Bufread,BufEnter *.md,*.txt execute &#39;normal zR&#39; | execute &#39;Goyo&#39;
+autocmd BufLeave *.md,*.txt execute &#39;Goyo!&#39;
+
+&quot; Automatically reload vimrc when it&#39;s saved
+&quot; autocmd BufWritePost .vimrc so ~/.vimrc
 
 &quot; Rainbow parenthesis always on!
 autocmd VimEnter * if exists(&#39;:RainbowParenthesesToggle&#39;) | exe &quot;:RainbowParenthesesToggleAll&quot; | endif
