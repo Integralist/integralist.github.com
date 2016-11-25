@@ -157,12 +157,12 @@
 
 <p>Alternatively, you can search multiple specific sections:</p>
 
-<pre><code class="language-bash">man 1:2 chmod
+<pre><code class="language-bash">man -S 1:2 chmod
 </code></pre>
 
 <p>The above command will search through only sections 1 and 2, but it will still stop at the first match it finds so the above command is no different in outcome than just <code>man chmod</code>.</p>
 
-<p>But if you know for sure that the command you&#39;re looking for is somewhere within either the system call or C library manual pages, then <code>man 2:3 &lt;your_command&gt;</code> would prevent a command from manual section 1 getting matched first.</p>
+<p>But if you know for sure that the command you&#39;re looking for is somewhere within either the system call or C library manual pages, then <code>man -S 2:3 &lt;your_command&gt;</code> would prevent a command from manual section 1 getting matched first.</p>
 
 <blockquote>
 <p>Note: to see the intro page for a section use <code>man &lt;n&gt; intro</code></p>
