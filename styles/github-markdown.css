@@ -648,7 +648,32 @@ body {
 	color: #CCAD00;
 }
 
+.markdown-body a {
+	text-decoration: underline;
+}
+
+.markdown-body a:hover {
+	text-decoration: none;
+}
+
+
 .markdown-body table th,
 .markdown-body table td {
   color: #333 !important;
+}
+
+.markdown-body .top-nav {
+	float: right;
+}
+
+.markdown-body .top-nav li {
+  display: inline-block;
+}
+
+.markdown-body .top-nav li:before {
+  content: "| "
+}
+
+.markdown-body .top-nav:after {
+  content: " |"
 }

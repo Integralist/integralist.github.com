@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Man Pages</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism-default.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+
+            pre[class*="language-"] {
+              border: 1px dashed #AAA;
+              margin-bottom: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+          <ul class="top-nav">
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts/about.html">About Me</a></li>
+              <li><a href="https://github.com/integralist">GitHub</a></li>
+              <li><a href="https://twitter.com/integralist">Twitter</a></li>
+              <li><a href="http://www.integralist.co.uk/resume">Resume</a></li>
+          </ul>
+
+<h1>Man Pages</h1>
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Sections</a></li>
+<li><a href="#3">Sub sections</a></li>
+<li><a href="#4">Accessing different sections</a></li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>Your operating system provides manual pages that explain what specific commands do and where they can be located on your computer.</p>
+
+<p>Most of us are at least familiar with opening a terminal and typing:</p>
+
+<pre><code class="language-bash">man &lt;some_command&gt;
+</code></pre>
+
+<p>But you might be confused, when you see a manual page informing you to check out <code>&lt;another_command&gt;(2)</code>. For example, you might be shown the message at the end of a man page that says <code>See also: chmod(2)</code>.</p>
+
+<p>If you try that, it won&#39;t work:</p>
+
+<pre><code class="language-bash">man chmod(2)
+</code></pre>
+
+<p>So let&#39;s understand why that is and what it means.</p>
+
+<div id="2"></div>
+
+<h2>Sections</h2>
+
+<p>So the manual pages are separated into &#39;sections&#39;. This is what the number within the parentheses represents (i.e. <code>chmod(2)</code> represents the <code>chmod</code> command from section 2 of the OS manual).</p>
+
+<p>To find where your manual pages are stored:</p>
+
+<pre><code class="language-bash">cd /usr/share/man
+</code></pre>
+
+<p>A simple <code>ls</code> will show that on my OS (macOS) I have nine manuals:</p>
+
+<pre><code class="language-bash">man1/   man2/   man3/   man4/   man5/   man6/   man7/   man8/   man9/
+</code></pre>
+
+<p>Each manual section has an introduction page † that explains what the section covers. These (taken from my OS) are as follows:</p>
+
+<ul>
+<li>man1: introduction to general commands (tools and utilities)</li>
+<li>man2: introduction to system calls and error numbers</li>
+<li>man3: introduction to the C libraries</li>
+<li>man4: contains documentation on special files and sockets</li>
+<li>man5: introduction to file formats</li>
+<li>man6: contains documentation about games and other miscellaneous fun programs</li>
+<li>man7: miscellaneous information pages</li>
+<li>man8: introduction to system maintenance and operation commands</li>
+<li>man9: introduction to system kernel interfaces</li>
+</ul>
+
+<blockquote>
+<p>† except for manual sections 4 and 6. I had to go to the online reference for <a href="https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/">macOS</a> in order to find out what they contained</p>
+</blockquote>
+
+<p>If you wanted to know &#39;at a glance&#39; what commands were available, then you could install the <code>tree</code> command and execute it at the current directory (<code>/usr/share/man</code>) and this would show you something like the following (cut short for brevity):</p>
+
+<pre><code class="language-bash">    .
+    ├── man1
+    │   ├── ab.1
+    │   ├── accesstool.1
+    │   ├── addftinfo.1
+    │   ├── afconvert.1
+    │   ├── afhash.1
+    │   ├── afida.1
+    │   ├── afinfo.1
+    ├── man2
+    │   ├── accept.2
+    │   ├── access.2
+    │   ├── acct.2
+    │   ├── adjtime.2
+    │   ├── aio_cancel.2
+    │   ├── aio_error.2
+    │   ├── aio_read.2
+</code></pre>
+
+<div id="3"></div>
+
+<h2> Sub sections</h2>
+
+<p>You&#39;ll notice that most page files within each manual section have an extension that matches the section they&#39;re contained within (e.g. <code>ab.1</code> for <code>ab</code> command inside manual 1 or <code>aio_read.2</code> for <code>aio_read</code> command inside manual 2).</p>
+
+<p>What&#39;s interesting is that there are some files, such as <code>httpdstat.d.1m</code> (which is inside manual section 1) that have a different extension (<code>d.1m</code>) or <code>asn1parse.1ssl</code> (<code>1ssl</code>).</p>
+
+<p>By looking back at the <a href="https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/">online macOS manual pages reference</a> I noticed there were additional sub sections:</p>
+
+<ul>
+<li><u>Section 1m</u>: contains documentation for tools built on top of DTrace</li>
+<li><u>Section 1ssl</u>: contains documentation on tools that are part of OpenSSL</li>
+<li><u>Section 1tcl</u>: contains documentation on tools that are part of Tcl</li>
+<li><u>Section 3cc</u>: contains documentation on the Common Crypto API</li>
+<li><u>Section 3pcap</u>: contains documentation on the packet capture library, libpcap</li>
+<li><u>Section 3pm</u>: contains documentation on Perl modules</li>
+<li><u>Section 3ssl</u>: contains documentation on OpenSSL C library routines</li>
+<li><u>Section 3tcl</u>: contains documentation on Tcl/Tk C library routines</li>
+<li><u>Section 3x</u>: contains documentation on curses-related C library routines</li>
+<li><u>Section 5ssl</u>: contains documentation on SSL-specific configuration file formats</li>
+<li><u>Section 7ssl</u>: miscellaneous SSL documentation section</li>
+<li><u>Section n</u>: contains documentation about Tcl/Tk</li>
+<li><u>Section ntcl</u>: contains documentation about Tcl/Tk</li>
+</ul>
+
+<div id="4"></div>
+
+<h2>Accessing different sections</h2>
+
+<p>Typically when we type <code>man &lt;some_command&gt;</code>, the <code>man</code> command will search all the sections looking for the specified command.</p>
+
+<p>It stops at the first match it finds. So there could be a scenario where you search for a command and you get the user space (top-level) entry command and not the &#39;system call&#39; version that actually interacts with your OS.</p>
+
+<p>The <code>chmod</code> command is a good example of that scenario.</p>
+
+<p>If you want to see the actual system call manual page for <code>chmod</code>, you need to search inside the specific section (which in this case is 2):</p>
+
+<pre><code class="language-bash">man 2 chmod
+</code></pre>
+
+<p>Alternatively, you can search multiple specific sections:</p>
+
+<pre><code class="language-bash">man 1:2 chmod
+</code></pre>
+
+<p>The above command will search through only sections 1 and 2, but it will still stop at the first match it finds so the above command is no different in outcome than just <code>man chmod</code>.</p>
+
+<p>But if you know for sure that the command you&#39;re looking for is somewhere within either the system call or C library manual pages, then <code>man 2:3 &lt;your_command&gt;</code> would prevent a command from manual section 1 getting matched first.</p>
+
+<blockquote>
+<p>Note: to see the intro page for a section use <code>man &lt;n&gt; intro</code></p>
+</blockquote>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
