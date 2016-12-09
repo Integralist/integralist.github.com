@@ -38,13 +38,28 @@
 <li><a href="#3">Understanding PKI</a></li>
 <li><a href="#4">OpenSSL vs OpenSSH</a></li>
 <li><a href="#5">What is GPG?</a></li>
-<li><a href="#6">Creating your own keys</a></li>
+<li><a href="#6">Creating your own keys</a>
+
+<ul>
+<li><a href="#6.1">OpenSSH</a></li>
+<li><a href="#6.2">OpenSSL</a></li>
+<li><a href="#6.3">GPG</a></li>
+</ul></li>
 <li><a href="#7">How to encrypt data using GPG, OpenSSL and Keybase</a>
 
 <ul>
-<li><a href="#7.1">GPG encryption</a></li>
+<li><a href="#7.1">GPG encryption</a>
+
+<ul>
+<li><a href="#7.1.1">Asymmetrical encryption</a></li>
+<li><a href="#7.1.2">Symmetrical encryption</a></li>
+<li><a href="#7.1.3">Key Signing</a></li>
+<li><a href="#7.1.4">Digital Signatures</a></li>
+<li><a href="#7.1.5">Revoking Keys</a></li>
+</ul></li>
 <li><a href="#7.2">OpenSSL encryption</a></li>
 <li><a href="#7.3">Keybase</a></li>
+<li><a href="#7.4">Which <em>should</em> I use?</a></li>
 </ul></li>
 <li><a href="#8">Creating, self-signing, issuing and revoking certificates</a></li>
 <li><a href="#9">Conclusion</a></li>
@@ -598,6 +613,8 @@ Alt-Svc: quic=&quot;www.google.com:443&quot;; p=&quot;1&quot;; ma=600,quic=&quot
 
 <p>So let&#39;s begin...</p>
 
+<div id="6.1"></div>
+
 <h3>OpenSSH</h3>
 
 <p>In the following example we&#39;re generating a new set of keys (public and private) using the RSA type and using 4096 bits for the key length. This is considered quite a secure set-up (anything less than 2048 bits is easily crackable in todays digital age):</p>
@@ -655,6 +672,8 @@ ssh -T git@github.com
 <p>Note: I also use the <code>-K</code> flag with <code>ssh-add</code> as that&#39;s specific to Mac OS X</p>
 </blockquote>
 
+<div id="6.2"></div>
+
 <h3>OpenSSL</h3>
 
 <p>Like with the OpenSSH example in the previous sub section, here we&#39;ll be generating a new set of keys (public and private) using the RSA type and using 4096 bits for the key length. The difference is that you have to generate the private key first and then extract the public key from it:</p>
@@ -667,6 +686,8 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 
 <pre><code class="language-bash">openssl rsa -text -in private_key.pem
 </code></pre>
+
+<div id="6.3"></div>
 
 <h3>GPG</h3>
 
@@ -789,6 +810,8 @@ default-recipient some-user-id # In case you happen to only ever communicate wit
 
 <p>GPG offers two forms of encryption: asymmetrical and symmetrical...</p>
 
+<div id="7.1.1"></div>
+
 <h4>Asymmetrical encryption</h4>
 
 <p>With GPG you&#39;ll need the recipients public key in order to encrypt files. So once you have the recipients public key you&#39;ll need to import it into GPG so you can reference it. To do that you&#39;ll use the following command:</p>
@@ -840,6 +863,8 @@ sub   4096R/A3FDEBC6 2016-05-24 [expires: 2017-05-24]
 <pre><code class="language-bash">gpg -o output_file -d some_encrypted_file.gpg
 </code></pre>
 
+<div id="7.1.2"></div>
+
 <h4>Symmetrical encryption</h4>
 
 <p>If you don&#39;t want to encrypt a file using your own key pair, you can use standard symmetrical encryption:</p>
@@ -885,6 +910,8 @@ Hash: MD5, SHA1, RIPEMD160, SHA256, SHA384, SHA512, SHA224
 Compression: Uncompressed, ZIP, ZLIB, BZIP2
 </code></pre>
 
+<div id="7.1.3"></div>
+
 <h4>Key Signing</h4>
 
 <p>GPG let&#39;s you &quot;sign&quot; a key, and which tells GPG you <em>trust</em> this key you have been provided (i.e. you have verified it belongs to who you think it should belong to). To sign a key you&#39;ve imported, simply run the following command and change the email to something relevant:</p>
@@ -903,6 +930,8 @@ Compression: Uncompressed, ZIP, ZLIB, BZIP2
 
 <pre><code class="language-bash">gpg --import &lt;file path&gt;
 </code></pre>
+
+<div id="7.1.4"></div>
 
 <h4>Digital Signatures</h4>
 
@@ -1012,6 +1041,8 @@ gpg: Good signature from &quot;Profile 1 (Bob) &lt;example@integralist.co.uk&gt;
 <p>Note: in all these examples I use <code>--local-user</code> to change the GPG profile.<br>
 But you could also use <code>--default-key</code> if you wanted</p>
 </blockquote>
+
+<div id="7.1.5"></div>
 
 <h4>Revoking Keys</h4>
 
@@ -1177,6 +1208,8 @@ gpg --encrypt -u 123 -r 456 secret.txt
 
 <pre><code class="language-bash">gpg -d secret.txt.gpg
 </code></pre>
+
+<div id="7.4"></div>
 
 <h3>Which <em>should</em> I use?</h3>
 
