@@ -43,7 +43,11 @@
 <ul>
 <li><a href="#6.1">OpenSSH</a></li>
 <li><a href="#6.2">OpenSSL</a></li>
-<li><a href="#6.3">GPG</a></li>
+<li><a href="#6.3">GPG</a>
+
+<ul>
+<li><a href="#6.3.1">Multiple Keys?</a></li>
+</ul></li>
 </ul></li>
 <li><a href="#7">How to encrypt data using GPG, OpenSSL and Keybase</a>
 
@@ -643,6 +647,12 @@ Alt-Svc: quic=&quot;www.google.com:443&quot;; p=&quot;1&quot;; ma=600,quic=&quot
 
 <p>One final change that can be made on your remote server (again, this could be handled by your devops or operations team) is to restrict logins to your server to <em>only</em> happen via SSH keys. To do this you need to log into the server and change the file <code>/etc/ssh/sshd_config</code> by locating the line that specifies <code>PermitRootLogin</code> and changing its value like so: <code>PermitRootLogin without-password</code>. From there you would run <code>reload ssh</code> for the changes to take immediate effect.</p>
 
+<blockquote>
+<p>Note: to find the fingerprint of your SSH key use:<br>
+<code>ssh-keygen -E md5 -lf ~/.ssh/your_rsa.pub</code><br>
+The <code>-E md5</code> provides output as shown by GitHub/GitLab</p>
+</blockquote>
+
 <h4>SSH Agent</h4>
 
 <p>Most operating systems have <code>ssh-agent</code> available. If you&#39;ve got <code>ssh-keygen</code> installed, then chances are you&#39;ll have the agent and other OpenSSH tools as well. The agent is used to store private keys used for public key authentication. It makes using SSH easier (a trade-off of security for convenience) by allowing you to specify your private key password once.</p>
@@ -797,6 +807,24 @@ sub   4096R/A1F3D5B6 2015-08-14 [expires: 2016-08-13]
 <pre><code class="language-ini">default-key 62DBDF62           # Personal
 default-recipient some-user-id # In case you happen to only ever communicate with one person
 </code></pre>
+
+<div id="6.3.1"></div>
+
+<h4>Multiple Keys?</h4>
+
+<p>Here&#39;s a quick question that people seem to ask a lot:</p>
+
+<blockquote>
+<p>I heard some people have multiple key pairs, one for &#39;signing&#39; and one for &#39;encryption&#39;. Why is that?</p>
+</blockquote>
+
+<p>The answer is that they will want to rotate their encryption key pair on a regular basis (you should not have a key pair that never expires or doesn&#39;t expire for a very long time) because if it becomes compromised (and you&#39;re unable to revoke) then you&#39;ve got serious problems. </p>
+
+<p>Equally, a company you work for might want to control your encryption key so that once you leave the organisation they can decrypt stuff you&#39;ve worked on previously. But if they have your key then you&#39;d need to create a new one for your personal interactions and means you couldn&#39;t build up a secure and well established identity outside of the company. </p>
+
+<p>In all these cases, it can be easier to just have a separate &#39;signing&#39; key pair that lasts for a long time. This ultimately becomes your <em>identify</em> that people trust. You then have separate keys for encrypting and you can digitally sign the encrypted content (which someone might not be able to trust as they don&#39;t recognise the key used) by using your long standing &#39;signing key&#39; (which you&#39;ve established as being <em>you</em>). </p>
+
+<p>Meaning, people can trust the encrypted content because they know it has been signed by a key they <em>do</em> recognise.</p>
 
 <div id="7"></div>
 

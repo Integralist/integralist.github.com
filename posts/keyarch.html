@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+        <title>Key Architecture</title>
+        <link rel="stylesheet" href="../styles/github-markdown.css">
+        <link rel="stylesheet" href="../styles/prism-default.css">
+        <style>
+            body {
+                min-width: 200px;
+                max-width: 790px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+
+            pre[class*="language-"] {
+              border: 1px dashed #AAA;
+              margin-bottom: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <article class="markdown-body">
+          <ul class="top-nav">
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../posts/about.html">About Me</a></li>
+              <li><a href="https://github.com/integralist">GitHub</a></li>
+              <li><a href="https://twitter.com/integralist">Twitter</a></li>
+              <li><a href="http://www.integralist.co.uk/resume">Resume</a></li>
+          </ul>
+
+<h1>Key Architecture</h1>
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Visual</a></li>
+<li><a href="#3">Breakdown</a></li>
+<li><a href="#4">Vulnerabilities?</a></li>
+<li><a href="#5">Conclusion</a></li>
+</ul>
+
+<div id="1"></div>
+
+<h2>Introduction</h2>
+
+<p>Just a quick post to cover the key architecture I&#39;m using currently. I&#39;m very interested to know how others are doing things in the hope that I can improve the security of my setup.</p>
+
+<blockquote>
+<p>Note: I&#39;m not a security paranoia nut, so I&#39;m not looking for the most concrete solution. But definitely want to be sure I&#39;m not missing anything obvious either</p>
+</blockquote>
+
+<div id="2"></div>
+
+<h2>Visual</h2>
+
+<p>Here is a high-level view of what I have currently:</p>
+
+<p><a href="../images/key-architecture.png">
+    <img src="../images/key-architecture.png">
+</a></p>
+
+<div id="3"></div>
+
+<h2>Breakdown</h2>
+
+<p>Let&#39;s start at the top...</p>
+
+<h3>Laptop</h3>
+
+<p>The laptop is password protected and the hard drive is automatically encrypted</p>
+
+<h3>Password Data Store</h3>
+
+<p>The laptop contains a password data store consisting of GPG keys for every record in the data store.</p>
+
+<p>In order to access the data store (or any of its records), you need a private GPG key.</p>
+
+<p>The data store is backed up to a private online git repository.</p>
+
+<h3>Private GPG Key</h3>
+
+<p>The private key is itself protected by a secure passphrase (i.e. one that is almost impossible to crack - by today&#39;s standards and recommendations - and I&#39;ve not written it down but memorised it entirely).</p>
+
+<p>The private/public key pair is stored on the laptop, but as the key is protected by a secure passphrase I feel (without going <em>over the top</em> on security) this is as good as I&#39;m probably going to get with it.</p>
+
+<p>The private key is also backed up onto a remote USB drive in case I lose my laptop and I need the key in order to access the data in the password data store.</p>
+
+<h3>Private Git Repository</h3>
+
+<p>The private git repo has two routes of access. The account itself with the relevant service provider and an SSH key that exists on my laptop to allow it to gain access to the contents of the repository (but not the contents of the files in the data store itself as they are protected by my private GPG key).</p>
+
+<p>The passphrase for both the account and the SSH key are secure (by today&#39;s standards and recommendations) and are stored inside the password data store.</p>
+
+<p>If my laptop was lost, then I&#39;d need to rely on the service provider&#39;s ability to reset my account password via email, where by I could then remove the existing SSH key and replace it with a new one.</p>
+
+<p>I mention replacing the SSH key because I don&#39;t back it up. I feel this SSH key doesn&#39;t need to be a long lasting key (unlike my private GPG key which I intend to keep as safe as possible + the offline backup as a fallback).</p>
+
+<div id="4"></div>
+
+<h2>Vulnerabilities?</h2>
+
+<p>There are a few layers to this architecture and so I&#39;m hoping this makes it harder for a compromise to be effective. </p>
+
+<p>If someone compromises my laptop (i.e. gets access to it), then they can&#39;t access the password data store as they can&#39;t access my private key.</p>
+
+<p>The only way to get my private key is to locate my remotely stored and safe USB that homes the raw private key contents.</p>
+
+<p>If someone compromises the private git repository, they again can&#39;t do anything with the contents without my private GPG key.</p>
+
+<div id="5"></div>
+
+<h2>Conclusion</h2>
+
+<p>So what do you think? Is this good, bad or just plain terrible?</p>
+
+<p>Please let me know your thoughts on twitter (<a href="https://twitter.com/integralist">@integralist</a>)</p>
+
+            <hr>
+            <h2>Links</h2>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../posts/about.html">About Me</a></li>
+                <li><a href="https://github.com/integralist">GitHub</a></li>
+                <li><a href="https://twitter.com/integralist">Twitter</a></li>
+                <li><a href="http://www.integralist.co.uk/resume">Resume</a></li>
+            </ul>
+        </article>
+        <script src="../scripts/prism.js"></script>
+        <script>
+            var _gaq=[['_setAccount','UA-33159515-1'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+    </body>
+</html>
