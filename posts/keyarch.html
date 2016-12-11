@@ -104,9 +104,17 @@
 
 <p>If someone compromises my laptop (i.e. gets access to it), then they can&#39;t access the password data store as they can&#39;t access my private key.</p>
 
+<blockquote>
+<p>Although a compromise <em>could</em> result in a key logger being installed and record what I type for my passphrase</p>
+</blockquote>
+
 <p>The only way to get my private key is to locate my remotely stored and safe USB that homes the raw private key contents.</p>
 
 <p>If someone compromises the private git repository, they again can&#39;t do anything with the contents without my private GPG key.</p>
+
+<blockquote>
+<p>Note: when exporting a private key from GPG, it is by default encrypted with its passphrase (it&#39;s not the raw key)</p>
+</blockquote>
 
 <div id="5"></div>
 
