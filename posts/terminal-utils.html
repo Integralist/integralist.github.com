@@ -706,8 +706,10 @@ total 0
 <pre><code class="language-bash">strace -e trace=open,connect,access lsof
 </code></pre>
 
+<p>You can also use <code>!</code> to negate the filter (see <code>man strace</code> for more details)</p>
+
 <blockquote>
-<p>Note: you can use <code>!</code> to negate the filter (see <code>man strace</code>)</p>
+<p>Note: if you try to use <code>grep</code> instead of <code>-e</code> then you&#39;ll need to ensure you redirect stderr to stdout or you wont see any output as strace sends to stderr by default; meaning you&#39;d need to execute something like <code>strace uptime 2&gt;&amp;1 | grep open</code></p>
 </blockquote>
 
 <p>You might also find that using the <code>-t</code> flag useful for tracking <em>when</em> the call was made:</p>
