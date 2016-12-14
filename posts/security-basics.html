@@ -989,7 +989,9 @@ Compression: Uncompressed, ZIP, ZLIB, BZIP2
 <pre><code class="language-bash">echo foobar &gt; secret.txt
 </code></pre>
 
-<p>OK, so let&#39;s begin with a clearsign signature:</p>
+<h5>clearsigned signatures</h5>
+
+<p>OK, so let&#39;s begin with Bob creating a clearsign signature:</p>
 
 <pre><code class="language-bash">gpg --local-user Bob --clearsign secret.txt 
 </code></pre>
@@ -1029,20 +1031,30 @@ gpg: Good signature from &quot;Profile 1 (Bob) &lt;example@integralist.co.uk&gt;
 gpg: WARNING: not a detached signature; file &#39;secret.txt&#39; was NOT verified!
 </code></pre>
 
-<p>The downside to using a clearsign signature is that you have modified the file to <em>include</em> the signature. Meaning the file is no longer the same, and when signing data you shouldn&#39;t modify the data in order to do the signing. You now have to separate the file from the signature. The other problem is the file isn&#39;t compressed using clearsign, which reduces the usecase further.</p>
+<p>The downside to using a clearsign signature is three fold:</p>
+
+<ol>
+<li>it&#39;s not encrypted data</li>
+<li>it&#39;s not the original file</li>
+<li>it&#39;s not compressed</li>
+</ol>
+
+<p>The first is obviously not great, but is OK if you don&#39;t care about the message being visible and you&#39;re only interested in proofing you signed it. The second item is a bigger problem in that you have modified the file to <em>include</em> the signature. Meaning the file is no longer the same, and when signing data you shouldn&#39;t modify the data in order to do the signing. The third item is equally not great depending on the size of the file and having to send a potentially large file over the network.</p>
+
+<h5>detached signatures</h5>
 
 <p>Let&#39;s look at the second type of signature, a &#39;detached signature&#39;:</p>
 
 <pre><code class="language-bash">gpg --local-user Bob --detach-sign secret.txt
 </code></pre>
 
-<p>So once you run this command you&#39;ll find a <code>secret.txt.sig</code> file has been generated (the <code>secret.txt</code> also hasn&#39;t been encrypted). You can&#39;t see the contents of the <code>.sig</code> file as it has been compressed †</p>
+<p>So once you run this command you&#39;ll find a <code>secret.txt.sig</code> file has been generated (the <code>secret.txt</code> still hasn&#39;t been encrypted). You can&#39;t see the contents of the <code>.sig</code> file as it has been compressed †</p>
 
 <blockquote>
 <p>† this is not the same as being &#39;encrypted&#39;, it is just compressed for the sake of performance and easier transportation</p>
 </blockquote>
 
-<p>This is better than <code>--clearsign</code> as the original file hasn&#39;t been modified in order to produce the signature. But this does mean in order for Alice to verify the signature, she needs to have the original plaintext file.</p>
+<p>This is better than <code>--clearsign</code> as the original file hasn&#39;t been modified in order to produce the signature. But this does mean in order for Alice to verify the signature, she needs to have the original plaintext file. If she doesn&#39;t, then you&#39;ll have to send her both the signature and the file.</p>
 
 <pre><code class="language-bash">$ gpg --local-user Alice --verify secret.txt.sig
 
@@ -1051,13 +1063,15 @@ gpg: Signature made Tue Nov  8 09:26:56 2016 GMT using RSA key ID 561C861B
 gpg: Good signature from &quot;Profile 1 (Bob) &lt;example@integralist.co.uk&gt;&quot; [ultimate]
 </code></pre>
 
+<h5>attached signatures</h5>
+
 <p>Finally, let&#39;s consider &#39;attached signatures&#39;. This mechanism enforces the use of verification before you can use the file (hence why the signature is considered <em>attached</em> to the file). </p>
 
-<p>In order for Bob to attach his signature (and thus making verification mandatory) is by using <code>--sign</code>. The attachment aspect is sort of theorectical in that it works by explicitly specifying <code>--encrypt</code>, and so if you didn&#39;t use that flag then this example becomes much like <code>--clearsign</code> but with the small benefit of being compressed.</p>
+<p>In order for Bob to attach his signature (and thus making verification mandatory) he must use <code>--sign</code>. The attachment aspect is sort of theorectical in that it works by explicitly specifying <code>--encrypt</code>, and so if you didn&#39;t use that flag then this example becomes much like <code>--clearsign</code> but with the small benefit of being compressed.</p>
 
-<p>But if you do use <code>--encrypt</code> with <code>--sign</code> then Alice can&#39;t just use <code>--verify</code> by itself, she has to usecase <code>--decrypt</code>.</p>
+<p>But if you do use <code>--encrypt</code> with <code>--sign</code> then Alice can&#39;t just use <code>--verify</code> by itself, she has to use <code>--decrypt</code>.</p>
 
-<pre><code class="language-bash">    gpg --local-user Bob --encrypt --recipient Personal --sign secret.txt
+<pre><code class="language-bash">    gpg --local-user Bob --encrypt --recipient Alice --sign secret.txt
 </code></pre>
 
 <p>Again, this generates a <code>secret.txt.gpg</code> file, but this time Alice must enter the passphrase for <em>her</em> private key in order to use the <code>--decrypt</code> flag as the file is no longer just &#39;compressed&#39; it is also &#39;encrypted&#39; as well (<code>--decrypt</code> doesn&#39;t just decrypt the encrypted file but also &#39;verifies&#39; its attached signature):</p>
