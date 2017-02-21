@@ -2898,6 +2898,38 @@ func main() {
 
 <h2>Shell Commands</h2>
 
+<p>Here is a simple example that writes the output of a command to a file:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;os&quot;
+  &quot;os/exec&quot;
+)
+
+func main() {
+  cmd := exec.Command(&quot;ls&quot;)
+
+  outfile, err := os.Create(&quot;./out.txt&quot;)
+  if err != nil {
+    panic(err)
+  }
+  defer outfile.Close()
+
+  cmd.Stdout = outfile
+  cmd.Stderr = outfile
+
+  err = cmd.Start()
+  if err != nil {
+    panic(err)
+  }
+
+  cmd.Wait()
+}
+</code></pre>
+
+<p>Here is an older example that printed the results of a command:</p>
+
 <pre><code class="language-go">var (
   cmdOut []byte
   err    error
