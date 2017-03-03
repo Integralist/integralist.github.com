@@ -473,7 +473,60 @@ func (enc *Encoder) Encode(v interface{}) error
 <p>Note: remember that your test file should have the same package name as your code being tested. This means the test file will have access to all the public functions and variables of that package (and so subsequently it&#39;ll have access to the code being tested)</p>
 </blockquote>
 
-<p>Here&#39;s our program:</p>
+<p>The following example program demonstrates how to mock an io function so that we&#39;re not reliant on reading from disk in our test suite.</p>
+
+<p>Here&#39;s the program:</p>
+
+<pre><code class="language-go">package main
+
+import (
+  &quot;fmt&quot;
+  &quot;io/ioutil&quot;
+)
+
+type fooIO func(string) ([]byte, error)
+
+func getContents(fio fooIO, path string) (string, error) {
+  f, err := fio(path)
+  if err != nil {
+    return &quot;&quot;, err
+  }
+  return string(f), nil
+}
+
+func main() {
+  contents, err := getContents(ioutil.ReadFile, &quot;example.txt&quot;)
+  if err != nil {
+    fmt.Println(err)
+  }
+  fmt.Println(contents)
+}
+</code></pre>
+
+<p>Here&#39;s the test:</p>
+
+<pre><code class="language-go">package main
+
+import &quot;testing&quot;
+
+var expectation = &quot;pretend to read from disk&quot;
+
+func fakeReadFileSuccess(path string) ([]byte, error) {
+  return []byte(expectation), nil
+}
+
+func TestIO(t *testing.T) {
+  contents, _ := getContents(fakeReadFileSuccess, &quot;dont-exist.txt&quot;)
+
+  if contents != expectation {
+    t.Errorf(&quot;Expected &#39;%s&#39; but got &#39;%s&#39;&quot;, expectation, contents)
+  }
+}
+</code></pre>
+
+<p>You could also probably use an interface there, but we&#39;ve gone with a <code>func</code> type.</p>
+
+<p>Here&#39;s another program that does something similar where we mock a function that expects a particular interface:</p>
 
 <pre><code class="language-go">package main
 
