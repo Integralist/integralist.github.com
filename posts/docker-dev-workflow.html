@@ -249,40 +249,49 @@ RUN time vim -c &quot;execute &#39;silent GoUpdateBinaries&#39; | execute &#39;q
 
 <p>Here&#39;s the Go Makefile (it works similarly to the Python one):</p>
 
-<pre><code class="language-make">copy_vim_files:
-  @if [ ! -d &quot;./.vim&quot; ]; then cp -r &quot;$$HOME/.vim&quot; ./.vim; fi
-  @if [ ! -f &quot;./.vimrc&quot; ]; then cp &quot;$$HOME/.vimrc&quot; ./.vimrc; fi
+<pre><code class="language-make">bin := &quot;/usr/local/bin/fastly&quot;
+vim_dir := &quot;./.vim&quot;
+vimrc := &quot;./.vimrc&quot;
+container_env := &quot;go-container-with-vim&quot;
+container_compiler := &quot;go-compiler&quot;
+
+copy_vim_files:
+  @if [ ! -d $(vim_dir) ]; then cp -r &quot;$$HOME/.vim&quot; $(vim_dir); fi
+  @if [ ! -f $(vimrc) ]; then cp &quot;$$HOME/.vimrc&quot; $(vimrc); fi
 
 remove_vim_files:
-  @rm -rf ./.vim
-  @rm ./.vimrc
+  @rm -rf $(vim_dir) &amp;&gt; /dev/null || true
+  @rm $(vimrc) &amp;&gt; /dev/null || true
+
+remove_compiled_files:
+  @rm ./fastly.{darwin,linux,windows.exe} &amp;&gt; /dev/null || true
+
+clean: remove_vim_files remove_compiled_files
+  @docker rmi -f $(container_env) &amp;&gt; /dev/null || true
+  @docker rmi -f $(container_compiler) &amp;&gt; /dev/null || true
+
+uninstall: clean
+  @rm $(bin) &amp;&gt; /dev/null || true
 
 build: copy_vim_files
-  @docker build -t go-container-with-vim .
+  @docker build -t $(container_env) .
 
-run: build remove_vim_files
-  @docker run -it -v &quot;$$(pwd)&quot;:/go/src go-container-with-vim /bin/bash
-
-clean: remove_vim_files
-  -@docker rmi -f go-container-with-vim &amp;&gt; /dev/null || true
-  -@rm ./app &amp;&gt; /dev/null || true
+dev: build remove_vim_files
+  @docker run -it -v &quot;$$(pwd)&quot;:/go/src $(container_env) /bin/bash
 
 rebuild: clean run
 
-uninstall: clean
-  -@rm /usr/local/bin/app &amp;&gt; /dev/null || true
-
-gobuild:
-  go build -o ./carbon
-
-install: gobuild
-  cp ./carbon  /usr/local/bin/carbon
-  rm ./carbon
-
 compile:
-  @docker build -t go-compiler -f ./Dockerfile-compile .
-  @docker run -it -v &quot;$$(pwd)&quot;:/go/src go-compiler || true
+  @docker build -t $(container_compiler) -f ./Dockerfile-compile .
+  @docker run -it -v &quot;$$(pwd)&quot;:/go/src $(container_compiler) || true
+
+copy_binary:
+  cp ./fastly.darwin $(bin)
+
+install: compile copy_binary remove_compiled_files
 </code></pre>
+
+<p>One thing I did this time was change the <code>make run</code> for <code>make dev</code> as I feel that&#39;s more indicative of what we&#39;re doing (the &#39;run&#39; suggests we&#39;re <em>running</em> our application when we&#39;re really just wanting to drop into a development environment).</p>
 
 <p>There&#39;s a few more steps in the Go Makefile and that&#39;s just for the purposes of having a separate Dockerfile for compiling our application. The following is the other Dockerfile we have in our project:</p>
 
@@ -290,18 +299,37 @@ compile:
 
 WORKDIR /go/src
 COPY ./Godeps /go/src
+COPY ./compile.sh /go/src
 
 RUN apt-get update &amp;&amp; apt-get install wget
 RUN wget https://raw.githubusercontent.com/pote/gpm/v1.4.0/bin/gpm &amp;&amp; chmod +x gpm &amp;&amp; mv gpm /usr/local/bin
 RUN gpm install
 RUN cp -r ./github.com /github.com  # backup packages to root to prevent volume mount removing it
 
-CMD [&quot;sh&quot;, &quot;-c&quot;, &quot;cp -fr /github.com ./github.com &amp;&amp; go build -o app . &amp;&amp; ./app&quot;]
+CMD [&quot;./compile.sh&quot;]
 </code></pre>
 
 <p>This Dockerfile does much the same thing: get dependency file, install those specified dependencies, then back them up to another directory.</p>
 
-<p>Finally, when the container is run we use a subshell to run multiple tasks at once (some people prefer having a dedicated run script for this, but whatever).</p>
+<p>This time though, when the container is run we use a separate script as the <code>CMD</code> value as our script was getting quite long (as you&#39;ll see).</p>
+
+<p>Here is the contents of <code>compile.sh</code>:</p>
+
+<blockquote>
+<p>Note: make sure you <code>chmod +x ./compile.sh</code> from your host</p>
+</blockquote>
+
+<pre><code class="language-bash">#!/bin/sh
+
+# copy packages back into our source code directory
+cp -fr /github.com ./github.com
+
+# compile application for the major operating systems
+gox -osarch=&#39;linux/amd64&#39; -osarch=&#39;darwin/amd64&#39; -osarch=&#39;windows/amd64&#39; -output=&#39;fastly.{{.OS}}&#39;
+
+# run the relevant compatible compiled binary for this container&#39;s OS
+./fastly.linux
+</code></pre>
 
 <p>The tasks we run are:</p>
 
@@ -312,7 +340,7 @@ CMD [&quot;sh&quot;, &quot;-c&quot;, &quot;cp -fr /github.com ./github.com &amp;
 </ol>
 
 <blockquote>
-<p>† this means our compiled binary will be a linux based binary, so you can&#39;t run it on your host machine if it&#39;s not linux based (e.g. I&#39;m using macOS). If you want to compiled for multiple OS&#39;s then consider using <a href="https://github.com/mitchellh/gox">Gox</a></p>
+<p>† this means our compiled binary will be a linux based binary, so you can&#39;t run it on your host machine if it&#39;s not linux based (e.g. I&#39;m using macOS). You&#39;ll see that to allow me to compiled my application for multiple OS&#39;s I&#39;ve installed <a href="https://github.com/mitchellh/gox">Gox</a></p>
 </blockquote>
 
 <p>Now here is our Go application, it simply uses the logging dependency we&#39;ve installed and that&#39;s it. Nothing too fancy necessary for this example.</p>
@@ -344,9 +372,10 @@ func main() {
 }
 </code></pre>
 
-<p>Here is our dependency file&#39;s content, where we can see the <a href="https://github.com/sirupsen/logrus">Logrus</a> dependency we&#39;ve specified:</p>
+<p>Here is our dependency file&#39;s content, where we can see the <a href="https://github.com/sirupsen/logrus">Logrus</a> dependency we&#39;ve specified (as well as Gox for the purposes of our container responsible for compiling our application for multiple OS&#39;):</p>
 
-<pre><code class="language-text">github.com/sirupsen/logrus 10f801ebc38b33738c9d17d50860f484a0988ff5
+<pre><code class="language-text">github.com/mitchellh/gox c9740af9c6574448fd48eb30a71f964014c7a837
+github.com/sirupsen/logrus 10f801ebc38b33738c9d17d50860f484a0988ff5
 </code></pre>
 
 <div id="4"></div>
