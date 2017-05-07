@@ -467,11 +467,37 @@ func (enc *Encoder) Encode(v interface{}) error
 
 <p>Run the tests: <code>go test -v ./...</code></p>
 
-<p>You can also run a specific test like so: <code>go test -v command/config_test.go command/config.go</code></p>
+<p>You can also run a specific test like so: <code>go test -v command/foo_test.go</code></p>
 
 <blockquote>
 <p>Note: remember that your test file should have the same package name as your code being tested. This means the test file will have access to all the public functions and variables of that package (and so subsequently it&#39;ll have access to the code being tested)</p>
 </blockquote>
+
+<p>Here is a simple test example:</p>
+
+<pre><code class="language-go">package foo
+
+import &quot;testing&quot;
+
+func TestBasics(t *testing.T) {
+  expect := &quot;abc&quot;
+  actual := &quot;def&quot;
+
+  if actual != expect {
+    t.Errorf(&quot;expected %s, actual %s&quot;, expect, actual)
+  }
+}
+</code></pre>
+
+<p>The output from running this test will be:</p>
+
+<pre><code class="language-text">=== RUN   TestBasics
+--- FAIL: TestBasics (0.00s)
+        foo_test.go:10: expected abc, actual def
+FAIL
+exit status 1
+FAIL    command-line-arguments  0.004s
+</code></pre>
 
 <p>The following example program demonstrates how to mock an io function so that we&#39;re not reliant on reading from disk in our test suite.</p>
 
