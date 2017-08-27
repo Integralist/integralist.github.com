@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Python Go Mounting Volumes  
+Introduction You&rsquo;re a software engineer with a new laptop.
+You&rsquo;re going to be writing code in multiple languages.
+You&rsquo;re going to have projects of varying dependencies.
+But you want to avoid the issues you&rsquo;ve had in the past:
+ Messy installations of lots of different software packages. Clogging up your system with programming language version managers.  You decide to use Docker.'>
+
+<meta property='og:title' content='Dev Environments Within Docker Containers ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Python Go Mounting Volumes  
+Introduction You&rsquo;re a software engineer with a new laptop.
+You&rsquo;re going to be writing code in multiple languages.
+You&rsquo;re going to have projects of varying dependencies.
+But you want to avoid the issues you&rsquo;ve had in the past:
+ Messy installations of lots of different software packages. Clogging up your system with programming language version managers.  You decide to use Docker.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/dev-environments-within-docker-containers/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='docker'><meta property='article:tag' content='go'><meta property='article:tag' content='python'><meta property='article:tag' content='vim'><meta property='article:published_time' content='2017-03-29T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2017-03-29T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Dev Environments Within Docker Containers ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/dev-environments-within-docker-containers/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Dev Environments Within Docker Containers</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2017-03-29T13:00:00&#43;01:00'>2017-03-29</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    9 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Python</a></li>
+<li><a href="#3">Go</a></li>
+<li><a href="#4">Mounting Volumes</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>You&rsquo;re a software engineer with a new laptop.<br />
+You&rsquo;re going to be writing code in multiple languages.<br />
+You&rsquo;re going to have projects of varying dependencies.</p>
+
+<p>But you want to avoid the issues you&rsquo;ve had in the past:</p>
+
+<ul>
+<li>Messy installations of lots of different software packages.</li>
+<li>Clogging up your system with programming language version managers.</li>
+</ul>
+
+<p>You decide to use <a href="https://www.docker.com/">Docker</a>.<br />
+It&rsquo;s a dependency sure, but you&rsquo;ve got to install <em>something</em>!<br />
+With Docker it allows your environment to stay clean.</p>
+
+<p>So let&rsquo;s see two simple examples:</p>
+
+<ol>
+<li><a href="https://www.python.org/">Python</a></li>
+<li><a href="https://golang.org/">Go</a></li>
+</ol>
+
+<blockquote>
+<p>Note: I don&rsquo;t claim this to be &lsquo;the way&rsquo; to do this.<br />
+This is just a setup that works well enough for me.<br />
+I&rsquo;m also a Vim user, so your mileage may vary.</p>
+</blockquote>
+
+<p><div id="2"></div></p>
+
+<h2 id="python">Python</h2>
+
+<p>You have a Python project you need to work on.</p>
+
+<blockquote>
+<p>I won&rsquo;t explain how Python works,<br />
+I&rsquo;ll just presume you&rsquo;re a Pythonista</p>
+</blockquote>
+
+<p>Here&rsquo;s the folder structure we&rsquo;re dealing with:</p>
+
+<pre><code>foo-project/
+| Dockerfile
+| Makefile
+| app.py
+| requirements.txt
+</code></pre>
+
+<p>We have a Dockerfile (naturally), along with a Makefile to allow us to more easily build our docker image. We also have an application script + a set of dependencies. Nice and simple.</p>
+
+<p>So here&rsquo;s what the Dockerfile looks like:</p>
+
+<pre><code>FROM python:3.6.1
+
+WORKDIR /tmp
+
+RUN apt-get update -y
+RUN apt-get install -y git ncurses-dev
+RUN git clone https://github.com/vim/vim.git &amp;&amp; cd vim &amp;&amp; ./configure &amp;&amp; make &amp;&amp; make install
+
+ADD ./requirements.txt /app/requirements.txt
+RUN pip install -r /app/requirements.txt
+
+COPY .vim /root/.vim
+COPY .vimrc /root/.vimrc
+
+WORKDIR /app
+</code></pre>
+
+<p>As you can see we&rsquo;re building our Docker image from an official Python base image (at the time of writing it&rsquo;s the latest Python version).</p>
+
+<p>We jump into a tmp directory so that we can install some dependencies required to get our setup just how we want it. So this means installing <code>git</code> so we can clone down the latest build of Vim and we also install <code>ncurses-dev</code> which is necessary in order to compile Vim.</p>
+
+<p>After that we copy our <code>requirements.txt</code> file into the image and install the packages specified inside that file. We also add in our <code>.vim</code> directory and <code>.vimrc</code> file to the image.</p>
+
+<blockquote>
+<p>Note: the Makefile has a command for copying <code>.vim/.vimrc</code> into the current project directory, as <code>docker build</code> has a specific context environment that is effectively the location of the Dockerfile</p>
+</blockquote>
+
+<p>Next we have the Makefile:</p>
+
+<pre><code>copy_vim_files:
+  @if [ ! -d &quot;./.vim&quot; ]; then cp -r &quot;$$HOME/.vim&quot; ./.vim; fi
+  @if [ ! -f &quot;./.vimrc&quot; ]; then cp &quot;$$HOME/.vimrc&quot; ./.vimrc; fi
+
+remove_vim_files:
+  @rm -rf ./.vim
+  @rm ./.vimrc
+
+build: copy_vim_files
+  @docker build -t python-container-with-vim .
+
+run: build
+  @docker run -it -v &quot;$$(pwd)&quot;:/app python-container-with-vim /bin/bash
+
+clean: remove_vim_files
+  -@docker rmi -f python-container-with-vim &amp;&gt; /dev/null || true
+
+rebuild: clean run
+</code></pre>
+
+<p>There&rsquo;s lots going on in there, but the important thing to know is that to start up your docker container (with Python and Vim pre-installed) is to use:</p>
+
+<pre><code>make run
+</code></pre>
+
+<p>This will copy over the host <code>.vim/.vimrc</code> directory/files, then build a new image and then call <code>docker run ...</code> where it&rsquo;ll mount the project directory as a volume into the running container.</p>
+
+<p>Once you&rsquo;re inside the container just execute <code>vim app.py</code> and off you go writing code.</p>
+
+<p>Just for completion, here is our application script:</p>
+
+<pre><code>print('hi')
+food = &quot;is a thing&quot;  # if linting is installed properly this will error
+
+
+def hello(message):
+    &quot;&quot;&quot;
+    My summary line starts capitalized and ends with a period.
+
+    my bigger description is going here
+    so pay attention to what it says
+    &quot;&quot;&quot;
+    print(message)
+</code></pre>
+
+<p>The above script has some &lsquo;linting&rsquo; issues, so if our packages (see below) are installed correctly then we should see Vim highlight the issue to us.</p>
+
+<pre><code>flake8==3.2.1
+flake8-deprecated==1.1
+flake8-docstrings==1.0.3
+flake8-mock==0.3
+flake8-quotes==0.9.0
+mypy==0.501
+pep8-naming==0.4.1
+pylint==1.6.4
+pytest==3.0.5
+</code></pre>
+
+<p>We can see from the <code>requirements.txt</code> file that we&rsquo;ve installed a few different linters along with the MyPy static analysis tool.</p>
+
+<p>That&rsquo;s it really. You can reuse the Dockerfile and Makefile for all your projects as they don&rsquo;t do anything specific to this project. Just setup the docker image/container so you can execute <code>make run</code> and start developing.</p>
+
+<p><div id="3"></div></p>
+
+<h2 id="go">Go</h2>
+
+<p>You have a Go project you need to work on.</p>
+
+<blockquote>
+<p>I won&rsquo;t explain how Go works,<br />
+I&rsquo;ll just presume you&rsquo;re a Gopher</p>
+</blockquote>
+
+<p>Here&rsquo;s the folder structure we&rsquo;re dealing with:</p>
+
+<pre><code>bar-project/
+| Dockerfile
+| Dockerfile-compile
+| Godeps
+| Makefile
+| app.go
+</code></pre>
+
+<p>So here&rsquo;s our main Dockerfile:</p>
+
+<pre><code>FROM golang:1.8
+
+RUN apt-get update -y
+RUN apt-get install -y wget git ncurses-dev time
+
+WORKDIR /tmp
+RUN git clone https://github.com/vim/vim.git &amp;&amp; cd vim &amp;&amp; make &amp;&amp; make install
+
+WORKDIR /go/src
+COPY .vim /root/.vim
+COPY .vimrc /root/.vimrc
+COPY ./Godeps /go/src
+
+RUN wget https://raw.githubusercontent.com/pote/gpm/v1.4.0/bin/gpm &amp;&amp; chmod +x gpm &amp;&amp; mv gpm /usr/local/bin
+RUN gpm install
+RUN cp -r ./github.com /github.com  # backup packages to root to prevent volume mount removing it
+
+# Install Go binaries that are utilised by the vim-go plugin:
+# https://github.com/fatih/vim-go/blob/master/plugin/go.vim#L9
+#
+# We don't manually install them, we let vim-go handle that
+# We use vim's `execute` command to pipe commands
+# This helps avoid &quot;Press ENTER or type command to continue&quot;
+RUN time vim -c &quot;execute 'silent GoUpdateBinaries' | execute 'quit'&quot;
+</code></pre>
+
+<p>Again we&rsquo;re not doing anything too crazy (not until the end, which I&rsquo;ll explain). We&rsquo;re building a new image from an official base image, then we&rsquo;re installing dependencies that allow us to manually compile the Vim editor.</p>
+
+<p>Next we copy over our vim files and the <code>Godeps</code> dependencies file and we install our dependency manager <a href="https://github.com/pote/gpm">gpm</a> and install the packages we want to use within our application.</p>
+
+<p>Next we back up the installed depedencies (<code>./github.com</code>) to another directory. The reason we do that is because when we mount our host project directory into the running container we will end up accidentally replacing the installed packages.</p>
+
+<p>Finally we run vim and pass it a script to be executed once Vim has loaded. What this does is allow the statically built image to include the updated set of depedencies that the <a href="https://github.com/fatih/vim-go">vim-go</a> plugin requires. I could have installed them manually, but then using the built in command provided by vim-go means I don&rsquo;t have to ensure my list of go tools still matches up to what vim-go is using.</p>
+
+<p>The downside to this is that when you build the image, you&rsquo;ll see (for ~20-30 seconds) Vim started and you wont be able to interact with it at all during that time. This is because it&rsquo;s installing the dependencies it uses. But after that, Vim will close and you&rsquo;ll be placed at the containers shell prompt. From there you can run Vim and start coding.</p>
+
+<p>Here&rsquo;s the Go Makefile (it works similarly to the Python one):</p>
+
+<pre><code>bin := &quot;/usr/local/bin/fastly&quot;
+vim_dir := &quot;./.vim&quot;
+vimrc := &quot;./.vimrc&quot;
+container_env := &quot;go-container-with-vim&quot;
+container_compiler := &quot;go-compiler&quot;
+
+copy_vim_files:
+  @if [ ! -d $(vim_dir) ]; then cp -r &quot;$$HOME/.vim&quot; $(vim_dir); fi
+  @if [ ! -f $(vimrc) ]; then cp &quot;$$HOME/.vimrc&quot; $(vimrc); fi
+
+remove_vim_files:
+  @rm -rf $(vim_dir) &amp;&gt; /dev/null || true
+  @rm $(vimrc) &amp;&gt; /dev/null || true
+
+remove_compiled_files:
+  @rm ./fastly.{darwin,linux,windows.exe} &amp;&gt; /dev/null || true
+
+clean: remove_vim_files remove_compiled_files
+  @docker rmi -f $(container_env) &amp;&gt; /dev/null || true
+  @docker rmi -f $(container_compiler) &amp;&gt; /dev/null || true
+
+uninstall: clean
+  @rm $(bin) &amp;&gt; /dev/null || true
+
+build: copy_vim_files
+  @docker build -t $(container_env) .
+
+dev: build remove_vim_files
+  @docker run -it -v &quot;$$(pwd)&quot;:/go/src $(container_env) /bin/bash
+
+rebuild: clean run
+
+compile:
+  @docker build -t $(container_compiler) -f ./Dockerfile-compile .
+  @docker run -it -v &quot;$$(pwd)&quot;:/go/src $(container_compiler) || true
+
+copy_binary:
+  cp ./fastly.darwin $(bin)
+
+install: compile copy_binary remove_compiled_files
+</code></pre>
+
+<p>One thing I did this time was change the <code>make run</code> for <code>make dev</code> as I feel that&rsquo;s more indicative of what we&rsquo;re doing (the &lsquo;run&rsquo; suggests we&rsquo;re <em>running</em> our application when we&rsquo;re really just wanting to drop into a development environment).</p>
+
+<p>There&rsquo;s a few more steps in the Go Makefile and that&rsquo;s just for the purposes of having a separate Dockerfile for compiling our application. The following is the other Dockerfile we have in our project:</p>
+
+<pre><code>FROM golang:1.8
+
+WORKDIR /go/src
+COPY ./Godeps /go/src
+COPY ./compile.sh /go/src
+
+RUN apt-get update &amp;&amp; apt-get install wget
+RUN wget https://raw.githubusercontent.com/pote/gpm/v1.4.0/bin/gpm &amp;&amp; chmod +x gpm &amp;&amp; mv gpm /usr/local/bin
+RUN gpm install
+RUN cp -r ./github.com /github.com  # backup packages to root to prevent volume mount removing it
+
+CMD [&quot;./compile.sh&quot;]
+</code></pre>
+
+<p>This Dockerfile does much the same thing: get dependency file, install those specified dependencies, then back them up to another directory.</p>
+
+<p>This time though, when the container is run we use a separate script as the <code>CMD</code> value as our script was getting quite long (as you&rsquo;ll see).</p>
+
+<p>Here is the contents of <code>compile.sh</code>:</p>
+
+<blockquote>
+<p>Note: make sure you <code>chmod +x ./compile.sh</code> from your host</p>
+</blockquote>
+
+<pre><code>#!/bin/sh
+
+# copy packages back into our source code directory
+cp -fr /github.com ./github.com
+
+# compile application for the major operating systems
+gox -osarch='linux/amd64' -osarch='darwin/amd64' -osarch='windows/amd64' -output='fastly.{{.OS}}'
+
+# run the relevant compatible compiled binary for this container's OS
+./fastly.linux
+</code></pre>
+
+<p>The tasks we run are:</p>
+
+<ol>
+<li>copy the backed up dependencies back into the mounted project directory</li>
+<li>build the app using the default compiler for the OS †</li>
+<li>execute the compiled binary to show it can run correctly inside the container</li>
+</ol>
+
+<blockquote>
+<p>† this means our compiled binary will be a linux based binary, so you can&rsquo;t run it on your host machine if it&rsquo;s not linux based (e.g. I&rsquo;m using macOS). You&rsquo;ll see that to allow me to compiled my application for multiple OS&rsquo;s I&rsquo;ve installed <a href="https://github.com/mitchellh/gox">Gox</a></p>
+</blockquote>
+
+<p>Now here is our Go application, it simply uses the logging dependency we&rsquo;ve installed and that&rsquo;s it. Nothing too fancy necessary for this example.</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+
+  log &quot;github.com/Sirupsen/logrus&quot;
+)
+
+func init() {
+  log.SetLevel(log.DebugLevel) // otherwise would not be shown
+}
+
+func main() {
+  fmt.Println(&quot;Hello World!&quot;)
+
+  logger := log.WithFields(log.Fields{
+    &quot;name&quot;: &quot;hello-world-app&quot;,
+  })
+  logger.Debug(&quot;this is my debug log message&quot;)
+  logger.Info(&quot;this is my info log message&quot;)
+  logger.Warn(&quot;this is my warn log message&quot;)
+  logger.Error(&quot;this is my error log message&quot;)
+  logger.Fatal(&quot;this is my Fatal log message&quot;)
+  logger.Panic(&quot;this is my Panic log message&quot;) // we don't actually reach here
+}
+</code></pre>
+
+<p>Here is our dependency file&rsquo;s content, where we can see the <a href="https://github.com/sirupsen/logrus">Logrus</a> dependency we&rsquo;ve specified (as well as Gox for the purposes of our container responsible for compiling our application for multiple OS&rsquo;):</p>
+
+<pre><code>github.com/mitchellh/gox c9740af9c6574448fd48eb30a71f964014c7a837
+github.com/sirupsen/logrus 10f801ebc38b33738c9d17d50860f484a0988ff5
+</code></pre>
+
+<p><div id="4"></div></p>
+
+<h2 id="mounting-volumes">Mounting Volumes</h2>
+
+<p>Just remember that when making changes inside the container, because you&rsquo;ve mounted your host project directory as a volume, if you make a change or add a new file or compile something inside of the container; then it&rsquo;ll be available on your host machine.</p>
+
+<p>This is all fine, but you might want to look at setting up a <code>.gitignore</code> file to ensure you don&rsquo;t accidentally commit any unwanted items into your git repository.</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/development'>development</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/docker'>docker</a>, <a class='tag' href='/tags/go'>go</a>, <a class='tag' href='/tags/python'>python</a>, <a class='tag' href='/tags/vim'>vim</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/key-architecture/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Key Architecture</a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+
