@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>http://www.integralist.co.uk/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/about/</loc>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/posts/dev-environments-within-docker-containers/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/posts/key-architecture/</loc>
+    <lastmod>2016-12-10T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/posts/hitchikers-guide-to-go/</loc>
+    <lastmod>2016-12-02T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/categories/code/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/categories/development/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/docker/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/go/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/golang/</loc>
+    <lastmod>2016-12-02T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/gpg/</loc>
+    <lastmod>2016-12-10T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/categories/guides/</loc>
+    <lastmod>2016-12-02T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/key/</loc>
+    <lastmod>2016-12-10T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/page/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/posts/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/python/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/categories/security/</loc>
+    <lastmod>2016-12-10T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/vim/</loc>
+    <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>
