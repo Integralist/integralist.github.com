@@ -1,0 +1,259 @@
+---
+title: "Multiple SSH Keys for Different GitHub Accounts"
+date: 2015-11-18T13:00:00+01:00
+categories:
+  - "github"
+  - "development"
+tags:
+  - "ssh"
+draft: false
+---
+
+- [Introduction](#1)
+- [The Problem?](#2)
+- [The Solution](#3)
+- [Creating a new Key](#4)
+- [SSH Config](#5)
+- [Optional Shell Function](#6)
+- [Alternatives?](#7)
+- [Another Alternative](#8)
+
+<div id="1"></div>
+## Introduction
+
+I recently had an issue with my GitHub set-up which has since prompted me to write this post. The issue I had was dealing with multiple GitHub accounts via SSH on a single laptop.
+
+So I have a GitHub account under the username [Integralist](https://github.com/Integralist). This is a personal account, and up until recently I was also using it to access my work's private repos ([BBC](https://github.com/bbc) and [BBC-News](https://github.com/BBC-News)).
+
+When cloning a repo from GitHub you will typically create an [SSH Key Pair](http://www.integralist.co.uk/posts/security-basics.html#6) and paste the contents of the public key into your GitHub account via their web site. When you come to clone a repo you'll also typically use the SSH variation of the path:
+
+```
+git@github.com:Integralist/Go-Requester.git
+```
+
+The problem occurred when I had to remove my personal account from the BBC/BBC-News repos and replace them with a generic [BBCMarkMcDonnell](https://github.com/BBCMarkMcDonnell) account.
+    
+<div id="2"></div>
+## The Problem?
+
+So the first thing I did was create myself a new SSH Key, upload the public key to my new GitHub account. 
+
+I then added the private key to my laptop's SSH-Agent:
+
+```
+ssh-add -K ~/.ssh/github_bbc_rsa
+```
+    
+I then tried to clone one of the BBC's private repos. This is where I discovered I didn't have authorisation to clone the private repo. 
+
+It turns out that although I had both SSH Key Pairs loaded within my SSH-Agent...
+
+```
+ssh-add -l
+ 
+# Returns something like...
+#
+# 4096 SHA256:xxxx /Users/M/.ssh/github_rsa (RSA)
+# 4096 SHA256:xxxx /Users/M/.ssh/github_bbc_rsa (RSA)
+```
+     
+...it was using the first key it came across for the host `github.com`, so it used my personal account to try and access the private BBC repositories (which obviously it's no longer authorised to do). 
+
+This is a problem because I have two separate keys for the same host, and I work on both BBC and personal code from my work laptop; so I needed to figure out how to get around this issue.
+    
+<div id="3"></div>
+## The Solution
+
+The solution turned out to be pretty straight forward, if not immediately obvious. I would need to modify my `~/.ssh/config` file (you'll need to create that file if you don't already have one).
+
+Then when cloning a private BBC repo I simply modify the clone command slightly. So where I would normally use:
+
+```
+git clone git@github.com:bbc/mozart.git
+```
+
+I would now use:
+
+```
+git clone git@BBCMarkMcDonnell:bbc/mozart.git
+```
+
+So let's take a look at how's this is done.
+
+<div id="4"></div>
+## Creating a new Key
+
+First things first, create a new SSH Key Pair and name it something relevant (e.g. I used `github_bbc_rsa`):
+
+```
+ssh-keygen -t rsa -b 4096 -C "you@example.com"
+```
+
+Next, paste the public key part into your GitHub account and add the private key to your SSH-Agent:
+
+```
+eval "$(ssh-agent -s)"
+ssh-add -K ~/.ssh/github_bbc_rsa
+```
+
+> Note: `ssh-add -l` will show you what keys have been added to the agent
+
+<div id="5"></div>
+## SSH Config
+
+Now create the file `~/.ssh/config` (or modify the existing one you have):
+
+```
+Host BBCMarkMcDonnell
+  User git
+  HostName github.com
+  IdentityFile ~/.ssh/github_bbc_rsa
+
+Host Integralist
+  User git
+  HostName github.com
+  IdentityFile ~/.ssh/github_rsa
+```
+
+As you can see I've created two hosts:
+
+1. BBCMarkMcDonnell
+2. Integralist
+
+> Note: you can call them whatever you like, I opted for the username for each account
+
+The keys within these two hosts are exactly the same. They state for the user `git`, and the hostname `github.com` make sure you use the specified `IdentityFile`.
+
+So if I want to access the BBC private repos then I'll use the following modified `git clone` command:
+
+```
+git clone git@BBCMarkMcDonnell:bbc/mozart.git
+```
+
+Where you can see the host section (`github.com`) has been replaced with `BBCMarkMcDonnell` which maps to the host block defined inside my `~/.ssh/config` file. So it'll use the relevant identity file needed to authorise successfully with.
+
+Now the second `Host` (Integralist) is actually redundant for my use case because if I want to clone one of my own repos (which are all public) then I'd execute something like `git@github.com:Integralist/Go-Requester.git` (this being the same command I've always run; no modification to it).
+
+What happens is SSH-Agent will do what it did before, which is look through the list of signatures within the SSH Agent and pick the first one that matches, which happens to be my personal Integralist account any way. But it works either way, I can either leave it up to the SSH Agent to locate my personal account or I could explicitly specify it like so:
+
+```
+git@Integralist:Integralist/Go-Requester.git
+```
+
+<div id="6"></div>
+## Optional Shell Function
+
+The last thing I did was to create a quick shell function that allowed me to update my global git settings. By default they're set to the following:
+
+```
+git config --global user.name "Integralist"
+git config --global user.email "mark@integralist.co.uk"
+```
+
+But this means if I'm pushing code for a work project then it'll show those details for the author information. I'd rather it show more BBC specific details. So whenever I'm working on a BBC project I'll execute:
+
+```
+switch_github BBCMarkMcDonnell mark.mcdonnell@bbc.co.uk
+```
+
+This will change the above details to the one's provided. I can then execute it again whenever I switch backed to a personal project, like so:
+
+```
+switch_github Integralist mark@integralist.co.uk
+```
+
+The function is added to my `~/.zshrc` file:
+
+```
+function switch_github() {
+  git config --global user.name $1
+  git config --global user.email $2
+
+  # print updated values just to be sure
+  echo "git config --global user.name: $(git config --global user.name)"
+  echo "git config --global user.email: $(git config --global user.email)"
+}
+```
+
+<div id="7"></div>
+## Alternatives?
+
+So [Simon Thulbourn](https://twitter.com/sthulb) informed me that he personally would've used `GIT_SSH` as a simpler alternative to the above modification I made to my `~/.ssh/config` file. Now the following might not actually be the way he was thinking to do this, but it seems to be the most common route people take using `GIT_SSH`, so that's the one I'm covering.
+
+The way [`GIT_SSH`](https://www.kernel.org/pub/software/scm/git/docs/#_other) works is like so:
+
+> When set git fetch and git push will use the specified command  
+> instead of ssh when they need to connect to a remote system
+
+So one way we could use this environment variable is like so:
+
+Create the following script file `~/.ssh/git.sh`:
+
+```
+#!/bin/sh
+
+if [ -z "$PKEY" ]; then
+  ssh "$@" # if PKEY is not specified, run ssh using default keyfile
+else
+  ssh -i "$PKEY" "$@"
+fi
+```
+
+> Note: script originally written by [Alvin Abad](https://alvinabad.wordpress.com/2013/03/23/how-to-specify-an-ssh-key-file-with-the-git-command/)
+
+Next we'll need to make this custom script executable:
+
+```
+chmod +x ~/.ssh/git.sh
+```
+
+Now we'll need to set `GIT_SSH` to point to this script:
+
+```
+export GIT_SSH=~/.ssh/git.sh
+```
+
+Finally we can execute our git clone command and specify the key would like it to use:
+
+```
+PKEY=~/.ssh/github_bbc_rsa git clone git@github.com:bbc/mozart.git
+```
+
+Personally I prefer the `~/.ssh/config` solution as it feels a little cleaner to me, as apposed to using a custom user script and then still having to specify your key manually every time you git clone. The config route seems simpler.
+
+Although that being said, there are quite a few different ways `GIT_SSH` can be used (see Alvin Abad's blog post for more ideas). But now you know about `GIT_SSH`, maybe you'll find a variation that suits you or you'll decide to just create your own. Enjoy
+
+<div id="8"></div>
+## Another Alternative
+
+I've found all sorts of issues recently with my original solution with things like Ruby's bundler or cli scripts that are hardcoded to use `git@github.com` where I can't change it to be a different host.
+
+The solution is a manual step but as I've managed to automate the process (see below), it's faster than what I was using before and doesn't require me to export any variables or retype the host name AND it actually works across everything (so far).
+
+The downside is that it only works with one other key. If you had to switch between three keys (work, home, other) then you'd need to find a different solution (or use the initial solution I defined at the start of this post).
+
+Simply add the following inside your ssh config (I comment it out by default):
+
+```
+# switch
+Host github.com
+  User git
+  HostName github.com
+  IdentityFile ~/.ssh/github_bbc_rsa
+```
+
+> Note: obviously change the IdentifyFile to point to your own private key
+
+Then if you have a project that requires you to use your work ssh keys then uncomment it so it becomes active.
+
+I've also automated the process using the following alias (the `# switch` comment is important, as well as the line number that it starts on in your config file):
+
+```
+alias sshconfig='nvim -c "norm 12ggVjjjgc" -c "wq" ~/.ssh/config && cat ~/.ssh/config | awk "/switch/ {for(i=0; i<=3; i++) {getline; print}}"'
+```
+
+So this uses NeoVim (although it works the same with standard Vim) to open the file and to use Tim Pope's Commentary plugin to toggle the comments around the Host block. My `# switch` line starts on line 12 of my config file, so you might need to change the alias to fit your use case. 
+
+I then use Awk to display only those lines so I can see whether it's toggled on/off.
+
+That's it. Seems to work fine for me.
