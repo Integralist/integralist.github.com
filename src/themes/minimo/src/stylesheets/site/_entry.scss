@@ -1,0 +1,56 @@
+.entry {
+  .meta {
+    margin-top: .6em;
+
+    span {
+      margin-right: .8333333333333334em;
+    }
+
+    .icon {
+      margin-right: .2222222222222222em;
+    }
+  }
+}
+
+.entry-content {
+  & > :last-child {
+    &,
+    & > :last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.entry-footer {
+  div {
+    margin-top: .3333333333333333em;
+
+    &:first-child {
+      margin-top: 1em;
+    }
+  }
+
+  .category-icon,
+  .tag-icon {
+    margin-right: .4444444444444444em;
+  }
+}
+
+/* Shortcodes */
+.center-align {
+  text-align: center;
+
+  & > blockquote {
+    display: inline-block;
+  }
+
+  & > ol,
+  & > ul {
+    display: inline-block;
+    text-align: initial;
+  }
+
+  li {
+    word-wrap: normal;
+  }
+}
