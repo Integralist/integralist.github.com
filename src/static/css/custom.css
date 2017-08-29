@@ -15,6 +15,14 @@ code, kbd, samp {
   font-size: .8em;
 }
 
+h1 > code,
+h2 > code,
+h3 > code,
+h4 > code,
+h5 > code,
+h6 > code,
+li > code,
+a > code,
 p > code {
   color: #c31900;
 }
