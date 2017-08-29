@@ -58,6 +58,17 @@ Introduction Just a quick post to cover the key architecture I&amp;rsquo;m using
     </item>
     
     <item>
+      <title>Concepts From the C Programming Language</title>
+      <link>http://www.integralist.co.uk/posts/concepts-from-the-c-programming-language/</link>
+      <pubDate>Mon, 28 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/concepts-from-the-c-programming-language/</guid>
+      <description>Introduction Compilation  Compilers C11 safe functions  Hello World Constants vs Directives Quotations Char Type Null Terminator Pointers Arrays Enumerators Memory Allocation with different Types Reallocating Memory Function Prototypes Conclusion  
+Introduction I decided recently to read a book on the C programming language. The idea was to learn some more low-level concepts that other higher-level languages were abstracting away from me.
+This write up is the result of some of those learnings.</description>
+    </item>
+    
+    <item>
       <title>Multiple SSH Keys for Different GitHub Accounts</title>
       <link>http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/</link>
       <pubDate>Wed, 18 Nov 2015 13:00:00 +0100</pubDate>
