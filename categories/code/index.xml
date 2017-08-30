@@ -117,5 +117,19 @@ I had some initial concerns regarding the nature of TCP sockets with a highly sc
 Introduction This is a quick post to demonstrate how I use a simple Bash shell script to report when web pages are failing (e.g. returning a non-200 HTTP status code). It does this by sending notifications of the URL which returned a non-200 status code into a remote application (in my case Slack; but you could modify the script to suit whatever service you happen to be using).</description>
     </item>
     
+    <item>
+      <title>RPC Variations in Go</title>
+      <link>http://www.integralist.co.uk/posts/rpc-variations-in-go/</link>
+      <pubDate>Fri, 19 Feb 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/rpc-variations-in-go/</guid>
+      <description>Introduction  Outline Variations Requirements  RPC over HTTP RPC over TCP JSON Calling from Ruby gRPC  
+Introduction Let&amp;rsquo;s begin by understanding what an RPC (Remote Procedure Call) actually is:
+ RPC is a way of connecting two separate services via a raw TCP socket
+ 
+Outline The fundamental principle behind RPC is to create a service that exposes a function behind that service.
+The steps typically look something like:</description>
+    </item>
+    
   </channel>
 </rss>

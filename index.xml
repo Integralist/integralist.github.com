@@ -177,6 +177,20 @@ Introduction This is a quick post to demonstrate how I use a simple Bash shell s
     </item>
     
     <item>
+      <title>RPC Variations in Go</title>
+      <link>http://www.integralist.co.uk/posts/rpc-variations-in-go/</link>
+      <pubDate>Fri, 19 Feb 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/rpc-variations-in-go/</guid>
+      <description>Introduction  Outline Variations Requirements  RPC over HTTP RPC over TCP JSON Calling from Ruby gRPC  
+Introduction Let&amp;rsquo;s begin by understanding what an RPC (Remote Procedure Call) actually is:
+ RPC is a way of connecting two separate services via a raw TCP socket
+ 
+Outline The fundamental principle behind RPC is to create a service that exposes a function behind that service.
+The steps typically look something like:</description>
+    </item>
+    
+    <item>
       <title>Multiple SSH Keys for Different GitHub Accounts</title>
       <link>http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/</link>
       <pubDate>Wed, 18 Nov 2015 13:00:00 +0100</pubDate>

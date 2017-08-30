@@ -45,5 +45,19 @@ Introduction I started designing a new microservice that I wanted to write in Go
 I had some initial concerns regarding the nature of TCP sockets with a highly scalable and distrubuted set of services (this was to be utilised within the BBC so these are genuine concerns to be had for my purposes) and so I decided to do some research.</description>
     </item>
     
+    <item>
+      <title>RPC Variations in Go</title>
+      <link>http://www.integralist.co.uk/posts/rpc-variations-in-go/</link>
+      <pubDate>Fri, 19 Feb 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/rpc-variations-in-go/</guid>
+      <description>Introduction  Outline Variations Requirements  RPC over HTTP RPC over TCP JSON Calling from Ruby gRPC  
+Introduction Let&amp;rsquo;s begin by understanding what an RPC (Remote Procedure Call) actually is:
+ RPC is a way of connecting two separate services via a raw TCP socket
+ 
+Outline The fundamental principle behind RPC is to create a service that exposes a function behind that service.
+The steps typically look something like:</description>
+    </item>
+    
   </channel>
 </rss>
