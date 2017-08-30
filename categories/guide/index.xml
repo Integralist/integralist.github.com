@@ -97,5 +97,17 @@ Both have a large number of engineers and teams, but due to different organisati
 Introduction When you first start learning algorithms (Binary Search, Quick Sort, Breadth-first Search etc), you&amp;rsquo;ll quickly realise that in order to take advantage of these algorithms, you need to know how fast they are.</description>
     </item>
     
+    <item>
+      <title>Git Merge Strategies</title>
+      <link>http://www.integralist.co.uk/posts/git-merge-strategies/</link>
+      <pubDate>Sun, 15 May 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/git-merge-strategies/</guid>
+      <description>Introduction git merge git merge --no-ff --edit  git reset Force the merge commit git branch --contains Losing useful history  git merge --squash git rebase git rebase --interactive git rebase --onto git format-patch Conclusion  
+Introduction Imagine I have a master branch with one commit:
+75eb1cb - (origin/master) README  This is a single README.md file with the following content:
+- A: 1  Now imagine I have a branch from master called feat/foo and in that branch I&amp;rsquo;ve made 3 additional commits:</description>
+    </item>
+    
   </channel>
 </rss>

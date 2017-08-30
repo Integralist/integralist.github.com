@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction git merge git merge --no-ff --edit  git reset Force the merge commit git branch --contains Losing useful history  git merge --squash git rebase git rebase --interactive git rebase --onto git format-patch Conclusion  
+Introduction Imagine I have a master branch with one commit:
+75eb1cb - (origin/master) README  This is a single README.md file with the following content:
+- A: 1  Now imagine I have a branch from master called feat/foo and in that branch I&rsquo;ve made 3 additional commits:'>
+
+<meta property='og:title' content='Git Merge Strategies ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction git merge git merge --no-ff --edit  git reset Force the merge commit git branch --contains Losing useful history  git merge --squash git rebase git rebase --interactive git rebase --onto git format-patch Conclusion  
+Introduction Imagine I have a master branch with one commit:
+75eb1cb - (origin/master) README  This is a single README.md file with the following content:
+- A: 1  Now imagine I have a branch from master called feat/foo and in that branch I&rsquo;ve made 3 additional commits:'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/git-merge-strategies/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='pr'><meta property='article:tag' content='github'><meta property='article:tag' content='git'><meta property='article:published_time' content='2016-05-15T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2016-05-15T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Git Merge Strategies ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/git-merge-strategies/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Git Merge Strategies</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2016-05-15T13:00:00&#43;01:00'>2016-05-15</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    17 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2"><code>git merge</code></a></li>
+<li><a href="#3"><code>git merge --no-ff --edit</code></a>
+
+<ul>
+<li><a href="#3.1"><code>git reset</code></a></li>
+<li><a href="#3.2">Force the merge commit</a></li>
+<li><a href="#3.3"><code>git branch --contains</code></a></li>
+<li><a href="#3.4">Losing useful history</a></li>
+</ul></li>
+<li><a href="#4"><code>git merge --squash</code></a></li>
+<li><a href="#5"><code>git rebase</code></a></li>
+<li><a href="#6"><code>git rebase --interactive</code></a></li>
+<li><a href="#7"><code>git rebase --onto</code></a></li>
+<li><a href="#8"><code>git format-patch</code></a></li>
+<li><a href="#9">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Imagine I have a <code>master</code> branch with one commit:</p>
+
+<pre><code>75eb1cb - (origin/master) README
+</code></pre>
+
+<p>This is a single <code>README.md</code> file with the following content:</p>
+
+<pre><code>- A: 1
+</code></pre>
+
+<p>Now imagine I have a branch from <code>master</code> called <code>feat/foo</code> and in that branch I&rsquo;ve made 3 additional commits:</p>
+
+<pre><code>* 41d4115 - Add C (also revert A)
+* 9e5626c - Modify A
+* 8e7965e - Add B
+</code></pre>
+
+<p>The contents of the <code>README.md</code> file is now:</p>
+
+<pre><code>- A: 1
+- B: 2
+- C: 3
+</code></pre>
+
+<p>Just to quickly clarify, you&rsquo;ll notice throughout this post that I use the command <code>git lg</code> which is actually an alias I have set within my <code>~/.gitconfig</code> that uses <code>git log</code> but modifies its behaviour with some additional git flags:</p>
+
+<pre><code>log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+</code></pre>
+
+<p><div id="2"></div></p>
+
+<h2 id="git-merge"><code>git merge</code></h2>
+
+<p>So <code>git merge</code> is the standard workhorse for merging branches in git. It&rsquo;ll try to resolve the differences between the two branches the best way it can.</p>
+
+<p>If the source branch <code>feat/foo</code> (the branch you want to merge from) can be merged <em>cleanly</em> (e.g. there are no major diverges from the destination branch <code>master</code>, which is the branch the changes are being merged into), then git will be able to perform a simple &ldquo;fast-forward&rdquo;.</p>
+
+<p>What &ldquo;fast-forward: means is that git will change the <code>HEAD</code> (on the destination branch) to point to the new latest commit, and all the other commits from your source branch will also appear in the git log/history of the destination branch.</p>
+
+<blockquote>
+<p>Note: <code>HEAD</code> is an alias that points to a commit (typically <code>HEAD</code> is the latest commit in your branch). Even the branch name itself is an alias that refers to a commit (<em>most things</em> in git do simply resolve to commits). This is why when you have a long branch name, instead of <code>git push origin really-long-branch-name</code> you can just use <code>git push origin head</code> and git will figure out which branch you&rsquo;re on</p>
+</blockquote>
+
+<p>If you check <code>git lg</code> after doing a <code>git merge feat/foo</code>, you should see something like:</p>
+
+<pre><code>* 41d4115 - (HEAD -&gt; master, origin/feat/foo, feat/foo) Add C (also revert A)
+* 9e5626c - Modify A
+* 8e7965e - Add B
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>We can see all the commits from <code>feat/foo</code> were replayed onto <code>master</code> successfully.</p>
+
+<blockquote>
+<p>Note: you might not realise that there is a short cut to checking out a branch and then merging another branch into it: <code>git merge &lt;source&gt; &lt;destination&gt;</code>, which is the same as doing <code>git checkout &lt;destination&gt;</code> followed by <code>git merge &lt;source&gt;</code></p>
+</blockquote>
+
+<p><div id="3"></div></p>
+
+<h2 id="git-merge-no-ff-edit"><code>git merge --no-ff --edit</code></h2>
+
+<p>Let&rsquo;s say you wanted a &ldquo;merge commit&rdquo; to happen (i.e. merge commits typically only occur if there has been a divergence between the branches which means git has to resolve the problem for you), then you can force git to use a &ldquo;merge commit&rdquo; even when there is no need for one (as is the case for me here).</p>
+
+<p>Using our previous example, which merged cleanly, let&rsquo;s say that a merge commit is what we wanted to have happen. Assuming you&rsquo;ve not pushed the branch to a remote, then you can safely go back to before the merge occurred using:</p>
+
+<pre><code>git reset --hard 75eb1cb
+</code></pre>
+
+<blockquote>
+<p>Note: <code>75eb1cb</code> being my first commit in <code>master</code></p>
+</blockquote>
+
+<p><div id="3.1"></div></p>
+
+<h3 id="git-reset"><code>git reset</code></h3>
+
+<p>It&rsquo;s important to understand how <code>git reset</code> works, as it has three flags and if not used correctly could have bad side effects. The flags are:</p>
+
+<ul>
+<li><code>--soft</code></li>
+<li><code>--mixed</code></li>
+<li><code>--hard</code></li>
+</ul>
+
+<p>The way reset works is that you use one of the above flags, followed by the commit you want to reset the <code>HEAD</code> back to. So in our case we used the commit <code>75eb1cb</code>, which was our very first commit.</p>
+
+<p>If I had used the <code>--soft</code> flag instead, then it would have reset the <code>HEAD</code> back to the first commit, but any other commits that happened since would have their changes staged together in our git &lsquo;index&rsquo; waiting to be committed.</p>
+
+<p>If I had used the <code>--mixed</code> flag instead, then it would have reset the <code>HEAD</code> back to the first commit, but any other commits that happened since would have their changes applied to the working directory, ready for us to choose which changes to be added to the index (i.e. staged) and then finally committed.</p>
+
+<p>When using <code>--hard</code> though, any of the changes that came after the commit being reset to, are lost. They&rsquo;re not sitting in your staging index, nor are they available within your working directory either.</p>
+
+<p>So be careful whenever using the <code>--hard</code> flag.</p>
+
+<p><div id="3.2"></div></p>
+
+<h3 id="force-the-merge-commit">Force the merge commit</h3>
+
+<p>Now we&rsquo;re back to where we were originally (a separate <code>feat/foo</code> branch and a <code>master</code> branch with a single commit), we can look at how to force a merge commit.</p>
+
+<p>To force a merge commit you&rsquo;ll need to use the <code>--no-ff</code> flag and then also use the <code>--edit</code> flag to allow you to modify the default merge commit message (otherwise git will provide its own commit message which is nearly always not useful or descriptive):</p>
+
+<pre><code>git merge --edit --no-ff feat/foo 
+</code></pre>
+
+<blockquote>
+<p>Note: <code>--edit</code> doesn&rsquo;t work without <code>--no-ff</code>, unless there is a <em>genuine</em> merge conflict</p>
+</blockquote>
+
+<p>Now if I look at my <code>git lg</code> I can see:</p>
+
+<pre><code>*   97f1257 - (HEAD -&gt; master) My custom merge commit message for 'feat/foo'
+|\  
+| * 41d4115 - (origin/feat/foo, feat/foo) Add C (also revert A)
+| * 9e5626c - Modify A
+| * 8e7965e - Add B
+|/  
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>We can see all the commits from <code>feat/foo</code> were replayed onto <code>master</code> successfully, but now you&rsquo;re able to more easily distinguish the three commits came from another branch (if using my <code>git lg</code> alias). Which is one of the main reasons to force a merge commit using <code>--no-ff</code> as it really helps keep a varied branch history.</p>
+
+<blockquote>
+<p>Notice <code>git log</code> will also show in its output for the merge commit<br />
+a field like <code>Merge: 75eb1cb 8e7965e 9e5626c 41d4115</code><br />
+Which helps (at a glance) to know more about what commits are inside the merge commit</p>
+</blockquote>
+
+<p><div id="3.3"></div></p>
+
+<h3 id="git-branch-contains"><code>git branch --contains</code></h3>
+
+<p>The following command can be useful in locating where a commit has come from:</p>
+
+<pre><code>git branch --contains 9e5626c
+</code></pre>
+
+<p>In our case this will indicate that the commit we specified is part of our <code>master</code> branch. Now when you use <code>--contains</code> with a commit such as <code>9e5626c</code> (which was merged in from our feature branch) you&rsquo;ll see that git recognises this commit is part of multiple branches †.</p>
+
+<blockquote>
+<p>† until you delete the branch (e.g. <code>git branch -D feat/foo</code>)</p>
+</blockquote>
+
+<p><div id="3.4"></div></p>
+
+<h3 id="losing-useful-history">Losing useful history</h3>
+
+<p>It&rsquo;s also worth mentioning, that even after the <code>feat/foo</code> branch has been deleted, git will still show (via <code>git log --graph</code>) those commits from our <code>feat/foo</code> branch as coming from an alternative path/branch history.</p>
+
+<p>This is a useful bit of information that can be lost when using other tools such as <code>git rebase</code> or <code>git merge --squash</code>, so you should discuss with your team what type of information you feel is useful to have when you look back at a project&rsquo;s git history before forging ahead with any one of the strategies I cover here.</p>
+
+<p>For example, some teams don&rsquo;t find being able to see that a set of commits actually came from another branch very useful: considering all commits/features should generally come in from separate branches/Pull Requests. So the use of rebase or squash isn&rsquo;t a concern for them. For a team like this, an aesthetically &lsquo;cleaner&rsquo; git commit history is preferred.</p>
+
+<p>Also, in teams where I&rsquo;ve worked and they&rsquo;ve utilised a &lsquo;squash&rsquo; strategy (see <a href="#4">below</a> for more details), we&rsquo;ve used the following structure for our commit message so it&rsquo;s clearer what&rsquo;s been squashed:</p>
+
+<pre><code>Closes #123 - New Feature X
+
+Squashed commit of the following:
+
+commit c7e4145f6e95e51fcff79d6b3476bcb19c058071
+commit 3275f1805c4f82298676aa3c61db8c65ee9f3428
+commit bb50fb69c2d131d0126fa9ae018377e6451678e2
+commit 7ceb49c352d812a91db0e87a8ed4c4cf426c0365
+commit 86d1de3c5133a403edf45343081353055c02b454
+commit 8f48e5b3c43acf71e8abab4b821cfdc66447b732
+commit ed857784feff091ece52d906e311ef7f64a49c3d
+commit a277e60c39333a55134c3e3ef6d97076f9bc8370
+commit dd7e1973fe91f29887928aad9d991be24efb143a
+commit ff7e7dabf745ac4d73b52644c3d29ea05d5c318f
+commit 36f1c5bc5949f01117c1d57e6ab12f05c2a202f5
+</code></pre>
+
+<p><div id="4"></div></p>
+
+<h2 id="git-merge-squash"><code>git merge --squash</code></h2>
+
+<p>So what if you don&rsquo;t want all those commits in your <code>master</code>? You could instead &ldquo;squash&rdquo; all the commits down into a single commit using the <code>--squash</code> command:</p>
+
+<pre><code>git merge --squash feat/foo
+</code></pre>
+
+<p>Now what this does is take my changes from the source branch <code>feat/foo</code> and automatically squashes those separate commits into a single change that&rsquo;s placed into the staging area of my destination branch.</p>
+
+<p>These collection of changes <em>now</em> appear as a single change to the file. They aren&rsquo;t actually <em>merged</em> yet. So you have the opportunity to change the commit message:</p>
+
+<pre><code>git commit -m &quot;your own custom commit message&quot;
+</code></pre>
+
+<p><div id="5"></div></p>
+
+<h2 id="git-rebase"><code>git rebase</code></h2>
+
+<p>The <code>git rebase</code> feature in essence is solving the same problem as <code>git merge</code> (they both integrate a set of changes), but they do them in fundamentally different ways.</p>
+
+<p>With <code>git merge</code> a merge commit is utilised to resolve conflicts and so is considered <em>non-destructive</em>. What this means is that the commits within either branch (destination or source) aren&rsquo;t modified in any way.</p>
+
+<p>With <code>git rebase</code> the source branch commits are placed <em>before</em> the destination branch&rsquo;s commits, but also the commits themselves are from the source are recreated inside the destination branch.</p>
+
+<p>Let&rsquo;s look and see what this does for us:</p>
+
+<pre><code>git rebase feat/foo
+</code></pre>
+
+<p>We can see that as there were no conflicts, git was able to &ldquo;fast-forward&rdquo; the commits. So in theory this is no different right now from originally doing <code>git merge feat/foo</code>.</p>
+
+<p>But what if <code>master</code> had a new change committed to it, and this change happened <em>after</em> we had branched off with <code>feat/foo</code>? For example, I&rsquo;ll add a second commit to <code>master</code> that changes <code>- A: 1</code> to <code>- A: 9</code>.</p>
+
+<p>If I run <code>git rebase feat/foo</code> I should see we get a merge conflict and one that git doesn&rsquo;t know how to resolve:</p>
+
+<pre><code>First, rewinding head to replay your work on top of it...
+Applying: A to 9
+Using index info to reconstruct a base tree...
+M	README.md
+Falling back to patching base and 3-way merge...
+Auto-merging README.md
+CONFLICT (content): Merge conflict in README.md
+error: Failed to merge in the changes.
+Patch failed at 0001 A to 9
+The copy of the patch that failed is found in: .git/rebase-apply/patch
+
+When you have resolved this problem, run &quot;git rebase --continue&quot;.
+If you prefer to skip this patch, run &quot;git rebase --skip&quot; instead.
+To check out the original branch and stop rebasing, run &quot;git rebase --abort&quot;.
+</code></pre>
+
+<p>We can see from the information git has given us that it first rewinded <code>master</code> back to the first commit <code>75eb1cb</code> in order for it to place our <code>feat/foo</code> commits on top of it (as that initial commit is where our branch originally forked from).</p>
+
+<p>From there we can see once git replayed our <code>feat/foo</code> commits on top of <code>75eb1cb</code> that it then tried to apply the new commit that <code>feat/foo</code> didn&rsquo;t have (e.g. <code>Applying: A to 9</code>) and it failed to do so.</p>
+
+<p>Git tells us that there was a merge conflict:</p>
+
+<pre><code>CONFLICT (content): Merge conflict in README.md
+</code></pre>
+
+<p>It&rsquo;s up to us to open <code>README.md</code> and to resolve the conflict ourself. When I open the file I see:</p>
+
+<pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; 41d411564c1dc3106f03427d1b5920d05d95e037
+- A: 1
+- B: 2
+- C: 3
+||||||| merged common ancestors
+- A: 1
+=======
+- A: 9
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; A to 9
+</code></pre>
+
+<p>So the above shows the file is split into three:</p>
+
+<ol>
+<li><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; &lt;commit_hash&gt;</code></li>
+<li><code>||||||| merged common ancestors</code></li>
+<li><code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; &lt;commit_message&gt;</code></li>
+</ol>
+
+<p>I know that I&rsquo;m happy for the line <code>- A: 1</code> (which was changed in my <code>feat/foo</code> branch commit <code>41d4115</code>) to be changed to <code>- A: 9</code> (which was changed in <code>master</code> after I originally branched from it). So I manually make that change by deleting all the added noise (e.g. <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> and <code>||||||| merged common ancestors</code> etc) so I&rsquo;m left with just the content the file should be expected to have now.</p>
+
+<p>I update it to look like:</p>
+
+<pre><code>- A: 9
+- B: 2
+- C: 3
+</code></pre>
+
+<p>I now must run the following commands:</p>
+
+<ul>
+<li><code>git add README.md</code> (as I&rsquo;ve made a change to the file at this point in time)</li>
+<li><code>git rebase --continue</code></li>
+</ul>
+
+<p>We see that git is trying again now to apply the commit (but this time there is no merge conflict info inside of the README) and so we see the output:</p>
+
+<pre><code>Applying: A to 9
+</code></pre>
+
+<p>Now when looking at the output from <code>git lg</code> I see:</p>
+
+<pre><code>* 7c001cd - (HEAD -&gt; master) A to 9
+* 41d4115 - (origin/feat/foo, feat/foo) Add C (also revert A)
+* 9e5626c - Modify A
+* 8e7965e - Add B
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>This shows that the changes from <code>feat/foo</code> where replayed directly on top of <code>75eb1cb</code>. Otherwise if we didn&rsquo;t use git&rsquo;s rebase feature but a standard <code>git merge</code>, we could&rsquo;ve ended up with a git history that looked like the following:</p>
+
+<pre><code>* 41d4115 - (origin/feat/foo, feat/foo) Add C (also revert A)
+* 9e5626c - Modify A
+* 8e7965e - Add B
+* 65553e0 - (HEAD -&gt; master) A to 9
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>Notice the <code>feat/foo</code> commits are on top of the <code>A to 9</code> commit and that might not necessarily be what we want to have happen.</p>
+
+<p><div id="6"></div></p>
+
+<h2 id="git-rebase-interactive"><code>git rebase --interactive</code></h2>
+
+<p>The <code>--interactive</code> flag is useful for letting us rewrite our git history. We&rsquo;re able to move the order of our commits as well as squash commits down and change their recorded message.</p>
+
+<p>So let&rsquo;s assume we want to squash all but the first commit in our <code>feat/foo</code> branch. By that I mean we currently have:</p>
+
+<pre><code>* b4f9dfd - (HEAD -&gt; feat/foo) Add C (also revert A)
+* 7354a41 - Modify A
+* c321b40 - Add B
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>Let&rsquo;s say we want &ldquo;Add B&rdquo;, &ldquo;Modify A&rdquo; and &ldquo;Add C (also revert A)&rdquo; squashed into one commit. To do this we need to locate the parent commit of the earliest commit we want to squash.</p>
+
+<p>So &ldquo;Add B&rdquo; is the earliest commit we want as part of the squash, so the parent commit is &ldquo;README&rdquo;. To action the rebase let&rsquo;s run the following command:</p>
+
+<pre><code>git rebase --interactive 75eb1cb
+</code></pre>
+
+<p>This drops us into an editor with the following output:</p>
+
+<pre><code>pick c321b40 Add B
+pick 7354a41 Modify A
+pick b4f9dfd Add C (also revert A)
+
+# Rebase 75eb1cb..b4f9dfd onto 75eb1cb (3 command(s))
+#
+# Commands:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like &quot;squash&quot;, but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+# d, drop = remove commit
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out
+</code></pre>
+
+<p>We can modify it like so:</p>
+
+<pre><code>pick c321b40 Add B
+squash 7354a41 Modify A
+squash b4f9dfd Add C (also revert A)
+</code></pre>
+
+<p>This will result in the following combined commit details:</p>
+
+<pre><code># This is a combination of 3 commits.
+# The first commit's message is:
+Add B
+
+# This is the 2nd commit message:
+
+Modify A
+
+# This is the 3rd commit message:
+
+Add C (also revert A)
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Sun May 15 17:29:32 2016 +0100
+#
+# interactive rebase in progress; onto 75eb1cb
+# Last commands done (3 commands done):
+#    squash 7354a41 Modify A
+#    squash b4f9dfd Add C (also revert A)
+# No commands remaining.
+# You are currently editing a commit while rebasing branch 'feat/foo' on '75eb1cb'.
+#
+# Changes to be committed:
+#	modified:   README.md
+#
+</code></pre>
+
+<p>Now if we run <code>git lg -p</code> we&rsquo;ll see the new squashed commit does indeed contain all the previous commit&rsquo;s contents:</p>
+
+<pre><code>* b63857d - (HEAD -&gt; feat/foo) Add B (16 minutes ago)| 
+| diff --git a/README.md b/README.md
+| index 428f59e..f2e26b6 100644
+| --- a/README.md
+| +++ b/README.md
+| @@ -1 +1,3 @@
+|  - A: 1
+| +- B: 2
+| +- C: 3
+</code></pre>
+
+<p><div id="7"></div></p>
+
+<h2 id="git-rebase-onto"><code>git rebase --onto</code></h2>
+
+<p>Imagine we&rsquo;ve merged our <code>feat/foo</code> branch at this point into <code>master</code> using:</p>
+
+<pre><code>git merge --squash feat/foo
+</code></pre>
+
+<blockquote>
+<p>Note: you&rsquo;ll need to fix a conflict first for it to be successful</p>
+</blockquote>
+
+<p>So <code>master</code> should now have three commits:</p>
+
+<pre><code>* 19ec1bb - (HEAD -&gt; master) Merge feat/foo
+* 3fc460b - A to 9
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>What&rsquo;s the easiest way to delete the middle/second commit <code>3fc460b</code>? We could use <code>git rebase --interactive</code> to delete the commit from history, but there is an alternative that&rsquo;s much easier:</p>
+
+<pre><code>git rebase --onto 75eb1cb 3fc460b
+</code></pre>
+
+<blockquote>
+<p>Note: in this scenario you&rsquo;ll get a conflict that you&rsquo;ll need to resolve first (e.g. we&rsquo;re removing a commit that sets A to the value 9 but that change was also pulled into the <code>feat/foo</code> branch so git isn&rsquo;t sure whether you definitely want that change any more or not), but in most cases you&rsquo;ll likely have a clean rebase</p>
+</blockquote>
+
+<p>The basic structure of this command is:</p>
+
+<pre><code>git rebase --onto &lt;commit_to_become_new_base&gt; &lt;commit_to_delete&gt;
+</code></pre>
+
+<p>For more information see the documentation for <code>git rebase</code>:</p>
+
+<ul>
+<li><code>man git-rebase</code></li>
+<li><a href="https://git-scm.com/docs/git-rebase">git-scm.com/docs/git-rebase</a></li>
+</ul>
+
+<p><div id="8"></div></p>
+
+<h2 id="git-format-patch"><code>git format-patch</code></h2>
+
+<p>At this point you&rsquo;re likely using a service such as <a href="https://github.com/">GitHub</a> or <a href="https://about.gitlab.com/">GitLab</a> for creating projects and opening pull requests, as apposed to Git&rsquo;s own native pull request feature which is substantially less feature rich than these commercial abstraction layers.</p>
+
+<p>But sometimes just accepting a &lsquo;patch&rsquo; from someone and being able to apply it quickly and easily is what you want to do. So that&rsquo;s where <code>git format-patch</code> comes in.</p>
+
+<p>Imagine you have a centralised <code>master</code> branch and someone has branched off from its <code>HEAD</code> to a new branch called <code>cool-new-features</code> and they would like you to merge their changes directly with the centralised repository&rsquo;s <code>master</code> branch.</p>
+
+<p>This person would need to execute the following command:</p>
+
+<pre><code>git format-patch master
+</code></pre>
+
+<blockquote>
+<p>Note: you can swap the branch <code>master</code> for any valid commit, alias or range</p>
+</blockquote>
+
+<p>What this will end up doing is generating a &lsquo;patch&rsquo; file for each new commit that isn&rsquo;t available in master. Below is an example patch file generated from a test repo I was messing around with, and which actually generated two patch files for me (this being the first one):</p>
+
+<pre><code>From 64a903d2ed6b4280d4a0914aaf50f014ae05cdd3 Mon Sep 17 00:00:00 2001
+From: Integralist &lt;mark.mcdx@gmail.com&gt;
+Date: Tue, 31 May 2016 08:28:56 +0100
+Subject: [PATCH 1/2] G
+
+---
+ foo.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/foo.txt b/foo.txt
+index b1e6722..6f04b1d 100644
+--- a/foo.txt
++++ b/foo.txt
+@@ -1,3 +1,4 @@
+ A
+ B
+ C
++G
+-- 
+2.7.4
+</code></pre>
+
+<blockquote>
+<p>Note: if you want a single patch file you can use<br />
+the <code>--stdout</code> flag and redirect the output to a file<br />
+<code>git format-patch master --stdout &gt; new-feature.patch</code></p>
+</blockquote>
+
+<p>The person who generates the patch file(s) will then need to send them to you (which can be done using <code>git send-email</code>):</p>
+
+<pre><code>git send-email -to devlist@example.org 0001-A.patch
+</code></pre>
+
+<p>If it&rsquo;s you sending the patch via git, then you may need to configure git to use your mail server details:</p>
+
+<pre><code>git config --global sendemail.smtpserver smtp.my-isp.com
+git config --global sendemail.smtpserverport 465
+</code></pre>
+
+<p>You, as the recipient of the patch file(s), can then review and apply the patch using:</p>
+
+<pre><code>git checkout review-new-feature
+cat new-feature.patch | git am # single patch file
+cat *.patch | git am           # multiple patch files
+</code></pre>
+
+<p>Also of interest, if using GitHub for Pull Requests, is that you can add a <code>.patch</code> extension to the end of a PR path or commit path for it to generate a patch for you! So you can utilise GitHub for some of the nice &lsquo;review&rsquo; features, but then utilise classic/traditional communication and application of patches if you so choose (maybe for an older/internal system).</p>
+
+<p>So if you have a GitHub PR URL like <code>https://github.com/my-org/my-repo/pull/123</code>, then you can convert this into a patch file using <code>https://github.com/my-org/my-repo/pull/123.patch</code></p>
+
+<p>Git also offers you the <code>git apply</code> command to use in place of <code>git am</code>. The reason being is that <code>git am</code> actually commits the changes in the patch, where as <code>git apply</code> will only affect your working directory, so you&rsquo;ll have the opportunity to stage and commit the changes however you like. Unless you use the <code>--cached</code> or <code>--index</code> flags (see <code>man git-apply</code> for details).</p>
+
+<blockquote>
+<p>Note: <code>git apply</code> also has a <code>--reverse</code> flag to manipulate the order when applying multiple patchess</p>
+</blockquote>
+
+<p>The other difference is that <code>git am</code> only accepts patch files, where as <code>git apply</code> accepts patch files and also output from <code>git diff</code>. So you have more options available to you that way. For example:</p>
+
+<pre><code>curl https://gist.githubusercontent.com/anonymous/x/raw/x/test.diff | git apply
+</code></pre>
+
+<p><div id="9"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There are so many aspects to merging commits and dealing with git&rsquo;s commit history, that it&rsquo;s difficult to cover everything without people having to mentally store too much information that most of the time you wont utilise.</p>
+
+<p>For example, I&rsquo;ve not covered anything to do with pulling commits: <code>git pull --strategy</code>, <code>git pull --squash</code>, <code>git pull --rebase</code>, <code>git pull --ff-only</code> and <code>git pull --no-commit</code>. Each have their use cases, but I think sometimes you&rsquo;re better picking a single strategy and defining it as a standard within your development team.</p>
+
+<p>If you&rsquo;re interested in one git workflow approach that utilises git&rsquo;s rebasing feature, and I&rsquo;ve used with success in the past at the BBC, then I recommend you have a read of this blog post I wrote a few years ago: <a href="http://www.integralist.co.uk/posts/github-workflow.html">integralist.co.uk/posts/github-workflow</a></p>
+
+<p>I&rsquo;ve also written about other types of git &ldquo;workflows&rdquo; as part of BBC News&rsquo; &ldquo;Coding Best Practices&rdquo; working group: <a href="https://github.com/bbc/news-coding-best-practices/blob/master/git-workflow.md">github.com/bbc/news-coding-best-practices/git-workflow</a></p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/process'>process</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/pr'>pr</a>, <a class='tag' href='/tags/github'>github</a>, <a class='tag' href='/tags/git'>git</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Multiple SSH Keys for Different GitHub Accounts</a>
+    </div><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/big-o-for-beginners/'>
+        <span class='screen-reader'>Next post: </span>Big O for Beginners<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+
