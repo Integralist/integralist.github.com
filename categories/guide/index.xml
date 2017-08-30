@@ -54,5 +54,16 @@ I have no formal Computer Science (CS) background, I started programming in 1999
 Introduction So this is a bit of a random journey through some different computer based subjects. Things that I felt I should try to better understand. Some of it will be very basic, but hopefully it&amp;rsquo;ll be useful to those who are new to tech, and are interested in learning these things (or old dogs like me who should know better).</description>
     </item>
     
+    <item>
+      <title>Terminal Password Manager</title>
+      <link>http://www.integralist.co.uk/posts/terminal-password-manager/</link>
+      <pubDate>Wed, 19 Oct 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/terminal-password-manager/</guid>
+      <description>Introduction Installation Example Usage Exporting Data Synchronisation Mobile and GUI Applications MultiFactor Authentication Conclusion  
+Introduction I&amp;rsquo;m guessing that you have an app like 1Password or KeePassX to manage your passwords and other login credentials and you&amp;rsquo;re now looking for a cheaper alternative, and also one that doesn&amp;rsquo;t rely on a GUI (although as you&amp;rsquo;ll see that&amp;rsquo;s still possible).
+If so, then &amp;ldquo;Pass&amp;rdquo; might be something of interest to you as it offers you the ability to securely store information via the command line interface (e.</description>
+    </item>
+    
   </channel>
 </rss>

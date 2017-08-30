@@ -23,5 +23,16 @@ Most of us are at least familiar with opening a terminal and typing:
 man &amp;lt;some_command&amp;gt;  But you might be confused, when you see a manual page informing you to check out &amp;lt;another_command&amp;gt;(2). For example, you might be shown the message at the end of a man page that says See also: chmod(2).</description>
     </item>
     
+    <item>
+      <title>Terminal Password Manager</title>
+      <link>http://www.integralist.co.uk/posts/terminal-password-manager/</link>
+      <pubDate>Wed, 19 Oct 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/terminal-password-manager/</guid>
+      <description>Introduction Installation Example Usage Exporting Data Synchronisation Mobile and GUI Applications MultiFactor Authentication Conclusion  
+Introduction I&amp;rsquo;m guessing that you have an app like 1Password or KeePassX to manage your passwords and other login credentials and you&amp;rsquo;re now looking for a cheaper alternative, and also one that doesn&amp;rsquo;t rely on a GUI (although as you&amp;rsquo;ll see that&amp;rsquo;s still possible).
+If so, then &amp;ldquo;Pass&amp;rdquo; might be something of interest to you as it offers you the ability to securely store information via the command line interface (e.</description>
+    </item>
+    
   </channel>
 </rss>
