@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Understanding Big O  Logarithms Logarithm Example Factorials  Back to Big O Simple Search Binary Search The Travelling Salesperson Calculating Operation Speed Arrays vs Linked Lists Selection Sort Quick Sort Conclusion References  
+Introduction When you first start learning algorithms (Binary Search, Quick Sort, Breadth-first Search etc), you&rsquo;ll quickly realise that in order to take advantage of these algorithms, you need to know how fast they are.'>
+
+<meta property='og:title' content='Big O for Beginners ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Understanding Big O  Logarithms Logarithm Example Factorials  Back to Big O Simple Search Binary Search The Travelling Salesperson Calculating Operation Speed Arrays vs Linked Lists Selection Sort Quick Sort Conclusion References  
+Introduction When you first start learning algorithms (Binary Search, Quick Sort, Breadth-first Search etc), you&rsquo;ll quickly realise that in order to take advantage of these algorithms, you need to know how fast they are.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/big-o-for-beginners/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='bigo'><meta property='article:published_time' content='2016-06-28T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2016-06-28T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Big O for Beginners ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/big-o-for-beginners/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Big O for Beginners</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2016-06-28T13:00:00&#43;01:00'>2016-06-28</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    16 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Understanding Big O</a>
+
+<ul>
+<li><a href="#3">Logarithms</a></li>
+<li><a href="#4">Logarithm Example</a></li>
+<li><a href="#5">Factorials</a></li>
+</ul></li>
+<li><a href="#6">Back to Big O</a></li>
+<li><a href="#7">Simple Search</a></li>
+<li><a href="#8">Binary Search</a></li>
+<li><a href="#9">The Travelling Salesperson</a></li>
+<li><a href="#10">Calculating Operation Speed</a></li>
+<li><a href="#11">Arrays vs Linked Lists</a></li>
+<li><a href="#12">Selection Sort</a></li>
+<li><a href="#13">Quick Sort</a></li>
+<li><a href="#14">Conclusion</a></li>
+<li><a href="#15">References</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>When you first start learning algorithms (Binary Search, Quick Sort, Breadth-first Search etc), you&rsquo;ll quickly realise that in order to take advantage of these algorithms, you need to know how fast they are.</p>
+
+<p>Otherwise, when presented with a programming problem in which you want to select an algorithm to use to solve that problem, how will you know which algorithm is more efficient?</p>
+
+<p>One way to know how fast an algorithm is, would be to use the <a href="https://en.wikipedia.org/wiki/The_Big_O">Big O</a> notation.</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="understanding-big-o">Understanding Big O</h2>
+
+<p>Big O doesn&rsquo;t tell you how fast in time (e.g. seconds) an algorithm is. Instead it informs you of the number of <em>operations</em>, and how those operations will grow over time.</p>
+
+<p>Although we&rsquo;ll see how to calculate the speed of operations later on in this post, the primary benefit is to see &lsquo;at a glance&rsquo; the growth of operations as your data becomes larger.</p>
+
+<blockquote>
+<p>So the O in &ldquo;Big O&rdquo; means &ldquo;Operation&rdquo;</p>
+</blockquote>
+
+<p>This means in order for you to really understand Big O you&rsquo;re going to need to know some maths. Now, this is OK. I&rsquo;m genuinely terrible at maths, but you&rsquo;ll see as we go along that it&rsquo;s not as complicated as you might think.</p>
+
+<p>Effectively there are two math concepts we need to know:</p>
+
+<ol>
+<li>Logarithms</li>
+<li>Factorials</li>
+</ol>
+
+<p>You don&rsquo;t even need to know that much about them. Only the bare minimum is required. So let&rsquo;s make a start with Logarithms and then move onto Factorials afterwards. Once we understand those two concepts we can go back to Big O and start tying together some examples.</p>
+
+<p><div id="3"></div></p>
+
+<h3 id="logarithms">Logarithms</h3>
+
+<p>As I said, in order to understand Big O, you&rsquo;ll need to understand how <a href="https://en.wikipedia.org/wiki/Logarithm">Logarithms</a> work.</p>
+
+<p>I&rsquo;m terrible at Math, but luckily the awesome book &ldquo;<a href="https://www.manning.com/books/grokking-algorithms">Grokking Algorithms: An Illustrated Guide</a>&rdquo; (which I highly recommend) helped me at least understand the basics of Logarithms; enough so that I could then go on to understand Big O.</p>
+
+<p>In essence the Logarithm notation looks something like:</p>
+
+<pre><code>Log n (х)
+</code></pre>
+
+<blockquote>
+<p>Note: I had used a nice <code>𝑛</code> icon instead of <code>n</code> but on my phone I noticed it wasn&rsquo;t showing :-/ so I had to change it to something that wasn&rsquo;t a symbol.</p>
+</blockquote>
+
+<p>&hellip;where the <code>n</code> is what&rsquo;s called the &ldquo;base&rdquo; and <code>х</code> is the number you&rsquo;re aiming for. But really what we&rsquo;re interested in is the <em>result</em> of this calculation.</p>
+
+<p><div id="4"></div></p>
+
+<h3 id="logarithm-example">Logarithm Example</h3>
+
+<p>Imagine we have the following Logarthim:</p>
+
+<pre><code>Log5(100)
+</code></pre>
+
+<p>What this is effectively asking is:</p>
+
+<p>&ldquo;how many times do I need to multiple 5 by itself in order to reach the number 100?&rdquo;</p>
+
+<p>Let&rsquo;s find out:</p>
+
+<pre><code>5*5*5 = 125
+</code></pre>
+
+<p>Looks like the result of our Logarithm would&rsquo;ve been <code>3</code>, because there were three <code>5</code>&rsquo;s used in order to get to a number that was equal or greater than <code>100</code>.</p>
+
+<p>In this case the calculation wasn&rsquo;t exactly equal. By that I mean we went <em>past</em> <code>100</code> and ended up at <code>125</code>. But that&rsquo;s the essence of how to understand what a Logarithm is asking and how to calculate the result.</p>
+
+<p>So we can see the calculation looks like this:</p>
+
+<pre><code>Log5(100) = 3
+</code></pre>
+
+<p>The <code>3</code> is effectively the worst case number of steps involved when calculating that particular item.</p>
+
+<p>The number <code>100</code> in this case represents the number of items we have to execute our algorithm against. So if you were using an algorithm (such as a Binary Search; demonstrated later on below) and it was running over a collection of items, then the length of the items (in the above example Logarithm) would be <code>100</code>.</p>
+
+<p>We&rsquo;ll see how this is useful in measuring an algorithm&rsquo;s <em>speed</em> in a later section of this post. But for now let&rsquo;s go and understand Factorials&hellip;</p>
+
+<p><div id="5"></div></p>
+
+<h3 id="factorials">Factorials</h3>
+
+<p>Factorials are one of those things that can come in handy for a number of reasons. But generally they&rsquo;re really useful for identifying &lsquo;variations&rsquo;.</p>
+
+<p>Imagine you have three letters:</p>
+
+<ul>
+<li><code>A</code></li>
+<li><code>B</code></li>
+<li><code>C</code></li>
+</ul>
+
+<p>How many variations of these letters can you produce? So we have <code>A, B, C</code> as one variation. <code>A, C, B</code> would be another variation and then maybe <code>B, A, C</code> would be another etc. But how do you calculate how many variations there are?</p>
+
+<p>The solution is the factorial: <code>n!</code> (where <code>n</code> is the number of items you have).</p>
+
+<p>So in our example we had three items, so that would be written as <code>3!</code> factorial.</p>
+
+<p>Which really means:</p>
+
+<pre><code>3*2*1 = 6
+</code></pre>
+
+<p>So that&rsquo;s six variations you have for three items.</p>
+
+<p>But what if you have 10 items?</p>
+
+<pre><code>10*9*8*7*6*5*4*3*2*1 = 3,628,800
+</code></pre>
+
+<p>You can see that with a small number of items, the number of operations is massive. This is the total oposite of Logarithms which we looked at earlier (remember its growth of operations stayed consistently good when the collection grew).</p>
+
+<p>Although Factorials serve a useful purpose (the example given in the book &ldquo;Grokking Algorithms&rdquo; is one called &lsquo;The Travelling Salesperson&rsquo; - which is a problem that required calculating the quickest route the saleperson can take in order to visit n number of cities) they are probably the worst performing algorithm.</p>
+
+<p>So if you see <code>n!</code> you should be wary.</p>
+
+<p><div id="6"></div></p>
+
+<h2 id="back-to-big-o">Back to Big O</h2>
+
+<p>So now we understand how Logarithms and Factorials work we can come back to the Big O notation and understand that it&rsquo;s really a simple visual wrapper around these different mathematical calculations.</p>
+
+<pre><code>O(х)
+</code></pre>
+
+<p>In the above snippet, <code>х</code> is a calculation.</p>
+
+<p>If we were considering Logarithms, then it would look like the following:</p>
+
+<pre><code>O(Log n (х))
+</code></pre>
+
+<p>If we were considering Factorials, then it would look like the following:</p>
+
+<pre><code>O(n!)
+</code></pre>
+
+<p>It&rsquo;s important noting that you&rsquo;ll never see a specific calculation like <code>O(Log5(100))</code> or <code>O(3!)</code> in Big O. It&rsquo;ll always be an abstract version like <code>O(Log n (х))</code> or <code>O(n!)</code> because Big O notation is a way of <em>talking</em> to other people and having a &lsquo;common language&rsquo;.</p>
+
+<p>For example:</p>
+
+<p>&ldquo;Hey Bob, I don&rsquo;t think we should use the Simple Search algorithm because it&rsquo;s <code>O(n)</code>. We&rsquo;d be much better off using a Binary Search, as that&rsquo;s <code>O(Log n (х))</code>&rdquo;.</p>
+
+<p>See how this gives us a common language. It&rsquo;s similar to Design Patterns. Patterns can be implemented in a variety of different ways and yet we have common language for easily identifying code that follows a certain pattern (or when we think a particular pattern might be a good solution to a design problem, we have a common language for explaining the solution to someone else without needing to actually implement it first).</p>
+
+<p>Now my mention of &lsquo;Simple Search&rsquo; and &lsquo;Binary Search&rsquo; might not mean much to you, as you might not know how these algorithms work. So let&rsquo;s look at these two algorithms next and then after that you&rsquo;ll hopefully understand why Big O helps us understand the performance of these algorithms.</p>
+
+<p><div id="7"></div></p>
+
+<h2 id="simple-search">Simple Search</h2>
+
+<p>Simple Search is probably the simplest algorithm you&rsquo;ll ever learn. You&rsquo;ll see why in just a moment&hellip;</p>
+
+<p>Imagine you have a collection of twelve items (and these items are numbers), which are sorted/in order. You are required to locate a particular item within that collection.</p>
+
+<p>Here is the collection:</p>
+
+<pre><code>[1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 21]
+</code></pre>
+
+<p>The Simple Search approach is to loop over the collection one item at a time and check whether the current item matches the item you&rsquo;re looking for.</p>
+
+<p>So if the number you were looking for was <code>19</code>, then that means you&rsquo;ll first check <code>1</code>, nope that&rsquo;s not it. You&rsquo;ll then check <code>3</code>, nope that&rsquo;s not it either&hellip; and keep going until you reach the number you&rsquo;re looking for.</p>
+
+<p>So what does this algorithm look like in Big O?</p>
+
+<pre><code>O(n)
+</code></pre>
+
+<h3 id="what-does-big-o-tell-us">What does Big O tell us?</h3>
+
+<p>Big O is telling us that this algorithm performs in &lsquo;linear&rsquo; time. This means the number of operations increase linearly with the number of items in the collection. So in the above example, the worst case number of operations will be 12. But if the collection length was 100 items, then the worst case number of operations would be 100.</p>
+
+<p>So in effect, the bigger the collection, the more <em>expensive</em> this algorithm becomes. With a very small collection it&rsquo;s fast because of its simplicity, but beyond a small collection it&rsquo;s a poor performing choice of algorithm. This is what Big O is telling us here.</p>
+
+<p><div id="8"></div></p>
+
+<h2 id="binary-search">Binary Search</h2>
+
+<p>Consider the same example as before, a collection of 12 items. The Binary Search algorithm is quite straight forward: you set the start and end indexes (usually zero for &lsquo;start&rsquo;, and the length of the collection for the &lsquo;end&rsquo;).</p>
+
+<p>Now you locate the middle of the collection and check if the value you&rsquo;re looking for either matches or is too low/high. If it matches, then hey great you&rsquo;ve just reduced the number of operations by a large amount compared to the Simple Search.</p>
+
+<p>If the middle item (our &lsquo;guess&rsquo;) is lower than the actual item we&rsquo;re looking for, then you reassign the value of &lsquo;start&rsquo; to be the middle index (the &lsquo;end&rsquo; stays set to the length of the collection). You&rsquo;ve now reduced the sliding window of items by half.</p>
+
+<p>Alternatively if the middle item was larger than the item we&rsquo;re looking for, then you reassign the value &lsquo;end&rsquo; to be the middle index (the &lsquo;start&rsquo; stays set to zero). You&rsquo;ve again reduced the sliding window of items by half.</p>
+
+<p>From here we &lsquo;rinse/repeat&rsquo; until the next &lsquo;middle of the collection&rsquo; selection is the item we&rsquo;re looking for.</p>
+
+<p>This is a much more efficient search algorithm compared to Simple Search.</p>
+
+<p>Let&rsquo;s see what this looks like in Big O notation&hellip;</p>
+
+<pre><code>O(Log n (х))
+</code></pre>
+
+<h3 id="what-does-big-o-tell-us-1">What does Big O tell us?</h3>
+
+<p>Big O is telling us that this algorithm works in &lsquo;log time&rsquo;, which means the performance improves as the size of the collection increases! You can tell this &lsquo;at a glance&rsquo; with Big O syntax (especially as you now know how Logarithms work). This algorithm will perform well across a wide range of collection sizes.</p>
+
+<p>Big O in effect tells us how the operations <em>grow</em>.</p>
+
+<p>So for this particular algorithm example, the worst case number of operations is <code>4</code>. Take a look at our earlier explanation of Logarithms if you&rsquo;re unsure why that is, but in a non-abstract sense this would look like: <code>O(Log2(12))</code>. We&rsquo;re dividing our collection in two (<code>Log2</code>) for each operation (<code>(12)</code>).</p>
+
+<p>This is probably one of the best Big O&rsquo;s you&rsquo;ll come across as effectively the performance (and by that I mean the growth of the operations) stays consistently good as the size of the collection increases.</p>
+
+<p>So if you have a collection of 1000 items, then that would result in (worst case) <code>10</code> operations required to locate the item you&rsquo;re looking for:</p>
+
+<pre><code>2*2*2*2*2*2*2*2*2*2 = 1024
+</code></pre>
+
+<p>How about a collection of a million items? That would be result in (worst case) <code>20</code> (yes 20!) operations to find the item you were looking for amongst one million items. That&rsquo;s incredible.</p>
+
+<p><div id="9"></div></p>
+
+<h2 id="the-travelling-salesperson">The Travelling Salesperson</h2>
+
+<p>Not much to say here that we haven&rsquo;t already mentioned earlier when talking about Factorials. This problem is about calculating the number of different routes someone can take in order to ensure they reach all the specified number of cities, and then working out which route was quickest.</p>
+
+<p>In Big O notation this looks like:</p>
+
+<pre><code>O(n!)
+</code></pre>
+
+<h3 id="what-does-big-o-tell-us-2">What does Big O tell us?</h3>
+
+<p>Big O is telling us this algorithm results in &lsquo;factorial time&rsquo;, and this is one of the worst performing algorithms known to mankind. Apparently it baffles the maths community, in that there isn&rsquo;t actually a better algorithm to solve this problem.</p>
+
+<p>So as we saw earlier, if there were ten cities to visit and we need to identify the quickest route to visit all ten cities, it would take us approximately <code>3,628,800</code> operations to just calculate all the variations, before we could identify which one was quickest.</p>
+
+<p><div id="10"></div></p>
+
+<h2 id="calculating-operation-speed">Calculating Operation Speed</h2>
+
+<p>In order to calculate the speed of an algorithm, we need to know the worst case number of operations. This is what Big O in effect gives us (whether it be linear time, log time or factorial time). So how do we calculate the speed based on the number of operations?</p>
+
+<p>First we need to know how many operations can be executed within one second.</p>
+
+<p>The answer to that question is ten operations:</p>
+
+<pre><code>1 second / 0.1 = 10 operations
+</code></pre>
+
+<blockquote>
+<p>Note: your computer can handle more than 10 operations a second, but as we&rsquo;ve said before, Big O is about worst case scenarios and so although not realistic; this number does give us a nice base line to work from</p>
+</blockquote>
+
+<p>We can then calculate the <em>time</em> associated with a number of operations.</p>
+
+<p>Imagine we have the following Big O:</p>
+
+<pre><code>O(Log n (х))
+</code></pre>
+
+<p>If this was a collection of 16 items, then the non-abstract version would look something like:</p>
+
+<pre><code>O(Log2(16))
+</code></pre>
+
+<p>We know from our earlier discussions that this would result in a worst case result of <code>4</code> operations to find the item we&rsquo;re searching for.</p>
+
+<blockquote>
+<p>Remember: <code>2x2x2x2 = 16</code><br />
+That&rsquo;s <code>4</code> times we multipled <code>2</code> by itself to reach <code>16</code></p>
+</blockquote>
+
+<p>We also now know that a single operation takes <code>0.1</code> of a second.</p>
+
+<p>So with this in mind we can calculate the speed of <code>O(Log2(16))</code> as being: <code>0.4</code> seconds</p>
+
+<pre><code>0.1 * 4 operations = 0.4
+</code></pre>
+
+<p>If we were using the Simple Search algorithm (which is <code>O(n)</code>) on a collection of 16 items, then we know that this would take <code>1.6</code> seconds to complete:</p>
+
+<pre><code>0.1 * 16 operations = 1.6
+</code></pre>
+
+<p><div id="11"></div></p>
+
+<h2 id="arrays-vs-linked-lists">Arrays vs Linked Lists</h2>
+
+<p>Let&rsquo;s consider what Big O looks like for the Array and Linked List data structures.</p>
+
+<p>An Array supports &lsquo;index access&rsquo;, meaning you can jump straight to an Array index. Where as with Linked Lists you have to traverse the entire list in order to locate a specific item.</p>
+
+<blockquote>
+<p>Note: another difference comes in memory management. Arrays require n number of memory &lsquo;slots&rsquo; to be next to each other, where as Linked List memory can be sparse and spread out due to how it implements its internal chaining of nodes. This is why Arrays are typically considered to be &lsquo;fixed size&rsquo; and not easily expanded, because expansion of the Array&rsquo;s size could potentially require an expensive movement of the Array to a new location in memory in order to faciliate a new index and yet still have memory slots side-by-side</p>
+</blockquote>
+
+<p>This suggests that Array lookups are <code>O(1)</code>, known as &lsquo;constant time&rsquo; because the lookup growth stays the same no matter the length of the collection (i.e. it&rsquo;s constant).</p>
+
+<p>Linked List lookups on the other hand are <code>O(n)</code>, which we already know is &lsquo;linear time&rsquo; (remember this is how the Simple Search algorithm performed).</p>
+
+<p>But what about new data insertions? Well, with an Array you insert new items at the end of the Array, and because of its index access it would indicate <code>O(1)</code>. But if you&rsquo;re inserting an item into the middle of the Array, then this changes to <code>O(n)</code> because of the internal implementation of Arrays in memory, it means you need to re-order all the following items, which is expensive (hence the side-effect of inserting into the middle is really more like linear time).</p>
+
+<p>Linked List insertions are generally <code>O(1)</code> if inserting at the beginning or end of the list, but more like <code>O(n) + O(1)</code> if inserting into the middle of the list because you have to traverse the list first and then insert your new item.</p>
+
+<p><div id="12"></div></p>
+
+<h2 id="selection-sort">Selection Sort</h2>
+
+<p>The &lsquo;selection sort&rsquo; algorithm sorts an unordered list by looping over the list <code>n</code> number of times, and for each loop it identifies either the smallest or largest element (which - smallest/largest - depends on how you&rsquo;re hoping to sort your list: do you want ascending or descending order). But ultimately you&rsquo;ll end up constructing a <em>new</em> &lsquo;ordered&rsquo; list.</p>
+
+<p>Specifically you loop a number of times to match the collection length. Then you loop the collection looking for smallest/largest item. Then you mutate the collection so it&rsquo;s smaller by one.</p>
+
+<p>This ends up being <code>O(n₂)</code> (n to the power of 2, or <code>O(n * n)</code>).</p>
+
+<blockquote>
+<p>Note: although you&rsquo;re looping over the collection multiple times, you are in fact looping over a slightly smaller collection each time. But it&rsquo;s <em>still</em> considered <code>O(n)</code> for each time you loop over the collection because regardless of how many items are in there you treat it as abstract</p>
+</blockquote>
+
+<p>So if your collection is 10 items long, then it would calculate as follows:</p>
+
+<pre><code>10 * 10 (i.e. n₂ meaning: 10 to the power of 2) = 100 operations
+0.1 * 100 = 10 seconds
+</code></pre>
+
+<p><div id="13"></div></p>
+
+<h2 id="quick-sort">Quick Sort</h2>
+
+<p>The &lsquo;quick sort&rsquo; algorithm achieves the same result as &lsquo;selection sort&rsquo;, but is much faster. This particular algorithm sorts an unordered list using recusion instead.</p>
+
+<p>Specifically it uses the D&amp;C (Divide and Conquer) approach to problem solving.</p>
+
+<p>The process is as follows:</p>
+
+<ul>
+<li>You pick a &lsquo;pivot&rsquo; (a random array index)</li>
+<li>Loop the array storing items less than the pivot</li>
+<li>Loop the array storing items greater than the pivot</li>
+<li>Assuming the &lsquo;less&rsquo; and &lsquo;greater&rsquo; collections are already sorted</li>
+<li>You can now return &lsquo;less&rsquo; + pivot + &lsquo;greater&rsquo;</li>
+</ul>
+
+<p>In reality you&rsquo;ll use recursion to then sort both the &lsquo;less&rsquo; and &lsquo;greater&rsquo; arrays using the same algorithm.</p>
+
+<p>This ends up being <code>O(n₂)</code> in the worst case, but can be <code>O(n Log₂ n)</code> in the better case.</p>
+
+<p>The explanation for this, is that the quicksort function takes in a single collection and loops over it. In the process it then splits the collection into three chunks (less, pivot and greater) and it recursively calls itself (i.e. quicksort calls quicksort) on the &lsquo;less&rsquo; and &lsquo;greater&rsquo; chunks, subsequently looping over those collections as well.</p>
+
+<p>Big O notation helps us to understand the hidden complexity of the algorithm. If you see something like <code>O(n₂)</code>, then you know that there are nested loops or some kind of recursion happening in order to cause that.</p>
+
+<p>Now it&rsquo;s worth being aware that Quick Sort&rsquo;s performance is dependent on the pivot you choose. Take a look at some of the example implementations of the quick sort algorithm in the reference list below <a href="#15">&ldquo;Gist: Algorithms in Python&rdquo;</a>.</p>
+
+<p>There you&rsquo;ll see we have three implementations: one where we pick the first index every time as the pivot, one where we pick the middle index every time and one where we pick an index at random.</p>
+
+<p>Picking an index at random will give you the best chance of high performance. If you, for example, always pick the first index then you&rsquo;ll have a situation where you&rsquo;re potentially sorting items unnecessarily.</p>
+
+<p>So in the best case scenario, if your collection is 10 items long, then it would calculate as follows:</p>
+
+<pre><code>10 * 4 (Log₂10 == 2*2*2*2) = 40 operations
+0.1 * 40 = 4 seconds
+</code></pre>
+
+<p>But in the worst case scenario, if your collection was 10 items long, then it could calculate as follows:</p>
+
+<pre><code>10 * 10 = 100 operations
+0.1 * 100 = 10 seconds
+</code></pre>
+
+<p><div id="14"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>This has been a very basic introduction to the concept of Big O. Hopefully you&rsquo;ve found it useful and have a greater appreciation for what Big O offers in the way of understanding the performance of particular algorithms (although we&rsquo;ve only really looked at a very small selection).</p>
+
+<p>We&rsquo;ve seen the following Big O types:</p>
+
+<ul>
+<li><code>O(Log n (x))</code>: log time</li>
+<li><code>O(n!)</code>: factorial time</li>
+<li><code>O(n)</code>: linear time</li>
+<li><code>O(1)</code>: constant time</li>
+<li><code>O(n * n)</code> (also known as <code>O(n₂)</code>): selection sort example</li>
+<li><code>O(n Log n (x))</code>: quick sort example</li>
+</ul>
+
+<p>There are many more algorithms and calculations for Big O, and as I learn them I&rsquo;ll be sure to update this blog post accordingly. If in the mean time you notice any mistakes, then please feel free to let me know.</p>
+
+<p><div id="15"></div></p>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://gist.github.com/Integralist/9763bded76e7d826535a3caeafc3bdff">Gist: Algorithms in Python</a></li>
+<li><a href="https://rob-bell.net/2009/06/a-beginners-guide-to-big-o-notation/">Beginners Guide to Big O</a></li>
+</ul>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/guide'>guide</a>, <a class='category' href='/categories/algorithms'>algorithms</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/bigo'>bigo</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Multiple SSH Keys for Different GitHub Accounts</a>
+    </div><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/github-pull-request-formatting/'>
+        <span class='screen-reader'>Next post: </span>GitHub Pull Request Formatting<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

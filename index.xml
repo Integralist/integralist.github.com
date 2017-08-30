@@ -134,6 +134,16 @@ Both have a large number of engineers and teams, but due to different organisati
     </item>
     
     <item>
+      <title>Big O for Beginners</title>
+      <link>http://www.integralist.co.uk/posts/big-o-for-beginners/</link>
+      <pubDate>Tue, 28 Jun 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/big-o-for-beginners/</guid>
+      <description>Introduction Understanding Big O  Logarithms Logarithm Example Factorials  Back to Big O Simple Search Binary Search The Travelling Salesperson Calculating Operation Speed Arrays vs Linked Lists Selection Sort Quick Sort Conclusion References  
+Introduction When you first start learning algorithms (Binary Search, Quick Sort, Breadth-first Search etc), you&amp;rsquo;ll quickly realise that in order to take advantage of these algorithms, you need to know how fast they are.</description>
+    </item>
+    
+    <item>
       <title>Multiple SSH Keys for Different GitHub Accounts</title>
       <link>http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/</link>
       <pubDate>Wed, 18 Nov 2015 13:00:00 +0100</pubDate>

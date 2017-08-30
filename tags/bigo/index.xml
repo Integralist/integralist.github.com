@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Bigo on integralist</title>
+    <link>http://www.integralist.co.uk/tags/bigo/</link>
+    <description>Recent content in Bigo on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Tue, 28 Jun 2016 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/bigo/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Big O for Beginners</title>
+      <link>http://www.integralist.co.uk/posts/big-o-for-beginners/</link>
+      <pubDate>Tue, 28 Jun 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/big-o-for-beginners/</guid>
+      <description>Introduction Understanding Big O  Logarithms Logarithm Example Factorials  Back to Big O Simple Search Binary Search The Travelling Salesperson Calculating Operation Speed Arrays vs Linked Lists Selection Sort Quick Sort Conclusion References  
+Introduction When you first start learning algorithms (Binary Search, Quick Sort, Breadth-first Search etc), you&amp;rsquo;ll quickly realise that in order to take advantage of these algorithms, you need to know how fast they are.</description>
+    </item>
+    
+  </channel>
+</rss>
