@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Sections Sub sections Accessing different sections  
+Introduction Your operating system provides manual pages that explain what specific commands do and where they can be located on your computer.
+Most of us are at least familiar with opening a terminal and typing:
+man &lt;some_command&gt;  But you might be confused, when you see a manual page informing you to check out &lt;another_command&gt;(2). For example, you might be shown the message at the end of a man page that says See also: chmod(2).'>
+
+<meta property='og:title' content='Understanding Man Pages ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Sections Sub sections Accessing different sections  
+Introduction Your operating system provides manual pages that explain what specific commands do and where they can be located on your computer.
+Most of us are at least familiar with opening a terminal and typing:
+man &lt;some_command&gt;  But you might be confused, when you see a manual page informing you to check out &lt;another_command&gt;(2). For example, you might be shown the message at the end of a man page that says See also: chmod(2).'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/understanding-man-pages/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='manpage'><meta property='article:tag' content='shell'><meta property='article:published_time' content='2016-11-25T13:00:00Z'/><meta property='article:modified_time' content='2016-11-25T13:00:00Z'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Understanding Man Pages ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/understanding-man-pages/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Understanding Man Pages</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2016-11-25T13:00:00Z'>2016-11-25</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    4 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Sections</a></li>
+<li><a href="#3">Sub sections</a></li>
+<li><a href="#4">Accessing different sections</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Your operating system provides manual pages that explain what specific commands do and where they can be located on your computer.</p>
+
+<p>Most of us are at least familiar with opening a terminal and typing:</p>
+
+<pre><code>man &lt;some_command&gt;
+</code></pre>
+
+<p>But you might be confused, when you see a manual page informing you to check out <code>&lt;another_command&gt;(2)</code>. For example, you might be shown the message at the end of a man page that says <code>See also: chmod(2)</code>.</p>
+
+<p>If you try that, it won&rsquo;t work:</p>
+
+<pre><code>man chmod(2)
+</code></pre>
+
+<p>So let&rsquo;s understand why that is and what it means.</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="sections">Sections</h2>
+
+<p>So the manual pages are separated into &lsquo;sections&rsquo;. This is what the number within the parentheses represents (i.e. <code>chmod(2)</code> represents the <code>chmod</code> command from section 2 of the OS manual).</p>
+
+<p>To find where your manual pages are stored:</p>
+
+<pre><code>cd /usr/share/man
+</code></pre>
+
+<p>A simple <code>ls</code> will show that on my OS (macOS) I have nine manuals:</p>
+
+<pre><code>man1/   man2/   man3/   man4/   man5/   man6/   man7/   man8/   man9/
+</code></pre>
+
+<p>Each manual section has an introduction page † that explains what the section covers. These (taken from my OS) are as follows:</p>
+
+<ul>
+<li>man1: introduction to general commands (tools and utilities)</li>
+<li>man2: introduction to system calls and error numbers</li>
+<li>man3: introduction to the C libraries</li>
+<li>man4: contains documentation on special files and sockets</li>
+<li>man5: introduction to file formats</li>
+<li>man6: contains documentation about games and other miscellaneous fun programs</li>
+<li>man7: miscellaneous information pages</li>
+<li>man8: introduction to system maintenance and operation commands</li>
+<li>man9: introduction to system kernel interfaces</li>
+</ul>
+
+<blockquote>
+<p>† except for manual sections 4 and 6. I had to go to the online reference for <a href="https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/">macOS</a> in order to find out what they contained</p>
+</blockquote>
+
+<p>If you wanted to know &lsquo;at a glance&rsquo; what commands were available, then you could install the <code>tree</code> command and execute it at the current directory (<code>/usr/share/man</code>) and this would show you something like the following (cut short for brevity):</p>
+
+<pre><code>.
+├── man1
+│   ├── ab.1
+│   ├── accesstool.1
+│   ├── addftinfo.1
+│   ├── afconvert.1
+│   ├── afhash.1
+│   ├── afida.1
+│   ├── afinfo.1
+├── man2
+│   ├── accept.2
+│   ├── access.2
+│   ├── acct.2
+│   ├── adjtime.2
+│   ├── aio_cancel.2
+│   ├── aio_error.2
+│   ├── aio_read.2
+</code></pre>
+
+<p><div id="3"></div></p>
+
+<h2 id="sub-sections">Sub sections</h2>
+
+<p>You&rsquo;ll notice that most page files within each manual section have an extension that matches the section they&rsquo;re contained within (e.g. <code>ab.1</code> for <code>ab</code> command inside manual 1 or <code>aio_read.2</code> for <code>aio_read</code> command inside manual 2).</p>
+
+<p>What&rsquo;s interesting is that there are some files, such as <code>httpdstat.d.1m</code> (which is inside manual section 1) that have a different extension (<code>d.1m</code>) or <code>asn1parse.1ssl</code> (<code>1ssl</code>).</p>
+
+<p>By looking back at the <a href="https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/">online macOS manual pages reference</a> I noticed there were additional sub sections:</p>
+
+<ul>
+<li><u>Section 1m</u>: contains documentation for tools built on top of DTrace</li>
+<li><u>Section 1ssl</u>: contains documentation on tools that are part of OpenSSL</li>
+<li><u>Section 1tcl</u>: contains documentation on tools that are part of Tcl</li>
+<li><u>Section 3cc</u>: contains documentation on the Common Crypto API</li>
+<li><u>Section 3pcap</u>: contains documentation on the packet capture library, libpcap</li>
+<li><u>Section 3pm</u>: contains documentation on Perl modules</li>
+<li><u>Section 3ssl</u>: contains documentation on OpenSSL C library routines</li>
+<li><u>Section 3tcl</u>: contains documentation on Tcl/Tk C library routines</li>
+<li><u>Section 3x</u>: contains documentation on curses-related C library routines</li>
+<li><u>Section 5ssl</u>: contains documentation on SSL-specific configuration file formats</li>
+<li><u>Section 7ssl</u>: miscellaneous SSL documentation section</li>
+<li><u>Section n</u>: contains documentation about Tcl/Tk</li>
+<li><u>Section ntcl</u>: contains documentation about Tcl/Tk</li>
+</ul>
+
+<p><div id="4"></div></p>
+
+<h2 id="accessing-different-sections">Accessing different sections</h2>
+
+<p>Typically when we type <code>man &lt;some_command&gt;</code>, the <code>man</code> command will search all the sections looking for the specified command.</p>
+
+<p>It stops at the first match it finds. So there could be a scenario where you search for a command and you get the user space (top-level) entry command and not the &lsquo;system call&rsquo; version that actually interacts with your OS.</p>
+
+<p>The <code>chmod</code> command is a good example of that scenario.</p>
+
+<p>If you want to see the actual system call manual page for <code>chmod</code>, you need to search inside the specific section (which in this case is 2):</p>
+
+<pre><code>man 2 chmod
+</code></pre>
+
+<p>Alternatively, you can search multiple specific sections:</p>
+
+<pre><code>man -S 1:2 chmod
+</code></pre>
+
+<p>The above command will search through only sections 1 and 2, but it will still stop at the first match it finds so the above command is no different in outcome than just <code>man chmod</code>.</p>
+
+<p>But if you know for sure that the command you&rsquo;re looking for is somewhere within either the system call or C library manual pages, then <code>man -S 2:3 &lt;your_command&gt;</code> would prevent a command from manual section 1 getting matched first.</p>
+
+<blockquote>
+<p>Note: to see the intro page for a section use <code>man &lt;n&gt; intro</code></p>
+</blockquote>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/manpage'>manpage</a>, <a class='tag' href='/tags/shell'>shell</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Multiple SSH Keys for Different GitHub Accounts</a>
+    </div><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/concepts-from-the-c-programming-language/'>
+        <span class='screen-reader'>Next post: </span>Concepts From the C Programming Language<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+
