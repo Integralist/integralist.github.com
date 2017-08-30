@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Four ways to skin a cat How does the adapter work? Why is this interesting?  
+Introduction Here is some code that demonstrates the typical &lsquo;hello world&rsquo; for a Go based web server:
+package main import ( &quot;fmt&quot; &quot;net/http&quot; ) func handler(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, &quot;Hello %s&quot;, r.URL.Path[1:]) } func main() { http.HandleFunc(&quot;/World&quot;, handler) http.ListenAndServe(&quot;:8080&quot;, nil) }   Note: http://localhost:8080/World will return Hello World'>
+
+<meta property='og:title' content='Understanding Golang&#39;s Func Type ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Four ways to skin a cat How does the adapter work? Why is this interesting?  
+Introduction Here is some code that demonstrates the typical &lsquo;hello world&rsquo; for a Go based web server:
+package main import ( &quot;fmt&quot; &quot;net/http&quot; ) func handler(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, &quot;Hello %s&quot;, r.URL.Path[1:]) } func main() { http.HandleFunc(&quot;/World&quot;, handler) http.ListenAndServe(&quot;:8080&quot;, nil) }   Note: http://localhost:8080/World will return Hello World'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/understanding-golangs-func-type/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='grpc'><meta property='article:tag' content='rpc'><meta property='article:tag' content='golang'><meta property='article:tag' content='go'><meta property='article:published_time' content='2015-11-23T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2015-11-23T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Understanding Golang&#39;s Func Type ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/understanding-golangs-func-type/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Understanding Golang&#39;s Func Type</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2015-11-23T13:00:00&#43;01:00'>2015-11-23</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    10 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Four ways to skin a cat</a></li>
+<li><a href="#3">How does the adapter work?</a></li>
+<li><a href="#4">Why is this interesting?</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Here is some code that demonstrates the typical &lsquo;hello world&rsquo; for a Go based web server:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;net/http&quot;
+)
+
+func handler(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;Hello %s&quot;, r.URL.Path[1:])
+}
+
+func main() {
+  http.HandleFunc(&quot;/World&quot;, handler)
+  http.ListenAndServe(&quot;:8080&quot;, nil)
+}
+</code></pre>
+
+<blockquote>
+<p>Note: <code>http://localhost:8080/World</code> will return <code>Hello World</code></p>
+</blockquote>
+
+<p>For most people, setting up a web server to handle incoming HTTP requests is considered a quick and simple introduction to the <a href="https://golang.org/">Go programming language</a>, and looking at the above code it&rsquo;s easy to see why that would be the case. But further investigation can yield some nice learnings about Go&rsquo;s built-in <code>func</code> type and how it is used as an adapter layer.</p>
+
+<p>In this blog post I will demonstrate a few different ways of creating a web server and then I&rsquo;ll clarify how some of the functionality (specifically <code>http.HandleFunc</code>) works. What initially drove me to look into this was my curiosity as to why I would always insert <code>nil</code> to the <code>http.ListenAndServe</code> function by default when setting up a basic web server (see above code example).</p>
+
+<p>It was never really that clear to me and so it&rsquo;s just something I &lsquo;cargo cult&rsquo;ed and subsequently replicated every single time I needed a web server. I realised I needed to know what its purpose was in order to feel like I wasn&rsquo;t going through the motions unnecessarily or missing out on additional functionality (which it turns out I was).</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="four-ways-to-skin-a-cat">Four ways to skin a cat</h2>
+
+<p>There are currently four ways, that I know of, to create a web server with Go (well, actually only three - the first two examples are effectively the same - but we add a little more code to demonstrate different ways incoming requests can be handled).</p>
+
+<p>Each of the variations ultimately revolve around what we send to <code>http.ListenAndServe</code> as its second argument (and this &lsquo;thing&rsquo; we send also ultimately should have a <code>ServeHTTP</code> method; we&rsquo;ll see shortly how this is achieved in different ways).</p>
+
+<p>So here are each of the variations:</p>
+
+<ol>
+<li>No request parsing (serve same content regardless of request)</li>
+<li>Manual request parsing</li>
+<li>Multiplexer</li>
+<li>Global multiplexer</li>
+</ol>
+
+<h3 id="no-request-parsing">No request parsing</h3>
+
+<p>The most basic implementation (and by basic I don&rsquo;t mean &lsquo;simplest&rsquo;, more&hellip; &lsquo;raw&rsquo;) is demonstrated in the below code sample, which calls <code>ListenAndServe</code> and passes in <code>db</code> as its second argument.</p>
+
+<blockquote>
+<p>Note: although I wrote this blog post back in October 2015, I&rsquo;ve rewritten the below examples based off inspiration from &ldquo;The Go Programming&rdquo; book I&rsquo;ve been reading recently</p>
+</blockquote>
+
+<p>This first section will give us enough background and grounding to build upon in the latter sections:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+)
+
+type pounds float32
+
+func (p pounds) String() string {
+  return fmt.Sprintf(&quot;£%.2f&quot;, p)
+}
+
+type database map[string]pounds
+
+func (d database) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+  for item, price := range d {
+    fmt.Fprintf(w, &quot;%s: %s\n&quot;, item, price)
+  }
+}
+
+func main() {
+  db := database{
+    &quot;foo&quot;: 1,
+    &quot;bar&quot;: 2,
+  }
+
+  log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, db))
+}
+</code></pre>
+
+<p>We can see from the above code sample that <code>db</code> is an instance of our custom <code>database</code> type, which states it should be a map data structure consisting of strings for keys and <code>pounds</code> for values.</p>
+
+<p>We can also see that <code>pounds</code> is itself a type of <code>float32</code> and has a custom <code>String</code> method attached, allowing us to modify its output when converted into a string value. Similarly the <code>database</code> type has a method attached, but this time it is a <code>ServeHTTP</code> method.</p>
+
+<p>The <code>ServeHTTP</code> is required in order to satisfy the <code>ListenAndServe</code> method signature, which states the second argument should be a type of <code>Handler</code>:</p>
+
+<pre><code>func ListenAndServe(addr string, handler Handler) error
+</code></pre>
+
+<blockquote>
+<p>Documentation: <code>godoc net/http ListenAndServe | less</code></p>
+</blockquote>
+
+<p>If we look at the source code for the <code>Handler</code> type (below) we can clearly see it requires a <code>ServeHTTP</code> method to be available (hence why our <code>database</code> type associates its own <code>ServeHTTP</code> method):</p>
+
+<pre><code>type Handler interface {
+    ServeHTTP(ResponseWriter, *Request)
+}
+</code></pre>
+
+<blockquote>
+<p>Documentation: <code>godoc net/http Handler | less</code></p>
+</blockquote>
+
+<p>The above sample web server code will always serve the same response regardless of the URL that was specified. So for example&hellip;</p>
+
+<ul>
+<li><code>http://localhost:8000/</code></li>
+<li><code>http://localhost:8000/abc</code></li>
+<li><code>http://localhost:8000/xyz</code></li>
+</ul>
+
+<p>&hellip;will all serve back the response:</p>
+
+<pre><code>foo: £1.00
+bar: £2.00
+</code></pre>
+
+<h3 id="manual-request-parsing">Manual request parsing</h3>
+
+<p>OK, so now we&rsquo;ve got the above example written. Let&rsquo;s enhance it by allowing our application to handle different routes as apposed to serving the same content all the time. To do this we&rsquo;ll modify our <code>ServeHTTP</code> method to interrogate the incoming request object and parse out the URL, as demonstrated in the below code sample:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+)
+
+type pounds float32
+
+func (p pounds) String() string {
+  return fmt.Sprintf(&quot;£%.2f&quot;, p)
+}
+
+type database map[string]pounds
+
+func (d database) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+  switch r.URL.Path {
+  case &quot;/foo&quot;:
+    fmt.Fprintf(w, &quot;foo: %s\n&quot;, d[&quot;foo&quot;])
+  case &quot;/bar&quot;:
+    fmt.Fprintf(w, &quot;bar: %s\n&quot;, d[&quot;bar&quot;])
+  default:
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintf(w, &quot;No page found for: %s\n&quot;, r.URL)
+  }
+}
+
+func main() {
+  db := database{
+    &quot;foo&quot;: 1,
+    &quot;bar&quot;: 2,
+  }
+
+  log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, db))
+}
+</code></pre>
+
+<p>Nothing else to say about this, other than we&rsquo;ve implemented what we set out to do by utilising a simple <code>switch</code> statement that checks for known paths and writes to the <code>http.ResponseWriter</code> a different response depending on the request. If we can&rsquo;t match the URL then we&rsquo;ll instead send a <code>404</code> status code (<code>StatusNotFound</code>) followed by a message to notify the user we couldn&rsquo;t identify their request.</p>
+
+<blockquote>
+<p>Documentation: <code>godoc -src net/http WriteHeader | less</code></p>
+</blockquote>
+
+<h3 id="multiplexer">Multiplexer</h3>
+
+<p>So writing the above example demonstrates a bit of a code smell. We could extract each case&rsquo;s block into separate functions but it&rsquo;s still an ever growing switch statement. We&rsquo;re also confined to using objects that implement the required interface (e.g. if you don&rsquo;t provide an object that has a <code>ServeHTTP</code> method then you&rsquo;re not going to have much success).</p>
+
+<p>Instead it would be nice if you could just pick an arbitrary function and allow it to be used as a handler. That&rsquo;s exactly what <code>ServeMux</code> provides to us via its <code>HandleFunc</code> function (which is really just a convenience method on top of <code>http.HandlerFunc</code>).</p>
+
+<blockquote>
+<p>Documentation: <code>godoc net/http ServeMux | less</code></p>
+</blockquote>
+
+<p>The following code sample demonstrates this in action, by removing the <code>ServeHTTP</code> method from the <code>database</code> type and instead implementing individual methods for our defined routes to call.</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+)
+
+type pounds float32
+
+func (p pounds) String() string {
+  return fmt.Sprintf(&quot;£%.2f&quot;, p)
+}
+
+type database map[string]pounds
+
+func (d database) foo(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;foo: %s\n&quot;, d[&quot;foo&quot;])
+}
+
+func (d database) bar(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;bar: %s\n&quot;, d[&quot;bar&quot;])
+}
+
+func (d database) baz(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;baz: %s\n&quot;, d[&quot;baz&quot;])
+}
+
+func main() {
+  db := database{
+    &quot;foo&quot;: 1,
+    &quot;bar&quot;: 2,
+    &quot;baz&quot;: 3,
+  }
+
+  mux := http.NewServeMux()
+
+  mux.Handle(&quot;/foo&quot;, http.HandlerFunc(db.foo))
+  mux.Handle(&quot;/bar&quot;, http.HandlerFunc(db.bar))
+
+  // Convenience method for longer form mux.Handle
+  mux.HandleFunc(&quot;/baz&quot;, db.baz)
+
+  log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, mux))
+}
+</code></pre>
+
+<p>As we can see, we create a new <code>ServeMux</code> instance using <code>http.NewServeMux</code> and then register our <code>database</code> methods as handlers for each of the route&rsquo;s we want to match them against. The <code>ServeMux</code> instance is a multiplexer, meaning we can pass it as the second argument to <code>http.ListenAndServe</code>.</p>
+
+<blockquote>
+<p>Note: you can also see we demonstrate the shorthand <code>mux.HandleFunc</code> which is really a convenience method over both <code>mux.Handle</code> and <code>http.HandlerFunc</code></p>
+</blockquote>
+
+<p>So how does <code>http.HandlerFunc</code> and <code>mux.HandleFunc</code> allow us to use an arbitrary function (as none of those database functions have access to a <code>ServeHTTP</code> function as required by <code>ListenAndServe</code>)? We&rsquo;ll come back to the answer in a little bit. Let&rsquo;s quickly review the last variation of how to run a web server first&hellip;</p>
+
+<h3 id="global-multiplexer">Global multiplexer</h3>
+
+<p>Typically you&rsquo;ll have your code split up into separate packages. So in order to setup your routing handlers, you would need to pass around your <code>ServeMux</code> instance to each of these packages. Instead, you can just utilise Go&rsquo;s global <code>DefaultServeMux</code>. To do that you pass <code>nil</code> as the second argument to <code>http.ListenAndServe</code>.</p>
+
+<blockquote>
+<p>Documentation: <code>godoc -src net/http DefaultServeMux | less</code></p>
+</blockquote>
+
+<p>The following code sample demonstrates this:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+)
+
+type pounds float32
+
+func (p pounds) String() string {
+  return fmt.Sprintf(&quot;£%.2f&quot;, p)
+}
+
+type database map[string]pounds
+
+func (d database) foo(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;foo: %s\n&quot;, d[&quot;foo&quot;])
+}
+
+func (d database) bar(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;bar: %s\n&quot;, d[&quot;bar&quot;])
+}
+
+func (d database) baz(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, &quot;baz: %s\n&quot;, d[&quot;baz&quot;])
+}
+
+func main() {
+  db := database{
+    &quot;foo&quot;: 1,
+    &quot;bar&quot;: 2,
+    &quot;baz&quot;: 3,
+  }
+
+  http.HandleFunc(&quot;/foo&quot;, db.foo)
+  http.HandleFunc(&quot;/bar&quot;, db.bar)
+  http.HandleFunc(&quot;/baz&quot;, db.baz)
+
+  log.Fatal(http.ListenAndServe(&quot;localhost:8000&quot;, nil))
+}
+</code></pre>
+
+<p>Again, we have a convenience method <code>HandleFunc</code> which allows an arbitrary function to be adapted so it fits the interface requirements that <code>ListenAndServe</code>&rsquo;s second argument enforces.</p>
+
+<p><div id="3"></div></p>
+
+<h2 id="how-does-the-adapter-work">How does the adapter work?</h2>
+
+<p>The &lsquo;adapter&rsquo; here being the <code>http.HandleFunc</code> function. How does it take an arbitrary function and enable it to support the relevant interface so it can be passed to <code>ListenAndServe</code>?</p>
+
+<p>The way <code>http.HandleFunc</code> solves this requirement is by internally calling its <em>other</em> function <code>http.Handle</code>, and passing it the required type (i.e. it passes a type that satisfies the interface requirement that the <code>Handle</code> function has).</p>
+
+<p>OK, let&rsquo;s look back at the two functions and their respective signatures to refresh our memory as to what&rsquo;s required:</p>
+
+<ul>
+<li><code>func Handle(pattern string, handler Handler)</code></li>
+<li><code>func HandleFunc(pattern string, handler func(ResponseWriter, *Request))</code></li>
+</ul>
+
+<p>We can see the <code>Handle</code> signature requires a type that satisfies the <code>Handler</code> interface (which is defined as follows):</p>
+
+<pre><code>type Handler interface {
+  ServeHTTP(ResponseWriter, *Request)
+}
+</code></pre>
+
+<p>In other words, as long as you pass in a type that has a <code>ServeHTTP</code> method then the <code>Handle</code> function will be happy. So <code>HandleFunc</code> facilitates this requirement by taking your user defined function and converting it into a type that happens to have <code>ServeHTTP</code> available.</p>
+
+<p>So how does it do that conversion? Firstly it defines a <code>func</code> type called <code>http.HandlerFunc</code>, like so:</p>
+
+<pre><code>type HandlerFunc func(ResponseWriter, *Request)
+</code></pre>
+
+<p>This says that for a function to match this type it should have the same signature (e.g. <code>ResponseWriter, *Request</code>).</p>
+
+<p>Inside the <code>HandleFunc</code> function you&rsquo;ll see it actually <em>calls</em> this <code>func</code> type and passes it your user defined function. This will look something like the following in the Go implementation source code:</p>
+
+<pre><code>func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+  mux.Handle(pattern, HandlerFunc(handler))
+}
+</code></pre>
+
+<p>Notice the call of <code>HandlerFunc(handler)</code> (where <code>handler</code> is your user defined function you passed into <code>HandleFunc</code> from your application code). This is the <em>conversion</em> of your function into the <code>HandlerFunc</code> type. You&rsquo;re now effectively passing a <code>HandlerFunc</code> into the internal function <code>mux.Handle</code>.</p>
+
+<p>So how does that help us? How does passing in a function that <em>looks</em> like a <code>HandlerFunc</code> type into <code>mux.Handle</code> help us solve the problem that we&rsquo;re still passing in a function that has no <code>ServeHTTP</code> method available (and so should fail the interface requirement that <code>mux.Handle</code> has)?</p>
+
+<p>Well, once you convert your user defined function into a <code>HandlerFunc</code> you&rsquo;ll find it now <em>does</em> have a <code>ServeHTTP</code> method available. If we look at the Go source code, just after the definition of the <code>HandlerFunc</code> func type, you&rsquo;ll also find the following snippet of code:</p>
+
+<pre><code>func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *Request) {
+  f(w, r)
+}
+</code></pre>
+
+<p>This associates the required <code>ServeHTTP</code> function with the <code>HandlerFunc</code> type. So when you convert your function to a <code>HandlerFunc</code> it will indeed gain access to a <code>ServeHTTP</code> function!</p>
+
+<p>Also remember that when you associate a method with a type/object the receiver is also available to you. So in this case we can see the <code>f</code> is actually your user defined function you passed in to be converted. So when you convert that user defined function into a <code>HandlerFunc</code> you get the <code>ServeHTTP</code> method which internally is calling your original user defined function.</p>
+
+<p>Let&rsquo;s now take a quick look at that <code>mux.Handle</code> function to see what it expects:</p>
+
+<pre><code>func (mux *ServeMux) Handle(pattern string, handler Handler) {
+  ...
+}
+</code></pre>
+
+<p>As we can see it expects a type of <code>Handler</code> to be provided. What is <code>Handler</code>? Well remember from earlier this is an interface which states there should be a <code>ServeHTTP</code> function available:</p>
+
+<pre><code>type Handler interface {
+  ServeHTTP(ResponseWriter, *Request)
+}
+</code></pre>
+
+<p>We know now that we&rsquo;ve utilised Go&rsquo;s <code>func</code> type to adapt/transform our incoming function into a type that has the required method <code>ServeHTTP</code> associated with it, thus allowing it to pass the <code>Handler</code> interface requirement.</p>
+
+<p><div id="4"></div></p>
+
+<h2 id="why-is-this-interesting">Why is this interesting?</h2>
+
+<p>Really understanding what initially looked to be a simple web server abstraction ended up being a complex mix of types and interfaces that work together to allow seemingly incompatible types to be adapted to fit. Demonstrating how flexible and dynamic your code can be when working in an idiomatic way with the Go principles.</p>
+
+<p>I now have a much better appreciation of why lots of long time Gophers will routinely recommend sifting through the official Go source code, as it can indeed be quite enlightening.</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/grpc'>grpc</a>, <a class='tag' href='/tags/rpc'>rpc</a>, <a class='tag' href='/tags/golang'>golang</a>, <a class='tag' href='/tags/go'>go</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Multiple SSH Keys for Different GitHub Accounts</a>
+    </div><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/rpc-variations-in-go/'>
+        <span class='screen-reader'>Next post: </span>RPC Variations in Go<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

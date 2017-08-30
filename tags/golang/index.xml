@@ -45,5 +45,16 @@ Outline The fundamental principle behind RPC is to create a service that exposes
 The steps typically look something like:</description>
     </item>
     
+    <item>
+      <title>Understanding Golang&#39;s Func Type</title>
+      <link>http://www.integralist.co.uk/posts/understanding-golangs-func-type/</link>
+      <pubDate>Mon, 23 Nov 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/understanding-golangs-func-type/</guid>
+      <description>Introduction Four ways to skin a cat How does the adapter work? Why is this interesting?  
+Introduction Here is some code that demonstrates the typical &amp;lsquo;hello world&amp;rsquo; for a Go based web server:
+package main import ( &amp;quot;fmt&amp;quot; &amp;quot;net/http&amp;quot; ) func handler(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, &amp;quot;Hello %s&amp;quot;, r.URL.Path[1:]) } func main() { http.HandleFunc(&amp;quot;/World&amp;quot;, handler) http.ListenAndServe(&amp;quot;:8080&amp;quot;, nil) }   Note: http://localhost:8080/World will return Hello World</description>
+    </item>
+    
   </channel>
 </rss>
