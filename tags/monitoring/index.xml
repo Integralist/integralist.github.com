@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Monitoring on integralist</title>
+    <link>http://www.integralist.co.uk/tags/monitoring/</link>
+    <description>Recent content in Monitoring on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Thu, 03 Mar 2016 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/monitoring/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Bash Watchtower</title>
+      <link>http://www.integralist.co.uk/posts/bash-watchtower/</link>
+      <pubDate>Thu, 03 Mar 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/bash-watchtower/</guid>
+      <description>Introduction How does it work? Comparison Code Explanation Conclusion  
+Introduction This is a quick post to demonstrate how I use a simple Bash shell script to report when web pages are failing (e.g. returning a non-200 HTTP status code). It does this by sending notifications of the URL which returned a non-200 status code into a remote application (in my case Slack; but you could modify the script to suit whatever service you happen to be using).</description>
+    </item>
+    
+  </channel>
+</rss>

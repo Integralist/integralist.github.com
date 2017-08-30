@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction How does it work? Comparison Code Explanation Conclusion  
+Introduction This is a quick post to demonstrate how I use a simple Bash shell script to report when web pages are failing (e.g. returning a non-200 HTTP status code). It does this by sending notifications of the URL which returned a non-200 status code into a remote application (in my case Slack; but you could modify the script to suit whatever service you happen to be using).'>
+
+<meta property='og:title' content='Bash Watchtower ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction How does it work? Comparison Code Explanation Conclusion  
+Introduction This is a quick post to demonstrate how I use a simple Bash shell script to report when web pages are failing (e.g. returning a non-200 HTTP status code). It does this by sending notifications of the URL which returned a non-200 status code into a remote application (in my case Slack; but you could modify the script to suit whatever service you happen to be using).'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/bash-watchtower/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='bash'><meta property='article:tag' content='shell'><meta property='article:tag' content='monitoring'><meta property='article:published_time' content='2016-03-03T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2016-03-03T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Bash Watchtower ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/bash-watchtower/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Bash Watchtower</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2016-03-03T13:00:00&#43;01:00'>2016-03-03</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    7 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">How does it work?</a></li>
+<li><a href="#3">Comparison</a></li>
+<li><a href="#4">Code</a></li>
+<li><a href="#5">Explanation</a></li>
+<li><a href="#6">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This is a quick post to demonstrate how I use a simple <a href="https://www.gnu.org/software/bash/">Bash</a> shell script to report when web pages are failing (e.g. returning a non-200 HTTP status code). It does this by sending notifications of the URL which returned a non-200 status code into a remote application (in my case <a href="https://slack.com/">Slack</a>; but you could modify the script to suit whatever service you happen to be using).</p>
+
+<p>I run this script via <a href="https://jenkins-ci.org/">Jenkins CI</a> on a five minute cron. The inspiration came from <a href="https://twitter.com/charlierevett">Charlie Revett</a> who wrote a <a href="https://nodejs.org/">nodejs</a> package called <a href="http://github.com/revett/watchtower/">Watchtower</a>. I like shell scripts (not so much Node) and so I decided, for no real good reason, to replicate his package in Bash.</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="how-does-it-work">How does it work?</h2>
+
+<p>The script has the following steps:</p>
+
+<ol>
+<li>Cleanup: remove any temporary files created during a previous run</li>
+<li>Retrieve: curl the remote endpoints in parallel</li>
+<li>Notify: parse the responses and send notification for any that fail</li>
+</ol>
+
+<p><div id="3"></div></p>
+
+<h2 id="comparison">Comparison</h2>
+
+<p>Well, the Node package has quite a few layers to it (e.g. Dockerfile, package.json, dependencies, multiple nested files that take some time to navigate around) where as my &lsquo;Bash Watchtower&rsquo; is a single shell script. So it&rsquo;s actually a lot easier and quicker (in my opinion at least) to understand what&rsquo;s going on and how things work.</p>
+
+<blockquote>
+<p>Note: on the plus side, he&rsquo;s got tests :-)<br />
+I couldn&rsquo;t be bothered with that for this quick hack</p>
+</blockquote>
+
+<p>My initial concern was going to be around the performance of requesting multiple endpoints, as well as sending potentially multiple failure notifications to the remote service (Slack). I knew that Node is popular for its event driven concurrency, and I was keen to ensure performance wasn&rsquo;t degraded in any way.</p>
+
+<p>I&rsquo;d argue (in theory, I haven&rsquo;t actually tested) that performance would be equal or better because I&rsquo;m running the relevant sections of the code in <em>parallel</em> rather than <em>concurrently</em> using the shell&rsquo;s <code>&amp;</code> operator to &lsquo;background&rsquo; each request/notification into a separate subshell. I&rsquo;m then utilising the <code>wait</code> command which (as the name suggests) waits for all currently active child processes to complete.</p>
+
+<blockquote>
+<p>Note: because of the background processes, this script will not scale and be as performant once the number of URLs you&rsquo;re looking to check against becomes very large. So if you&rsquo;re looking to validate 100&rsquo;s of URLs, then you&rsquo;ll likely hit performance issues</p>
+</blockquote>
+
+<p><div id="4"></div></p>
+
+<h2 id="code">Code</h2>
+
+<p>So here is the code:</p>
+
+<pre><code>function cleanup() {
+  rm results.txt
+  rm temp.txt
+}
+
+function pull() {
+  local base=$1
+  local urls=(&quot;${!2}&quot;)
+
+  for resource in &quot;${urls[@]}&quot;
+  do
+    curl $base$resource --head \
+                        --location \
+                        --silent \
+                        --output /dev/null \
+                        --connect-timeout 2 \
+                        --write-out &quot;%{url_effective} %{http_code}\n&quot; &amp;
+  done
+
+  wait
+}
+
+function parse() {
+  local results=$1
+  local remote=https://hooks.slack.com/services/foo/bar/baz
+
+  cat $results | awk '!/200/ { print $2 &quot;: &quot; $1 }' &gt; temp.txt
+
+  while read line; do
+    curl --header &quot;Content-Type: application/json&quot; \
+         --silent \
+         --output /dev/null \
+         --request POST \
+         --data &quot;{\&quot;text\&quot;: \&quot;$line\&quot;}&quot; $remote &amp;
+  done &lt; temp.txt
+
+  wait
+
+  display temp.txt
+}
+
+function display() {
+  printf &quot;\n\n&quot;
+  cat $1
+  printf &quot;\n\n&quot;
+}
+
+trap cleanup EXIT
+
+endpoints=(
+  /newsbeat
+  /newsbeat/popular
+  /newsbeat/topics
+  /newsbeat/topics/entertainment
+  /newsbeat/topics/surgery
+  /newsbeat/article/32792353/im-engaged-but-will-i-ever-be-able-to-marry-my-boyfriend
+)
+
+pull http://bbc.co.uk endpoints[@] &gt; results.txt
+display results.txt
+parse results.txt
+</code></pre>
+
+<blockquote>
+<p>Note: I&rsquo;ve multilined the <code>curl</code> request here for readability (but I prefer one liners)</p>
+</blockquote>
+
+<p><div id="5"></div></p>
+
+<h2 id="explanation">Explanation</h2>
+
+<p>The script is broken out into functions:</p>
+
+<ul>
+<li><code>cleanup</code>: removes specified files</li>
+<li><code>pull</code>: gets our endpoints (only the HTTP headers)</li>
+<li><code>parse</code>: looks for non-200 status code and sends notification</li>
+<li><code>display</code>: prints specified file</li>
+</ul>
+
+<p>The <code>cleanup</code> and <code>display</code> functions aren&rsquo;t of any special interest, so we&rsquo;ll focus primarily on <code>pull</code> and <code>parse</code>. The only thing I will say is that previously I was manually calling <code>cleanup</code> twice (the function was originally written to take an argument - a file path - and remove the specified file if it indeed existed); this has since changed to not take an argument but instead explictly remove the two files I know I create within this script.</p>
+
+<p>I also now automatically run the <code>cleanup</code> function when the shell exits. I do this using:</p>
+
+<pre><code>trap cleanup EXIT
+</code></pre>
+
+<p>If you&rsquo;ve not seen this before then please refer to <code>help trap</code> for more details.</p>
+
+<blockquote>
+<p>Note: most of the time the <code>man &lt;command&gt;</code> will help you locate information<br />
+But with builtin commands (those that are part of the shell environment itself)<br />
+you need to use: <code>help &lt;command&gt;</code> (e.g. <code>help trap</code> or <code>help wait</code>)<br />
+Failing that you could search inside <code>man bash</code> but that&rsquo;s lunacy!</p>
+</blockquote>
+
+<h3 id="pull">Pull</h3>
+
+<p>First we take in two arguments, the first we store in a local variable called <code>base</code> while the other is stored in a variable called <code>urls</code>. You&rsquo;ll notice we&rsquo;ve had to convert the second argument into an Array by assigning something that resembles an Array (e.g. the parentheses <code>(...)</code>) and then expand the incoming string of elements inside it (<code>(&quot;${!2}&quot;)</code>).</p>
+
+<blockquote>
+<p>Note: you&rsquo;ll notice that when we call <code>pull</code><br />
+we have to pass <code>endpoints[@]</code> and not <code>$endpoints</code><br />
+this is to ensure we properly expand all elements within the Array</p>
+</blockquote>
+
+<p>Next we loop over the <code>urls</code> Array and for each item we send a <code>curl</code> request (which in this case is a unique URL constructed from the <code>$base</code> and <code>$resource</code> variables), but we specify that we&rsquo;re only interested in getting back the HTTP headers for the request (<code>--head</code>).</p>
+
+<p>We make sure that if the resource being requested actually <code>301</code> redirects to another endpoint, then we should follow that redirect to the new location (<code>--location</code>). We&rsquo;re also not interested in any progress bars or error output (<code>--silent</code>). We direct any other &lsquo;output&rsquo; to <code>/dev/null</code>, as we don&rsquo;t need it (<code>--output /dev/null</code>).</p>
+
+<p>After this we specify a timeout for each request, as we don&rsquo;t want a slow server to impact our script&rsquo;s performance (<code>--connect-timeout 2</code>). Now we tell <code>curl</code> to make sure after a successful request it should dump out some additional information to <code>stdout</code> and that it should be formatted in a specific way (<code>--write-out &quot;%{url_effective} %{http_code}</code>) as this makes it easier for us to deal with (as outside of this function we redirect this <code>stdout</code> information into a file called <code>result.txt</code>).</p>
+
+<p>Finally we call <code>wait</code>, which as we now know (see above) will wait for each of the backgrounded child processes to complete before the function ends.</p>
+
+<h3 id="parse">Parse</h3>
+
+<p>In this function we take in a single argument, the <code>results.txt</code> file, which would contain a set of &lsquo;results&rsquo; that <em>could</em> look something like:</p>
+
+<pre><code>http://www.bbc.co.uk/newsbeat/topics/entertainment 200
+http://www.bbc.co.uk/newsbeat/popular 200
+http://www.bbc.co.uk/newsbeat/topics 200
+http://www.bbc.co.uk/newsbeat 200
+http://www.bbc.co.uk/newsbeat/topics/surgery 200
+http://www.bbc.co.uk/newsbeat/article/32792353/im-engaged-but-will-i-ever-be-able-to-marry-my-boyfriend 500
+</code></pre>
+
+<blockquote>
+<p>Note: here the results suggest only one URL has returned a 500 status code</p>
+</blockquote>
+
+<p>We also store off our remote endpoint (in my case: our Slack incoming webhook URL) in a variable called <code>remote</code>. This is where we&rsquo;ll be sending our JSON data of failed URLs to.</p>
+
+<p>At this point we use <a href="https://en.wikipedia.org/wiki/AWK">Awk</a> to check each line of the incoming <code>results.txt</code> to see if it doesn&rsquo;t include <code>200</code> somewhere. If it doesn&rsquo;t then we store that line into a <code>temp.txt</code> file in the format of <code>&lt;status_code&gt; &lt;url&gt;</code>. We then redirect the contents of <code>temp.txt</code> into a <code>while read</code> loop and for each line we <code>curl</code> our remote endpoint (in parallel using <code>&amp;</code>); POST&rsquo;ing it a JSON object that details the URL that gave a non-200 response.</p>
+
+<p>Again, like the <code>pull</code> function, we utilise <code>wait</code> to ensure all the child subprocesses finish before doing some final displaying and cleanup of the <code>temp.txt</code> file and then returning the function back to the caller.</p>
+
+<p><div id="6"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s it. Fairly standard Bash scripting. I&rsquo;m sure they&rsquo;ll be some unix/linux neck-beard wizards in the audience ready to &lsquo;shred me a new one&rsquo; because my chops aren&rsquo;t as <em>wizardy</em> as theirs. If that&rsquo;s the case: feel free to get in contact as I&rsquo;d love to know how I could make this code simpler or easier to work with (or just more idiomatic).</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/bash'>bash</a>, <a class='tag' href='/tags/shell'>shell</a>, <a class='tag' href='/tags/monitoring'>monitoring</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Multiple SSH Keys for Different GitHub Accounts</a>
+    </div><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/grpc-for-beginners/'>
+        <span class='screen-reader'>Next post: </span>gRPC for Beginners<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

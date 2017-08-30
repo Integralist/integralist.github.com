@@ -1,0 +1,188 @@
+---
+title: "Bash Watchtower"
+date: 2016-03-03T13:00:00+01:00
+categories:
+  - "code"
+  - "guide"
+tags:
+  - "bash"
+  - "shell"
+  - "monitoring"
+draft: false
+---
+
+- [Introduction](#1)
+- [How does it work?](#2)
+- [Comparison](#3)
+- [Code](#4)
+- [Explanation](#5)
+- [Conclusion](#6)
+
+<div id="1"></div>
+## Introduction
+
+This is a quick post to demonstrate how I use a simple [Bash](https://www.gnu.org/software/bash/) shell script to report when web pages are failing (e.g. returning a non-200 HTTP status code). It does this by sending notifications of the URL which returned a non-200 status code into a remote application (in my case [Slack](https://slack.com/); but you could modify the script to suit whatever service you happen to be using).
+
+I run this script via [Jenkins CI](https://jenkins-ci.org/) on a five minute cron. The inspiration came from [Charlie Revett](https://twitter.com/charlierevett) who wrote a [nodejs](https://nodejs.org/) package called [Watchtower](http://github.com/revett/watchtower/). I like shell scripts (not so much Node) and so I decided, for no real good reason, to replicate his package in Bash.
+
+<div id="2"></div>
+## How does it work?
+
+The script has the following steps:
+
+1. Cleanup: remove any temporary files created during a previous run
+2. Retrieve: curl the remote endpoints in parallel
+3. Notify: parse the responses and send notification for any that fail
+
+<div id="3"></div>
+## Comparison
+
+Well, the Node package has quite a few layers to it (e.g. Dockerfile, package.json, dependencies, multiple nested files that take some time to navigate around) where as my 'Bash Watchtower' is a single shell script. So it's actually a lot easier and quicker (in my opinion at least) to understand what's going on and how things work.
+
+> Note: on the plus side, he's got tests :-)  
+> I couldn't be bothered with that for this quick hack
+
+My initial concern was going to be around the performance of requesting multiple endpoints, as well as sending potentially multiple failure notifications to the remote service (Slack). I knew that Node is popular for its event driven concurrency, and I was keen to ensure performance wasn't degraded in any way. 
+
+I'd argue (in theory, I haven't actually tested) that performance would be equal or better because I'm running the relevant sections of the code in *parallel* rather than *concurrently* using the shell's `&` operator to 'background' each request/notification into a separate subshell. I'm then utilising the `wait` command which (as the name suggests) waits for all currently active child processes to complete.
+
+> Note: because of the background processes, this script will not scale and be as performant once the number of URLs you're looking to check against becomes very large. So if you're looking to validate 100's of URLs, then you'll likely hit performance issues
+
+<div id="4"></div>
+## Code
+
+So here is the code:
+
+```
+function cleanup() {
+  rm results.txt
+  rm temp.txt
+}
+
+function pull() {
+  local base=$1
+  local urls=("${!2}")
+
+  for resource in "${urls[@]}"
+  do
+    curl $base$resource --head \
+                        --location \
+                        --silent \
+                        --output /dev/null \
+                        --connect-timeout 2 \
+                        --write-out "%{url_effective} %{http_code}\n" &
+  done
+
+  wait
+}
+
+function parse() {
+  local results=$1
+  local remote=https://hooks.slack.com/services/foo/bar/baz
+
+  cat $results | awk '!/200/ { print $2 ": " $1 }' > temp.txt
+
+  while read line; do
+    curl --header "Content-Type: application/json" \
+         --silent \
+         --output /dev/null \
+         --request POST \
+         --data "{\"text\": \"$line\"}" $remote &
+  done < temp.txt
+
+  wait
+
+  display temp.txt
+}
+
+function display() {
+  printf "\n\n"
+  cat $1
+  printf "\n\n"
+}
+
+trap cleanup EXIT
+
+endpoints=(
+  /newsbeat
+  /newsbeat/popular
+  /newsbeat/topics
+  /newsbeat/topics/entertainment
+  /newsbeat/topics/surgery
+  /newsbeat/article/32792353/im-engaged-but-will-i-ever-be-able-to-marry-my-boyfriend
+)
+
+pull http://bbc.co.uk endpoints[@] > results.txt
+display results.txt
+parse results.txt
+```
+
+> Note: I've multilined the `curl` request here for readability (but I prefer one liners)
+
+<div id="5"></div>
+## Explanation
+
+The script is broken out into functions:
+
+- `cleanup`: removes specified files
+- `pull`: gets our endpoints (only the HTTP headers)
+- `parse`: looks for non-200 status code and sends notification
+- `display`: prints specified file
+
+The `cleanup` and `display` functions aren't of any special interest, so we'll focus primarily on `pull` and `parse`. The only thing I will say is that previously I was manually calling `cleanup` twice (the function was originally written to take an argument - a file path - and remove the specified file if it indeed existed); this has since changed to not take an argument but instead explictly remove the two files I know I create within this script.
+
+I also now automatically run the `cleanup` function when the shell exits. I do this using:
+
+```
+trap cleanup EXIT
+```
+
+If you've not seen this before then please refer to `help trap` for more details.
+
+> Note: most of the time the `man <command>` will help you locate information  
+> But with builtin commands (those that are part of the shell environment itself)  
+> you need to use: `help <command>` (e.g. `help trap` or `help wait`)  
+> Failing that you could search inside `man bash` but that's lunacy! 
+
+### Pull
+
+First we take in two arguments, the first we store in a local variable called `base` while the other is stored in a variable called `urls`. You'll notice we've had to convert the second argument into an Array by assigning something that resembles an Array (e.g. the parentheses `(...)`) and then expand the incoming string of elements inside it (`("${!2}")`).
+
+> Note: you'll notice that when we call `pull`  
+> we have to pass `endpoints[@]` and not `$endpoints`  
+> this is to ensure we properly expand all elements within the Array
+
+Next we loop over the `urls` Array and for each item we send a `curl` request (which in this case is a unique URL constructed from the `$base` and `$resource` variables), but we specify that we're only interested in getting back the HTTP headers for the request (`--head`).
+
+We make sure that if the resource being requested actually `301` redirects to another endpoint, then we should follow that redirect to the new location (`--location`). We're also not interested in any progress bars or error output (`--silent`). We direct any other 'output' to `/dev/null`, as we don't need it (`--output /dev/null`).
+
+After this we specify a timeout for each request, as we don't want a slow server to impact our script's performance (`--connect-timeout 2`). Now we tell `curl` to make sure after a successful request it should dump out some additional information to `stdout` and that it should be formatted in a specific way (`--write-out "%{url_effective} %{http_code}`) as this makes it easier for us to deal with (as outside of this function we redirect this `stdout` information into a file called `result.txt`).
+
+Finally we call `wait`, which as we now know (see above) will wait for each of the backgrounded child processes to complete before the function ends.
+
+### Parse
+
+In this function we take in a single argument, the `results.txt` file, which would contain a set of 'results' that *could* look something like:
+
+```
+http://www.bbc.co.uk/newsbeat/topics/entertainment 200
+http://www.bbc.co.uk/newsbeat/popular 200
+http://www.bbc.co.uk/newsbeat/topics 200
+http://www.bbc.co.uk/newsbeat 200
+http://www.bbc.co.uk/newsbeat/topics/surgery 200
+http://www.bbc.co.uk/newsbeat/article/32792353/im-engaged-but-will-i-ever-be-able-to-marry-my-boyfriend 500
+```
+
+> Note: here the results suggest only one URL has returned a 500 status code
+
+We also store off our remote endpoint (in my case: our Slack incoming webhook URL) in a variable called `remote`. This is where we'll be sending our JSON data of failed URLs to.
+
+At this point we use [Awk](https://en.wikipedia.org/wiki/AWK) to check each line of the incoming `results.txt` to see if it doesn't include `200` somewhere. If it doesn't then we store that line into a `temp.txt` file in the format of `<status_code> <url>`. We then redirect the contents of `temp.txt` into a `while read` loop and for each line we `curl` our remote endpoint (in parallel using `&`); POST'ing it a JSON object that details the URL that gave a non-200 response.
+
+Again, like the `pull` function, we utilise `wait` to ensure all the child subprocesses finish before doing some final displaying and cleanup of the `temp.txt` file and then returning the function back to the caller.
+
+<div id="6"></div>
+## Conclusion
+
+That's it. Fairly standard Bash scripting. I'm sure they'll be some unix/linux neck-beard wizards in the audience ready to 'shred me a new one' because my chops aren't as *wizardy* as theirs. If that's the case: feel free to get in contact as I'd love to know how I could make this code simpler or easier to work with (or just more idiomatic).
+
