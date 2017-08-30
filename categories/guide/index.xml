@@ -74,5 +74,18 @@ If so, then &amp;ldquo;Pass&amp;rdquo; might be something of interest to you as 
       <description>Introduction Prerequisites  TCP and HTTP OSI Model  Utilities  top: check running processes for cpu and memory utilisation ps: see what processes are running strace: monitor interactions between processes lsof: list of open files netstat: monitoring network traffic ifconfig: configure or review your network interfaces iftop: monitors network traffic and displays table of bandwidth usage iptraf: monitoring network traffic (more visual than netstat, not as detailed) tcpdump: network packet sniffer wireshark: network packet sniffer and analyser (gui) tshark: network packet sniffer and analyser telnet: utility for communicating with another host  Honorable mentions Conclusion</description>
     </item>
     
+    <item>
+      <title>GitHub Pull Request Formatting</title>
+      <link>http://www.integralist.co.uk/posts/github-pull-request-formatting/</link>
+      <pubDate>Mon, 22 Aug 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/github-pull-request-formatting/</guid>
+      <description>Introduction Why Size Process Communication Merge Strategies Conclusion  
+Introduction What makes a good Pull Request?
+The answer will depend on your team, and to a certain extent your organisation.
+Currently I work at BuzzFeed, and prior to that I worked at the BBC.
+Both have a large number of engineers and teams, but due to different organisational structures they have differing opinions on what constitutes a good pull request format.</description>
+    </item>
+    
   </channel>
 </rss>

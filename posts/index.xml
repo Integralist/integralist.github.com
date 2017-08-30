@@ -109,6 +109,19 @@ If so, then &amp;ldquo;Pass&amp;rdquo; might be something of interest to you as 
     </item>
     
     <item>
+      <title>GitHub Pull Request Formatting</title>
+      <link>http://www.integralist.co.uk/posts/github-pull-request-formatting/</link>
+      <pubDate>Mon, 22 Aug 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/github-pull-request-formatting/</guid>
+      <description>Introduction Why Size Process Communication Merge Strategies Conclusion  
+Introduction What makes a good Pull Request?
+The answer will depend on your team, and to a certain extent your organisation.
+Currently I work at BuzzFeed, and prior to that I worked at the BBC.
+Both have a large number of engineers and teams, but due to different organisational structures they have differing opinions on what constitutes a good pull request format.</description>
+    </item>
+    
+    <item>
       <title>Multiple SSH Keys for Different GitHub Accounts</title>
       <link>http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/</link>
       <pubDate>Wed, 18 Nov 2015 13:00:00 +0100</pubDate>
