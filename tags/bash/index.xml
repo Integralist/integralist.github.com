@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Bash on integralist</title>
+    <link>http://www.integralist.co.uk/tags/bash/</link>
+    <description>Recent content in Bash on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 12 Sep 2016 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/bash/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Terminal Debugging Utilities</title>
+      <link>http://www.integralist.co.uk/posts/terminal-debugging-utilities/</link>
+      <pubDate>Mon, 12 Sep 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/terminal-debugging-utilities/</guid>
+      <description>Introduction Prerequisites  TCP and HTTP OSI Model  Utilities  top: check running processes for cpu and memory utilisation ps: see what processes are running strace: monitor interactions between processes lsof: list of open files netstat: monitoring network traffic ifconfig: configure or review your network interfaces iftop: monitors network traffic and displays table of bandwidth usage iptraf: monitoring network traffic (more visual than netstat, not as detailed) tcpdump: network packet sniffer wireshark: network packet sniffer and analyser (gui) tshark: network packet sniffer and analyser telnet: utility for communicating with another host  Honorable mentions Conclusion</description>
+    </item>
+    
+  </channel>
+</rss>
