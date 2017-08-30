@@ -56,5 +56,16 @@ Introduction Here is some code that demonstrates the typical &amp;lsquo;hello wo
 package main import ( &amp;quot;fmt&amp;quot; &amp;quot;net/http&amp;quot; ) func handler(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, &amp;quot;Hello %s&amp;quot;, r.URL.Path[1:]) } func main() { http.HandleFunc(&amp;quot;/World&amp;quot;, handler) http.ListenAndServe(&amp;quot;:8080&amp;quot;, nil) }   Note: http://localhost:8080/World will return Hello World</description>
     </item>
     
+    <item>
+      <title>HTTP/2</title>
+      <link>http://www.integralist.co.uk/posts/http2/</link>
+      <pubDate>Tue, 20 Oct 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/http2/</guid>
+      <description>Introduction Persistent Connections Multiplexing Compression Prioritization SSL/TLS Server Push Implementations  Nginx Go  References  
+Introduction This is a super quick post for demonstrating how to utilise the new HTTP/2 protocol. If you&amp;rsquo;re unfamiliar with it, then let me spend a brief few moments discussing some of the highlights:
+ Single, persistent connection Multiplexing Header compression Prioritization Encryption Server Push  If none of these features make sense, then allow me to clarify further&amp;hellip;</description>
+    </item>
+    
   </channel>
 </rss>

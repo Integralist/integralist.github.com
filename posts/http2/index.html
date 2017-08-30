@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Persistent Connections Multiplexing Compression Prioritization SSL/TLS Server Push Implementations  Nginx Go  References  
+Introduction This is a super quick post for demonstrating how to utilise the new HTTP/2 protocol. If you&rsquo;re unfamiliar with it, then let me spend a brief few moments discussing some of the highlights:
+ Single, persistent connection Multiplexing Header compression Prioritization Encryption Server Push  If none of these features make sense, then allow me to clarify further&hellip;'>
+
+<meta property='og:title' content='HTTP/2 ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Persistent Connections Multiplexing Compression Prioritization SSL/TLS Server Push Implementations  Nginx Go  References  
+Introduction This is a super quick post for demonstrating how to utilise the new HTTP/2 protocol. If you&rsquo;re unfamiliar with it, then let me spend a brief few moments discussing some of the highlights:
+ Single, persistent connection Multiplexing Header compression Prioritization Encryption Server Push  If none of these features make sense, then allow me to clarify further&hellip;'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/http2/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='HTTP'><meta property='article:tag' content='HTTP2'><meta property='article:tag' content='network'><meta property='article:tag' content='performance'><meta property='article:tag' content='golang'><meta property='article:tag' content='go'><meta property='article:tag' content='nginx'><meta property='article:published_time' content='2015-10-20T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2015-10-20T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>HTTP/2 ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/http2/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>HTTP/2</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2015-10-20T13:00:00&#43;01:00'>2015-10-20</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    7 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Persistent Connections</a></li>
+<li><a href="#3">Multiplexing</a></li>
+<li><a href="#4">Compression</a></li>
+<li><a href="#5">Prioritization</a></li>
+<li><a href="#6">SSL/TLS</a></li>
+<li><a href="#7">Server Push</a></li>
+<li><a href="#8">Implementations</a>
+
+<ul>
+<li><a href="#9">Nginx</a></li>
+<li><a href="#10">Go</a></li>
+</ul></li>
+<li><a href="#11">References</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This is a super quick post for demonstrating how to utilise the new HTTP/2 protocol. If you&rsquo;re unfamiliar with it, then let me spend a brief few moments discussing some of the highlights:</p>
+
+<ul>
+<li><a href="#2">Single, persistent connection</a></li>
+<li><a href="#3">Multiplexing</a></li>
+<li><a href="#4">Header compression</a></li>
+<li><a href="#5">Prioritization</a></li>
+<li><a href="#6">Encryption</a></li>
+<li><a href="#7">Server Push</a></li>
+</ul>
+
+<p>If none of these features make sense, then allow me to clarify further&hellip;</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="persistent-connections">Persistent Connections</h2>
+
+<p>When using HTTP/1.x each resource your web page specified would need its own connection. If you had three images on a page then that would be three separate connections.</p>
+
+<p>With HTTP/2 the situation is improved by utilising a single connection which supports the concept of a &lsquo;stream&rsquo;. A stream is effectively a two way channel, so information flows up and down it; and a single connection will be able to manage as many streams as necessary.</p>
+
+<p>This removes the need for previous &lsquo;performance&rsquo; techniques such as:</p>
+
+<ul>
+<li>domain sharding: a way to side step the problem of browsers only being able to parallelize a limited number of connections to the same domain</li>
+<li>image spriting: combining multiple images into one to reduce multiple connections to the server</li>
+<li>concatenating css/js: combining multiples stylesheets or javascript files into a single file to reduce multiple connections to the server</li>
+</ul>
+
+<p>This also means that the browser is able to more precisely cache resources as there is no need to have to bundle all your static assets together. This also avoids the user downloading assets for a page that they will never visit.</p>
+
+<p><div id="3"></div></p>
+
+<h2 id="multiplexing">Multiplexing</h2>
+
+<p>This simply means that multiple resources can be loaded in parallel over a single connection. Just to be clear: this is a very good performance boost and facilitates the ability to transfer lots of resources in a much more efficient manner than HTTP/1.x</p>
+
+<p><div id="4"></div></p>
+
+<h2 id="compression">Compression</h2>
+
+<p>Header information will no longer be sent over the wire in plaintext format. It&rsquo;ll now be compressed, making it smaller and the responses subsequently quicker to receive (although admittedly this is only a marginal gain).</p>
+
+<p>This also means we should be less concerned about having to serve static assets from a cookie-less domain, which was a problem because the size of the static resources would all become larger due to cookie data being associated with them.</p>
+
+<p><div id="5"></div></p>
+
+<h2 id="prioritization">Prioritization</h2>
+
+<p>Because all connections are multiplexed into a single connection, we need a way to prioritize certain requests over others in order to ensure the fastest possible overall response. HTTP/2 supports the concept of &lsquo;weighting&rsquo; each &lsquo;stream&rsquo; (see &ldquo;Persistent Connections&rdquo; above for details of what a stream is).</p>
+
+<p>I wont dive into the specifics of how this has been designed, suffice to say, if you want the gory details then I recommend you read the specification document here: <a href="http://http2.github.io/http2-spec/#rfc.section.5.3.2">http2.github.io/http2-spec</a></p>
+
+<p><div id="6"></div></p>
+
+<h2 id="ssl-tls">SSL/TLS</h2>
+
+<p>The above highlights also suggest a reduction in the overall time cost associated with the SSL/TLS &lsquo;handshake&rsquo; process. Here&rsquo;s why:</p>
+
+<ul>
+<li>A single connection will minimize SSL handshaking back and forth between the client/server</li>
+<li>Multiplexing allows requests to be handled asynchronously</li>
+<li>Compressing the HTTP headers will make the connection smaller (and subsequently faster)</li>
+<li>Prioritized connections means allowing relevant requests to be handled in an appropriate order</li>
+</ul>
+
+<p><div id="7"></div></p>
+
+<h2 id="server-push">Server Push</h2>
+
+<p>In HTTP/2 the server now has the ability to send additional information along with the initial HTTP request made by the client. Now it&rsquo;s important to realise that the concept of &lsquo;server push&rsquo; isn&rsquo;t the same thing as <a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events">Server-Sent Events</a>.</p>
+
+<p>Server-Sent Events allows the server to push updates to the client and as long as the client is listening for the relevant event, the client will be able to receive the pushed notification.</p>
+
+<p>Server Push isn&rsquo;t the same thing and was designed to solve a different use case. With HTTP/2 the server is able to send the client additional resources, even though the client hadn&rsquo;t explicitly requested them.</p>
+
+<p>A typical example given is when the client requests a HTTP page and that page has some static resources like CSS and JavaScript. In HTTP/1.x the client would request a web page, and then start parsing it only to discover the page includes CSS and JavaScript resources. The client would then have to make additional requests for those static resources.</p>
+
+<p>But with HTTP/2 the server can save the client from making multiple requests by sending all the other static resources in parallel for the client&rsquo;s initial request for the main page/document.</p>
+
+<p><div id="8"></div></p>
+
+<h2 id="implementations">Implementations</h2>
+
+<p>Im not sure exactly how many implementations are available for the HTTP/2 specification out in the wild, but there are two that we&rsquo;ll look at here in this article: <a href="https://www.nginx.com/">nginx</a> and <a href="https://golang.org/">Go</a>.</p>
+
+<p>If you&rsquo;re interested in other implementations then you can find a list of alternative options here: <a href="https://github.com/http2/http2-spec/wiki/Implementations">github.com/http2/http2-spec/wiki/Implementations</a>.</p>
+
+<p><div id="9"></div></p>
+
+<h3 id="nginx">Nginx</h3>
+
+<p>The latest release of nginx (both its open-source and paid for models) has good support for HTTP/2, but (for the moment at least) it doesn&rsquo;t support Server Push. I&rsquo;m going to presume that you&rsquo;re already familiar with nginx and how it works, so I won&rsquo;t bother explaining things a basic nginx user would already know.</p>
+
+<p>Below is a snippet from a <code>nginx.conf</code> file that has enabled HTTP/2 support:</p>
+
+<pre><code>http {
+  server {
+    listen *:443 ssl http2;
+    server_name integralist.co.uk;
+
+    ssl_certificate         /etc/nginx/certs/server.crt;
+    ssl_certificate_key     /etc/nginx/certs/server.key;
+    ssl_trusted_certificate /etc/nginx/certs/ca.crt;
+  }
+}
+</code></pre>
+
+<p>As you can see, the <code>listen</code> directive specifies <code>http2</code>. In essence this is all you would need to enable HTTP/2 using nginx. The reason we&rsquo;re restricting nginx to listening on port <code>443</code> and enabling <code>ssl</code> (+ specifying SSL certificates) is because the majority of web browsers require TLS in order to support HTTP/2, and also nginx&rsquo;s implementation relies upon TLS (see below for details).</p>
+
+<blockquote>
+<p>Note: currently Opera and Safari 9 supports HTTP/2 without TLS</p>
+</blockquote>
+
+<p>Nginx is a reverse proxy and so because the client doesn&rsquo;t have direct access to the back-end services/applications, nginx is able to translate HTTP/2 into HTTP/1.x which also allows those services to not have to be rearchitected.</p>
+
+<p>When a client communicates with nginx it&rsquo;ll typically pass a list of protocols it supports along with the request. Nginx will attempt to identify the <code>h2</code> protocol within that list, which indicates HTTP/2 support (specifically nginx implements the <a href="https://tools.ietf.org/html/rfc7301">Application Layer Protocol Negotiation</a> extension for TLS). If HTTP/2 isn&rsquo;t supported then nginx falls back to HTTP/1.x instead.</p>
+
+<p><div id="10"></div></p>
+
+<h3 id="go">Go</h3>
+
+<p>If you&rsquo;re not using a load balancer or a reverse proxy (such as nginx), then you might still be able to implement HTTP/2 support via your application server. One such example is with the Go programming language.</p>
+
+<p>Below is an example application which demonstrates how to enable HTTP/2 support. Because we&rsquo;re not utilising a reverse proxy we don&rsquo;t have SSL termination handled automatically for us, and so our application will need to handle the TLS handshake process:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;html&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+
+  &quot;golang.org/x/net/http2&quot;
+)
+
+func main() {
+  var server http.Server
+
+  http2.VerboseLogs = true
+  server.Addr = &quot;:8080&quot;
+
+  http2.ConfigureServer(&amp;server, nil)
+
+  http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, &quot;URL: %q\n&quot;, html.EscapeString(r.URL.Path))
+    ShowRequestInfoHandler(w, r)
+  })
+
+  log.Fatal(server.ListenAndServeTLS(&quot;localhost.cert&quot;, &quot;localhost.key&quot;))
+}
+func ShowRequestInfoHandler(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set(&quot;Content-Type&quot;, &quot;text/plain&quot;)
+
+  fmt.Fprintf(w, &quot;Method: %s\n&quot;, r.Method)
+  fmt.Fprintf(w, &quot;Protocol: %s\n&quot;, r.Proto)
+  fmt.Fprintf(w, &quot;Host: %s\n&quot;, r.Host)
+  fmt.Fprintf(w, &quot;RemoteAddr: %s\n&quot;, r.RemoteAddr)
+  fmt.Fprintf(w, &quot;RequestURI: %q\n&quot;, r.RequestURI)
+  fmt.Fprintf(w, &quot;URL: %#v\n&quot;, r.URL)
+  fmt.Fprintf(w, &quot;Body.ContentLength: %d (-1 means unknown)\n&quot;, r.ContentLength)
+  fmt.Fprintf(w, &quot;Close: %v (relevant for HTTP/1 only)\n&quot;, r.Close)
+  fmt.Fprintf(w, &quot;TLS: %#v\n&quot;, r.TLS)
+  fmt.Fprintf(w, &quot;\nHeaders:\n&quot;)
+
+  r.Header.Write(w)
+}
+</code></pre>
+
+<blockquote>
+<p>Note: the above code has been slightly modified from an example originally conceived by <a href="https://plus.google.com/111824860449692850794/posts">Kim Ilyong</a></p>
+</blockquote>
+
+<p>If you stick the above code into a file called <code>http2.go</code>, run the program and visit <code>https://localhost:8080/</code> in your browser (using one that supports HTTP/2 obviously), then you should see the following output (or something similar):</p>
+
+<pre><code>URL: &quot;/&quot;
+Method: GET
+Protocol: HTTP/2.0
+Host: localhost:8080
+RemoteAddr: [::1]:63555
+RequestURI: &quot;/&quot;
+URL: &amp;url.URL{Scheme:&quot;&quot;, Opaque:&quot;&quot;, User:(*url.Userinfo)(nil), Host:&quot;&quot;, Path:&quot;/&quot;, RawPath:&quot;&quot;, RawQuery:&quot;&quot;, Fragment:&quot;&quot;}
+Body.ContentLength: 0 (-1 means unknown)
+Close: false (relevant for HTTP/1 only)
+TLS: &amp;tls.ConnectionState{Version:0x303, HandshakeComplete:true, DidResume:false, CipherSuite:0xc02f, NegotiatedProtocol:&quot;h2&quot;, NegotiatedProtocolIsMutual:true, ServerName:&quot;localhost&quot;, PeerCertificates:[]*x509.Certificate(nil), VerifiedChains:[][]*x509.Certificate(nil), SignedCertificateTimestamps:[][]uint8(nil), OCSPResponse:[]uint8(nil), TLSUnique:[]uint8{0xf6, 0xb, 0xf8, 0x95, 0x6f, 0x73, 0x4f, 0x26, 0x8f, 0x72, 0x26, 0xab}}
+
+Headers:
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: en-US,en;q=0.8
+Cache-Control: max-age=0
+Cookie: _chartbeat2=CAgQSrCqRzJnCmxa4b.1434983427317.1434983759085.1
+Dnt: 1
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36
+</code></pre>
+
+<p>You&rsquo;ll notice the <code>Protocol: HTTP/2.0</code> which indicates we&rsquo;re handling HTTP/2 now. If you&rsquo;re using the Chrome web browser you can also download an extension called &ldquo;HTTP/2 and SPDY indicator&rdquo; which will display a blue lightning bolt on any site that is serving content via the HTTP/2 protocol.</p>
+
+<p><div id="11"></div></p>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://http2.github.io/faq/">HTTP/2 FAQ</a></li>
+<li><a href="https://github.com/http2/http2-spec/wiki/Implementations">HTTP/2 Implementations</a></li>
+<li><a href="https://http2.golang.org/">Go HTTP/2 Demo Page</a></li>
+<li><a href="https://github.com/bradfitz/http2/tree/master/h2demo">Go HTTP/2 Example Code</a></li>
+</ul>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/http'>HTTP</a>, <a class='tag' href='/tags/http2'>HTTP2</a>, <a class='tag' href='/tags/network'>network</a>, <a class='tag' href='/tags/performance'>performance</a>, <a class='tag' href='/tags/golang'>golang</a>, <a class='tag' href='/tags/go'>go</a>, <a class='tag' href='/tags/nginx'>nginx</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/'>
+        <span class='screen-reader'>Next post: </span>Multiple SSH Keys for Different GitHub Accounts<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+
