@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on integralist</title>
+    <link>http://www.integralist.co.uk/tags/</link>
+    <description>Recent content in Tags on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 16 Nov 2016 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Bits</title>
+      <link>http://www.integralist.co.uk/tags/bits/</link>
+      <pubDate>Wed, 16 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/bits/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Bytes</title>
+      <link>http://www.integralist.co.uk/tags/bytes/</link>
+      <pubDate>Wed, 16 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/bytes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>C</title>
+      <link>http://www.integralist.co.uk/tags/c/</link>
+      <pubDate>Mon, 28 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/c/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Cidr</title>
+      <link>http://www.integralist.co.uk/tags/cidr/</link>
+      <pubDate>Wed, 16 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/cidr/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Docker</title>
+      <link>http://www.integralist.co.uk/tags/docker/</link>
+      <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/docker/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Go</title>
+      <link>http://www.integralist.co.uk/tags/go/</link>
+      <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/go/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Golang</title>
+      <link>http://www.integralist.co.uk/tags/golang/</link>
+      <pubDate>Fri, 02 Dec 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/golang/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gpg</title>
+      <link>http://www.integralist.co.uk/tags/gpg/</link>
+      <pubDate>Sat, 10 Dec 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/gpg/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Key</title>
+      <link>http://www.integralist.co.uk/tags/key/</link>
+      <pubDate>Sat, 10 Dec 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/key/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Manpage</title>
+      <link>http://www.integralist.co.uk/tags/manpage/</link>
+      <pubDate>Fri, 25 Nov 2016 13:00:00 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/manpage/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Python</title>
+      <link>http://www.integralist.co.uk/tags/python/</link>
+      <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ram</title>
+      <link>http://www.integralist.co.uk/tags/ram/</link>
+      <pubDate>Wed, 16 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/ram/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Shell</title>
+      <link>http://www.integralist.co.uk/tags/shell/</link>
+      <pubDate>Fri, 25 Nov 2016 13:00:00 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/shell/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ssh</title>
+      <link>http://www.integralist.co.uk/tags/ssh/</link>
+      <pubDate>Wed, 18 Nov 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/ssh/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Syscall</title>
+      <link>http://www.integralist.co.uk/tags/syscall/</link>
+      <pubDate>Fri, 18 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/syscall/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Vim</title>
+      <link>http://www.integralist.co.uk/tags/vim/</link>
+      <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/vim/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

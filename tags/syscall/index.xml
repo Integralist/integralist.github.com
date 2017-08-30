@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Syscall on integralist</title>
+    <link>http://www.integralist.co.uk/tags/syscall/</link>
+    <description>Recent content in Syscall on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Fri, 18 Nov 2016 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/syscall/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Syscalls and C</title>
+      <link>http://www.integralist.co.uk/posts/syscalls-and-c/</link>
+      <pubDate>Fri, 18 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/syscalls-and-c/</guid>
+      <description>Syscalls and C This post is aimed at explaining the difference between a system call (provided by the Linux kernal) and a wrapper function that has a similar name within one of the C standard libraries.
+I have no formal Computer Science (CS) background, I started programming in 1999 and only from 2016 am I starting to learn the C programming language in order to help give me a deeper knowledge of how *nix systems work and other core CS concepts.</description>
+    </item>
+    
+  </channel>
+</rss>

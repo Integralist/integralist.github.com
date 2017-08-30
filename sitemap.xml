@@ -42,8 +42,25 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/posts/bits-and-bytes/</loc>
+    <lastmod>2016-11-16T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/posts/multiple-ssh-keys-for-different-github-accounts/</loc>
     <lastmod>2015-11-18T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/bits/</loc>
+    <lastmod>2016-11-16T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/bytes/</loc>
+    <lastmod>2016-11-16T13:00:00+01:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
@@ -54,6 +71,12 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/cidr/</loc>
+    <lastmod>2016-11-16T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -141,6 +164,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/ram/</loc>
+    <lastmod>2016-11-16T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/categories/security/</loc>
     <lastmod>2016-12-10T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -166,7 +195,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/</loc>
-    <lastmod>2016-11-28T13:00:00+01:00</lastmod>
+    <lastmod>2016-11-16T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   

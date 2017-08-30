@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Shell on integralist</title>
+    <link>http://www.integralist.co.uk/tags/shell/</link>
+    <description>Recent content in Shell on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Fri, 25 Nov 2016 13:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/shell/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Understanding Man Pages</title>
+      <link>http://www.integralist.co.uk/posts/understanding-man-pages/</link>
+      <pubDate>Fri, 25 Nov 2016 13:00:00 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/understanding-man-pages/</guid>
+      <description>Introduction Sections Sub sections Accessing different sections  
+Introduction Your operating system provides manual pages that explain what specific commands do and where they can be located on your computer.
+Most of us are at least familiar with opening a terminal and typing:
+man &amp;lt;some_command&amp;gt;  But you might be confused, when you see a manual page informing you to check out &amp;lt;another_command&amp;gt;(2). For example, you might be shown the message at the end of a man page that says See also: chmod(2).</description>
+    </item>
+    
+  </channel>
+</rss>

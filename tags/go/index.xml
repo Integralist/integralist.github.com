@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Go on integralist</title>
+    <link>http://www.integralist.co.uk/tags/go/</link>
+    <description>Recent content in Go on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 29 Mar 2017 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Dev Environments Within Docker Containers</title>
+      <link>http://www.integralist.co.uk/posts/dev-environments-within-docker-containers/</link>
+      <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/dev-environments-within-docker-containers/</guid>
+      <description>Introduction Python Go Mounting Volumes  
+Introduction You&amp;rsquo;re a software engineer with a new laptop.
+You&amp;rsquo;re going to be writing code in multiple languages.
+You&amp;rsquo;re going to have projects of varying dependencies.
+But you want to avoid the issues you&amp;rsquo;ve had in the past:
+ Messy installations of lots of different software packages. Clogging up your system with programming language version managers.  You decide to use Docker.</description>
+    </item>
+    
+    <item>
+      <title>Hitchikers Guide to Go</title>
+      <link>http://www.integralist.co.uk/posts/hitchikers-guide-to-go/</link>
+      <pubDate>Fri, 02 Dec 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/hitchikers-guide-to-go/</guid>
+      <description>Introduction Private Repo Access Build and Compilation Dependency Information Dependency Management Documentation Testing Logging Godo Import Race Conditions New vs Make Custom Types Function Types Enumerator IOTA Struct: Var vs Type Embedded Structs Reference vs Value See all methods on &amp;lt;Type&amp;gt; Convert Struct into JSON Pretty Printing JSON String Convert Struct into YAML Sorting Structs Read Users Input HTTP Middleware Sessions HTTPS TLS Request HTTP GET Web Page Custom HTTP Request Methods Pointers Type Assertion Line Counting Reading File in Chunks Time Starting and Stopping things with Channels Channel Pipelines Templating Error handling Socket Programming Comparing Maps Zip File Contents Shell Commands New Instance Idiom JSON Connection Draining</description>
+    </item>
+    
+  </channel>
+</rss>

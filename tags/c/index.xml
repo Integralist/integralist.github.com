@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C on integralist</title>
+    <link>http://www.integralist.co.uk/tags/c/</link>
+    <description>Recent content in C on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 28 Nov 2016 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/c/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Concepts From the C Programming Language</title>
+      <link>http://www.integralist.co.uk/posts/concepts-from-the-c-programming-language/</link>
+      <pubDate>Mon, 28 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/concepts-from-the-c-programming-language/</guid>
+      <description>Introduction Compilation  Compilers C11 safe functions  Hello World Constants vs Directives Quotations Char Type Null Terminator Pointers Arrays Enumerators Memory Allocation with different Types Reallocating Memory Function Prototypes Conclusion  
+Introduction I decided recently to read a book on the C programming language. The idea was to learn some more low-level concepts that other higher-level languages were abstracting away from me.
+This write up is the result of some of those learnings.</description>
+    </item>
+    
+    <item>
+      <title>Syscalls and C</title>
+      <link>http://www.integralist.co.uk/posts/syscalls-and-c/</link>
+      <pubDate>Fri, 18 Nov 2016 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/syscalls-and-c/</guid>
+      <description>Syscalls and C This post is aimed at explaining the difference between a system call (provided by the Linux kernal) and a wrapper function that has a similar name within one of the C standard libraries.
+I have no formal Computer Science (CS) background, I started programming in 1999 and only from 2016 am I starting to learn the C programming language in order to help give me a deeper knowledge of how *nix systems work and other core CS concepts.</description>
+    </item>
+    
+  </channel>
+</rss>
