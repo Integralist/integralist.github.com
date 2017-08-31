@@ -1,29 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Docker on integralist</title>
-    <link>http://www.integralist.co.uk/tags/docker/</link>
-    <description>Recent content in Docker on integralist</description>
+    <title>Curl on integralist</title>
+    <link>http://www.integralist.co.uk/tags/curl/</link>
+    <description>Recent content in Curl on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Wed, 29 Mar 2017 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Sat, 03 Oct 2015 13:00:00 +0100</lastBuildDate>
     
-	<atom:link href="http://www.integralist.co.uk/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://www.integralist.co.uk/tags/curl/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Dev Environments Within Docker Containers</title>
-      <link>http://www.integralist.co.uk/posts/dev-environments-within-docker-containers/</link>
-      <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
-      
-      <guid>http://www.integralist.co.uk/posts/dev-environments-within-docker-containers/</guid>
-      <description>Introduction Python Go Mounting Volumes  
-Introduction You&amp;rsquo;re a software engineer with a new laptop.
-You&amp;rsquo;re going to be writing code in multiple languages.
-You&amp;rsquo;re going to have projects of varying dependencies.
-But you want to avoid the issues you&amp;rsquo;ve had in the past:
- Messy installations of lots of different software packages. Clogging up your system with programming language version managers.  You decide to use Docker.</description>
-    </item>
     
     <item>
       <title>Client Cert Authentication</title>

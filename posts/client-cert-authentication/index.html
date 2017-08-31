@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Directory Structure Configuration Building Running Verifying Revocation References Conclusion  
+Introduction The purpose of this post is to demonstrate how to configure nginx to use client certificates for authenticated access to your back-end service (in this example: a Ruby/Sinatra application).
+ Note: the focus of this post isn&rsquo;t about Ruby/Sinatra so don&rsquo;t worry if your back-end service is built with another programming language
+ I won&rsquo;t be going into the details of how most of it was set-up, as the majority of this was already documented in a previous blog post here: Setting up nginx with Docker so I recommend reading through that first if you&rsquo;re new to Docker and nginx.'>
+
+<meta property='og:title' content='Client Cert Authentication ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Directory Structure Configuration Building Running Verifying Revocation References Conclusion  
+Introduction The purpose of this post is to demonstrate how to configure nginx to use client certificates for authenticated access to your back-end service (in this example: a Ruby/Sinatra application).
+ Note: the focus of this post isn&rsquo;t about Ruby/Sinatra so don&rsquo;t worry if your back-end service is built with another programming language
+ I won&rsquo;t be going into the details of how most of it was set-up, as the majority of this was already documented in a previous blog post here: Setting up nginx with Docker so I recommend reading through that first if you&rsquo;re new to Docker and nginx.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/client-cert-authentication/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='bash'><meta property='article:tag' content='certificates'><meta property='article:tag' content='curl'><meta property='article:tag' content='docker'><meta property='article:tag' content='https'><meta property='article:tag' content='keys'><meta property='article:tag' content='nginx'><meta property='article:tag' content='openssl'><meta property='article:tag' content='ssl'><meta property='article:published_time' content='2015-10-03T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2015-10-03T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Client Cert Authentication ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/client-cert-authentication/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Client Cert Authentication</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2015-10-03T13:00:00&#43;01:00'>2015-10-03</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    23 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Directory Structure</a></li>
+<li><a href="#3">Configuration</a></li>
+<li><a href="#4">Building</a></li>
+<li><a href="#5">Running</a></li>
+<li><a href="#6">Verifying</a></li>
+<li><a href="#7">Revocation</a></li>
+<li><a href="#8">References</a></li>
+<li><a href="#9">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The purpose of this post is to demonstrate how to configure nginx to use client certificates for authenticated access to your back-end service (in this example: a Ruby/Sinatra application).</p>
+
+<blockquote>
+<p>Note: the focus of this post isn&rsquo;t about Ruby/Sinatra so don&rsquo;t worry if your back-end service is built with another programming language</p>
+</blockquote>
+
+<p>I won&rsquo;t be going into the details of how most of it was set-up, as the majority of this was already documented in a previous blog post here: <a href="http://www.integralist.co.uk/posts/docker-nginx.html">Setting up nginx with Docker</a> so I recommend reading through that first if you&rsquo;re new to Docker and nginx.</p>
+
+<p>I will be showing most of the files, but I&rsquo;ll assume you&rsquo;re familiar with nginx and Docker. The changes involved for setting up client authentication is actually very minimal, and in reality the majority of the work is in the creation of a CA, CRL and signing certificates.</p>
+
+<p>If you need a refresher on TLS/SSL then please read: <a href="http://www.integralist.co.uk/posts/security-basics.html">Security basics with GPG, OpenSSH and OpenSSL</a> which covers the SSL handshake process and a lot more.</p>
+
+<p>So let&rsquo;s get started&hellip;</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="directory-structure">Directory Structure</h2>
+
+<p>First things first, we&rsquo;re going to need the following set of files and folders:</p>
+
+<pre><code>.
+├── docker-app
+│   ├── Dockerfile
+│   ├── Gemfile
+│   ├── Gemfile.lock
+│   ├── app.rb
+├── docker-nginx
+│   ├── Dockerfile
+│   ├── certs
+│   │   ├── ca.crt
+│   │   ├── ca.key
+│   │   ├── client.crt
+│   │   ├── client.csr
+│   │   ├── client.key
+│   │   ├── server.crt
+│   │   ├── server.csr
+│   │   ├── server.key
+│   └── nginx.conf
+└── html
+    ├── index.html
+    └── test.html
+</code></pre>
+
+<p>You can get most of this structure from the following GitHub repository: <a href="https://github.com/Integralist/Docker-Examples/tree/master/Nginx-ClientCertAccess">Integralist/Docker-Examples/Nginx-ClientCertAccess</a>.</p>
+
+<p>I say &ldquo;most&rdquo; because the <code>docker-nginx/certs</code> folder no longer exists in the repo. This is OK because I&rsquo;ll demonstrate how to generate these files in the following sub sections of this article.</p>
+
+<p>The reason the <code>docker-nginx/certs</code> folder no longer exists is due to the last portion of this article where by we switch to another format for generating certificates and self-signing (specifically the &ldquo;<a href="#7">Revocation/CRL Management</a>&rdquo; section).</p>
+
+<p><div id="3"></div></p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>As far as configuration is concerned, the main part comes down to the <code>nginx.conf</code> file:</p>
+
+<pre><code>user nobody nogroup;
+worker_processes auto;
+
+events {
+  worker_connections 512;
+}
+
+http {
+  upstream app {
+    server app:4567;
+  }
+
+  server {
+    listen *:443;
+    ssl on;
+    server_name &quot;&quot;; 
+
+    ssl_certificate        /etc/nginx/certs/server.crt;
+    ssl_certificate_key    /etc/nginx/certs/server.key;
+    ssl_client_certificate /etc/nginx/certs/ca.crt;
+    ssl_verify_client      on;
+
+    root /usr/share/nginx/html;
+
+    location /app/ {
+      proxy_pass http://app/;
+      proxy_set_header X-ClientCert-DN $ssl_client_s_dn;
+    }
+  }
+}
+</code></pre>
+
+<p>As we can see we&rsquo;re telling nginx to listen to any interface on port <code>443</code> (TLS connections) only. We then enable SSL and specify a few different <code>ssl_</code> settings that direct nginx to certain locations where it can find the server&rsquo;s own certificate and private key, as well as the CA certificate that was used to sign both the server certificate as well as the user/client certificate we&rsquo;ll be using shortly to connect to this service.</p>
+
+<p>You&rsquo;ll probably also notice <code>ssl_verify_client</code> has been turned <code>on</code>. This could be made &lsquo;optional&rsquo; so that some connections are allowed to public endpoints. But in my case I want everything to be protected by client certs.</p>
+
+<p>Finally, when we proxy traffic onto our back-end service, we also create a new custom HTTP header to be proxied on as well; which I&rsquo;ve named: <code>X-ClientCert-DN</code>. The value assigned to this custom header uses the nginx <code>$ssl_client_s_dn</code> variable, which extracts the <code>Common Name</code> section of the client&rsquo;s certificate.</p>
+
+<p>Interestingly, the Ruby server receives the HTTP request with the custom header transformed into <code>HTTP_X_CLIENTCERT_DN</code>. Just something to be aware of if you decide to switch from Ruby to another programming language, such as <a href="https://golang.org/">Go</a> (as your mileage may vary).</p>
+
+<h3 id="generating-the-certificates-and-keys">Generating the certificates and keys</h3>
+
+<p>So the first thing we want to do is to create the CA key/certificate, which will be used for signing both the server and the client certificate requests:</p>
+
+<pre><code>openssl genrsa -des3 -out ca.key 4096
+openssl req -new -x509 -days 365 -key ca.key -out ca.crt
+</code></pre>
+
+<p>For the <code>ca.crt</code> generation I pretty much entered <code>.</code> (which means &lsquo;no value&rsquo;) for all details. The only exception was the <code>Common Name</code> field which I entered &lsquo;TheCA&rsquo; (so I could recognise it as the &lsquo;ca&rsquo;, just in case I needed to inspect the certificate)</p>
+
+<blockquote>
+<p>Note: all of these commands I ran inside of the <code>docker-nginx/certs</code> folder to make it easier later on to mount them as a volume into my Docker containers</p>
+</blockquote>
+
+<p>Next we&rsquo;ll create the server key along with a CSR (Certificate Signing Request) which the CA will use to generate the server&rsquo;s certificate:</p>
+
+<pre><code>openssl genrsa -out server.key 4096
+openssl req -new -key server.key -out server.csr
+</code></pre>
+
+<p>For the CSR I pretty much entered <code>.</code> (which means &lsquo;no value&rsquo;) for all details. The only exception was the <code>Common Name</code> field which I entered &lsquo;TheServer&rsquo; (so I recognise it as the &lsquo;server&rsquo;, just in case I needed to inspect the certificate).</p>
+
+<blockquote>
+<p>Note: I don&rsquo;t specify <code>-des3</code> in the command as I don&rsquo;t want to generate a passphrase for the private key. If I have to restart my server I don&rsquo;t want the automation to be affected by requiring me to manually enter the passphrase</p>
+</blockquote>
+
+<p>Now we&rsquo;ll self-sign the server&rsquo;s CSR and generate its own certificate (in case it&rsquo;s not clear: self-signing isn&rsquo;t something you want to do unless you know you are going to ask your users to trust your certificate and ignore big warnings about an unknown CA signing the server&rsquo;s cert):</p>
+
+<pre><code>openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+</code></pre>
+
+<p>OK, almost there. We now need to create a private key and CSR for our client (i.e. this will be the user trying to access the service):</p>
+
+<pre><code>openssl genrsa -out client.key 2048
+openssl req -new -key client.key -out client.csr
+</code></pre>
+
+<p>You&rsquo;ll notice I&rsquo;ve made the encryption length <code>2048</code> instead of <code>4096</code>. I did this as a speed/perf compromise, as higher length encryption keys can be slower to use with the TLS handshake process (just one of the many security compromises that need to be considered).</p>
+
+<p>For the CSR I pretty much entered <code>.</code> (which means &lsquo;no value&rsquo;) for all details. The only exceptions were the <code>Common Name</code> field which I entered &lsquo;Mark McDonnell&rsquo; (so I recognise it as the &lsquo;client&rsquo;) and the <code>Email Address</code> field, which I entered something like <code>mark@integralist.com</code> (as I want to parse out that email in my Ruby application)</p>
+
+<blockquote>
+<p>Note: again I don&rsquo;t specify <code>-des3</code> in the command, as I don&rsquo;t want to generate a passphrase for the private key</p>
+</blockquote>
+
+<p>Finally, I sign the client CSR using the CA certificate:</p>
+
+<pre><code>openssl x509 -req -days 365 -in client.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out client.crt
+</code></pre>
+
+<p>That&rsquo;s it, that&rsquo;s all the different certificates set-up and ready to be used. Let&rsquo;s move onto building our Docker set-up and running some containers&hellip;</p>
+
+<p><div id="4"></div></p>
+
+<h2 id="building">Building</h2>
+
+<p>This section&rsquo;s nice and short because I provide the <code>Dockerfile</code> for both the Ruby and nginx applications (just make sure you <code>cd ../</code> back up into the project&rsquo;s root directory before executing the following commands):</p>
+
+<pre><code>docker build -t my-ruby-app ./docker-app
+docker build -t my-nginx ./docker-nginx
+</code></pre>
+
+<p><div id="5"></div></p>
+
+<h2 id="running">Running</h2>
+
+<p>This section is also nice and short. First let&rsquo;s run the Ruby application:</p>
+
+<pre><code>docker run --name ruby-app -p 4567:4567 -d my-ruby-app
+</code></pre>
+
+<p>Now let&rsquo;s run the nginx container:</p>
+
+<pre><code>docker run --name nginx-container \
+  -v $(pwd)/html:/usr/share/nginx/html:ro \
+  -v $(pwd)/docker-nginx/certs/server.crt:/etc/nginx/certs/server.crt \
+  -v $(pwd)/docker-nginx/certs/server.key:/etc/nginx/certs/server.key \
+  -v $(pwd)/docker-nginx/certs/ca.crt:/etc/nginx/certs/ca.crt \
+  -v $(pwd)/docker-nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
+  --link ruby-app:app \
+  -P -d my-nginx
+</code></pre>
+
+<p>OK so the nginx <code>docker run</code> command was a little bit more involved, but really all it&rsquo;s doing is mounting volumes from the host machine (my Mac) into the Docker container. The most important items to be aware of are the certs we&rsquo;re mounting into the container as well as the <code>nginx.conf</code> file.</p>
+
+<p>You&rsquo;ll also notice I&rsquo;m linking the running Ruby container to the nginx container. This is important because it allows nginx to utilise the Ruby container as a back-end service.</p>
+
+<p><div id="6"></div></p>
+
+<h2 id="verifying">Verifying</h2>
+
+<p>Now the containers are built and running, we should verify that the services themselves are doing what they should be. But before we do that, it&rsquo;s worth me mentioning now that when I reference <code>&lt;ip&gt;</code> and <code>&lt;nginx_port&gt;</code> below, you&rsquo;ll need to swap these references for actual values.</p>
+
+<p>To get the value for <code>&lt;ip&gt;</code> I&rsquo;m using the following:</p>
+
+<pre><code>$(docker-machine ip dev)
+</code></pre>
+
+<p>This gives me the ip address of my running docker VM. If you&rsquo;re running on Linux then localhost <code>127.0.0.1</code> would suffice. But as you can see, I&rsquo;m running things on a Mac and so I&rsquo;m using <code>docker-machine</code> with a VM named <code>dev</code>. Your mileage will ultimately vary.</p>
+
+<p>To get the value of <code>&lt;nginx_port&gt;</code> I&rsquo;m using the following to access the dynamically allocated port number:</p>
+
+<pre><code>$(docker port nginx-container 443 | awk -F ':' '{ print $2 }')
+</code></pre>
+
+<p>Where <code>nginx-container</code> is the name I gave to my container when executing the <code>docker run</code> command earlier.</p>
+
+<p>So let&rsquo;s demonstrate some different application routes that should all <strong>FAIL</strong> (for reasons I&rsquo;ll explain as we go along):</p>
+
+<pre><code>curl http://&lt;ip&gt;:&lt;nginx_port&gt;/
+</code></pre>
+
+<p>So in the above example, we should see the following error, as the HTTP protocol was used instead of HTTPS (remember that nginx was setup to only listen on 443, not 80):</p>
+
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;400 The plain HTTP request was sent to HTTPS port&lt;/title&gt;&lt;/head&gt;
+&lt;body bgcolor=&quot;white&quot;&gt;
+&lt;center&gt;&lt;h1&gt;400 Bad Request&lt;/h1&gt;&lt;/center&gt;
+&lt;center&gt;The plain HTTP request was sent to HTTPS port&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;nginx/1.4.6 (Ubuntu)&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Now let&rsquo;s try and switch to HTTPS:</p>
+
+<pre><code>curl https://&lt;ip&gt;:&lt;nginx_port&gt;/
+</code></pre>
+
+<p>The above attempt should also error, as the server&rsquo;s cert isn&rsquo;t trusted (i.e. it&rsquo;s self-signed). To fix this we can use the <code>--insecure</code> flag:</p>
+
+<pre><code>curl --insecure https://&lt;ip&gt;:&lt;nginx_port&gt;/
+</code></pre>
+
+<p>The above attempt should now fail because no client certificate was provided for purpose of authentication with nginx. Great. So now we&rsquo;re verified all the failing paths, let&rsquo;s consider <code>curl</code> commands that should return us some actual working content.</p>
+
+<p>But before we do that, a slight intermission&hellip;</p>
+
+<hr />
+
+<h3 id="mac-os-x-curl">Mac OS X Curl</h3>
+
+<p>In the below section I&rsquo;ll be demonstrating some <code>curl</code> calls that actually <em>work</em>. Now you might still find they don&rsquo;t work for you, but not for the reasons you&rsquo;d expect.</p>
+
+<p>The problem depends on what operating system you&rsquo;re playing along with. For example, if you see the following error&hellip;</p>
+
+<pre><code>curl: (58) SSL: Can't load the certificate &quot;/path/to/docker-nginx/certs/client.crt&quot; and its private key: OSStatus -25299
+</code></pre>
+
+<p>&hellip;then fear not, it&rsquo;s just that the <code>curl</code> command provided by Mac OS X is a bit rubbish. The solution is to use Docker to run a different version of <code>curl</code> like so:</p>
+
+<pre><code>docker run -it speg03/curl &lt;...&gt;
+</code></pre>
+
+<p>We&rsquo;ll use this Docker container like so:</p>
+
+<pre><code>docker run \
+  -it \
+  -v $(pwd)/docker-nginx/certs/client.key:/var/cert/client.key \
+  -v $(pwd)/docker-nginx/certs/client.crt:/var/cert/client.crt \
+  speg03/curl --insecure \
+              --key /var/cert/client.key \
+              --cert /var/cert/client.crt \
+              https://$(docker-machine ip dev):$(docker port nginx-container 443 | awk -F ':' '{ print $2 }')/app/cert
+</code></pre>
+
+<p>Yeah it&rsquo;s bit long-winded, but you can alias bits or stick it into a bash function if you prefer. Effectively we&rsquo;re mounting our generated certificates into the container and then specifying them as <code>--key</code> and <code>--cert</code> when trying to access a specific application endpoint.</p>
+
+<p>For the following <code>curl</code> commands just remember to use the Dockerised version of <code>curl</code> if you&rsquo;re finding your native Mac OS X <code>curl</code> isn&rsquo;t working for you.</p>
+
+<hr />
+
+<p>Now in the following section I define some local variables for the purpose of making the overall <code>curl</code> commands shorter. But all of these <code>curl</code> requests should work fine (as the client cert/key have been provided as flags):</p>
+
+<pre><code>client_key=$(pwd)/docker-nginx/certs/client.key
+client_crt=$(pwd)/docker-nginx/certs/client.crt
+
+curl --insecure --key $client_key --cert $client_crt https://&lt;ip&gt;:&lt;nginx_port&gt;/
+curl --insecure --key $client_key --cert $client_crt https://&lt;ip&gt;:&lt;nginx_port&gt;/test.html
+curl --insecure --key $client_key --cert $client_crt https://&lt;ip&gt;:&lt;nginx_port&gt;/app/
+curl --insecure --key $client_key --cert $client_crt https://&lt;ip&gt;:&lt;nginx_port&gt;/app/foo
+</code></pre>
+
+<blockquote>
+<p>Note: we use <code>--insecure</code> to trust the self-signed certificate, we could install the CA into our OS certificate store but I&rsquo;ve not done that as this is just an example set-up and so I&rsquo;m using <code>--insecure</code> as a quick win</p>
+</blockquote>
+
+<p>Finally, let&rsquo;s test the client cert is being proxied through the HTTP request to the Ruby app:</p>
+
+<pre><code>curl --insecure --key $client_key --cert $client_crt https://&lt;ip&gt;:&lt;nginx_port&gt;/app/cert
+</code></pre>
+
+<p>You should see something like the following output by the Ruby application:</p>
+
+<pre><code>/CN=Mark McDonnell/emailAddress=mark@integralist.com
+</code></pre>
+
+<p>Now at this point you can parse your client certificate&rsquo;s CommonName (CN) however you like. In my application I just print it back out to the user, but in a real-world application you might want to use the details to present some nice personalised welcome message like &ldquo;Hello Mark!&rdquo; or whatever.</p>
+
+<p>Either way, you can only access the Ruby application if you provide a cert/key that was signed by the self-signed CA that is specified in the nginx configuration.</p>
+
+<p>If you were to try and provide a different cert/key (one that wasn&rsquo;t signed by the self-signed CA), then you&rsquo;ll see the following error response:</p>
+
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;400 The SSL certificate error&lt;/title&gt;&lt;/head&gt;
+&lt;body bgcolor=&quot;white&quot;&gt;
+&lt;center&gt;&lt;h1&gt;400 Bad Request&lt;/h1&gt;&lt;/center&gt;
+&lt;center&gt;The SSL certificate error&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;nginx/1.4.6 (Ubuntu)&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Which is great. That is exactly what we want to see: denying access to our service unless properly authorised.</p>
+
+<p><div id="7"></div></p>
+
+<h2 id="revocation">Revocation</h2>
+
+<p>Now before we close, we should consider what happens when we want to prevent a user from accessing our content after we have issued them a certificate. In order to do this we need to provide a CRL (Certificate Revocation List) to nginx. The purpose of the CRL is to identify which certificates issued by the CA have since been revoked and should no longer allow access to the service.</p>
+
+<p>The modification we need to make to nginx is simple:</p>
+
+<pre><code>ssl_certificate        /etc/nginx/certs/server.crt;
+ssl_certificate_key    /etc/nginx/certs/server.key;
+ssl_client_certificate /etc/nginx/certs/ca.crt;
+ssl_verify_client      on;
+ssl_crl                /etc/nginx/certs/crl.pem;
+</code></pre>
+
+<p>Notice where we defined all the other <code>ssl_</code> configuration, we have now added <code>ssl_crl</code> at the bottom and pointed it to a <code>crl.pem</code> file that contains the list of revoked certificates.</p>
+
+<blockquote>
+<p>Note: use <code>service nginx reload</code> to cause nginx to pick up any changes to the <code>crl.pem</code></p>
+</blockquote>
+
+<h3 id="crl-management">CRL Management</h3>
+
+<p>At this point in time we have a working set-up. I&rsquo;m now going to change things by no longer using the <code>docker-nginx/certs</code> folder we&rsquo;ve been using so far. I&rsquo;m going to start from scratch in that respect, in order to demonstrate how CRL (Certificate Revocation Lists) work and how to create a set-up that allows you to manage a CRL.</p>
+
+<p>So let&rsquo;s begin by removing the <code>docker-nginx/certs</code> folder and creating a new directory within <code>docker-nginx</code> called <code>CertificateManagement</code>. Once you&rsquo;ve created that folder <code>cd</code> into it (as all the following commands will need to be run from within that directory - unless I say otherwise).</p>
+
+<h3 id="openssl-cnf">Openssl.cnf</h3>
+
+<p>We need to create an <code>openssl.cnf</code> file, which will allow us to automate a lot of the generic set-up that you would otherwise have to manually specify yourself via the command-line (<code>touch openssl.cnf</code> should do the trick). The contents of this file will be as follows:</p>
+
+<pre><code>#
+# OpenSSL configuration file.
+#
+
+# Establish working directory.
+dir            = .
+
+[ ca ]
+default_ca     = CA_default
+
+[ CA_default ]
+serial           = $dir/serial
+database         = $dir/certindex.txt
+new_certs_dir    = $dir/certs
+certificate      = $dir/ca.crt
+private_key      = $dir/private/ca.key
+default_days     = 365
+default_md       = md5
+default_crl_days = 30
+preserve         = no
+email_in_dn      = yes
+nameopt          = default_ca
+certopt          = default_ca
+policy           = policy_match
+crl_dir          = $dir/revoked
+crlnumber        = $crl_dir/crlnumber
+crl_extensions   = crl_ext
+x509_extensions  = usr_cert
+copy_extensions  = copy
+
+[ policy_match ]
+countryName            = match    # Must be the same as the CA
+stateOrProvinceName    = optional # not required
+organizationName       = optional # not required
+organizationalUnitName = optional # not required
+commonName             = supplied # must be there, whatever it is
+emailAddress           = supplied # must be there, whatever it is
+
+[ crl_ext ]
+authorityKeyIdentifier = keyid:always,issuer:always
+
+[ usr_cert ]
+basicConstraints       = CA:FALSE
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid, issuer
+crlDistributionPoints  = URI:http://www.yourdomain.com/ca/crl.pem # this should be updated to be unique to the CA
+
+[ req ]
+default_bits       = 2048    # Size of keys
+default_keyfile    = key.pem # name of generated keys
+default_md         = md5     # message digest algorithm
+string_mask        = nombstr # permitted characters
+distinguished_name = req_distinguished_name
+req_extensions     = v3_req
+
+[ req_distinguished_name ]
+# Variable name				Prompt string
+#-------------------------	  ----------------------------------
+0.organizationName     = Organization Name (company)
+organizationalUnitName = Organizational Unit Name (department, division)
+emailAddress           = Email Address
+emailAddress_max       = 40
+localityName           = Locality Name (city, district)
+stateOrProvinceName    = State or Province Name (full name)
+countryName            = Country Name (2 letter code)
+countryName_min        = 2
+countryName_max        = 2
+commonName             = Common Name (hostname, IP, or your name)
+commonName_max         = 64
+
+# Default values for the above, for consistency and less typing.
+# Variable name				Value
+#------------------------	  ------------------------------
+0.organizationName_default  = My Company
+localityName_default        = My Town
+stateOrProvinceName_default = State or Providence
+countryName_default         = US
+
+[ v3_ca ]
+basicConstraints            = CA:TRUE
+subjectKeyIdentifier        = hash
+authorityKeyIdentifier      = keyid:always,issuer:always
+
+[ v3_req ]
+basicConstraints            = CA:FALSE
+subjectKeyIdentifier        = hash
+</code></pre>
+
+<blockquote>
+<p>Note: for an excellent walk-through of the <code>openssl.conf</code> and what it all means, then I highly recommend reading <a href="https://www.phildev.net/ssl/opensslconf.html">phildev.net/ssl/opensslconf</a></p>
+</blockquote>
+
+<p>From here we now want to create some other directories referenced by <code>openssl.cnf</code>:</p>
+
+<pre><code>mkdir certs private revoked
+</code></pre>
+
+<p>We need to create a few files which are also referenced by <code>openssl.cnf</code>:</p>
+
+<pre><code>echo '100001' &gt; serial
+touch certindex.txt
+</code></pre>
+
+<p>Now we should find we have the following tree structure (inside of <code>docker-nginx/CertificateManagement</code>):</p>
+
+<pre><code>.
+├── certindex.txt
+├── certs
+├── openssl.cnf
+├── private
+├── revoked
+└── serial
+</code></pre>
+
+<h3 id="generating-a-new-ca">Generating a new CA</h3>
+
+<p>We&rsquo;ll be recreating a CA certificate that&rsquo;s valid for a year (along with its private key). The <code>ca.crt</code> file that will be generated is what can be provided to users for importing into their web browsers so that the CA becomes a trusted entity.</p>
+
+<p>Let&rsquo;s now create the CA:</p>
+
+<pre><code>openssl req -new -x509 -days 365 -out ca.crt -keyout private/ca.key
+</code></pre>
+
+<p>Most of the details I was asked for I left blank, with the exception of:</p>
+
+<ul>
+<li><code>PEM pass phrase</code> which I set to <code>pass</code></li>
+<li><code>Country Name</code> which I set to <code>GB</code></li>
+<li><code>Organization Name</code> which I set to <code>Integralist Ltd</code></li>
+<li><code>Common Name</code> which I set to <code>Integralist</code></li>
+<li><code>Email Address</code> which I set to <code>ca@integralist.com</code>
+<br /></li>
+</ul>
+
+<p>At this point our directory tree should look like the following:</p>
+
+<pre><code>.
+├── ca.crt          # newly created
+├── certindex.txt
+├── certs
+├── openssl.cnf
+├── private
+│   └── ca.key      # newly created
+├── revoked
+└── serial
+</code></pre>
+
+<h3 id="server-csr">Server CSR</h3>
+
+<p>We&rsquo;ll now recreate our server CSR (Certificate Signing Request) and private key:</p>
+
+<pre><code>openssl req -new -nodes -out server.csr -keyout private/server.key -config ./openssl.cnf
+</code></pre>
+
+<p>Most of the details I was asked for I left blank, with the exception of:</p>
+
+<ul>
+<li><code>Email Address</code> which I set to <code>server@integralist.com</code></li>
+<li><code>Country Name</code> which I set to <code>GB</code></li>
+<li><code>Common Name</code> which I set to <code>TheServer</code></li>
+</ul>
+
+<p>At this point our directory tree should look like the following:</p>
+
+<pre><code>.
+├── ca.crt
+├── certindex.txt
+├── certs
+├── openssl.cnf
+├── private
+│   ├── ca.key
+│   └── server.key # newly created
+├── revoked
+├── serial
+└── server.csr     # newly created
+</code></pre>
+
+<h3 id="server-cert">Server Cert</h3>
+
+<p>We&rsquo;ll now sign our server&rsquo;s CSR like so:</p>
+
+<pre><code>openssl ca -out server.crt -config ./openssl.cnf -infiles server.csr
+</code></pre>
+
+<p>You&rsquo;ll be prompted to enter the pass phrase for the CA and then it&rsquo;ll display information about the new server certificate and if you&rsquo;re happy for it to be generated:</p>
+
+<pre><code>Using configuration from ./openssl.cnf
+Enter pass phrase for ./private/ca.key:
+Check that the request matches the signature
+Signature ok
+The Subject's Distinguished Name is as follows
+emailAddress          :IA5STRING:'server@integralist.com'
+countryName           :PRINTABLE:'GB'
+commonName            :PRINTABLE:'TheServer'
+Certificate is to be certified until Oct  2 14:14:23 2016 GMT (365 days)
+
+Sign the certificate? [y/n]: y
+</code></pre>
+
+<p>After this it&rsquo;ll ask if you want to commit the changes:</p>
+
+<pre><code>1 out of 1 certificate requests certified, commit? [y/n] y
+Write out database with 1 new entries
+Data Base Updated
+</code></pre>
+
+<p>If you look at the <code>serial</code> file you&rsquo;ll notice its value is now <code>100002</code> (we created it with the initial value of <code>100001</code>) and that there is now a <code>serial.old</code> which contains the previous value.</p>
+
+<p>If you look at the <code>certindex.txt</code> you&rsquo;ll see a new record has been added (it wont be identical, but it&rsquo;ll look something like the following):</p>
+
+<pre><code>V 161002141423Z   100001  unknown /C=GB/CN=TheServer/emailAddress=server@integralist.com
+</code></pre>
+
+<p>Notice the number <code>100001</code>. This is the serial number (and name) of the certificate that&rsquo;s been generated for the server and is used for the purpose of revoking the certificate at a later date (e.g. if the private key becomes compromised).</p>
+
+<p>At this point our directory tree should look like the following:</p>
+
+<pre><code>.
+├── ca.crt
+├── certindex.txt      # updated
+├── certindex.txt.attr # newly created
+├── certindex.txt.old  # newly created
+├── certs
+│   └── 100001.pem     # newly created
+├── openssl.cnf
+├── private
+│   ├── ca.key
+│   └── server.key
+├── revoked
+├── serial             # updated
+├── serial.old         # newly created
+├── server.crt         # newly created
+└── server.csr
+</code></pre>
+
+<h3 id="client-cert">Client Cert</h3>
+
+<p>Same as before with the server, we&rsquo;ll want to recreate the client CSR and private key:</p>
+
+<pre><code>openssl req -new -nodes -out client.csr -keyout private/client.key -days 365 -config ./openssl.cnf
+</code></pre>
+
+<p>Most of the details I was asked for I left blank, with the exception of:</p>
+
+<ul>
+<li><code>Email Address</code> which I set to <code>client@integralist.com</code></li>
+<li><code>Country Name</code> which I set to <code>GB</code></li>
+<li><code>Common Name</code> which I set to <code>TheClient</code></li>
+</ul>
+
+<p>At this point our directory tree should look like the following:</p>
+
+<pre><code>.
+├── ca.crt
+├── certindex.txt
+├── certindex.txt.attr
+├── certindex.txt.old
+├── certs
+│   └── 100001.pem
+├── client.csr         # newly created
+├── instructions.md
+├── openssl.cnf
+├── private
+│   ├── ca.key
+│   ├── client.key     # newly created
+│   └── server.key
+├── revoked
+├── serial
+├── serial.old
+├── server.crt
+└── server.csr
+</code></pre>
+
+<p>Typically you&rsquo;ll get a request from a company employee or customer that needs access to your service(s) and so that&rsquo;s when you&rsquo;ll issue them a client certificate.</p>
+
+<p>From here we can self-sign the certificate (just like we did with the server CSR):</p>
+
+<pre><code>openssl ca -out client.crt -days 365 -config ./openssl.cnf -infiles client.csr
+</code></pre>
+
+<p>The exact same process is required as before when signing the server certificate, so all the same files are updated (e.g. <code>serial</code> and <code>certindex.txt</code>) and similar new files are created:</p>
+
+<pre><code>.
+├── ca.crt
+├── certindex.txt
+├── certindex.txt.attr
+├── certindex.txt.attr.old
+├── certindex.txt.old
+├── certs
+│   ├── 100001.pem
+│   └── 100002.pem         # newly created
+├── client.crt             # newly created
+├── client.csr
+├── instructions.md
+├── openssl.cnf
+├── private
+│   ├── ca.key
+│   ├── client.key
+│   └── server.key
+├── revoked
+├── serial
+├── serial.old
+├── server.crt
+└── server.csr
+</code></pre>
+
+<h2 id="crl-certificate-revocation-list">CRL (Certificate Revocation List)</h2>
+
+<p>At this point we need to look at how to generate a revocation list, as that list will be provided to nginx so it can cross-reference the incoming certificate against it.</p>
+
+<p>The first thing we need to do is to add an initial number to a <code>crlnumber</code> file into our <code>revoked</code> directory we created at the beginning of this section on CRL management:</p>
+
+<pre><code>echo 01 &gt; ./revoked/crlnumber
+</code></pre>
+
+<p>This file is used by the CRL in a way similar to how the CA uses the <code>serial</code> file. By that I mean, every time you revoke a certificate you&rsquo;ll need to generate a new CRL (using the below command). Every new CRL you create will include the current <code>crlnumber</code> (which we&rsquo;ll see in a moment, after we create a CRL and then inspect it).</p>
+
+<p>Once we have the <code>crlnumber</code> file created (and an initial value added) we can then run the following command to generate our first CRL:</p>
+
+<pre><code>openssl ca -gencrl -out revoked/crl.pem -config ./openssl.cnf
+</code></pre>
+
+<p>If you want to inspect the CRL file to see what&rsquo;s inside, then run the following command:</p>
+
+<pre><code>openssl crl -text -noout -in revoked/crl.pem
+</code></pre>
+
+<blockquote>
+<p>Note: the <code>-noout</code> simply prevents the x509 CRL hash from being printed as well (which is what you would have seen if you had just run <code>cat revoked/crl.pem</code>)</p>
+</blockquote>
+
+<p>The command will output something that looks like:</p>
+
+<pre><code>Certificate Revocation List (CRL):
+        Version 2 (0x1)
+        Signature Algorithm: md5WithRSAEncryption
+        Issuer: /C=GB/O=IntegralistLtd/CN=Integralist/emailAddress=ca@integralist.com
+        Last Update: Oct  3 14:45:53 2015 GMT
+        Next Update: Nov  2 14:45:53 2015 GMT
+        CRL extensions:
+            X509v3 Authority Key Identifier: 
+                keyid:43:3A:75:41:E1:AE:46:F0:5F:AC:F4:24:6A:3A:DB:D1:31:7E:27:6B
+                DirName:/C=GB/O=IntegralistLtd/CN=Integralist/emailAddress=ca@integralist.com
+                serial:E0:86:88:E8:CA:0C:7F:29
+
+            X509v3 CRL Number: 
+                1
+No Revoked Certificates.
+    Signature Algorithm: md5WithRSAEncryption
+        28:1d:b0:f3:fb:69:f0:1a:36:83:2d:38:50:72:c6:11:39:4f:
+        6d:e9:da:0a:ec:63:a9:b1:63:55:ff:79:48:4f:9e:6a:ec:c3:
+        2e:01:88:ea:aa:8d:76:12:ac:f9:0b:77:d3:aa:dd:c4:22:bd:
+        fe:77:5d:a2:2b:3b:e9:22:b5:32:2e:26:74:1c:6c:94:78:84:
+        08:54:44:52:87:f2:51:68:98:e7:7c:42:cd:44:f6:6b:4c:28:
+        b0:d5:11:4a:49:4d:4f:83:09:f3:6b:2d:69:a3:95:d5:55:e0:
+        dc:4c:fd:53:5c:78:5e:a6:48:ac:7d:66:c8:20:6b:ba:c7:19:
+        37:ba
+</code></pre>
+
+<blockquote>
+<p>Note: you can tell how many versions of the CRL have been generated by looking at the value assigned to <code>X509v3 CRL Number</code></p>
+</blockquote>
+
+<p>The CRL itself has been configured (by the <code>openssl.conf</code>) to expire after 30 days. So even if you don&rsquo;t revoke any certificates in that time, you&rsquo;ll still want to regenerate the CRL. Meaning there needs to be a certain level of automation involved (which is outside the scope of this article).</p>
+
+<h3 id="re-running-our-containers">Re-running our containers</h3>
+
+<p>OK, we&rsquo;ve now regenerated our CA, server and client certificates and we&rsquo;ve also looked at creating a CRL; so we&rsquo;ll want to stop the currently running nginx container (using a combination of <code>docker ps</code> to find the container id, along with <code>docker stop &lt;cid&gt;</code> and <code>docker rm &lt;cid&gt;</code>).</p>
+
+<p>Let&rsquo;s first jump back up to our project root directory (<code>cd ../../</code>) and restart the nginx container, but this time using the new certificates (this will also mean our updated <code>nginx.conf</code> file will be pulled in).</p>
+
+<p>So the new <code>docker run</code> command we&rsquo;ll be using is a bit of a monster! Lots of mounted volumes&hellip;</p>
+
+<pre><code>docker run \
+  --name nginx-container \
+  -v $(pwd)/html:/usr/share/nginx/html:ro \
+  -v $(pwd)/docker-nginx/CertificateManagement/server.crt:/etc/nginx/certs/server.crt \
+  -v $(pwd)/docker-nginx/CertificateManagement/private/server.key:/etc/nginx/certs/server.key \
+  -v $(pwd)/docker-nginx/CertificateManagement/ca.crt:/etc/nginx/certs/ca.crt \
+  -v $(pwd)/docker-nginx/CertificateManagement/revoked/crl.pem:/etc/nginx/certs/crl.pem \
+  -v $(pwd)/docker-nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
+  --link ruby-app:app -P -d my-nginx
+</code></pre>
+
+<p>We can now verify that nginx is working as expected; and by that I mean: our client (when using the provided client certificate) can access the Ruby service:</p>
+
+<pre><code>docker run \
+  -it \
+  -v $(pwd)/docker-nginx/CertificateManagement/private/client.key:/var/cert/client.key \
+  -v $(pwd)/docker-nginx/CertificateManagement/client.crt:/var/cert/client.crt \
+  speg03/curl --insecure \
+              --key /var/cert/client.key \
+              --cert /var/cert/client.crt \
+              https://$(docker-machine ip dev):$(docker port nginx-container 443 | awk -F ':' '{ print $2 }')/app/cert
+</code></pre>
+
+<p>This gives us the output as expected:</p>
+
+<pre><code>/C=GB/CN=TheClient/emailAddress=client@integralist.com
+</code></pre>
+
+<h3 id="revoking-certificates">Revoking Certificates</h3>
+
+<p>Here we are at our final stage. We&rsquo;ve verified that the client certificates are working using the new format. We&rsquo;ve created a CRL and so far the client cert has been allowed through nginx.</p>
+
+<p>What we&rsquo;ll do now is revoke that certificate and then re-run our nginx container to see if it has picked up the new CRL and subsequently recognises that the client cert is no longer valid (and so refuse access to the Ruby service).</p>
+
+<p>In order to revoke the client certificate, I first need to look it up in the <code>certindex.txt</code> file. The contents of that file resembles something like:</p>
+
+<pre><code>V 161002113732Z 100001 unknown /C=GB/CN=TheServer/emailAddress=server@integralist.com
+V 161002113931Z 100002 unknown /C=GB/CN=TheClient/emailAddress=client@integralist.com
+</code></pre>
+
+<p>I can now easily say to myself &ldquo;ok, so I know its the &lsquo;client&rsquo; who needs their cert revoked; that looks to be cert 100002&rdquo;, and from there I would execute the following command (make sure you <code>cd</code> into the <code>docker-nginx/CertificateManagement/</code> directory before running the next command):</p>
+
+<pre><code>openssl ca -revoke certs/100002.pem -config ./openssl.cnf
+</code></pre>
+
+<p>This will output the following response:</p>
+
+<pre><code>Using configuration from ./openssl.cnf
+Enter pass phrase for ./private/ca.key:
+Revoking Certificate 100002.
+Data Base Updated
+</code></pre>
+
+<p>Now if we look at the <code>certindex.txt</code> file again we&rsquo;ll see that <code>100002</code> has been revoked:</p>
+
+<pre><code>V 161002113732Z               100001 unknown /C=GB/CN=TheServer/emailAddress=server@integralist.com
+R 161002113931Z 151003114104Z 100002 unknown /C=GB/CN=TheClient/emailAddress=client@integralist.com
+</code></pre>
+
+<p>You&rsquo;ll notice the <code>R</code> for &ldquo;revoked&rdquo; has been applied. The additional reference number <code>151003114104Z</code> is the revocation timestamp and you can see the full format <a href="http://pki-tutorial.readthedocs.io/en/latest/cadb.html">here</a>.</p>
+
+<blockquote>
+<p>Note: as you can see, to revoke a certificate means you need to keep copies of all certificates that have been generated</p>
+</blockquote>
+
+<p>So now the client cert has been revoked, let&rsquo;s generate a new CRL and then apply that to the nginx container.</p>
+
+<pre><code>ca -gencrl -out revoked/crl.pem -config ./openssl.cnf
+</code></pre>
+
+<p>Now verify the version number inside the <code>crl.pem</code>:</p>
+
+<pre><code>openssl crl -text -noout -in revoked/crl.pem
+</code></pre>
+
+<p>You should now see <code>X509v3 CRL Number</code> has a value of <code>2</code>.</p>
+
+<p>Let&rsquo;s now stop the running nginx container, and re-run it so it can pick up the new CRL (use same commands as before, but remember to move up to the project root - <code>cd ../../</code> - before you do so).</p>
+
+<p>Now when you try to access the <code>/app/cert</code> endpoint you&rsquo;ll find that you cannot:</p>
+
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;400 The SSL certificate error&lt;/title&gt;&lt;/head&gt;
+&lt;body bgcolor=&quot;white&quot;&gt;
+&lt;center&gt;&lt;h1&gt;400 Bad Request&lt;/h1&gt;&lt;/center&gt;
+&lt;center&gt;The SSL certificate error&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;nginx/1.4.6 (Ubuntu)&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Job done.</p>
+
+<p><div id="8"></div></p>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="http://nginx.org/en/docs/http/ngx_http_ssl_module.html">nginx http ssl module</a></li>
+<li><a href="http://www.mad-hacking.net/documentation/linux/security/ssl-tls/creating-ca.xml">mad-hacking.net/ssl-tls</a></li>
+<li><a href="https://www.phildev.net/ssl/opensslconf.html">Openssl.conf Walkthru</a></li>
+</ul>
+
+<p><div id="9"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There are many side effects and issues we&rsquo;ve not covered, such as: how to handle multiple CRLs (generated from different CA&rsquo;s). This is a problem where by nginx&rsquo;s <code>ssl_crl</code> setting only allows you to point to a single CRL &ldquo;file&rdquo; (rather than a directory of CRLs). To work around this issue you would need to concatenate all your CRLs together into a single file (which is a bit of a pain).</p>
+
+<p>There is also the question of automation. This is a process that is fraught with user error and mistakes and so ideally you&rsquo;d want to automate as much of the CRL and certificate generating process as possible. I&rsquo;ll leave this as an exercise for the reader.</p>
+
+<p>In closing: hopefully you&rsquo;ve found the information in this article useful and it has helped you to understand some of the more complicated processes for handling certificate authentication.</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/guide'>guide</a>, <a class='category' href='/categories/process'>process</a>, <a class='category' href='/categories/security'>security</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/bash'>bash</a>, <a class='tag' href='/tags/certificates'>certificates</a>, <a class='tag' href='/tags/curl'>curl</a>, <a class='tag' href='/tags/docker'>docker</a>, <a class='tag' href='/tags/https'>https</a>, <a class='tag' href='/tags/keys'>keys</a>, <a class='tag' href='/tags/nginx'>nginx</a>, <a class='tag' href='/tags/openssl'>openssl</a>, <a class='tag' href='/tags/ssl'>ssl</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/http2/'>
+        <span class='screen-reader'>Next post: </span>HTTP/2<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

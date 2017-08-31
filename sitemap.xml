@@ -102,6 +102,11 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/posts/client-cert-authentication/</loc>
+    <lastmod>2015-10-03T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/categories/algorithms/</loc>
     <lastmod>2016-06-28T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -144,6 +149,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/certificates/</loc>
+    <lastmod>2015-10-03T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/tags/cidr/</loc>
     <lastmod>2016-11-16T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -152,6 +163,12 @@
   <url>
     <loc>http://www.integralist.co.uk/categories/code/</loc>
     <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/curl/</loc>
+    <lastmod>2015-10-03T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -174,14 +191,14 @@
   </url>
   
   <url>
-    <loc>http://www.integralist.co.uk/tags/github/</loc>
-    <lastmod>2016-08-22T13:00:00+01:00</lastmod>
+    <loc>http://www.integralist.co.uk/categories/github/</loc>
+    <lastmod>2015-11-18T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://www.integralist.co.uk/categories/github/</loc>
-    <lastmod>2015-11-18T13:00:00+01:00</lastmod>
+    <loc>http://www.integralist.co.uk/tags/github/</loc>
+    <lastmod>2016-08-22T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -234,8 +251,20 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/https/</loc>
+    <lastmod>2015-10-03T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/tags/key/</loc>
     <lastmod>2016-12-10T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/keys/</loc>
+    <lastmod>2015-10-03T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -260,6 +289,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/nginx/</loc>
     <lastmod>2015-10-20T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/openssl/</loc>
+    <lastmod>2015-10-03T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -331,6 +366,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/ssh/</loc>
     <lastmod>2015-11-18T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/ssl/</loc>
+    <lastmod>2015-10-03T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
