@@ -107,6 +107,11 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/posts/dns-101/</loc>
+    <lastmod>2015-09-30T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/categories/algorithms/</loc>
     <lastmod>2016-06-28T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -143,6 +148,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/caching/</loc>
+    <lastmod>2015-09-30T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/categories/</loc>
     <lastmod>2016-06-28T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -175,6 +186,12 @@
   <url>
     <loc>http://www.integralist.co.uk/categories/development/</loc>
     <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/dns/</loc>
+    <lastmod>2015-09-30T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -299,6 +316,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/categories/operations/</loc>
+    <lastmod>2015-09-30T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/page/</loc>
     <priority>0</priority>
   </url>
@@ -342,6 +365,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/ram/</loc>
     <lastmod>2016-11-16T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/records/</loc>
+    <lastmod>2015-09-30T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -390,6 +419,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/terminal/</loc>
     <lastmod>2016-10-19T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/ttl/</loc>
+    <lastmod>2015-09-30T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
