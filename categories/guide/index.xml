@@ -187,5 +187,14 @@ Introduction The purpose of this post is to demonstrate how to configure nginx t
       <description>DNS (Domain Name System) Lookup Process  Resolver Root Name Server(s) TLD Name Server(s) SLD Name Server(s)  Tree Hierarchy DNS Structure Authority Zones Name Servers Commands  whois dig  Flags option: nostats option: nocomments option: trace Other options  host nslookup  Record Types  NS A CNAME MX SOA SRV PTR TXT  TTL (Time to Live)  Local Caching  References Conclusion</description>
     </item>
     
+    <item>
+      <title>Security basics with GPG, OpenSSH, OpenSSL and Keybase</title>
+      <link>http://www.integralist.co.uk/posts/security-basics/</link>
+      <pubDate>Tue, 25 Aug 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/security-basics/</guid>
+      <description>Introduction What are keys and how do they work? Understanding PKI OpenSSL vs OpenSSH What is GPG? Creating your own keys  OpenSSH OpenSSL GPG  Multiple Keys?   How to encrypt data using GPG, OpenSSL and Keybase  GPG encryption  Asymmetrical encryption Symmetrical encryption Key Signing Digital Signatures Revoking Keys  OpenSSL encryption Keybase Which should I use?  Creating, self-signing, issuing and revoking certificates Conclusion   UPDATE: for those short on time, read the following Introduction, What are keys and how do they work?</description>
+    </item>
+    
   </channel>
 </rss>

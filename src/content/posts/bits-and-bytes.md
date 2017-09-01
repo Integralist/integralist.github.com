@@ -216,6 +216,8 @@ This is useful when you've converted a number like `75` into a different base (l
 <div id="8.1"></div>
 ### Convert Base-10 into Base-2/8
 
+> Note: the steps are the same for converting to base-2 and base-8
+
 Now let's consider how to convert the number `75` into another base, like base-8. To do so, follow these steps
 
 1. divide the number (75) by the desired base (8) (take note of the remainder: 3)
