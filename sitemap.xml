@@ -67,6 +67,11 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/posts/the-perfect-developer-qualities/</loc>
+    <lastmod>2016-05-27T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/posts/git-merge-strategies/</loc>
     <lastmod>2016-05-15T13:00:00+01:00</lastmod>
   </url>
@@ -213,14 +218,14 @@
   </url>
   
   <url>
-    <loc>http://www.integralist.co.uk/categories/github/</loc>
-    <lastmod>2015-11-18T13:00:00+01:00</lastmod>
+    <loc>http://www.integralist.co.uk/tags/github/</loc>
+    <lastmod>2016-08-22T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://www.integralist.co.uk/tags/github/</loc>
-    <lastmod>2016-08-22T13:00:00+01:00</lastmod>
+    <loc>http://www.integralist.co.uk/categories/github/</loc>
+    <lastmod>2015-11-18T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -339,6 +344,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/categories/opinion/</loc>
+    <lastmod>2016-05-27T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/page/</loc>
     <priority>0</priority>
   </url>
@@ -380,6 +391,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/quality/</loc>
+    <lastmod>2016-05-27T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/tags/ram/</loc>
     <lastmod>2016-11-16T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -388,6 +405,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/records/</loc>
     <lastmod>2015-09-30T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/responsibility/</loc>
+    <lastmod>2016-05-27T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
