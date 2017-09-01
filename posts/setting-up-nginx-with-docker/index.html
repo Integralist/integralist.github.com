@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Just give me the code Setting up nginx Setting up the Ruby application Linking your app to nginx Conclusion  
+Introduction I wanted to learn about how to use the popular proxy server nginx for handling &ldquo;reverse proxy&rdquo; duties on a Ruby project I was working on. So I decided the easiest thing to do in order to play around with nginx (as I work on a MacBook Pro laptop), would be to install and run it (and my back-end application) within Docker containers.'>
+
+<meta property='og:title' content='Setting Up Nginx With Docker ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Just give me the code Setting up nginx Setting up the Ruby application Linking your app to nginx Conclusion  
+Introduction I wanted to learn about how to use the popular proxy server nginx for handling &ldquo;reverse proxy&rdquo; duties on a Ruby project I was working on. So I decided the easiest thing to do in order to play around with nginx (as I work on a MacBook Pro laptop), would be to install and run it (and my back-end application) within Docker containers.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/setting-up-nginx-with-docker/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='docker'><meta property='article:tag' content='nginx'><meta property='article:tag' content='ruby'><meta property='article:published_time' content='2015-08-04T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2015-08-04T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Setting Up Nginx With Docker ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/setting-up-nginx-with-docker/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Setting Up Nginx With Docker</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2015-08-04T13:00:00&#43;01:00'>2015-08-04</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    18 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Just give me the code</a></li>
+<li><a href="#3">Setting up nginx</a></li>
+<li><a href="#4">Setting up the Ruby application</a></li>
+<li><a href="#5">Linking your app to nginx</a></li>
+<li><a href="#6">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>I wanted to learn about how to use the popular proxy server <a href="http://nginx.org">nginx</a> for handling &ldquo;reverse proxy&rdquo; duties on a Ruby project I was working on. So I decided the easiest thing to do in order to play around with nginx (as I work on a MacBook Pro laptop), would be to install and run it (and my back-end application) within <a href="http://docker.com/">Docker</a> containers.</p>
+
+<blockquote>
+<p>Note: I did some preliminary Googling and sadly didn&rsquo;t find anything straightforward that demonstrated this relatively simple requirement (i.e. run nginx and have it proxy requests to a back-end service). So I decided it would be best to write about it myself</p>
+</blockquote>
+
+<p>Now if you&rsquo;re unsure of what a reverse proxy does, it simply takes <em>in</em> traffic (i.e. users requesting a website domain) and proxies those requests onto another service (the service could be external to the host server or it could be running on the same box - which is the scenario I have - and typically the service being proxied to isn&rsquo;t publically available to the internet).</p>
+
+<p>The nginx server has many features, such as load balancing, caching and serving static files (to name but a few). When used as a reverse proxy it can also be useful for handling SSL termination (i.e. SSL is an expensive operation and so the proxy server will authenticate the provided credentials - allowing access - but terminate the SSL requirement at that point before directing traffic onto the other protected service).</p>
+
+<p>In this post we&rsquo;ll be primarily focusing on using nginx as a reverse proxy, although I also demonstrate how to serve static files. But the focus will be reverse proxying and not demonstrating other features within nginx. I&rsquo;ll also not be explaining Docker and how it works (I&rsquo;m assuming you&rsquo;ve used Docker in some form or another previously).</p>
+
+<p>Lastly, I&rsquo;m going to take you on the same journey I took while setting this all up; so rather than work through a perfect scenario you&rsquo;ll get to see some of the errors I stumbled across along the way. If you&rsquo;d prefer to just read the (small amount of) code then the next section is for you.</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="just-give-me-the-code">Just give me the code</h2>
+
+<p><a href="https://github.com/Integralist/Docker-Examples/tree/master/Nginx">github.com/integralist/docker-examples/nginx</a></p>
+
+<p><div id="3"></div></p>
+
+<h2 id="setting-up-nginx">Setting up nginx</h2>
+
+<p>So to begin with, I went to <a href="https://hub.docker.com/">Docker Hub</a> and found the <a href="https://registry.hub.docker.com/_/nginx/">official nginx Docker image</a>. It suggested the easiest thing to do to get started was to download and run the image; so knowing not a lot about nginx, that&rsquo;s exactly what I did:</p>
+
+<pre><code>docker run --name nginx-container -P -d nginx
+</code></pre>
+
+<blockquote>
+<p>Note: you can use the <code>-p &lt;host_port&gt;:&lt;container_port&gt;</code> option instead of <code>-P</code> if you&rsquo;re not going to be running multiple nginx instances (again, for the moment I was just following the recommendation from Docker Hub)</p>
+</blockquote>
+
+<p>Once the container was running I attempted to <code>curl</code> the endpoint (something like <code>http://localhost:&lt;port_number_container_mapped_to&gt;</code>) but I found this didn&rsquo;t work; and by that I mean it didn&rsquo;t return a recognisable nginx home page as was suggested it would. This was the first trip-up I made.</p>
+
+<p>The reason this didn&rsquo;t work is because (for me) using <a href="http://boot2docker.io/">Boot2Docker</a> on a Mac - rather than being on a pure Linux machine capable of running Docker natively - means that localhost is the Mac and not the Docker host (which is the Boot2Docker VM). So to resolve that issue I needed to curl the ip of the Boot2Docker host. To get the ip simply run <code>boot2docker ip</code>.</p>
+
+<p>So your curl command (depending on what OS you&rsquo;re running on) should look something like:</p>
+
+<pre><code>curl http://$(&lt;docker_host_ip&gt;:&lt;port_number_container_mapped_to&gt;
+</code></pre>
+
+<p>For me this was:</p>
+
+<pre><code>curl http://$(boot2docker ip):32781
+</code></pre>
+
+<p>Executing this resulted in the following output:</p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+&lt;style&gt;
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+&lt;p&gt;If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.&lt;/p&gt;
+
+&lt;p&gt;For online documentation and support please refer to
+&lt;a href=&quot;http://nginx.org/&quot;&gt;nginx.org&lt;/a&gt;.&lt;br/&gt;
+Commercial support is available at
+&lt;a href=&quot;http://nginx.com/&quot;&gt;nginx.com&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Thank you for using nginx.&lt;/em&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3 id="mounting-our-own-static-files">Mounting our own static files</h3>
+
+<p>Now at this point having a standard nginx welcome page isn&rsquo;t very useful. We want to add our own nginx configuration and to have it serve up our own static files. To achieve that with Docker we&rsquo;ll need to use <a href="https://docs.docker.com/userguide/dockervolumes/">Volumes</a>.</p>
+
+<p>But before I show the command for that, I need to show you the project directory I have right now:</p>
+
+<pre><code>.
+├── Dockerfile
+├── Gemfile
+├── Gemfile.lock
+├── app.rb
+├── nginx.conf
+└── html
+    └── test.html
+</code></pre>
+
+<p>This isn&rsquo;t the final directory structure mind you, but it&rsquo;s what I initially started out with. You&rsquo;ll see as we move on I had to add a little more structure to the project. But for now, this is what we&rsquo;ve got.</p>
+
+<p>I&rsquo;ll show the contents of these files now, most of them are really small anyway:</p>
+
+<h4 id="dockerfile">Dockerfile</h4>
+
+<pre><code>FROM ruby:2.1-onbuild
+CMD [&quot;ruby&quot;, &quot;app.rb&quot;]
+</code></pre>
+
+<h4 id="gemfile">Gemfile</h4>
+
+<pre><code>source &quot;http://rubygems.org/&quot;
+
+gem &quot;sinatra&quot;
+</code></pre>
+
+<h4 id="app-rb">app.rb</h4>
+
+<pre><code>require &quot;sinatra&quot;
+
+set :bind, &quot;0.0.0.0&quot;
+
+get &quot;/&quot; do
+  &quot;Hello World&quot;
+end
+
+get &quot;/foo&quot; do
+  &quot;Foo!&quot;
+end
+</code></pre>
+
+<h4 id="nginx-conf">nginx.conf</h4>
+
+<pre><code>user nobody nogroup;
+worker_processes auto;          # auto-detect number of logical CPU cores
+
+events {
+  worker_connections 512;       # set the max number of simultaneous connections (per worker process)
+}
+
+http {
+  server {
+    listen *:80;                # Listen for incoming connections from any interface on port 80
+    server_name &quot;&quot;;             # Don't worry if &quot;Host&quot; HTTP Header is empty or not set
+    root /usr/share/nginx/html; # serve static files from here
+  }
+}
+</code></pre>
+
+<h4 id="html-test-html">html/test.html</h4>
+
+<pre><code>&lt;h1&gt;Hey there!&lt;/h1&gt;
+&lt;p&gt;Here is my test HTML file&lt;/p&gt;
+</code></pre>
+
+<h4 id="mounting-the-files">Mounting the files</h4>
+
+<p>Let&rsquo;s see the syntax structure of the command I was looking to run:</p>
+
+<pre><code>docker run --name nginx-container \
+  -v /path/to/static/files/on/host:/usr/share/nginx/html:ro \
+  -v /path/to/conf/on/host:/etc/nginx/nginx.conf:ro \
+  -P -d nginx
+</code></pre>
+
+<p>In the above example, you can see I&rsquo;m using the <code>-v</code> flag to mount my static files directory to <code>/usr/share/nginx/html</code> as well as mounting my own nginx configuration file into the container at <code>/etc/nginx/nginx.conf</code>.</p>
+
+<blockquote>
+<p>Note: <code>:ro</code> sets the volumes to be &ldquo;read only&rdquo;</p>
+</blockquote>
+
+<p>So for me, a working example looked like the following:</p>
+
+<pre><code>docker run --name nginx-container \
+  -v $(pwd)/html:/usr/share/nginx/html:ro \
+  -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
+  -P -d nginx
+</code></pre>
+
+<blockquote>
+<p>Note: the host path has to be absolute, so tweak it as necessary (I used <code>pwd</code> to make the command shorter)</p>
+</blockquote>
+
+<p>If you want to debug things, then you can run the container not as a daemon (<code>-d</code>) but with an interactive tty (<code>-it</code>) and drop yourself inside of a bash shell:</p>
+
+<pre><code>docker run -it --name nginx-container \
+  -v $(pwd)/html:/usr/share/nginx/html:ro \
+  -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
+  -P nginx bash
+</code></pre>
+
+<p>Once the container is running and the <code>nginx.conf</code> and static files are mounted as a Volume, you can verify that nginx is serving the static files by trying to hit localhost on port <code>80</code> (as mentioned earlier: if you&rsquo;re on a Mac using Boot2Docker like me, then you&rsquo;ll need to access localhost via the Boot2Docker VM ip address instead):</p>
+
+<blockquote>
+<p>Note: don&rsquo;t forget the port number I&rsquo;ve used will be different for you (get yours from <code>docker ps</code>)</p>
+</blockquote>
+
+<pre><code>curl http://$(boot2docker ip):32781
+</code></pre>
+
+<p>This will display a <code>403</code> error page, which is to be expected because we&rsquo;ve not mounted a folder that has a <code>index.html</code> file. Our mounted directory only contained a <code>test.html</code> file, so if we try to access that instead, then we&rsquo;ll see it&rsquo;ll be loaded without a problem:</p>
+
+<pre><code>curl http://$(boot2docker ip):32781/test.html
+</code></pre>
+
+<p>If you were following along at home then you would have noticed that this returns the following HTML content:</p>
+
+<pre><code>&lt;h1&gt;Hey there!&lt;/h1&gt;
+&lt;p&gt;Here is my test HTML file&lt;/p&gt;
+</code></pre>
+
+<p>If we try the exact same command again, but this time add the <code>-I</code> flag (e.g. <code>curl -I &lt;url&gt;</code> - this returns just the HTTP headers), we&rsquo;ll see that this is indeed being served by nginx:</p>
+
+<pre><code>HTTP/1.1 200 OK
+Server: nginx/1.9.3
+Date: Sat, 01 Aug 2015 17:27:01 GMT
+Content-Type: text/html
+Content-Length: 53
+Last-Modified: Sat, 01 Aug 2015 14:05:59 GMT
+Connection: keep-alive
+ETag: &quot;55bcd247-35&quot;
+Accept-Ranges: bytes
+</code></pre>
+
+<h4 id="dynamically-updating-containers-without-restart">Dynamically updating containers without restart</h4>
+
+<p>Because we&rsquo;ve mounted the <code>html</code> directory as a volume, we can now create an <code>index.html</code> file for nginx to use as the root page to load when you request <code>http://$(boot2docker ip):32781/</code>; and in doing this it&rsquo;ll take effect immediately without requiring us to restart the container. Once we&rsquo;ve created the file inside the <code>html</code> directory, we can then make the relevant curl request to see nginx serve up the html file.</p>
+
+<p>Just so you know, the <code>index.html</code> file I created looks like this:</p>
+
+<pre><code>&lt;h1&gt;Welcome&lt;/h1&gt;
+&lt;p&gt;This is my home page&lt;/p&gt;
+</code></pre>
+
+<p><div id="4"></div></p>
+
+<h2 id="setting-up-the-ruby-application">Setting up the Ruby application</h2>
+
+<p>The Ruby application we&rsquo;ll be creating is a super simple <a href="http://sinatrarb.com/">Sinatra</a> web application with two routes defined:</p>
+
+<ol>
+<li><code>/</code></li>
+<li><code>/foo</code></li>
+</ol>
+
+<p>One of the first things you need to do is to make sure you run <code>bundle install</code> so you have a <code>Gemfile.lock</code> generated, otherwise the base Ruby image will complain. The reason it complains is because the base Docker image is using an <code>onbuild</code> version of the Ruby image, and what this means is that it follows a &ldquo;convention over configuration&rdquo; model where by it assumes you have three files available (<code>app.rb</code>, <code>Gemfile</code> and <code>Gemfile.lock</code>) for it to automatically copy into the built Docker image for you.</p>
+
+<p>Once you&rsquo;ve done that, you can now build the Docker image:</p>
+
+<pre><code>docker build -t my-ruby-app .
+</code></pre>
+
+<p>Once the image is built, you can run your Ruby application like so:</p>
+
+<pre><code>docker run --name ruby-app -p 4567:4567 -d my-ruby-app
+</code></pre>
+
+<p>You&rsquo;ll notice we&rsquo;re not using a dynamic port range because the Sinatra app we&rsquo;ve created explicitly binds to port <code>4567</code> and so I&rsquo;m exposing that specific port to the Boot2Docker VM. We can then access this application directly with the following curl command:</p>
+
+<pre><code>curl http://$(boot2docker ip):4567/
+
+# Results in...
+
+Hello World%
+</code></pre>
+
+<p>Now if we want to see the HTTP Headers coming back:</p>
+
+<pre><code>curl -I http://$(boot2docker ip):4567/
+
+# Results in...
+
+HTTP/1.1 200 OK
+Content-Type: text/html;charset=utf-8
+Content-Length: 11
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+Server: WEBrick/1.3.1 (Ruby/2.1.6/2015-04-13)
+Date: Sun, 02 Aug 2015 09:20:47 GMT
+Connection: Keep-Alive
+</code></pre>
+
+<p><div id="5"></div></p>
+
+<h2 id="linking-your-app-to-nginx">Linking your app to nginx</h2>
+
+<p>OK, so we&rsquo;re nearing the finish line now. We&rsquo;ve got a working nginx container and a working Ruby container. We need to gel them together by making a request and having nginx proxy the request on to the Ruby container (if the request was aimed at that) or have nginx serve a static file if the request was relevant to that.</p>
+
+<p>To get this to work with Docker, we have two options:</p>
+
+<ol>
+<li>Host file</li>
+<li>ENV variables</li>
+</ol>
+
+<p>Both options require a custom Dockerfile to be used for setting up nginx and both have about the same amount of complexity in different ways.</p>
+
+<p>But to understand these options, we need to be sure we understand what Docker does when linking containers. So to clarify, when linking a container (Ruby) with another container (nginx), Docker adds the ip of the linked container (Ruby) into the other container (nginx). It does this by updating the container&rsquo;s <code>/etc/hosts</code> file with a new entry that looks something like the following (note the last line of the file output):</p>
+
+<pre><code>host.conf  hostname   hosts
+root@a4a3bde52f8e:/# cat /etc/hosts
+172.17.0.19     a4a3bde52f8e
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.17.0.18     app 3435f6926e83 ruby-app
+</code></pre>
+
+<p>You can test this yourself by using the following command, which interactively jumps into a running version of the nginx container:</p>
+
+<pre><code>docker run --rm -it \
+  --name nginx-container \
+  --link ruby-app:app \
+  -P nginx bash
+</code></pre>
+
+<p>Once inside the container, run <code>cat /etc/hosts</code> to get the above output (or something similar to it at least - your ip will likely be different to mine).</p>
+
+<p>While you&rsquo;re still inside the temporarily running nginx container, we can clarify the second option which is the ENV variable setup Docker handles. When linking a container, Docker will add details of the linked container as environment variables (as well as adding a new entry to the <code>/etc/hosts</code> file). So while you&rsquo;re still inside the running nginx container, execute the following command:</p>
+
+<pre><code>env | grep APP | sort
+</code></pre>
+
+<blockquote>
+<p>Note: we&rsquo;re <code>grep</code>ing for the phrase <code>APP</code> as that&rsquo;s what we specified in our <code>docker run</code> command (i.e. <code>--link ruby-app:app</code>)</p>
+</blockquote>
+
+<p>We should now see the following output (or something very similar):</p>
+
+<pre><code>APP_ENV_BUNDLER_VERSION=1.10.6
+APP_ENV_BUNDLE_APP_CONFIG=/usr/local/bundle
+APP_ENV_GEM_HOME=/usr/local/bundle
+APP_ENV_RUBY_DOWNLOAD_SHA256=1e1362ae7427c91fa53dc9c05aee4ee200e2d7d8970a891c5bd76bee28d28be4
+APP_ENV_RUBY_MAJOR=2.1
+APP_ENV_RUBY_VERSION=2.1.6
+APP_NAME=/nginx-container/app
+APP_PORT=tcp://172.17.0.18:4567
+APP_PORT_4567_TCP=tcp://172.17.0.18:4567
+APP_PORT_4567_TCP_ADDR=172.17.0.18
+APP_PORT_4567_TCP_PORT=4567
+APP_PORT_4567_TCP_PROTO=tcp
+</code></pre>
+
+<p>Notice that Docker has capitalised the link name (e.g. <code>app</code> is now <code>APP</code>) and has used the convention of <code>&lt;LINK_NAME&gt;_&lt;ENV_VAR_FROM_LINKED_CONTAINER&gt;</code>.</p>
+
+<h3 id="choosing-an-option">Choosing an option?</h3>
+
+<p>With this knowledge secured in our minds, we can now understand what we need to do for each option (i.e. host file vs environment variable). For the host file option we can manipulate our <code>nginx.conf</code> file manually (before building the image) to use a named <code>upstream</code> server that references the <code>--link</code> name we provided, as part of the <code>docker run</code> command.</p>
+
+<p>Where as with the environment variables option we would need to manipulate the <code>nginx.conf</code> file <em>dynamically</em> at run time. So within our <code>Dockerfile</code> we would add a shell script, which would be executed by the <code>CMD</code> statement within the <code>Dockerfile</code>. This shell script would run and use something like the <code>sed</code> command to replace a placeholder reference within our <code>nginx.conf</code> file (likely we&rsquo;d use the <code>APP_PORT</code> environment variable and do some regular expression parsing for the ip address). Once the placeholder had been replaced with the appropriate container ip, we would manually start nginx using <code>service nginx start</code>.</p>
+
+<p>Out of the two options, I think I&rsquo;ll go with the &ldquo;host file&rdquo; one. So let&rsquo;s run through the steps&hellip;</p>
+
+<ul>
+<li>Create a new directory structure that looks like the following (you can grab the exact files from <a href="https://github.com/Integralist/Docker-Examples/tree/master/Nginx">github.com/integralist/docker-examples/nginx</a>):</li>
+</ul>
+
+<pre><code>.
+├── docker-app
+│   ├── Dockerfile
+│   ├── Gemfile
+│   ├── Gemfile.lock
+│   └── app.rb
+├── docker-nginx
+│   ├── Dockerfile
+│   └── nginx.conf
+└── html
+    ├── index.html
+    └── test.html
+</code></pre>
+
+<ul>
+<li>Build the images (we&rsquo;ll see what these look like in a moment) for the Ruby app and nginx</li>
+<li>Run the Ruby app container</li>
+<li>Run the nginx container and link it to the running Ruby container</li>
+<li>Verify everything works</li>
+</ul>
+
+<p>Other than moving existing files (related to the building of the Ruby Docker image) inside of a <code>docker-app</code> folder, the two biggest changes are the addition of a new <code>Dockerfile</code> inside the <code>docker-nginx</code> folder and the following updated <code>nginx.conf</code> file:</p>
+
+<pre><code>user nobody nogroup;
+worker_processes auto;          # auto-detect number of logical CPU cores
+
+events {
+  worker_connections 512;       # set the max number of simultaneous connections (per worker process)
+}
+
+http {
+  upstream app {
+    server app:4567;            # app is automatically defined inside /etc/hosts by Docker
+  }
+
+  server {
+    listen *:80;                # Listen for incoming connections from any interface on port 80
+    server_name &quot;&quot;;             # Don't worry if &quot;Host&quot; HTTP Header is empty or not set
+    root /usr/share/nginx/html; # serve static files from here
+
+    location /app/ {            # catch any requests that start with /app/
+      proxy_pass http://app;    # proxy requests onto our app server (i.e. a different container)
+    }
+  }
+}
+</code></pre>
+
+<p>The aim of the new configuration is to accept any requests to <code>/app/</code> and proxy them onto our application server. So if we were to request <code>/app/</code> we&rsquo;d want nginx to proxy it to the Sinatra <code>/</code> route; and if we were to request <code>/app/foo</code> then we&rsquo;d expect nginx to proxy it to the Sinatra <code>/foo</code> route.</p>
+
+<p>The new <code>Dockerfile</code> we&rsquo;ve created inside the <code>docker-nginx</code> folder will have the following content:</p>
+
+<pre><code>FROM ubuntu
+
+# install nginx
+RUN apt-get update &amp;&amp; apt-get install -y nginx
+RUN rm -rf /etc/nginx/sites-enabled/default
+
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log
+RUN ln -sf /dev/stderr /var/log/nginx/error.log
+
+EXPOSE 80 443
+CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
+</code></pre>
+
+<blockquote>
+<p>Note: some bright chap by the name of <a href="https://twitter.com/stevenjack85">Steven Jack</a> suggested setting <code>ENTRYPOINT</code> in the Dockerfile to <code>nginx</code> and have the two options (<code>-g</code> and <code>daemon off</code>) left in the <code>CMD</code>. Doing this means if you wanted to pass other options to nginx you wouldn&rsquo;t have to duplicate all of your CMD</p>
+</blockquote>
+
+<p>So from the root of our project directory, let&rsquo;s complete the next step and build our new Docker images (technically you don&rsquo;t have to rebuild the Ruby application as there has been no changes to the <code>Dockerfile</code>, but just for completion I&rsquo;ll demonstrate the build command again).</p>
+
+<p>First let&rsquo;s rebuild the Ruby Docker image:</p>
+
+<pre><code>docker build -t my-ruby-app ./docker-app
+</code></pre>
+
+<p>Now let&rsquo;s build our new custom nginx Docker image:</p>
+
+<pre><code>docker build -t my-nginx ./docker-nginx
+</code></pre>
+
+<p>The third step in our list was to run the Ruby container:</p>
+
+<pre><code>docker run --name ruby-app -p 4567:4567 -d my-ruby-app
+</code></pre>
+
+<p>Let&rsquo;s also verify that it&rsquo;s running (the following command should return back &ldquo;Hello World&rdquo;):</p>
+
+<pre><code>curl http://$(boot2docker ip):4567/
+</code></pre>
+
+<p>Now onto our fourth step, which was to run our custom nginx container whilst linking it to our already running ruby container:</p>
+
+<pre><code>docker run --name nginx-container \
+  -v $(pwd)/html:/usr/share/nginx/html:ro \
+  -v $(pwd)/docker-nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
+  --link ruby-app:app \
+  -P -d my-nginx
+</code></pre>
+
+<p>The final step is to verify that everything worked as expected (i.e. we should be able to make a request to our Boot2Docker VM&rsquo;s localhost and have it proxy the request through to our Ruby application server). But let&rsquo;s do it in stages, so the first stage is to hit the root of localhost:</p>
+
+<blockquote>
+<p>Note: in the following example you&rsquo;ll need to get the dynamically allocated port number for the nginx container. You can do this by running <code>docker ps</code> and extracting the port number from the output provided</p>
+</blockquote>
+
+<pre><code>curl http://$(boot2docker ip):&lt;dynamic_port_number&gt;
+</code></pre>
+
+<p>This <code>curl</code> request will result in the following output to stdout&hellip;</p>
+
+<pre><code>&lt;h1&gt;Welcome&lt;/h1&gt;
+&lt;p&gt;This is my home page&lt;/p&gt;
+</code></pre>
+
+<p>The second stage is to hit the <code>/test.html</code> endpoint for localhost and make sure nginx is still serving back our static files correctly:</p>
+
+<pre><code>curl http://$(boot2docker ip):&lt;dynamic_port_number&gt;/test.html
+</code></pre>
+
+<p>This <code>curl</code> request will result in the following output to stdout&hellip;</p>
+
+<pre><code>&lt;h1&gt;Hey there!&lt;/h1&gt;
+&lt;p&gt;Here is my test HTML file&lt;/p&gt;
+</code></pre>
+
+<p>Looking good. OK the third and final stage is to now try to hit the <code>/app/</code> endpoint for localhost and make sure nginx is proxying the request through to our Ruby backend application server (and also sending the result back again!):</p>
+
+<pre><code>curl http://$(boot2docker ip):32785/app/
+</code></pre>
+
+<p>This <code>curl</code> request will result in the following output to stdout&hellip;</p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;style type=&quot;text/css&quot;&gt;
+  body { text-align:center;font-family:helvetica,arial;font-size:22px;
+    color:#888;margin:20px}
+  #c {margin:0 auto;width:500px;text-align:left}
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h2&gt;Sinatra doesn&amp;rsquo;t know this ditty.&lt;/h2&gt;
+  &lt;img src='http://app/__sinatra__/404.png'&gt;
+  &lt;div id=&quot;c&quot;&gt;
+    Try this:
+    &lt;pre&gt;get &amp;#x27;&amp;#x2F;app&amp;#x2F;&amp;#x27; do
+  &amp;quot;Hello World&amp;quot;
+end
+&lt;/pre&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Ewww? OK so we can see nginx <em>is</em> proxying through to our Ruby application server, but the server doesn&rsquo;t seem to know how to handle the request <code>/app/</code>? Maybe it&rsquo;s something to do with the extra forward slash on the end of the request? If I change it to <code>/app</code> instead we&rsquo;ll see what that does:</p>
+
+<pre><code>curl http://$(boot2docker ip):32785/app
+</code></pre>
+
+<p>This <code>curl</code> request will result in the following output to stdout&hellip;</p>
+
+<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;301 Moved Permanently&lt;/title&gt;&lt;/head&gt;
+&lt;body bgcolor=&quot;white&quot;&gt;
+&lt;center&gt;&lt;h1&gt;301 Moved Permanently&lt;/h1&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;nginx/1.4.6 (Ubuntu)&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Hmm, ok that&rsquo;s not much better. So what&rsquo;s going on here? Well, we&rsquo;re seeing the <code>301</code> redirect because Sinatra is redirecting anything without a forward slash. So ok, but what about the &ldquo;Sinatra doesn&rsquo;t know this ditty&rdquo; error?</p>
+
+<h3 id="the-final-solution">The final solution</h3>
+
+<p>The cause of the problem is because we&rsquo;ve misconfigured nginx. The solution to the issue requires us to know a <em>very</em> subtle detail about how nginx location blocks work, which is:</p>
+
+<p>If you don&rsquo;t put a forward slash <code>/</code> at the end of the upstream name, then you&rsquo;ll find nginx passes the request exactly as it was made (i.e. <code>/app/</code>) through to the backend service, as apposed to passing it as just <code>/</code>.</p>
+
+<p>For example, we had set the proxy to pass to <code>http://app;</code> which meant a request to <code>/app/</code> was being passed to Sinatra as <code>/app/</code> and a request to <code>/app/foo</code> was being passed on to Sinatra as <code>/app/foo</code>; and as you can see from the Sinatra application code, we have no such routes defined.</p>
+
+<p>What we should do instead is change the proxy pass value to <code>http://app/;</code> (notice the extra forward slash just before the closing semi-colon).</p>
+
+<p>By putting a <code>/</code> after the upstream name means it acts more like nginx&rsquo;s <code>alias</code> directive which remaps requests for you. If I kept it as <code>http://app;</code>, then I would&rsquo;ve needed to have added an <code>/app/</code> route to my Ruby application. But the additional forward slash remaps <code>/app/</code> so it&rsquo;s passed to Sinatra as <code>/</code> (we have a route for that) as well as remapping <code>/app/foo</code> to just <code>/foo</code> (we have a route for that too!).</p>
+
+<p>So with this in mind you&rsquo;ll see in GitHub I&rsquo;ve updated the <code>nginx.conf</code> to look like the following (with additional comments to clarify the behaviour):</p>
+
+<pre><code>user nobody nogroup;
+worker_processes auto;          # auto-detect number of logical CPU cores
+
+events {
+  worker_connections 512;       # set the max number of simultaneous connections (per worker process)
+}
+
+http {
+  upstream app {
+    server app:4567;            # app is automatically defined inside /etc/hosts by Docker
+  }
+
+  server {
+    listen *:80;                # Listen for incoming connections from any interface on port 80
+    server_name &quot;&quot;;             # Don't worry if &quot;Host&quot; HTTP Header is empty or not set
+    root /usr/share/nginx/html; # serve static files from here
+
+    location /app/ {            # catch any requests that start with /app/
+      proxy_pass http://app/;   # proxy requests onto our app server (i.e. a different container)
+                                #
+                                # NOTE: If you don't put a forward slash / at the end of the upstream name
+                                #       then you'll find nginx passes the request as /app/ rather than just /
+                                #       Putting / after the upstream name means it acts more like the alias directive
+                                #       If I kept it as http://app; then I would've needed to add a /app/ route to Sinatra
+    }
+  }
+}
+</code></pre>
+
+<p>With this change made, we can now make the following requests successfully:</p>
+
+<ul>
+<li><code>curl http://$(boot2docker ip):&lt;dynamic_port_number&gt;/app/</code></li>
+<li><code>curl http://$(boot2docker ip):&lt;dynamic_port_number&gt;/app/foo</code></li>
+</ul>
+
+<p><div id="6"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>This was a bit of a whirlwind run through to getting a simple nginx reverse proxy set-up with Docker. You can obviously swap out the Ruby backend with whatever technology stack is more appropriate (e.g. Node, Clojure, Scala&hellip; whatever).</p>
+
+<p>From here, if you&rsquo;re new to nginx (like I am) you can start to experiment with the many other features nginx provides. Enjoy!</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/development'>development</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/docker'>docker</a>, <a class='tag' href='/tags/nginx'>nginx</a>, <a class='tag' href='/tags/ruby'>ruby</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/security-basics/'>
+        <span class='screen-reader'>Next post: </span>Security basics with GPG, OpenSSH, OpenSSL and Keybase<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

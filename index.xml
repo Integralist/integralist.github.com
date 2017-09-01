@@ -263,5 +263,15 @@ Introduction The purpose of this post is to demonstrate how to configure nginx t
       <description>Introduction What are keys and how do they work? Understanding PKI OpenSSL vs OpenSSH What is GPG? Creating your own keys  OpenSSH OpenSSL GPG  Multiple Keys?   How to encrypt data using GPG, OpenSSL and Keybase  GPG encryption  Asymmetrical encryption Symmetrical encryption Key Signing Digital Signatures Revoking Keys  OpenSSL encryption Keybase Which should I use?  Creating, self-signing, issuing and revoking certificates Conclusion   UPDATE: for those short on time, read the following Introduction, What are keys and how do they work?</description>
     </item>
     
+    <item>
+      <title>Setting Up Nginx With Docker</title>
+      <link>http://www.integralist.co.uk/posts/setting-up-nginx-with-docker/</link>
+      <pubDate>Tue, 04 Aug 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/setting-up-nginx-with-docker/</guid>
+      <description>Introduction Just give me the code Setting up nginx Setting up the Ruby application Linking your app to nginx Conclusion  
+Introduction I wanted to learn about how to use the popular proxy server nginx for handling &amp;ldquo;reverse proxy&amp;rdquo; duties on a Ruby project I was working on. So I decided the easiest thing to do in order to play around with nginx (as I work on a MacBook Pro laptop), would be to install and run it (and my back-end application) within Docker containers.</description>
+    </item>
+    
   </channel>
 </rss>
