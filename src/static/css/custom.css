@@ -26,3 +26,7 @@ a > code,
 p > code {
   color: #c31900;
 }
+
+pre {
+  border-radius: .3em;
+}
