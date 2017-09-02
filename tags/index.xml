@@ -6,10 +6,19 @@
     <description>Recent content in Tags on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Mon, 12 Sep 2016 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 30 Mar 2015 13:00:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Aws</title>
+      <link>http://www.integralist.co.uk/tags/aws/</link>
+      <pubDate>Mon, 30 Mar 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/aws/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Bash</title>
@@ -80,6 +89,15 @@
       <pubDate>Sat, 03 Oct 2015 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/certificates/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ci</title>
+      <link>http://www.integralist.co.uk/tags/ci/</link>
+      <pubDate>Mon, 30 Mar 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/ci/</guid>
       <description></description>
     </item>
     
@@ -201,6 +219,15 @@
     </item>
     
     <item>
+      <title>Jruby</title>
+      <link>http://www.integralist.co.uk/tags/jruby/</link>
+      <pubDate>Mon, 30 Mar 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/jruby/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Key</title>
       <link>http://www.integralist.co.uk/tags/key/</link>
       <pubDate>Sat, 10 Dec 2016 13:00:00 +0100</pubDate>
@@ -300,6 +327,15 @@
     </item>
     
     <item>
+      <title>Patterns</title>
+      <link>http://www.integralist.co.uk/tags/patterns/</link>
+      <pubDate>Mon, 30 Mar 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/patterns/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Performance</title>
       <link>http://www.integralist.co.uk/tags/performance/</link>
       <pubDate>Tue, 20 Oct 2015 13:00:00 +0100</pubDate>
@@ -368,6 +404,15 @@
       <pubDate>Mon, 11 Apr 2016 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/rpc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Rpm</title>
+      <link>http://www.integralist.co.uk/tags/rpm/</link>
+      <pubDate>Mon, 30 Mar 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/rpm/</guid>
       <description></description>
     </item>
     

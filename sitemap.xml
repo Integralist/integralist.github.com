@@ -132,8 +132,25 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/posts/designing-for-simplicity/</loc>
+    <lastmod>2015-03-30T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/categories/algorithms/</loc>
     <lastmod>2016-06-28T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/categories/architecture/</loc>
+    <lastmod>2015-03-30T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/aws/</loc>
+    <lastmod>2015-03-30T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -192,6 +209,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/ci/</loc>
+    <lastmod>2015-03-30T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/tags/cidr/</loc>
     <lastmod>2016-11-16T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -206,6 +229,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/curl/</loc>
     <lastmod>2015-10-03T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/categories/design/</loc>
+    <lastmod>2015-03-30T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -234,14 +263,14 @@
   </url>
   
   <url>
-    <loc>http://www.integralist.co.uk/tags/github/</loc>
-    <lastmod>2016-08-22T13:00:00+01:00</lastmod>
+    <loc>http://www.integralist.co.uk/categories/github/</loc>
+    <lastmod>2015-11-18T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://www.integralist.co.uk/categories/github/</loc>
-    <lastmod>2015-11-18T13:00:00+01:00</lastmod>
+    <loc>http://www.integralist.co.uk/tags/github/</loc>
+    <lastmod>2016-08-22T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -296,6 +325,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/https/</loc>
     <lastmod>2015-10-03T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/jruby/</loc>
+    <lastmod>2015-03-30T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -383,6 +418,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/patterns/</loc>
+    <lastmod>2015-03-30T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/tags/performance/</loc>
     <lastmod>2015-10-20T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -443,6 +484,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/rpm/</loc>
+    <lastmod>2015-03-30T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/tags/ruby/</loc>
     <lastmod>2015-08-04T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -480,7 +527,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/</loc>
-    <lastmod>2016-09-12T13:00:00+01:00</lastmod>
+    <lastmod>2015-03-30T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   

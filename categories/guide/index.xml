@@ -206,5 +206,15 @@ Introduction The purpose of this post is to demonstrate how to configure nginx t
       <description>Introduction What are keys and how do they work? Understanding PKI OpenSSL vs OpenSSH What is GPG? Creating your own keys  OpenSSH OpenSSL GPG  Multiple Keys?   How to encrypt data using GPG, OpenSSL and Keybase  GPG encryption  Asymmetrical encryption Symmetrical encryption Key Signing Digital Signatures Revoking Keys  OpenSSL encryption Keybase Which should I use?  Creating, self-signing, issuing and revoking certificates Conclusion   UPDATE: for those short on time, read the following Introduction, What are keys and how do they work?</description>
     </item>
     
+    <item>
+      <title>Designing for Simplicity</title>
+      <link>http://www.integralist.co.uk/posts/designing-for-simplicity/</link>
+      <pubDate>Mon, 30 Mar 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/designing-for-simplicity/</guid>
+      <description>This post was originally written for David Walsh back in 2015. I&amp;rsquo;ve since decided to reproduce it here for my own records - Integralist: August, 2017.
+ Before we get started, it&amp;rsquo;s worth me spending a brief moment introducing myself to you. My name is Mark (or @integralist if Twitter happens to be your communication tool of choice) and I currently work for BBC News in London England as a principal engineer/tech lead; and I&amp;rsquo;m also the author of &amp;ldquo;Pro Vim&amp;rdquo;.</description>
+    </item>
+    
   </channel>
 </rss>

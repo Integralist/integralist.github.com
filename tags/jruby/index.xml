@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jruby on integralist</title>
+    <link>http://www.integralist.co.uk/tags/jruby/</link>
+    <description>Recent content in Jruby on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 30 Mar 2015 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/jruby/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Designing for Simplicity</title>
+      <link>http://www.integralist.co.uk/posts/designing-for-simplicity/</link>
+      <pubDate>Mon, 30 Mar 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/designing-for-simplicity/</guid>
+      <description>This post was originally written for David Walsh back in 2015. I&amp;rsquo;ve since decided to reproduce it here for my own records - Integralist: August, 2017.
+ Before we get started, it&amp;rsquo;s worth me spending a brief moment introducing myself to you. My name is Mark (or @integralist if Twitter happens to be your communication tool of choice) and I currently work for BBC News in London England as a principal engineer/tech lead; and I&amp;rsquo;m also the author of &amp;ldquo;Pro Vim&amp;rdquo;.</description>
+    </item>
+    
+  </channel>
+</rss>

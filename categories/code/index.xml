@@ -182,5 +182,15 @@ Introduction Most web developers use a build tool of some sort nowadays. I’m n
 Introduction I wanted to learn about how to use the popular proxy server nginx for handling &amp;ldquo;reverse proxy&amp;rdquo; duties on a Ruby project I was working on. So I decided the easiest thing to do in order to play around with nginx (as I work on a MacBook Pro laptop), would be to install and run it (and my back-end application) within Docker containers.</description>
     </item>
     
+    <item>
+      <title>Designing for Simplicity</title>
+      <link>http://www.integralist.co.uk/posts/designing-for-simplicity/</link>
+      <pubDate>Mon, 30 Mar 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/designing-for-simplicity/</guid>
+      <description>This post was originally written for David Walsh back in 2015. I&amp;rsquo;ve since decided to reproduce it here for my own records - Integralist: August, 2017.
+ Before we get started, it&amp;rsquo;s worth me spending a brief moment introducing myself to you. My name is Mark (or @integralist if Twitter happens to be your communication tool of choice) and I currently work for BBC News in London England as a principal engineer/tech lead; and I&amp;rsquo;m also the author of &amp;ldquo;Pro Vim&amp;rdquo;.</description>
+    </item>
+    
   </channel>
 </rss>
