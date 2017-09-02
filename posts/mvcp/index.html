@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction  Model View Controller  Mixed definitions  God Controller Problems Skinny Controller  Presenters?  What problem are Presenters trying to solve? How do they work?  Code Example  Controller View Presenter  Conclusion  
+Introduction Model, View, Controller (MVC). This is a pretty standard architectural pattern and has been in use when developing software since the early 1970&rsquo;s.
+The basic principle of the pattern is to separate the different areas of logic from your application into distinct compartments.'>
+
+<meta property='og:title' content='MVCP: Model, View, Controller, Presenter ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction  Model View Controller  Mixed definitions  God Controller Problems Skinny Controller  Presenters?  What problem are Presenters trying to solve? How do they work?  Code Example  Controller View Presenter  Conclusion  
+Introduction Model, View, Controller (MVC). This is a pretty standard architectural pattern and has been in use when developing software since the early 1970&rsquo;s.
+The basic principle of the pattern is to separate the different areas of logic from your application into distinct compartments.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/mvcp/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='mvc'><meta property='article:tag' content='patterns'><meta property='article:tag' content='ruby'><meta property='article:published_time' content='2013-10-22T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2013-10-22T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>MVCP: Model, View, Controller, Presenter ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/mvcp/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>MVCP: Model, View, Controller, Presenter</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2013-10-22T13:00:00&#43;01:00'>2013-10-22</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    9 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a>
+
+<ul>
+<li>Model</li>
+<li>View</li>
+<li>Controller</li>
+</ul></li>
+<li><a href="#2">Mixed definitions</a>
+
+<ul>
+<li>God Controller</li>
+<li>Problems</li>
+<li>Skinny Controller</li>
+</ul></li>
+<li><a href="#3">Presenters?</a>
+
+<ul>
+<li>What problem are Presenters trying to solve?</li>
+<li>How do they work?</li>
+</ul></li>
+<li><a href="#4">Code Example</a>
+
+<ul>
+<li>Controller</li>
+<li>View</li>
+<li>Presenter</li>
+</ul></li>
+<li><a href="#5">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Model, View, Controller (MVC). This is a pretty standard architectural pattern and has been in use when developing software since the early 1970&rsquo;s.</p>
+
+<p>The basic principle of the pattern is to separate the different areas of logic from your application into distinct compartments.</p>
+
+<h3 id="model">Model</h3>
+
+<p>The model holds your business data. Typically this will be data that is pulled in from a database or external data service of some kind.</p>
+
+<h3 id="view">View</h3>
+
+<p>The view is your user interface. This is what the client will interact with when using your application.</p>
+
+<h3 id="controller">Controller</h3>
+
+<p>The controller is the boss. He sits at the top and delegates responsibilities to either the view or the model.</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="mixed-definitions">Mixed definitions</h2>
+
+<p>There seems to be a dispute in the dev community regarding how the responsibilities should be divided.</p>
+
+<p>Some feel a &lsquo;fat controller&rsquo; principle is best (where by the controller tells the model not only <em>when</em> but <em>where</em> and <em>how</em> it should get its data).</p>
+
+<p>My understanding of the pattern is that it was designed so that the Controller stays &lsquo;skinny&rsquo;. It may be the boss, but like most good bosses it doesn&rsquo;t try and stay in control. It knows the best team member for the job at hand and delegates accordingly.</p>
+
+<p>This is also good code design because the Controller doesn&rsquo;t have too much <em>context</em> (i.e. it doesn&rsquo;t know everything, which means it&rsquo;ll be easier to maintain and scale).</p>
+
+<h3 id="god-controller">God Controller</h3>
+
+<p>There are a few ways we can implement an MVC pattern, one is known as the &lsquo;God Controller&rsquo;.</p>
+
+<p>This is where a single Controller exists and it oversees everything no matter what was requested by the client.</p>
+
+<p>For example, the single Controller would be passed the request from the client (usually handled by a custom routing application, and most frameworks will provide their own).</p>
+
+<p>The Controller would determine what type of request was made (if the request was for a &lsquo;contact&rsquo; page then it&rsquo;ll make a request for the Contact model, or if the request was for the &lsquo;about&rsquo; page then it&rsquo;ll make a request for the About model).</p>
+
+<p>Once it knows the type of request it&rsquo;ll proceed to get the relevant model data and assign it to some View variables and render the required View.</p>
+
+<h3 id="problems">Problems</h3>
+
+<p>Now there are two problems with this implementation:</p>
+
+<ol>
+<li>maintainability</li>
+<li>scalability</li>
+</ol>
+
+<p>As mentioned before, this comes down to bad code design. The &lsquo;God Controller&rsquo; knows too much and tries to do too much. Once you start getting above a few different types of requests you&rsquo;ll start to understand what a mess the code can become by having multiple branches for different routing scenarios.</p>
+
+<p>I work as an engineer for the BBC News team in London and we had suffered from this exact set-up (hence the lessons the team has learnt and improved upon are the reason why I&rsquo;m able to write this post for you now).</p>
+
+<h3 id="skinny-controller">Skinny Controller</h3>
+
+<p>There is another approach we can take which is known as the &lsquo;skinny controller&rsquo; approach.</p>
+
+<p>The way it works is that a request will come into the application and will get passed to a page specific Controller.</p>
+
+<p>The page specific Controller will call the relevant Model and will assign the returned data to a few View variables.</p>
+
+<p>The Controller will then render a View and pass through the variables into the View for it to use.</p>
+
+<p>As you can see, this isn&rsquo;t that different from the &lsquo;God Controller&rsquo; with the exception that the Routing part of the application now will have extra logic which determines which specific Controller should be loaded. This is a better situation to be in because you&rsquo;re making your code base both more maintainable and scalable.</p>
+
+<p>Note: as I mentioned in the previous section, BBC News had a sort of &lsquo;God Controller&rsquo; issue and our first step to resolving the problem was to take a similar approach as described above (i.e. to start creating page specific Controllers). That was a good first step.</p>
+
+<p>The next step from here was to separate out our logic even further by implementing Presenters, and it was our tech lead at BBC News (<a href="http://twitter.com/jcleveley">John Cleveley</a>) who made that decision which resulted in a much more efficient, maintainable and scalable code base.</p>
+
+<p><div id="3"></div></p>
+
+<h2 id="presenters">Presenters</h2>
+
+<h3 id="what-problem-are-presenters-trying-to-solve">What problem are Presenters trying to solve?</h3>
+
+<p>Let&rsquo;s imagine we&rsquo;ve gone for the &lsquo;Skinny Controller&rsquo; approach. There are still some inherent issues…</p>
+
+<p>First of all, our Controller can still have too much context and be handling more information than it should.</p>
+
+<p>But also, and more importantly, you may find there is still a lot of duplication of code across your Controllers.</p>
+
+<p>The reasoning for this is that if you consider the structure of a web page/application you&rsquo;ll notice that it is typically made up of unique &lsquo;features&rsquo;. For example, if you&rsquo;re displaying your tweets on a page then that&rsquo;s a unique feature.</p>
+
+<p>Each feature must be able to stand on its own. We normally describe these features as being &lsquo;components&rsquo;. Each component can be loaded whenever and wherever needed. Having a component based architecture allows your code base to become more modular and reusable.</p>
+
+<p>For example the navigation menu on a page could be considered a &lsquo;component&rsquo;. Also, the navigation menu component is likely going to need to appear on every single page of the application.</p>
+
+<p>So, if you&rsquo;re splitting up your logic into page specific Controllers then it&rsquo;s possible that you&rsquo;re still repeating code across the Controllers to handle the loading of re-occurring components such as the navigation (e.g. pulling its data from a navigation Model and setting View variables etc).</p>
+
+<p>Now there are ways that this code repetition can be avoided, and one such way is to use the concept of Presenters.</p>
+
+<h3 id="how-do-they-work">How do they work?</h3>
+
+<p>Presenters (like everything in software engineering) can be implemented in many different ways.</p>
+
+<p>For example, at BBC News we initially were manually creating new Presenter instances within our page Controllers. But the team here are quite clever chaps (especially <a href="http://twitter.com/kenturamon">Robert Kenny</a> and <a href="http://twitter.com/sthulb">Simon Thulbourn</a>) and they realised that this process could be greatly improved by using configuration files instead (specifically <a href="http://yaml.org/">YAML</a>). As we have multiple teams working on the BBC News code base and in multiple languages, using configuration files is a much easier and maintainable solution.</p>
+
+<p>I&rsquo;m not going to go into the configuration set-up we use at BBC News. Instead I&rsquo;ll focus on the basic principles of how Presenters work, which is quite simply a case of moving the logic (getting component specific Model data and assigning it to to component specific variables) into separate files called Presenters which you can instantiate within your controller.</p>
+
+<p><div id="4"></div></p>
+
+<h2 id="code-example">Code Example</h2>
+
+<h3 id="controller-1">Controller</h3>
+
+<p>Here is a basic example in Ruby…</p>
+
+<pre><code>require 'app/presenters/a'
+require 'app/presenters/b'
+
+class AboutController &lt; ApplicationController
+  get '/' do
+    @a = Presenters::A.new
+    @b = Presenters::B.new
+
+    title 'About'
+    erb :about
+  end
+end
+</code></pre>
+
+<p>…in this example we have an &lsquo;About&rsquo; page which is made up of two components <code>a</code> and <code>b</code>. As you can see we <code>require</code> the presenters which handle those two components and within our Controller we instantiate the Presenters.</p>
+
+<p>Notice that&rsquo;s all we do. Each Presenter encapsulates the logic needed to prepare the data to be passed to the <code>:about</code> view template.</p>
+
+<h3 id="view-1">View</h3>
+
+<p>Before I show you the Presenter code itself, I&rsquo;ll show you the View template file…</p>
+
+<pre><code>&lt;h1&gt;&lt;%= @title %&gt;&lt;/h1&gt;
+
+&lt;% if @a.run %&gt;
+  &lt;%= partial :&quot;components/a&quot;, { :title =&gt; @a.title, :summary =&gt; @a.summary, :data =&gt; @a.data } %&gt;
+&lt;% end %&gt;
+
+&lt;% if @b.run %&gt;
+  &lt;%= partial :&quot;components/b&quot;, { :name =&gt; @b.name, :age =&gt; @b.age } %&gt;
+&lt;% end %&gt;
+</code></pre>
+
+<p>…as you can see we have very minimal logic in place. If anything I have too much logic in the View as I initially was re-using the same View template over and over and so I wanted to protect again errors appearing when loading a template which referenced a component I wasn&rsquo;t loading, but I&rsquo;ve since changed how my application was working but left the conditional checks in as an example of how code can evolve over time.</p>
+
+<p>We literally just check to see if the component has been initialised (in this case we created a <code>run</code> property we set to <code>true</code> when the component&rsquo;s Presenter is first initialised).</p>
+
+<p>We then render the View for the component and pass through the variables that were set-up from within the Presenter.</p>
+
+<p>Now I can also open up my <code>:home</code> View file and add in the <code>a</code> component there as well just as easily. It would be even easier if I didn&rsquo;t have to manually add the <code>a</code> component to the <code>:home</code> View file but that&rsquo;s where running from configuration files like we do at BBC News would come in handy (but that would have been too complicated an implementation for the sake of such a basic example as required for this post).</p>
+
+<h3 id="presenter">Presenter</h3>
+
+<p>Now let&rsquo;s take a look at one of our Presenters, in this case the Presenter for our <code>b</code> component…</p>
+
+<pre><code>require 'app/presenters/base'
+require 'app/models/b'
+
+class Presenters::B &lt; Presenters::Base
+  attr_reader :run, :name, :age
+
+  def initialize
+    @run = true
+
+    model = B.new('Mark', '99')
+    prepare_view_data({ :name =&gt; model.name, :age =&gt; model.age })
+  end
+end
+</code></pre>
+
+<p>…as you can see we load a specific Model for this component and then generate our View data by passing the Model information through to a <code>prepare_view_data</code> method (see below for the implementation details).</p>
+
+<p>The <code>Base</code> Presenter which our component Presenters inherit from is very straight forward as you can see from the following example…</p>
+
+<pre><code>module Presenters
+  class Base
+    attr_accessor :model
+
+    def prepare_view_data hash
+      hash.each do |name, value|
+        instance_variable_set(&quot;@#{name}&quot;, value)
+      end
+    end
+  end
+end
+</code></pre>
+
+<p>…it&rsquo;s just a module namespace with a base class that has a single method <code>prepare_view_data</code> which dynamically generates instance variables based on the data we passed through from the inheriting Presenter class and which then are usable within the View.</p>
+
+<p><div id="5"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s all there is to it as far as understanding the Presenter pattern. It&rsquo;s a nice clean solution for componentising your different page features and keeping your code more easily maintainable.</p>
+
+<p>I&rsquo;ve created a repo on GitHub called <a href="https://github.com/Integralist/MVCP">MVCP</a> which is written in <a href="https://www.ruby-lang.org/">Ruby</a> and uses the <a href="http://www.sinatrarb.com/">Sinatra</a> web framework. Note: I had some help from my colleague <a href="http://twitter.com/sthulb">Simon</a> in cleaning up and refactoring some of the code (it may only have been minor changes but as with all good refactorings it made a massive difference to the quality of the code, so thanks to him for helping out).</p>
+
+<p>If you have any questions then feel free to contact me either here on <a href="http://twitter.com/integralist">twitter</a> and let me know your thoughts.</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/mvc'>mvc</a>, <a class='tag' href='/tags/patterns'>patterns</a>, <a class='tag' href='/tags/ruby'>ruby</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/javascript-101/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>JavaScript 101</a>
+    </div><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/functional-recursive-javascript-programming/'>
+        <span class='screen-reader'>Next post: </span>Functional Recursive JavaScript Programming<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

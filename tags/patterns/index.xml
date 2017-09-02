@@ -21,5 +21,16 @@
  Before we get started, it&amp;rsquo;s worth me spending a brief moment introducing myself to you. My name is Mark (or @integralist if Twitter happens to be your communication tool of choice) and I currently work for BBC News in London England as a principal engineer/tech lead; and I&amp;rsquo;m also the author of &amp;ldquo;Pro Vim&amp;rdquo;.</description>
     </item>
     
+    <item>
+      <title>MVCP: Model, View, Controller, Presenter</title>
+      <link>http://www.integralist.co.uk/posts/mvcp/</link>
+      <pubDate>Tue, 22 Oct 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/mvcp/</guid>
+      <description>Introduction  Model View Controller  Mixed definitions  God Controller Problems Skinny Controller  Presenters?  What problem are Presenters trying to solve? How do they work?  Code Example  Controller View Presenter  Conclusion  
+Introduction Model, View, Controller (MVC). This is a pretty standard architectural pattern and has been in use when developing software since the early 1970&amp;rsquo;s.
+The basic principle of the pattern is to separate the different areas of logic from your application into distinct compartments.</description>
+    </item>
+    
   </channel>
 </rss>

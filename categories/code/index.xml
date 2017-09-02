@@ -213,6 +213,17 @@ Introduction This post isn&amp;rsquo;t about Functional Programming per se, as t
     </item>
     
     <item>
+      <title>MVCP: Model, View, Controller, Presenter</title>
+      <link>http://www.integralist.co.uk/posts/mvcp/</link>
+      <pubDate>Tue, 22 Oct 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/mvcp/</guid>
+      <description>Introduction  Model View Controller  Mixed definitions  God Controller Problems Skinny Controller  Presenters?  What problem are Presenters trying to solve? How do they work?  Code Example  Controller View Presenter  Conclusion  
+Introduction Model, View, Controller (MVC). This is a pretty standard architectural pattern and has been in use when developing software since the early 1970&amp;rsquo;s.
+The basic principle of the pattern is to separate the different areas of logic from your application into distinct compartments.</description>
+    </item>
+    
+    <item>
       <title>JavaScript 101</title>
       <link>http://www.integralist.co.uk/posts/javascript-101/</link>
       <pubDate>Sat, 24 Nov 2012 13:00:00 +0100</pubDate>
