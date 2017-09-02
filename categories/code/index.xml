@@ -212,5 +212,18 @@ Introduction Concurrency is a difficult concept. Regardless of programming langu
 Introduction This post isn&amp;rsquo;t about Functional Programming per se, as there are many parts to pure FP (seen in Lisp, Clojure, Haskell etc) which we can&amp;rsquo;t achieve completely in the JavaScript language (for example, implementing fundamental principles of FP such as &amp;ldquo;immutable data&amp;rdquo; is very difficult in a language designed around allowing data structures to be mutable.</description>
     </item>
     
+    <item>
+      <title>Host Methods vs Native Methods</title>
+      <link>http://www.integralist.co.uk/posts/host-methods-vs-native-methods/</link>
+      <pubDate>Sun, 22 Apr 2012 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/host-methods-vs-native-methods/</guid>
+      <description>Introduction What they are? How to detect them? When is it OK to modify them?  
+Introduction This was intended as a short and overly simplified post about Host methods and Native methods.
+
+What they are? Native methods are built-in functions provided by the ECMAScript core specification. So things like Object methods (e.g. Object.create), Array methods (e.g. Array#forEach) etc.
+Host methods are functions provided by the host environment (most of the time when working in web development the host environment will be the user’s web browser).</description>
+    </item>
+    
   </channel>
 </rss>

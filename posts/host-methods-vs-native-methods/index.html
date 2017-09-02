@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction What they are? How to detect them? When is it OK to modify them?  
+Introduction This was intended as a short and overly simplified post about Host methods and Native methods.
+
+What they are? Native methods are built-in functions provided by the ECMAScript core specification. So things like Object methods (e.g. Object.create), Array methods (e.g. Array#forEach) etc.
+Host methods are functions provided by the host environment (most of the time when working in web development the host environment will be the user’s web browser).'>
+
+<meta property='og:title' content='Host Methods vs Native Methods ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction What they are? How to detect them? When is it OK to modify them?  
+Introduction This was intended as a short and overly simplified post about Host methods and Native methods.
+
+What they are? Native methods are built-in functions provided by the ECMAScript core specification. So things like Object methods (e.g. Object.create), Array methods (e.g. Array#forEach) etc.
+Host methods are functions provided by the host environment (most of the time when working in web development the host environment will be the user’s web browser).'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/host-methods-vs-native-methods/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='javascript'><meta property='article:published_time' content='2012-04-22T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2012-04-22T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Host Methods vs Native Methods ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/host-methods-vs-native-methods/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Host Methods vs Native Methods</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2012-04-22T13:00:00&#43;01:00'>2012-04-22</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    6 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">What they are?</a></li>
+<li><a href="#3">How to detect them?</a></li>
+<li><a href="#4">When is it OK to modify them?</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This was intended as a short and overly simplified post about Host methods and Native methods.</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="what-they-are">What they are?</h2>
+
+<p>Native methods are built-in functions provided by the ECMAScript core specification. So things like Object methods (e.g. <code>Object.create</code>), Array methods (e.g. <code>Array#forEach</code>) etc.</p>
+
+<p>Host methods are functions provided by the host environment (most of the time when working in web development the host environment will be the user’s web browser). So things like the DOM API and the Events object are host objects/methods (e.g. <code>attachEvent</code> is a host method and <code>addEventListener</code> is a host method)</p>
+
+<p><div id="3"></div></p>
+
+<h2 id="how-to-detect-them">How to detect them?</h2>
+
+<p>Detecting Native methods is relatively straight forward. The real problem comes when you need to determine whether the object/method you’re detecting actually works the way the specification dictates it should work. So just checking it is available to use isn’t good enough.</p>
+
+<p>Detecting host methods is similar but a lot more problematic, because the ECMAScript specification states that the host environment can implement certain methods however they like and so there is no guarantee that your checks for certain host methods (which may work today) will work in future.</p>
+
+<p>We’ll give an example of each so you can get an idea of what I mean…</p>
+
+<p>To detect a Native method such as Array#forEach you should be able to do the following:</p>
+
+<pre><code>if (!Array.prototype.forEach) { 
+    /* polyfill for missing forEach method */ 
+}
+</code></pre>
+
+<p>Note: polyfill is a term that Remy Sharp coined which means ‘a shim that mimics a future API’ (see: <a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">http://remysharp.com/2010/10/08/what-is-a-polyfill/</a>)</p>
+
+<p>But the issue you could encounter in this example is if you’re inheriting a project from another developer and they have already extended the Native Array object with a forEach method and their polyfill version of the missing forEach function doesn’t work how the specification has dictated it should then you could find your code errors at hard to debug stages because of the difference in implementation where you’re passing parameters into a polyfill’ed method and that method hasn’t been implemented properly so the extra parameters either throw an error or (potentially worse) silently fail.</p>
+
+<p>This is where you either ‘suck it and see’ (which is a bad idea, but not always unavoidable), or you attempt genuine ‘feature detection’ which means (in this example) you create a test Array and test the forEach method works how you expect it to.</p>
+
+<p>The downsides to this approach (although it is the most robust and future-proof way of writing your code) is that all these checks are a performance penalty. If you’re sure the method you’re checking for is going to work how you expect it to then should you waste time/effort writing additional checks/tests to ensure the method works how the specification dictates? What happens if you do the full feature detection and discover the method doesn’t work how you expect it? You’ll still then need to implement some kind of fallback or lose the functionality that relies on that method.</p>
+
+<p>These are important decisions that need to be made and ones that are outside the realms of this post I’m afraid (simply because there are no easy answers).</p>
+
+<p>Now, detecting Host methods is actually worse because they can be implemented in any fashion the host environment chooses.</p>
+
+<p>So far it has been <em>noted</em> that checking the <code>typeof</code> result for a Host method will normally result in either function, object or unknown, so if you get one of these back as a result then it’s a good chance the host object you’re checking for is available to use, but as you should be able to tell by now, this is a flawed process… fun heh!</p>
+
+<p>Again, this isn’t a reliable assumption to make, because in a future/new host environment they might have a <code>typeof</code> result that is none of the above. Literally you could check the <code>typeof</code> for a method and its result could be <em>spacecraft</em> - there are no rules as far as the Host environment is concerned!</p>
+
+<p>But for testing a host method exists, the following function has become the de-facto standard:</p>
+
+<pre><code>/*
+ * Feature Testing a Host Method
+ * Because a callable host object can legitimately have any typeof result then it can't be relied upon.
+ *
+ * @notes:
+ * The reason for the &amp;&amp; !!object[property] is because in ECMAScript version 3, 
+ * a null object has typeof result 'object' (which is considered a bug).
+ * In future versions (ECMAScript 6+) the typeof result will be 'null' (as it should be).
+ * 
+ * @reference: http://michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
+ */
+
+function isHostMethod(object, property) {
+    var type = typeof object[property];
+
+    return type == 'function' || // This is the result we're expecting (as the test is for a method)
+           (type == 'object' &amp;&amp; !!object[property]) || // Protect against ES3 'null' typeof result being 'object'
+           type == 'unknown'; // For IE &lt; 9 when Microsoft used ActiveX objects for Native Functions (we're checking property of ActiveX object)
+}
+</code></pre>
+
+<p>So lets take a quick re-cap of what’s going on here:</p>
+
+<ul>
+<li><p><code>function</code>:<br />
+For most browsers the <code>typeof</code> operator will result with <code>function</code> when passed a callable host object</p></li>
+
+<li><p><code>'object’ &amp;&amp; !!object[property]</code>:<br />
+Because we&rsquo;re dealing with host objects we can&rsquo;t expect <code>function</code> to be returned, and in most cases (as far as ECMAScript 3 [ES3] implementations are concerned) the result will normally be <code>object</code> which is incorrect but allowed as far as the ES3 spec is concerned.</p>
+
+<p>So first of all we check for <code>object</code>.</p>
+
+<p>If that matches we then check to make sure the property coerces to true. The reason for this is that ES3 allows the host to return whatever they like, so if the property you&rsquo;re checking for is actually <code>null</code> the ES3 <code>typeof</code> result (for most browsers) will still be <code>object</code> even though the result is <code>null</code>! So to work around this issue we coerce the result into a boolean (so if <code>null</code> is the result it will coerce to false and thus this whole expression will return false, otherwise it&rsquo;ll return true).</p></li>
+
+<li><p><code>unknown</code>:<br />
+In older versions of IE (less than 9) it implements some of its host objects not as Native functions but as ActiveX objects (admittedly this is deep browser implementation talk and normally you don’t need to know this stuff, but in this instance it’s important to understand what the heck is going on with IE).</p>
+
+<p>So, in IE calling the <code>typeof</code> operator with properties of an ActiveX Object will result in <code>unknown</code>.</p></li>
+</ul>
+
+<p><div id="4"></div></p>
+
+<h2 id="when-is-it-ok-to-modify-them">When is it OK to modify them?</h2>
+
+<p>Modifying built-in Native objects isn’t as dangerous as host objects (as already noted by Kangax <a href="http://perfectionkills.com/extending-built-in-native-objects-evil-or-not/">http://perfectionkills.com/extending-built-in-native-objects-evil-or-not/</a>) but care needs to be taken to ensure the augmented object works as the spec dictates (something that isn’t possible all the time, for example like with <code>Object.create</code>).</p>
+
+<p>As far as host objects are concerned, never ever ever ever modify or augment them, just too dangerous.</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/javascript'>javascript</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/functional-recursive-javascript-programming/'>
+        <span class='screen-reader'>Next post: </span>Functional Recursive JavaScript Programming<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+
