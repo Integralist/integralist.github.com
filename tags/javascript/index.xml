@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Javascript on integralist</title>
+    <link>http://www.integralist.co.uk/tags/javascript/</link>
+    <description>Recent content in Javascript on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sat, 26 Apr 2014 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/javascript/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Functional Recursive JavaScript Programming</title>
+      <link>http://www.integralist.co.uk/posts/functional-recursive-javascript-programming/</link>
+      <pubDate>Sat, 26 Apr 2014 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/functional-recursive-javascript-programming/</guid>
+      <description>Introduction The problem Tail Call Optimisation The solution Trampolining A more advanced solution Explanation Conclusion  
+Introduction This post isn&amp;rsquo;t about Functional Programming per se, as there are many parts to pure FP (seen in Lisp, Clojure, Haskell etc) which we can&amp;rsquo;t achieve completely in the JavaScript language (for example, implementing fundamental principles of FP such as &amp;ldquo;immutable data&amp;rdquo; is very difficult in a language designed around allowing data structures to be mutable.</description>
+    </item>
+    
+  </channel>
+</rss>

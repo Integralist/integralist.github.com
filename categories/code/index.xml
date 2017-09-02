@@ -202,5 +202,15 @@ Introduction I wanted to learn about how to use the popular proxy server nginx f
 Introduction Concurrency is a difficult concept. Regardless of programming language or idiom that you use, the practice of programming a &amp;ldquo;thread-safe&amp;rdquo; application can be harder than you think.</description>
     </item>
     
+    <item>
+      <title>Functional Recursive JavaScript Programming</title>
+      <link>http://www.integralist.co.uk/posts/functional-recursive-javascript-programming/</link>
+      <pubDate>Sat, 26 Apr 2014 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/functional-recursive-javascript-programming/</guid>
+      <description>Introduction The problem Tail Call Optimisation The solution Trampolining A more advanced solution Explanation Conclusion  
+Introduction This post isn&amp;rsquo;t about Functional Programming per se, as there are many parts to pure FP (seen in Lisp, Clojure, Haskell etc) which we can&amp;rsquo;t achieve completely in the JavaScript language (for example, implementing fundamental principles of FP such as &amp;ldquo;immutable data&amp;rdquo; is very difficult in a language designed around allowing data structures to be mutable.</description>
+    </item>
+    
   </channel>
 </rss>
