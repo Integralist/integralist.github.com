@@ -47,5 +47,16 @@ Introduction This is a quick post to cover a GitHub workflow that is utilised by
  Open a GitHub PR (Pull Request) by creating a new feature branch from master Make feature specific changes and request a code review If given a &amp;ldquo;thumbs up&amp;rdquo;, this means the PR author is allowed to handle merging the PR The merge process requires a set of sub steps (see below)</description>
     </item>
     
+    <item>
+      <title>Git Tips</title>
+      <link>http://www.integralist.co.uk/posts/git-tips/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/git-tips/</guid>
+      <description>I thought I would get down in a blog post the different Git commands and tips that I find really useful, because every now and then it seems I need to refer back to these notes (which up until this point have been in a txt file in my Dropbox) if I&amp;rsquo;ve not used a particular command in a while.
+Hopefully you&amp;rsquo;ll find them useful too.
+ Show where Git is installed Show the Git version installed Update your global user details Set-up a global ignore file Adding all files (inc.</description>
+    </item>
+    
   </channel>
 </rss>

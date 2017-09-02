@@ -400,5 +400,16 @@ What they are? Native methods are built-in functions provided by the ECMAScript 
 Host methods are functions provided by the host environment (most of the time when working in web development the host environment will be the user’s web browser).</description>
     </item>
     
+    <item>
+      <title>Git Tips</title>
+      <link>http://www.integralist.co.uk/posts/git-tips/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/git-tips/</guid>
+      <description>I thought I would get down in a blog post the different Git commands and tips that I find really useful, because every now and then it seems I need to refer back to these notes (which up until this point have been in a txt file in my Dropbox) if I&amp;rsquo;ve not used a particular command in a while.
+Hopefully you&amp;rsquo;ll find them useful too.
+ Show where Git is installed Show the Git version installed Update your global user details Set-up a global ignore file Adding all files (inc.</description>
+    </item>
+    
   </channel>
 </rss>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='I thought I would get down in a blog post the different Git commands and tips that I find really useful, because every now and then it seems I need to refer back to these notes (which up until this point have been in a txt file in my Dropbox) if I&rsquo;ve not used a particular command in a while.
+Hopefully you&rsquo;ll find them useful too.
+ Show where Git is installed Show the Git version installed Update your global user details Set-up a global ignore file Adding all files (inc.'>
+
+<meta property='og:title' content='Git Tips ⋆ Mark McDonnell'>
+<meta property='og:description' content='I thought I would get down in a blog post the different Git commands and tips that I find really useful, because every now and then it seems I need to refer back to these notes (which up until this point have been in a txt file in my Dropbox) if I&rsquo;ve not used a particular command in a while.
+Hopefully you&rsquo;ll find them useful too.
+ Show where Git is installed Show the Git version installed Update your global user details Set-up a global ignore file Adding all files (inc.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/git-tips/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='bash'><meta property='article:tag' content='git'><meta property='article:tag' content='shell'>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Git Tips ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/git-tips/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Git Tips</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='0001-01-01T00:00:00Z'>0001-01-01</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    12 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<p>I thought I would get down in a blog post the different <a href="http://git-scm.com">Git</a> commands and tips that I find really useful, because every now and then it seems I need to refer back to these notes (which up until this point have been in a txt file in my Dropbox) if I&rsquo;ve not used a particular command in a while.</p>
+
+<p>Hopefully you&rsquo;ll find them useful too.</p>
+
+<ol>
+<li><a href="#1">Show where Git is installed</a></li>
+<li><a href="#2">Show the Git version installed</a></li>
+<li><a href="#3">Update your global user details</a></li>
+<li><a href="#4">Set-up a global ignore file</a></li>
+<li><a href="#5">Adding all files (inc. those marked as deleted)</a></li>
+<li><a href="#6">Writing a long commit</a></li>
+<li><a href="#7">Viewing file changes while writing your commit</a></li>
+<li><a href="#8">Viewing what files have been committed</a></li>
+<li><a href="#9">Improving <code>git log</code> with <code>git lg</code></a></li>
+<li><a href="#10">Shorter <code>git status</code></a></li>
+<li><a href="#11">Finding a commit that includes a specific phrase</a></li>
+<li><a href="#12">Only merging the files you want</a></li>
+<li><a href="#13">Stashing changes you&rsquo;re not ready to commit</a></li>
+<li><a href="#14">Revert all changes back to last commit</a></li>
+<li><a href="#15">Unstaging files</a></li>
+<li><a href="#16">Untrack a file without deleting it</a></li>
+<li><a href="#17">Amend your last commit</a></li>
+<li><a href="#18">Show the files within a commit</a></li>
+<li><a href="#19">See any changes between current working directory and last commit</a></li>
+<li><a href="#20">See changes between two commits</a></li>
+<li><a href="#21">Creating a branch and moving to it at the same time</a></li>
+<li><a href="#22">Deleting a branch</a></li>
+<li><a href="#23">Viewing all branches of a remote</a></li>
+<li><a href="#24">Checkout a remote branch</a></li>
+<li><a href="#25">Remove a remote</a></li>
+<li><a href="#26">Revert a specific file back to an earlier version</a></li>
+<li><a href="#27">Viewing all commits for a file and who made those changes</a></li>
+<li><a href="#28">Commiting only parts of a file rather than the whole file</a></li>
+<li><a href="#29">Modifying your Git history with <code>rebase</code></a></li>
+<li><a href="#30">Push branch without specifying its name</a></li>
+</ol>
+
+<p><div id="1"></div></p>
+
+<h2 id="show-where-git-is-installed">Show where Git is installed</h2>
+
+<p><code>which git</code></p>
+
+<p><div id="2"></div></p>
+
+<h2 id="show-the-git-version-installed">Show the Git version installed</h2>
+
+<p><code>git version</code></p>
+
+<p><div id="3"></div></p>
+
+<h2 id="update-your-global-user-details">Update your global user details</h2>
+
+<pre><code>git config --global user.name &quot;Your Name&quot;
+git config --global user.email &quot;Your Email&quot;
+git config --global apply.whitespace nowarn # ignore white space changes!
+</code></pre>
+
+<p><div id="4"></div></p>
+
+<h2 id="set-up-a-global-ignore-file">Set-up a global ignore file</h2>
+
+<p>First create the global ignore file…</p>
+
+<p><code>touch ~/.gitignore_global</code></p>
+
+<p>Then add the following content to it (<em>this is a standard ignore file but I&rsquo;ve added some Sass CSS pre-processor files to it</em>)…</p>
+
+<pre><code># Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.sass-cache
+*.scssc
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+</code></pre>
+
+<p>You can let Git know about your global ignore file by editing your global <code>.gitconfig</code> file…</p>
+
+<p><code>nano ~/.gitconfig</code></p>
+
+<p>…then adding the following to it…</p>
+
+<pre><code>[core]
+    excludesfile = /Users/&lt;home-directory&gt;/.gitignore_global
+</code></pre>
+
+<p>…or once the <code>.gitignore_global</code> file is created you can just tell git by using this short-hand command…</p>
+
+<p><code>git config --global core.excludesfile ~/.gitignore_global</code></p>
+
+<p><div id="5"></div></p>
+
+<h2 id="adding-all-files-inc-those-marked-as-deleted">Adding all files (inc. those marked as deleted)</h2>
+
+<p><code>git add -A</code></p>
+
+<p><div id="6"></div></p>
+
+<h2 id="writing-a-long-commit">Writing a long commit</h2>
+
+<p>A short git commit message would look like this…</p>
+
+<p><code>git commit -m &quot;My short commit message&quot;</code></p>
+
+<p>…but you should really be writing longer more descriptive commit messages which you do like so:</p>
+
+<p><code>git commit</code></p>
+
+<p>…what this does is open up the default editor for commit messages (which for most is Vim). Now Vim is a bizarre editor with all sorts of odd shortcuts for adding text. I&rsquo;ve only used Vim to write commit messages (nothing else) so I have a very focused set of commands to write my commands…</p>
+
+<p>Press <code>i</code> which puts Vim into &lsquo;insert&rsquo; mode (meaning you can actually write)</p>
+
+<pre><code>This is my short description for this commit
+- Here is a break down of my changes
+- Another note about a particular change
+</code></pre>
+
+<p>After I&rsquo;ve written my commit I just need to save the commit and exit Vim…</p>
+
+<ul>
+<li>Press <code>Esc</code></li>
+<li>Press <code>:wq</code> (the colon means you can execute more commands, w = write, q = quit)</li>
+</ul>
+
+<p><div id="7"></div></p>
+
+<h2 id="viewing-file-changes-while-writing-your-commit">Viewing file changes while writing your commit</h2>
+
+<p><code>git commit -v</code></p>
+
+<p><div id="8"></div></p>
+
+<h2 id="viewing-what-files-have-been-committed">Viewing what files have been committed</h2>
+
+<p><code>git ls-files</code></p>
+
+<p><div id="9"></div></p>
+
+<h2 id="improving-git-log-with-git-lg">Improving <code>git log</code> with <code>git lg</code></h2>
+
+<p>To get a better looking <code>git log</code> we need to write an alias called <code>git lg</code> that is just made up of standard Git commands/flags but when put together (along with specific colour settings) means we can have a short git command that provides us lots of useful information.</p>
+
+<p>What we need to do is open the <code>~/.gitconfig</code> file and then add the following content…</p>
+
+<pre><code>[alias]
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset' --abbrev-commit --date=relative
+</code></pre>
+
+<p><div id="10"></div></p>
+
+<h2 id="shorter-git-status">Shorter <code>git status</code></h2>
+
+<p>As per the above tip, we can create two extra alias&rsquo; which give us a shorter command to type (I don&rsquo;t know about you but when typing really fast I seem to always misspell the word &lsquo;status&rsquo;) and doesn&rsquo;t show us all the unnecessary crap that someone new to Git needs to see.</p>
+
+<p>What we need to do is open the <code>~/.gitconfig</code> file and then add the following content…</p>
+
+<pre><code>[alias] 
+    st = status
+    sts = status -sb
+</code></pre>
+
+<p>…you don&rsquo;t need to specify <code>[alias]</code> if it&rsquo;s already in the file (see previous tip).</p>
+
+<p>Now typing <code>git st</code> will be the same as <code>git status</code>, and typing <code>git sts</code> will be the same as <code>git status -sb</code>.</p>
+
+<p><div id="11"></div></p>
+
+<h2 id="finding-a-commit-that-includes-a-specific-phrase">Finding a commit that includes a specific phrase</h2>
+
+<p><code>git log --grep=&lt;your-phrase-here&gt;</code></p>
+
+<p>For example, <code>git log --grep=CSS</code> will display all commits that contain the word &lsquo;CSS&rsquo; in the message.</p>
+
+<p><div id="12"></div></p>
+
+<h2 id="only-merging-the-files-you-want">Only merging the files you want</h2>
+
+<p><code>git checkout &lt;branch-name&gt; &lt;file1&gt; &lt;file2&gt; &lt;file3&gt;</code></p>
+
+<p><div id="13"></div></p>
+
+<h2 id="stashing-changes-you-re-not-ready-to-commit">Stashing changes you&rsquo;re not ready to commit</h2>
+
+<p>If you make changes to your branch and then want to quickly change branches without first having to commit your current &lsquo;dirty state&rsquo; then run:</p>
+
+<p><code>git stash</code></p>
+
+<p>To apply a stashed state (git assumes the most recent stashed state if none specified) use:</p>
+
+<p><code>git stash apply</code></p>
+
+<p>To see which stashes you&rsquo;ve stored (on any branch) use:</p>
+
+<p><code>git stash list</code></p>
+
+<p>When viewing a list of stashes it can be useful if the stashes had corresponding messages (so you know what each stash holds), for that to happen you&rsquo;ll need to create stashes with an associated message using the <code>save</code> command:</p>
+
+<p><code>git stash save &quot;my message here&quot;</code></p>
+
+<p>If you have multiple stashes under a branch (e.g. <code>stash@{1}</code> <code>stash@{2}</code> <code>stash@{3}</code>) then you can reference a particular stash using:</p>
+
+<p><code>git stash apply stash@{2}</code> (pre 2.0 this would work <code>git stash apply@{2}</code>)</p>
+
+<p>If you want to stash only specific changes then use the patch mode:</p>
+
+<p><code>git stash -p</code></p>
+
+<p>To view the contents of a stash use:</p>
+
+<p><code>git stash show -p stash@{n}</code></p>
+
+<p>…where &lsquo;n&rsquo; is the numeric index of the stash (you can also use <code>git show stash@{n}</code>)</p>
+
+<p>Applying the stash doesn&rsquo;t mean it&rsquo;s removed from your list of stashes though(!) so you need to run:</p>
+
+<p><code>git stash drop stash@{&lt;index&gt;}</code></p>
+
+<p>e.g. <code>git stash drop stash@{2}</code></p>
+
+<p>You can also apply and drop the stash at the same time:</p>
+
+<p><code>git stash pop</code></p>
+
+<p>You can also specify an exact stash to pop:</p>
+
+<p><code>git stash pop stash@{2}</code></p>
+
+<p>If you stash some work, leave it there for a while, and continue on the branch from which you stashed the work, you may have a problem reapplying the work. If the apply tries to modify a file that you’ve since modified, you’ll get a merge conflict and will have to try to resolve it. If you want an easier way to test the stashed changes again, you can run <code>git stash &lt;branch&gt;</code> which creates a new branch for you, checks out the commit you were on when you stashed your work, reapplies your work there, and then drops the stash if it applies successfully.</p>
+
+<p>If you need to stash only specific files then first <code>git add</code> the files you don&rsquo;t want to stash, then run:</p>
+
+<p><code>git stash --keep-index</code></p>
+
+<p>&hellip;finally you can then <code>git reset</code> the files you originally added (if you don&rsquo;t plan on committing them yet).</p>
+
+<p><div id="14"></div></p>
+
+<h2 id="revert-all-changes-back-to-last-commit">Revert all changes back to last commit</h2>
+
+<p><code>git reset --hard</code></p>
+
+<p>Note: you can do a &lsquo;soft&rsquo; reset <code>git reset --soft &lt;hash&gt;</code>. The difference between <code>--hard</code> and <code>--soft</code> is with <code>--hard</code> the specified commit hash&rsquo;s files are moved into the working directory and the staging area (as if there were no changes since that specified commit). But using <code>--soft</code> will leave whatever changes you&rsquo;ve made in your working directory/staging area but will restore the specified commit you&rsquo;ve selected.</p>
+
+<p><div id="15"></div></p>
+
+<h2 id="unstaging-files">Unstaging files</h2>
+
+<p>To unstage files we&rsquo;ve added to the staging area we need to run the command <code>reset HEAD</code> but that&rsquo;s a bit ugly and awkward to remember. What would be easier is if we could just say <code>git unstage</code>, so let&rsquo;s create an alias to help make that easier!</p>
+
+<p>Open up the file <code>~/.gitconfig</code> and then add the following content…</p>
+
+<pre><code>[alias]
+    unstage = reset HEAD
+</code></pre>
+
+<p>Note: you don&rsquo;t need to specify <code>[alias]</code> if it&rsquo;s already in the <code>~/.gitconfig</code> file.</p>
+
+<p>You can also unstage a single file using:</p>
+
+<p><code>git reset &lt;file&gt;</code></p>
+
+<p>If you&rsquo;ve staged files before any commits have been set (e.g. right at the start of your project) then you&rsquo;ll find the above wont work because technically there are no commits to revert back to. So instead you&rsquo;ll need to remove the files like so…</p>
+
+<p><code>git rm --cached &lt;file&gt;</code></p>
+
+<p><div id="16"></div></p>
+
+<h2 id="untrack-a-file-without-deleting-it">Untrack a file without deleting it</h2>
+
+<p>If you want to have Git stop tracking a file it&rsquo;s already tracking then you would think to run:</p>
+
+<p><code>git rm &lt;file&gt;</code></p>
+
+<p>…but the problem with that command is that Git will also delete the file altogether!? Something we usually don&rsquo;t want to have happen.</p>
+
+<p>The work around to that issue is to use the <code>--cached</code> flag:</p>
+
+<p><code>git rm --cached &lt;file&gt;</code></p>
+
+<p><div id="17"></div></p>
+
+<h2 id="amend-your-last-commit">Amend your last commit</h2>
+
+<p>If you make a commit and then realise that you want to amend the commit message then don&rsquo;t make any changes to the files and just run…</p>
+
+<p><code>git commit --amend</code></p>
+
+<p>…which will open up the default editor for handling commits (usually Vim) and will let you amend the commit message.</p>
+
+<p>If on the other hand you decide that after you&rsquo;ve written a commit that you want to amend the commit by adding some more files to it then just add the files as normal and run the same command as above and when Vim opens to let you edit the commit message you&rsquo;ll see the extra files you added as part of that commit.</p>
+
+<p><div id="18"></div></p>
+
+<h2 id="show-the-files-within-a-commit">Show the files within a commit</h2>
+
+<p><code>git show &lt;hash&gt; --name-only</code></p>
+
+<p><div id="19"></div></p>
+
+<h2 id="see-differences-between-files">See differences between files</h2>
+
+<p>To see the difference between the current working directory and the last commit:</p>
+
+<p><code>git diff</code></p>
+
+<p>If your files have been added to the staging area already then you can use the <code>--cached</code> flag:</p>
+
+<p><code>git diff --cached</code></p>
+
+<p>To show specific changes use the <code>--word-diff</code> flag:</p>
+
+<p><code>git diff --word-diff</code></p>
+
+<p>To see the diff between the working directory and a specific commit:</p>
+
+<p><code>git diff &lt;hash&gt; &lt;file-name&gt;</code> (the file name is optional)</p>
+
+<p>To see the difference between branches:</p>
+
+<p><code>git diff &lt;branch-1&gt;..&lt;branch-2&gt;</code></p>
+
+<p><div id="20"></div></p>
+
+<h2 id="see-changes-between-two-commits">See changes between two commits</h2>
+
+<p><code>git diff &lt;more-recent-hash&gt; &lt;older-hash&gt;</code></p>
+
+<p><div id="21"></div></p>
+
+<h2 id="creating-a-branch-and-moving-to-it-at-the-same-time">Creating a branch and moving to it at the same time</h2>
+
+<p><code>git checkout -b &lt;branch-name&gt;</code></p>
+
+<p><div id="22"></div></p>
+
+<h2 id="deleting-a-branch">Deleting a branch</h2>
+
+<p><code>git branch -D &lt;branch-name&gt;</code></p>
+
+<p><div id="23"></div></p>
+
+<h2 id="viewing-all-branches-of-a-remote">Viewing all branches of a remote</h2>
+
+<p><code>git branch -a</code></p>
+
+<p><div id="24"></div></p>
+
+<h2 id="checkout-a-remote-branch">Checkout a remote branch</h2>
+
+<p>What normally happens is this: you clone down a repository from GitHub and this repo will have multiple branches, but if you run <code>git branch</code> locally all you see is the <code>master</code> branch.</p>
+
+<p>If you run <code>git branch -a</code> you can see all the branches for that remote repository but you just can&rsquo;t access them or check them out?</p>
+
+<p>So if you want to access the other branches within that repo then run the following command:</p>
+
+<p><code>git checkout -b &lt;new-local-branch-name&gt; origin/&lt;remote-branch-name&gt;</code></p>
+
+<p>…this will create a new branch named whatever you called it and contains the content of the remote branch you specified.</p>
+
+<p><div id="25"></div></p>
+
+<h2 id="remove-a-remote">Remove a remote</h2>
+
+<p><code>git remove rm &lt;remote&gt;</code></p>
+
+<p><div id="26"></div></p>
+
+<h2 id="revert-a-specific-file-back-to-an-earlier-version">Revert a specific file back to an earlier version</h2>
+
+<p><code>git checkout &lt;hash|tag|HEAD&gt; &lt;file-name&gt;</code></p>
+
+<p>Note if you&rsquo;ve staged your file and then started making changes to the file which you no longer want applied you can use: <code>git checkout -- &lt;file-name&gt;</code> to revert to the version of the file in the staging area.</p>
+
+<p><div id="27"></div></p>
+
+<h2 id="viewing-all-commits-for-a-file-and-who-made-those-changes">Viewing all commits for a file and who made those changes</h2>
+
+<p><code>git blame &lt;file&gt;</code></p>
+
+<p><div id="28"></div></p>
+
+<h2 id="commiting-only-parts-of-a-file-rather-than-the-whole-file">Commiting only parts of a file rather than the whole file</h2>
+
+<p>If you have a file with lots of changes made, you might not want to have all the changes logged under one single commit.</p>
+
+<p>To split the single file into multiple commits you need to use Git&rsquo;s <code>patch</code> mode…</p>
+
+<p><code>git add &lt;file&gt; -p</code></p>
+
+<p>…Git will attempt to split a file into separate hunks (Git terminology for a chunk of code). You can then press <code>?</code> to see what options you have available, the most common being:</p>
+
+<ul>
+<li><code>y</code> - yes</li>
+<li><code>n</code> - no</li>
+<li><code>d</code> - no to all remaining hunks</li>
+<li><code>s</code> - split current hunk into more hunks</li>
+</ul>
+
+<p>Sometimes you can&rsquo;t split a hunk into more hunks automatically, you have to do it manually. To do so you press <code>e</code> to edit and then use Vim to manually make changes.</p>
+
+<p>So if you have a line removed that you want to keep as part of the commit then you&rsquo;ll remove the <code>-</code> so there is just a space instead, and if you have a line added that you want to not have included as part of the commit then you remove the entire line. BUT the most important part it also updating the line numbers at the top of the file so that the number of lines in the file match what you are looking to commit (otherwise the commit will fail). To make the edit to the hunk final (pre-commit) press <code>esc</code> then <code>:wq</code> and then you&rsquo;ll be able to commit the selected changes.</p>
+
+<p><div id="29"></div></p>
+
+<h2 id="modifying-your-git-history-with-rebase">Modifying your Git history with <code>rebase</code></h2>
+
+<p>To change multiple commits you must use the interactive mode of the <code>rebase</code> command and you must tell Git how many commits back you want to go (because it&rsquo;ll start from there and keep moving through the commits until it reaches the <code>HEAD</code>).</p>
+
+<p>REMEMBER: when using <code>rebase</code> every commit in the range specified is changed whether you change the message or not. So don&rsquo;t use <code>rebase</code> on commits that have already been pushed to a remote server as other users might have those commits pulled down and your changing of the commits will cause havoc for those users in the near future.</p>
+
+<p>To amend the last 3 commits we use: <code>git rebase -i HEAD~3</code> and follow the instructions.</p>
+
+<p>The principle is if you want to merge two commits then you&rsquo;ll need to have a commit to merge into and then change <code>pick</code> to <code>squash</code> on the other commits that you want to have squashed into the previous commit.</p>
+
+<p>You can also re-order commits and other things like change commits (add files, rename the message) and remove commits completely.</p>
+
+<p><div id="30"></div></p>
+
+<h2 id="push-branch-without-specifying-its-name">Push branch without specifying its name</h2>
+
+<p>If you have a long branch name then you&rsquo;ll know how tedious it is to type out:</p>
+
+<pre><code>git push origin bug-fix/cache-nodes-expiration
+</code></pre>
+
+<p>Instead you can rely on the fact that git will retrieve the current branch name from its head tag:</p>
+
+<pre><code>git push origin head
+</code></pre>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/bash'>bash</a>, <a class='tag' href='/tags/git'>git</a>, <a class='tag' href='/tags/shell'>shell</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/host-methods-vs-native-methods/'>
+        <span class='screen-reader'>Next post: </span>Host Methods vs Native Methods<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

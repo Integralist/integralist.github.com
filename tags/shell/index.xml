@@ -72,5 +72,16 @@ Introduction Most web developers use a build tool of some sort nowadays. I’m n
       <description>Introduction Basics  What directory am I currently in? How can I see what&amp;rsquo;s in this directory? Moving around Displaying content of a file Copy a file Move a file Create a file Rename a file Delete a file Delete a directory Create a directory  Find (searching for files)  Finding files over a certain size  Grep (Searching for patterns) Sed (Find and Replace) Awk (Looping Logic) Piping I/O  Input and Output Redirection Piping Piping examples Sequences and Parallelism  Processes  Viewing processes Moving processes between the fore/background  Miscellaneous Commands  tee dig ps xargs cut tr du !</description>
     </item>
     
+    <item>
+      <title>Git Tips</title>
+      <link>http://www.integralist.co.uk/posts/git-tips/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/git-tips/</guid>
+      <description>I thought I would get down in a blog post the different Git commands and tips that I find really useful, because every now and then it seems I need to refer back to these notes (which up until this point have been in a txt file in my Dropbox) if I&amp;rsquo;ve not used a particular command in a while.
+Hopefully you&amp;rsquo;ll find them useful too.
+ Show where Git is installed Show the Git version installed Update your global user details Set-up a global ignore file Adding all files (inc.</description>
+    </item>
+    
   </channel>
 </rss>
