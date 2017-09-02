@@ -35,11 +35,11 @@ The purpose of this post is to demonstrate how to configure nginx to use client 
 
 > Note: the focus of this post isn't about Ruby/Sinatra so don't worry if your back-end service is built with another programming language
 
-I won't be going into the details of how most of it was set-up, as the majority of this was already documented in a previous blog post here: [Setting up nginx with Docker](http://www.integralist.co.uk/posts/docker-nginx.html) so I recommend reading through that first if you're new to Docker and nginx.
+I won't be going into the details of how most of it was set-up, as the majority of this was already documented in a previous blog post here: [Setting up nginx with Docker](http://www.integralist.co.uk/posts/setting-up-nginx-with-docker/) so I recommend reading through that first if you're new to Docker and nginx.
 
 I will be showing most of the files, but I'll assume you're familiar with nginx and Docker. The changes involved for setting up client authentication is actually very minimal, and in reality the majority of the work is in the creation of a CA, CRL and signing certificates.
 
-If you need a refresher on TLS/SSL then please read: [Security basics with GPG, OpenSSH and OpenSSL](http://www.integralist.co.uk/posts/security-basics.html) which covers the SSL handshake process and a lot more.
+If you need a refresher on TLS/SSL then please read: [Security basics with GPG, OpenSSH, OpenSSL and Keybase](http://www.integralist.co.uk/posts/security-basics/) which covers the SSL handshake process and a lot more.
 
 So let's get started...
 

@@ -20,7 +20,7 @@ draft: false
 <div id="1"></div>
 ## Introduction
 
-In my [previous post](http://integralist.co.uk/Object-Oriented-Design.html) I quoted the following description of object-oriented design…
+In my [previous post](http://www.integralist.co.uk/posts/object-oriented-design/) I quoted the following description of object-oriented design…
 
 > Object-Oriented Design is about the messages that get sent between objects and not the objects themselves.
 

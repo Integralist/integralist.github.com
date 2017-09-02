@@ -36,7 +36,7 @@ Pass is much simpler than that.
 
 On the plus side, Pass is based on standardised unix technology. Specifically [GPG](https://www.gnupg.org/), which can give you confidence in the security mechanisms being utilised.
 
-> Note: if you need a refresher on encryption and GPG, then I'll refer you to an [earlier blog post of mine](http://www.integralist.co.uk/posts/security-basics.html) that covers the basics on this topic
+> Note: if you need a refresher on encryption and GPG, then I'll refer you to an [earlier blog post of mine](http://www.integralist.co.uk/posts/security-basics/) that covers the basics on this topic
 
 <div id="2"></div>
 ## Installation

@@ -912,7 +912,7 @@ def dynamic_methods(*method_names, &block)
 end 
 ```
 
-You can also use this technique to help ease creating properties on an object. For example, I used this technique in my [MVCP](mvcp.html) blog post to dynamically create instance variables... 
+You can also use this technique to help ease creating properties on an object. For example, I used this technique in my [MVCP](http://www.integralist.co.uk/posts/mvcp/) blog post to dynamically create instance variables... 
 
 ```
 require 'app/presenters/base' 

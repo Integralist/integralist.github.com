@@ -25,7 +25,7 @@ I recently had an issue with my GitHub set-up which has since prompted me to wri
 
 So I have a GitHub account under the username [Integralist](https://github.com/Integralist). This is a personal account, and up until recently I was also using it to access my work's private repos ([BBC](https://github.com/bbc) and [BBC-News](https://github.com/BBC-News)).
 
-When cloning a repo from GitHub you will typically create an [SSH Key Pair](http://www.integralist.co.uk/posts/security-basics.html#6) and paste the contents of the public key into your GitHub account via their web site. When you come to clone a repo you'll also typically use the SSH variation of the path:
+When cloning a repo from GitHub you will typically create an [SSH Key Pair](http://www.integralist.co.uk/posts/security-basics/#6.1) and paste the contents of the public key into your GitHub account via their web site. When you come to clone a repo you'll also typically use the SSH variation of the path:
 
 ```
 git@github.com:Integralist/Go-Requester.git

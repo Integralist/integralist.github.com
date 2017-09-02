@@ -547,7 +547,7 @@ printf("off: %d\n", off); // 2
 <div id="11"></div>
 ## Memory Allocation with different Types
 
-> See [here](http://www.integralist.co.uk/posts/bits.html) if you need a refresher on understanding RAM, bits, binary and stuff like that
+> Read [this article](http://www.integralist.co.uk/posts/bits-and-bytes/) if you need a refresher on understanding RAM, bits, binary and stuff like that
 
 ### Array
 
