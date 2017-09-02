@@ -78,5 +78,14 @@ Introduction This is a quick post to cover a GitHub workflow that is utilised by
  Open a GitHub PR (Pull Request) by creating a new feature branch from master Make feature specific changes and request a code review If given a &amp;ldquo;thumbs up&amp;rdquo;, this means the PR author is allowed to handle merging the PR The merge process requires a set of sub steps (see below)</description>
     </item>
     
+    <item>
+      <title>Clean Coder</title>
+      <link>http://www.integralist.co.uk/posts/clean-coder/</link>
+      <pubDate>Sat, 01 Jun 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/clean-coder/</guid>
+      <description>Who is Robert C. Martin? What&amp;rsquo;s it all about? Take responsibility Work ethic Know your field Stay current Collaborate Mentoring Know your domain Identify with your employer Learn to say no Rules and principles for coding Acceptance Tests Managing time  Meetings Scrum Sprint Planning Sprint Retro Discussions Code  Estimations Pressure Conclusion  Who is Robert C. Martin? Robert C. Martin is a legend in the development industry.</description>
+    </item>
+    
   </channel>
 </rss>

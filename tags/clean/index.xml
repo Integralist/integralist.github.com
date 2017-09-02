@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Clean on integralist</title>
+    <link>http://www.integralist.co.uk/tags/clean/</link>
+    <description>Recent content in Clean on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sat, 01 Jun 2013 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/clean/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Clean Coder</title>
+      <link>http://www.integralist.co.uk/posts/clean-coder/</link>
+      <pubDate>Sat, 01 Jun 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/clean-coder/</guid>
+      <description>Who is Robert C. Martin? What&amp;rsquo;s it all about? Take responsibility Work ethic Know your field Stay current Collaborate Mentoring Know your domain Identify with your employer Learn to say no Rules and principles for coding Acceptance Tests Managing time  Meetings Scrum Sprint Planning Sprint Retro Discussions Code  Estimations Pressure Conclusion  Who is Robert C. Martin? Robert C. Martin is a legend in the development industry.</description>
+    </item>
+    
+  </channel>
+</rss>

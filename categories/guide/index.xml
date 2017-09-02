@@ -267,6 +267,15 @@ The basic principle of the pattern is to separate the different areas of logic f
     </item>
     
     <item>
+      <title>Clean Coder</title>
+      <link>http://www.integralist.co.uk/posts/clean-coder/</link>
+      <pubDate>Sat, 01 Jun 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/clean-coder/</guid>
+      <description>Who is Robert C. Martin? What&amp;rsquo;s it all about? Take responsibility Work ethic Know your field Stay current Collaborate Mentoring Know your domain Identify with your employer Learn to say no Rules and principles for coding Acceptance Tests Managing time  Meetings Scrum Sprint Planning Sprint Retro Discussions Code  Estimations Pressure Conclusion  Who is Robert C. Martin? Robert C. Martin is a legend in the development industry.</description>
+    </item>
+    
+    <item>
       <title>Message Passing in Object Oriented Code</title>
       <link>http://www.integralist.co.uk/posts/message-passing-in-object-oriented-code/</link>
       <pubDate>Sun, 31 Mar 2013 13:00:00 +0100</pubDate>

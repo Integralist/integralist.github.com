@@ -167,6 +167,11 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/posts/clean-coder/</loc>
+    <lastmod>2013-06-01T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/posts/message-passing-in-object-oriented-code/</loc>
     <lastmod>2013-03-31T13:00:00+01:00</lastmod>
   </url>
@@ -278,6 +283,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/cidr/</loc>
     <lastmod>2016-11-16T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/clean/</loc>
+    <lastmod>2013-06-01T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
