@@ -313,6 +313,17 @@ Introduction This post isn&amp;rsquo;t about Functional Programming per se, as t
     </item>
     
     <item>
+      <title>JavaScript 101</title>
+      <link>http://www.integralist.co.uk/posts/javascript-101/</link>
+      <pubDate>Sat, 24 Nov 2012 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/javascript-101/</guid>
+      <description>Introduction What is JavaScript Terminology Global Object Variables Types Objects Arrays Conditional Statements Coercion Functions Code Reuse (inheritance) Conclusion  
+Introduction I&amp;rsquo;ve written this very brief guide to JavaScript just as an aid for people new to the language and who need a basic starting point to see what the syntax looks like and to get a feeling for some of its features.
+This article&amp;rsquo;s main purpose is to give readers new to the language a glimpse of the JavaScript environment and to hopefully spur them onto further reading/learning.</description>
+    </item>
+    
+    <item>
       <title>Host Methods vs Native Methods</title>
       <link>http://www.integralist.co.uk/posts/host-methods-vs-native-methods/</link>
       <pubDate>Sun, 22 Apr 2012 13:00:00 +0100</pubDate>
