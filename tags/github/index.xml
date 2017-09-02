@@ -36,5 +36,16 @@ Introduction Imagine I have a master branch with one commit:
 - A: 1  Now imagine I have a branch from master called feat/foo and in that branch I&amp;rsquo;ve made 3 additional commits:</description>
     </item>
     
+    <item>
+      <title>GitHub Workflow</title>
+      <link>http://www.integralist.co.uk/posts/github-workflow/</link>
+      <pubDate>Sat, 27 Dec 2014 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/github-workflow/</guid>
+      <description>Introduction Rebase before merge Example (Bonus) Modifying content within an interactive rebase  
+Introduction This is a quick post to cover a GitHub workflow that is utilised by our specific team (Frameworks) here at BBC News. The basis of our workflow is this:
+ Open a GitHub PR (Pull Request) by creating a new feature branch from master Make feature specific changes and request a code review If given a &amp;ldquo;thumbs up&amp;rdquo;, this means the PR author is allowed to handle merging the PR The merge process requires a set of sub steps (see below)</description>
+    </item>
+    
   </channel>
 </rss>

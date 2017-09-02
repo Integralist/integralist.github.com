@@ -291,5 +291,16 @@ Introduction I wanted to learn about how to use the popular proxy server nginx f
 Introduction Concurrency is a difficult concept. Regardless of programming language or idiom that you use, the practice of programming a &amp;ldquo;thread-safe&amp;rdquo; application can be harder than you think.</description>
     </item>
     
+    <item>
+      <title>GitHub Workflow</title>
+      <link>http://www.integralist.co.uk/posts/github-workflow/</link>
+      <pubDate>Sat, 27 Dec 2014 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/github-workflow/</guid>
+      <description>Introduction Rebase before merge Example (Bonus) Modifying content within an interactive rebase  
+Introduction This is a quick post to cover a GitHub workflow that is utilised by our specific team (Frameworks) here at BBC News. The basis of our workflow is this:
+ Open a GitHub PR (Pull Request) by creating a new feature branch from master Make feature specific changes and request a code review If given a &amp;ldquo;thumbs up&amp;rdquo;, this means the PR author is allowed to handle merging the PR The merge process requires a set of sub steps (see below)</description>
+    </item>
+    
   </channel>
 </rss>

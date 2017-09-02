@@ -216,5 +216,16 @@ Introduction The purpose of this post is to demonstrate how to configure nginx t
  Before we get started, it&amp;rsquo;s worth me spending a brief moment introducing myself to you. My name is Mark (or @integralist if Twitter happens to be your communication tool of choice) and I currently work for BBC News in London England as a principal engineer/tech lead; and I&amp;rsquo;m also the author of &amp;ldquo;Pro Vim&amp;rdquo;.</description>
     </item>
     
+    <item>
+      <title>GitHub Workflow</title>
+      <link>http://www.integralist.co.uk/posts/github-workflow/</link>
+      <pubDate>Sat, 27 Dec 2014 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/github-workflow/</guid>
+      <description>Introduction Rebase before merge Example (Bonus) Modifying content within an interactive rebase  
+Introduction This is a quick post to cover a GitHub workflow that is utilised by our specific team (Frameworks) here at BBC News. The basis of our workflow is this:
+ Open a GitHub PR (Pull Request) by creating a new feature branch from master Make feature specific changes and request a code review If given a &amp;ldquo;thumbs up&amp;rdquo;, this means the PR author is allowed to handle merging the PR The merge process requires a set of sub steps (see below)</description>
+    </item>
+    
   </channel>
 </rss>
