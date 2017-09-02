@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Concurrency on integralist</title>
+    <link>http://www.integralist.co.uk/tags/concurrency/</link>
+    <description>Recent content in Concurrency on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sun, 28 Dec 2014 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/concurrency/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Thread Safe Concurrency</title>
+      <link>http://www.integralist.co.uk/posts/thread-safe-concurrency/</link>
+      <pubDate>Sun, 28 Dec 2014 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/thread-safe-concurrency/</guid>
+      <description>Introduction  Shared Memory Message Passing  Various options Mutexes/Semaphores  Atomic operations  STM  Clojure example Quick Clojure Concurrency Detour JRuby example  Actors  Transactions and Actors? Actors in Clojure Differences between Agents and Erlang Actors Limitations  CSP Threads  CPU vs I/O Calculating the number of Threads Even workload distribution  Conclusion  
+Introduction Concurrency is a difficult concept. Regardless of programming language or idiom that you use, the practice of programming a &amp;ldquo;thread-safe&amp;rdquo; application can be harder than you think.</description>
+    </item>
+    
+  </channel>
+</rss>

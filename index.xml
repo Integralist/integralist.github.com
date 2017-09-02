@@ -293,5 +293,15 @@ Introduction I wanted to learn about how to use the popular proxy server nginx f
  Before we get started, it&amp;rsquo;s worth me spending a brief moment introducing myself to you. My name is Mark (or @integralist if Twitter happens to be your communication tool of choice) and I currently work for BBC News in London England as a principal engineer/tech lead; and I&amp;rsquo;m also the author of &amp;ldquo;Pro Vim&amp;rdquo;.</description>
     </item>
     
+    <item>
+      <title>Thread Safe Concurrency</title>
+      <link>http://www.integralist.co.uk/posts/thread-safe-concurrency/</link>
+      <pubDate>Sun, 28 Dec 2014 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/thread-safe-concurrency/</guid>
+      <description>Introduction  Shared Memory Message Passing  Various options Mutexes/Semaphores  Atomic operations  STM  Clojure example Quick Clojure Concurrency Detour JRuby example  Actors  Transactions and Actors? Actors in Clojure Differences between Agents and Erlang Actors Limitations  CSP Threads  CPU vs I/O Calculating the number of Threads Even workload distribution  Conclusion  
+Introduction Concurrency is a difficult concept. Regardless of programming language or idiom that you use, the practice of programming a &amp;ldquo;thread-safe&amp;rdquo; application can be harder than you think.</description>
+    </item>
+    
   </channel>
 </rss>

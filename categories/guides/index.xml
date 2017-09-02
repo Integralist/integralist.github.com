@@ -20,5 +20,15 @@
       <description>Introduction Private Repo Access Build and Compilation Dependency Information Dependency Management Documentation Testing Logging Godo Import Race Conditions New vs Make Custom Types Function Types Enumerator IOTA Struct: Var vs Type Embedded Structs Reference vs Value See all methods on &amp;lt;Type&amp;gt; Convert Struct into JSON Pretty Printing JSON String Convert Struct into YAML Sorting Structs Read Users Input HTTP Middleware Sessions HTTPS TLS Request HTTP GET Web Page Custom HTTP Request Methods Pointers Type Assertion Line Counting Reading File in Chunks Time Starting and Stopping things with Channels Channel Pipelines Templating Error handling Socket Programming Comparing Maps Zip File Contents Shell Commands New Instance Idiom JSON Connection Draining</description>
     </item>
     
+    <item>
+      <title>Thread Safe Concurrency</title>
+      <link>http://www.integralist.co.uk/posts/thread-safe-concurrency/</link>
+      <pubDate>Sun, 28 Dec 2014 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/thread-safe-concurrency/</guid>
+      <description>Introduction  Shared Memory Message Passing  Various options Mutexes/Semaphores  Atomic operations  STM  Clojure example Quick Clojure Concurrency Detour JRuby example  Actors  Transactions and Actors? Actors in Clojure Differences between Agents and Erlang Actors Limitations  CSP Threads  CPU vs I/O Calculating the number of Threads Even workload distribution  Conclusion  
+Introduction Concurrency is a difficult concept. Regardless of programming language or idiom that you use, the practice of programming a &amp;ldquo;thread-safe&amp;rdquo; application can be harder than you think.</description>
+    </item>
+    
   </channel>
 </rss>

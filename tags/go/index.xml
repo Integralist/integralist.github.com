@@ -81,5 +81,15 @@ Introduction This is a super quick post for demonstrating how to utilise the new
  Single, persistent connection Multiplexing Header compression Prioritization Encryption Server Push  If none of these features make sense, then allow me to clarify further&amp;hellip;</description>
     </item>
     
+    <item>
+      <title>Thread Safe Concurrency</title>
+      <link>http://www.integralist.co.uk/posts/thread-safe-concurrency/</link>
+      <pubDate>Sun, 28 Dec 2014 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/thread-safe-concurrency/</guid>
+      <description>Introduction  Shared Memory Message Passing  Various options Mutexes/Semaphores  Atomic operations  STM  Clojure example Quick Clojure Concurrency Detour JRuby example  Actors  Transactions and Actors? Actors in Clojure Differences between Agents and Erlang Actors Limitations  CSP Threads  CPU vs I/O Calculating the number of Threads Even workload distribution  Conclusion  
+Introduction Concurrency is a difficult concept. Regardless of programming language or idiom that you use, the practice of programming a &amp;ldquo;thread-safe&amp;rdquo; application can be harder than you think.</description>
+    </item>
+    
   </channel>
 </rss>
