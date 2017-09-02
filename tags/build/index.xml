@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Build on integralist</title>
+    <link>http://www.integralist.co.uk/tags/build/</link>
+    <description>Recent content in Build on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 07 Oct 2015 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/build/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Building Systems With Make</title>
+      <link>http://www.integralist.co.uk/posts/building-systems-with-make/</link>
+      <pubDate>Wed, 07 Oct 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/building-systems-with-make/</guid>
+      <description>Introduction Simple Example Terminology Prerequisites How Make Decides What To Do Automatic variables Commands Targets As Prerequisites Accessing Targets Parsing Targets And Prerequisites Dynamic Targets Dereferencing (Variables and Macros) Functions  Filter Shell Eval Files  User-Defined Functions Conventions Revisiting The For Loop Example Includes Conclusion  
+Introduction Most web developers use a build tool of some sort nowadays. I’m not refering to continuous integration software like Jenkins CI (a very popular build system), but the lower-level software it uses to actually acquire dependencies and construct your applications with.</description>
+    </item>
+    
+  </channel>
+</rss>

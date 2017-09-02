@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Simple Example Terminology Prerequisites How Make Decides What To Do Automatic variables Commands Targets As Prerequisites Accessing Targets Parsing Targets And Prerequisites Dynamic Targets Dereferencing (Variables and Macros) Functions  Filter Shell Eval Files  User-Defined Functions Conventions Revisiting The For Loop Example Includes Conclusion  
+Introduction Most web developers use a build tool of some sort nowadays. I’m not refering to continuous integration software like Jenkins CI (a very popular build system), but the lower-level software it uses to actually acquire dependencies and construct your applications with.'>
+
+<meta property='og:title' content='Building Systems With Make ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Simple Example Terminology Prerequisites How Make Decides What To Do Automatic variables Commands Targets As Prerequisites Accessing Targets Parsing Targets And Prerequisites Dynamic Targets Dereferencing (Variables and Macros) Functions  Filter Shell Eval Files  User-Defined Functions Conventions Revisiting The For Loop Example Includes Conclusion  
+Introduction Most web developers use a build tool of some sort nowadays. I’m not refering to continuous integration software like Jenkins CI (a very popular build system), but the lower-level software it uses to actually acquire dependencies and construct your applications with.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/building-systems-with-make/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='bash'><meta property='article:tag' content='build'><meta property='article:tag' content='make'><meta property='article:tag' content='shell'><meta property='article:tag' content='utility'><meta property='article:published_time' content='2015-10-07T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2015-10-07T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Building Systems With Make ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/building-systems-with-make/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Building Systems With Make</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2015-10-07T13:00:00&#43;01:00'>2015-10-07</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    28 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Simple Example</a></li>
+<li><a href="#3">Terminology</a></li>
+<li><a href="#4">Prerequisites</a></li>
+<li><a href="#5">How Make Decides What To Do</a></li>
+<li><a href="#6">Automatic variables</a></li>
+<li><a href="#7">Commands</a></li>
+<li><a href="#8">Targets As Prerequisites</a></li>
+<li><a href="#9">Accessing Targets</a></li>
+<li><a href="#10">Parsing Targets And Prerequisites</a></li>
+<li><a href="#11">Dynamic Targets</a></li>
+<li><a href="#12">Dereferencing (Variables and Macros)</a></li>
+<li><a href="#13">Functions</a>
+
+<ul>
+<li><a href="#14">Filter</a></li>
+<li><a href="#15">Shell</a></li>
+<li><a href="#16">Eval</a></li>
+<li><a href="#17">Files</a></li>
+</ul></li>
+<li><a href="#18">User-Defined Functions</a></li>
+<li><a href="#19">Conventions</a></li>
+<li><a href="#20">Revisiting The For Loop Example</a></li>
+<li><a href="#21">Includes</a></li>
+<li><a href="#22">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Most web developers use a <strong>build tool</strong> of some sort nowadays. I’m not refering to continuous integration software like <a href="http://jenkins-ci.org/">Jenkins CI</a> (a very popular build system), but the lower-level software it uses to actually acquire dependencies and construct your applications with.</p>
+
+<p>There is a dizzying array of options to choose from:</p>
+
+<ul>
+<li><a href="http://ant.apache.org/">Apache Ant</a> (XML-based)</li>
+<li><a href="http://docs.seattlerb.org/rake/">Rake</a> (Ruby-based)</li>
+<li><a href="http://gruntjs.com/">Grunt</a> (JS-based)</li>
+<li><a href="http://gulpjs.com/">Gulp</a> (JS-based)</li>
+<li><a href="https://github.com/broccolijs/broccoli">Broccoli</a> (JS-based)</li>
+<li><a href="https://www.npmjs.com/">NPM</a> (JS-based)</li>
+<li>Good ol’ shell scripts (although no real orchestration around it)</li>
+</ul>
+
+<p>The build tool I want to look at in more detail here though is the granddaddy of them all: <a href="http://www.gnu.org/software/make/">Make</a>.</p>
+
+<p>Originally designed back in 1976, Make is the leading build utility for Unix, Linux and Mac OS X. Chances are, most computers you log in to will already have it installed and available to use. This really reduces the set-up entry point (which for other tools listed above can be tedious and error prone – with the exception of shell scripts, as the shell is something inherently available for all systems).</p>
+
+<p>My hope is for you to see that Make is an automation/orchestration tool that can be used in place of other modern build tools, and will help to strengthen your understanding and ability to use the terminal/shell environment (which is a big plus in my opinion, and helps open up many avenues of technical progression).</p>
+
+<p>I couldn’t hope to cover every aspect of what Make offers, so please don’t mistakenly consider this post as anything even remotely exhaustive. Whole books have been written on the topic of Make and writing Makefiles so I’ll leave it up to you to investigate further beyond this post if I’ve managed to kindle your interest.</p>
+
+<p>Let me start by referencing the <a href="http://www.gnu.org/software/make/">GNU website</a> for its definition of what Make is and does:</p>
+
+<blockquote>
+<p>GNU Make is a tool which controls the generation of executables and other non-source files of a program from the program’s source files</p>
+</blockquote>
+
+<p>Make relies on a <em>Makefile</em> being defined and which consists of a set of instructions for building your software. If you’ve used another build system, such as <a href="http://gruntjs.com">Grunt</a>, you’ll notice that most of them use a naming convention taken from Make (e.g. <em>Gruntfile</em>).</p>
+
+<p>The point of a Makefile (in the traditional sense) is to build a program; although Make can be used to run any kind of task and so it isn’t limited to compiling software. Much like how other JavaScript-based build tools aren’t limited to building JavaScript applications, they can handle most tasks you wish to run (maybe compiling CSS or optimizing images).</p>
+
+<p>You’ll find Make is widely distributed and is likely already on your computer. For example, I’m using an Apple laptop with Mac OS X installed. If I run the following command:</p>
+
+<pre><code>make --version
+</code></pre>
+
+<p>I get back the following response:</p>
+
+<pre><code>GNU Make 3.81
+Copyright (C) 2006  Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+This program built for i386-apple-darwin11.3.0
+</code></pre>
+
+<p>Which means I already have the <code>make</code> command available and I can start writing my Makefile right away.</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="simple-example">Simple Example</h2>
+
+<p>Let’s consider a standard project requirement, which is to run a linter such as <a href="http://www.jshint.com/">JSHint</a> over a JavaScript file (that is, analyze the code for formatting issues and general errors and warnings).</p>
+
+<blockquote>
+<p>Note: as mentioned earlier, traditionally Make is used to compile program files. In this instance I’ve opted for a simple example that doesn’t require compilation but should instead demonstrate how Make is actually useful for many different types of task.</p>
+</blockquote>
+
+<p>Imagine you have a <em>test.js</em> file and it contains the following content:</p>
+
+<pre><code>function foo() {
+  bar = &quot;baz&quot;
+}
+</code></pre>
+
+<p>If we were to execute the command <code>jshint test.js --show-non-errors</code> (assuming you have the CLI version of JSHint installed) then we should see something like the following displayed:</p>
+
+<pre><code>test.js: line 2, col 14, Missing semicolon.
+
+1 error
+
+test.js :
+  Implied globals:
+    bar: 2
+  Unused Variables:
+    foo(1),
+</code></pre>
+
+<p>So we can see from this output that JSHint is warning us that we have a function <code>foo</code> that’s not being used and a variable that appears to have been declared globally; but it also indicates that we have an error in our program: we’re missing a semicolon from line 2 in our JavaScript file.</p>
+
+<p>OK great, so how do we take this example further and automate the analysis process (which will get more complicated as our application grows in size and features) using the Make utility?</p>
+
+<p>First we need to create a <em>Makefile</em>. Below are the contents of the Makefile I’m going to use to demonstrate how Make works (I’ll explain the structure of the file in the next section):</p>
+
+<pre><code>lint
+  jshint *.js --show-non-errors
+</code></pre>
+
+<blockquote>
+<p>Note: Makefiles use tabs instead of spaces, so if your editor is set up to replace spaces with tabs then you could find things don’t work as expected</p>
+</blockquote>
+
+<p>To run the Makefile above, we would need to use the <code>make</code> shell command. This by itself will run the first target it finds (this is also referred to as the <em>default target</em>) which in this case is <code>lint</code>. You can also be more explicit and specify the exact target you want to execute by providing the name of the target to the <code>make</code> command, like so:</p>
+
+<pre><code>make lint
+</code></pre>
+
+<p>Executing the above command is the same as running:</p>
+
+<pre><code>jshint test.js --show-non-errors
+</code></pre>
+
+<p>You’ll also have noticed we used a wildcard <code>*</code> to indicate multiple JavaScript files at once.</p>
+
+<p>In this instance, using Make means it’s easier to remember specific commands for common tasks such as this. Having to remember the format of the JSHint shell command is now not an issue, especially considering that I’m using the most bare bones example of running JSHint, and the shell command itself can become much longer and unwieldy.</p>
+
+<p>The Makefile also acts as a documented file that can now be committed into version control, meaning we now have a record of the compilation step. Both these points become even more important as the compilation/build steps become more and more complicated, which they will as your application or software system naturally grows and evolves.</p>
+
+<blockquote>
+<p>Note: if your Makefile is in a different directory, you can pass its location to the <code>make</code> command using the <code>-f</code> flag like so: <code>make -f &lt;makefile&gt;</code></p>
+</blockquote>
+
+<p>The convention for writing Makefiles is to have the default command (your entry point) at the top of the file and have Make process the commands from the top down. You don’t have to do this, though (as you’ll see, I’ve not really worried about it with the examples throughout this post), and you’re free to put your rules in whatever order makes sense to you. But be aware that when you call the Make command, you’ll want to specify the specific target if it’s not the default.</p>
+
+<p><div id="3"></div></p>
+
+<h2 id="terminology">Terminology</h2>
+
+<p>There are three key phrases you need to be aware of when talking about a Makefile:</p>
+
+<ul>
+<li>Rules</li>
+<li>Targets</li>
+<li>Prerequisites</li>
+</ul>
+
+<p>The following snippet demonstrates the basic structure of a Makefile:</p>
+
+<pre><code>target: prereq1 prereq2
+    commands
+</code></pre>
+
+<p>You can see we have: a single target (this is what we reference when running the command <code>make &lt;target&gt;</code>); a set of dependencies (i.e. prerequisites); and a command to execute (e.g. <code>jshint test.js --show-non-errors</code>). This entire structure is collectively referred to as a “rule” and a Makefile is typically made up of multiple rules.</p>
+
+<p><div id="4"></div></p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>Prerequisites are the dependencies for the target. What this means is that the target cannot be built successfully without the dependencies first being resolved.</p>
+
+<p>Imagine we’re compiling Sass into CSS. An example Makefile (which we’ll look at in more detail shortly) could look like:</p>
+
+<pre><code>compile: foo.scss
+    sass foo.scss foo.css
+</code></pre>
+
+<p>In the above example we specified the prerequisite as being <code>foo.scss</code>; meaning Make will either look for a target called <code>foo.scss</code> or expect a file to exist in the current directory structure.</p>
+
+<p>We don’t have a target named <code>foo.scss</code> and so if that file also didn’t exist, then we couldn’t resolve the dependency and subsequently the rule would fail (if it can’t resolve the dependency then the command in the rule won’t be executed).</p>
+
+<p><div id="5"></div></p>
+
+<h2 id="how-make-decides-what-to-do">How Make Decides What To Do</h2>
+
+<p>How and why Make decides what to do when you run <code>make &lt;target&gt;</code> is very important as it’ll help you understand the performance implications of certain tasks. The rule of thumb for Make is pretty simple: if the target (or any of its prerequisite files) are out of date or missing, then the commands for that target will be executed.</p>
+
+<p>Make uses the modification timestamp to avoid duplicate processing. If the timestamp of the dependent files is older than the resulting output, then running Make won’t do anything. Hence you can force Make to recompile a file by simply using the <code>touch</code> command on the relevant files.</p>
+
+<blockquote>
+<p>Note: if you want to see what Make will execute without it actually doing anything, then run the <code>make</code> command as you normally would but ensure you include the <code>-n</code> flag. This will cause Make to print out all commands that would be executed, including commands collated from any specified prerequisites.</p>
+</blockquote>
+
+<p><div id="6"></div></p>
+
+<h2 id="automatic-variables">Automatic variables</h2>
+
+<p>Let’s consider another example whereby we want to compile a <a href="http://sass-lang.com/">Sass</a> style sheet into CSS:</p>
+
+<pre><code>compile: foo.scss
+    sass foo.scss foo.css
+</code></pre>
+
+<p>We have some slight duplication here, the reference to <em>foo.scss</em>. We can clean this up a bit by using some special variables that Make provides (also referred to as automatic variables). Specifically for the problem we want to solve, we’ll be using the <code>$&lt;</code> automatic variable.</p>
+
+<p>When the <code>compile</code> target is run, the <code>$&lt;</code> variable will reference the first prerequisite in the list, which will simplify the example and save you from having to repeat yourself. The following example demonstrates what this looks like:</p>
+
+<pre><code>compile: foo.scss
+    sass $&lt; foo.css
+</code></pre>
+
+<p>This is good because we’ve removed a hardcoded value and made our code slightly more flexible. But what happens if we have multiple dependencies?</p>
+
+<p>Assume we have three files <em>foo.txt</em>, <em>bar.txt</em> and <em>baz.txt</em>. We can use a combination of the <code>$^</code> variable (which gives us all the dependencies/prerequisites as a list) and a small bit of standard <a href="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29">Bash shell</a> code (Make commands are ultimately structured shell scripts with extra syntactical sugar) to loop over the provided dependency list.</p>
+
+<p>The following example demonstrates how this could be written:</p>
+
+<pre><code>list: foo.txt bar.txt baz.txt
+    for i in $^; do echo &quot;Dependency: $$i&quot;; done
+</code></pre>
+
+<p>Executing <code>make list</code> would result in the following response:</p>
+
+<pre><code>for i in foo.txt bar.txt baz.txt; do echo &quot;Dependency: $i&quot;; done
+Dependency: foo.txt
+Dependency: bar.txt
+Dependency: baz.txt
+</code></pre>
+
+<blockquote>
+<p>Note: because Makefiles have their own special syntax, the use of <code>$</code> will conflict when writing our shell script (which also has its own special syntax around <code>$</code>). This means if we want to use the dollar character and not have it be Makefile specific, then we have to escape it using another dollar. So rather than writing <code>$i</code> – which works fine within the context of a normal shell script – we’ve had to write <code>$$i</code> instead.</p>
+</blockquote>
+
+<p>We’ll see a few different automatic variables throughout this post, but in the meantime check out the quick reference list below for some of the more useful ones:</p>
+
+<ul>
+<li><code>$&lt;</code>: first prerequisite</li>
+<li><code>$^</code>: list of prerequisites</li>
+<li><code>$?</code>: list of prerequisites that have changed</li>
+<li><code>$@</code>: target name</li>
+<li><code>$*</code>: the value of a target placeholder</li>
+</ul>
+
+<p>The <a href="http://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html#Automatic-Variables">full reference of automatic variables</a> is available on the GNU Make website.</p>
+
+<p>Later on in this post we’ll revisit this <code>for</code> loop example and demonstrate a more idiomatic way to achieve the result we want.</p>
+
+<p><div id="7"></div></p>
+
+<h2 id="commands">Commands</h2>
+
+<p>It’s worth being aware that each command provided inside the overall rule is considered a separate shell context. This means if you export a shell environment variable in one command, it won’t be available within the next command. Once the first command has finished, a fresh shell is spawned for the next command, and so on.</p>
+
+<p>You’ll also notice that when running Make it will print out the command instructions <em>before</em> executing them. This can be disabled in one of three ways. You can either run Make with the <code>-s</code> flag, which will silence any output; or you can use the <code>@</code> syntax before the command itself, like so:</p>
+
+<pre><code>list: foo.txt bar.txt baz.txt
+    @for i in $^; do echo &quot;Dependency: $$i&quot;; done
+</code></pre>
+
+<p>The third way to silence output is to use the <code>.SILENCE</code> flag. The following snippet demonstrates how to silence three targets: <code>foo</code>, <code>bar</code> and <code>baz</code>:</p>
+
+<pre><code>.SILENT: foo bar baz
+</code></pre>
+
+<blockquote>
+<p>Note: silencing the output unfortunately also means silencing any errors!</p>
+</blockquote>
+
+<p>Much like shell scripting, if you have a command that is more complicated than what can feasibly fit on a single line, then – for the sake of readability if nothing else – you’ll need to write it across multiple lines and escape the line breaks using the <code>\</code> character, as the following example demonstrates:</p>
+
+<pre><code>list: foo.txt bar.txt baz.txt
+    for i in $^; do \
+        echo &quot;Dependency: $$i&quot;; \
+    done
+</code></pre>
+
+<p><div id="8"></div></p>
+
+<h2 id="targets-as-prerequisites">Targets As Prerequisites</h2>
+
+<p>So far our prerequisites have been physical files that already existed. But what if you need to dynamically create the files first via other targets? Make allows you to specify targets as dependencies, so that’s not a problem. Let’s see how this works in the following example:</p>
+
+<pre><code>foo:
+    @echo foo &gt; foo-file.txt
+
+bar:
+    @echo bar &gt; bar-file.txt
+
+baz: foo bar
+    @echo baz | cat - foo-file.txt bar-file.txt &gt; baz-file.txt
+</code></pre>
+
+<blockquote>
+<p>Note: Make typically uses the convention of naming targets after the files they create. This isn’t a necessity but it’s generally considered good practice</p>
+</blockquote>
+
+<p>What we have are three targets: <code>foo</code>, <code>bar</code> and <code>baz</code>. The first two have no dependencies of their own and all they do is generate a new text file. The last target, <code>baz</code>, specifies the other two targets as its dependencies. So when we run <code>make baz</code> we should see no output (as we’ve used the special <code>@</code> syntax to silence any output) but we should find we have the following files created:</p>
+
+<ul>
+<li><em>foo-file.txt</em></li>
+<li><em>bar-file.txt</em></li>
+<li><em>baz-file.txt</em></li>
+</ul>
+
+<p>The last file in the list should contain not only a line that displays <code>baz</code> but also two other lines comprising the contents of the other files. So running <code>cat baz-file.txt</code> should print:</p>
+
+<pre><code>baz
+foo
+bar
+</code></pre>
+
+<blockquote>
+<p>Note: if you’ve not seen it used before, the <code>-</code> in the <code>cat</code> command is telling it to expect input from stdin (the <code>echo</code> command writes to stdout and that is piped <code>|</code> over to the <code>cat</code> command as stdin)</p>
+</blockquote>
+
+<p><div id="9"></div></p>
+
+<h2 id="accessing-targets">Accessing Targets</h2>
+
+<p>In the above example, I was generating a file based on the contents of two other targets (which themselves dynamically generated some files). There was a slight bit of repetition that could have been cleaned up if we used another automatic variable provided by Make, specifically <code>$@</code>.</p>
+
+<p>The <code>$@</code> variable is a reference to the target name, so let’s see how we can use this with our previous example:</p>
+
+<pre><code>foo:
+    @echo $@ &gt; &quot;$@-file.txt&quot;
+
+bar:
+    @echo $@ &gt; &quot;$@-file.txt&quot;
+
+baz: foo bar
+    @echo $@ | cat - foo-file.txt bar-file.txt &gt; &quot;$@-file.txt&quot;
+</code></pre>
+
+<p>In the example above we’ve saved ourselves from typing <code>foo</code>, <code>bar</code> and <code>baz</code> a few times but we’ve not eradicated them completely as we still have to reference <code>foo</code> and <code>bar</code> as prerequisites, as well as referencing them from within the <code>baz</code> command itself.</p>
+
+<p>With regards to the <code>baz</code> command, we could use <code>$^</code> along with some shell scripting to clean that up so we’re again not relying on hardcoded values. The following example shows how to achieve that:</p>
+
+<pre><code>foo:
+    @echo $@ &gt; &quot;$@-file.txt&quot;
+
+bar:
+    @echo $@ &gt; &quot;$@-file.txt&quot;
+
+baz: foo bar
+    @files=$$(echo $^ | sed -E 's/([a-z]+)/\1-file.txt/g'); echo $@ | cat - $$files &gt; &quot;$@-file.txt&quot;
+</code></pre>
+
+<p>Oh boy, OK. So yes, we’ve removed some more hardcoded values, but unless you’re supremely confident with shell scripting then I’m guessing the above refactor won’t make much sense to you. But let’s break it down a bit so we can see what we have:</p>
+
+<ul>
+<li>We use <code>$^</code> to get the list of dependencies; in this case, <code>foo bar</code>.</li>
+<li>We pipe that over to the <code>sed</code> command. We also use the extended regular expression engine <code>-E</code> to make our regex pattern easier to understand.</li>
+<li>The <code>sed</code> command replaces <code>foo bar</code> with <code>foo-file.txt bar-file.txt</code>.</li>
+<li>We do that replacement within a subprocess <code>$()</code>, which is a special shell syntax. This means we have to escape the dollar sign within the Makefile (<code>$$()</code>).</li>
+<li>The values returned from the subprocess (<code>foo-file.txt bar-file.txt</code>) are then stored in a variable called <code>files</code> and we reference that variable in place of the original hardcoded values.</li>
+</ul>
+
+<p>On top of all that, we <em>still</em> have duplication: the <code>foo</code> and <code>bar</code> referenced within the prerequisites area. That has to be hardcoded unless we’re going to use Make or some other form of shell scripting to dynamically generate the actual Makefile itself; which even for me is a step too far in this case.</p>
+
+<p>OK, so what does this ultimately tell us? That simplicity is the key.</p>
+
+<p>The reason I went to all this trouble is it allowed me to demonstrate first, how to really stretch what Make can do for you if you have enough shell scripting knowledge; and second, to allow me to now demonstrate how you can use more idiomatic Make to simplify the code and avoid overengineering like the previous example:</p>
+
+<pre><code>baz: foo-file.txt bar-file.txt
+  echo $@ | cat - $^ &gt; $@-file.txt
+
+%-file.txt:
+  echo $* &gt; $@
+</code></pre>
+
+<p>In this refactored version we define a target called <code>baz</code> and we set its dependencies to be two files that don’t exist. We also don’t have any defined targets in our Makefile either.</p>
+
+<p>To solve this problem we use a virtual rule, one that uses Make’s <code>%</code> placeholder syntax to pattern match against. We’ll see the <code>%</code> syntax in more detail shortly, but for now it will suffice to know that it acts like a wildcard.</p>
+
+<p>When we run <code>make baz</code>, Make will try to resolve the two dependencies. The following rule <code>%-file.txt</code> will then match both <code>foo-file.txt</code> and <code>bar-file.txt</code> and so the command <code>echo $* &gt; $@</code> will be executed twice.</p>
+
+<p>The command takes the dynamic part of the rule (the <code>foo</code> and <code>bar</code> parts) and makes them available via <code>$*</code>. We write those two values into <code>$@</code>, which is the target name (in this case <code>foo-file.txt</code> and <code>bar-file.txt</code>) and subsequently create those two files.</p>
+
+<p>We’ve now resolved the <code>baz</code> rule’s dependencies and we can move on to executing its command, which completes the requirements as we’ve already seen.</p>
+
+<p><div id="10"></div></p>
+
+<h2 id="parsing-targets-and-prerequisites">Parsing Targets And Prerequisites</h2>
+
+<p>There are many different automatic variables available for Make and we’ll see a few more of them as we go along. But as we’ve already discussed <code>$@</code> and <code>$&lt;</code>, it’s worth noting that you are also able to parse the specific directory and file name details for the first dependency and the target by using the syntax <code>$(&lt;D)</code>/<code>$(&lt;F)</code> for the prerequisite, and <code>$(@D)</code>/<code>$(@F)</code> for the target.</p>
+
+<p>Using the following snippet as an example (you would run it with <code>make foo/bar/baz.txt</code>):</p>
+
+<pre><code>bing/bop.txt:
+    @# do nothing
+
+foo/bar/baz.txt: bing/bop.txt
+    @echo $(@D)
+    @echo $(@F)
+    @echo -------
+    @echo $(&lt;D)
+    @echo $(&lt;F)
+</code></pre>
+
+<p>The example above would output first the directory structure and then the file name which has been parsed from the target, and after that the directory structure and file name parsed from the prerequisite:</p>
+
+<pre><code>foo/bar
+baz.txt
+-------
+bing
+bop.txt
+</code></pre>
+
+<p>Depending on your requirements this can be quite a powerful tool to help you construct more complex commands.</p>
+
+<blockquote>
+<p>Note: if you’re interested in knowing where your <code>make</code> binary is located then you can use the built-in <code>MAKE</code> special variable in your command: <code>@echo $(MAKE)</code>.</p>
+</blockquote>
+
+<p><div id="11"></div></p>
+
+<h2 id="dynamic-targets">Dynamic Targets</h2>
+
+<p>Targets can dynamically match mulitiple unknown values and allow for abstracting away common functionality, such as generating files that have similar names (to give a simplified example).</p>
+
+<p>To do this we need to take advantage of the placeholder syntax <code>%</code>, and its corresponding <code>$*</code> syntax. The following example demonstrates the basic structure:</p>
+
+<pre><code>dynamic-%:
+    @echo &quot;Placeholder value: $* and target value: $@&quot;
+</code></pre>
+
+<p>If you run the target using <code>make dynamic-foo</code> then you’ll get the following response (notice that the dynamic aspect of the command <code>foo</code> is captured in the placeholder):</p>
+
+<pre><code>Placeholder value: foo and target value: dynamic-foo
+</code></pre>
+
+<p><div id="12"></div></p>
+
+<h2 id="dereferencing-variables-and-macros">Dereferencing (Variables and Macros)</h2>
+
+<p>Make provides the multipurpose utility <code>$()</code>, which is used to dereference values. The values can be functions (Make has many functions built in and we’ll take a quick glance at some of them later on) or they can be variable names. Let’s consider a simple example where we dereference a variable:</p>
+
+<pre><code>some_var := abc
+
+print_var:
+    @echo $(some_var)
+</code></pre>
+
+<p>Notice in the above example that we defined the variable using the <code>:=</code> syntax (whereas with most languages you would assign a value to a variable using <code>=</code>). Make also supports <code>=</code> as an alternative assignment operator but its use is specifically for situations where you need to take advantage of recursive dereferencing. Let’s see what that means in practice by reviewing the following example:</p>
+
+<pre><code>foo = $(bar)
+bar = $(baz)
+baz = qux value here
+
+recursive:
+    @echo $(foo)
+</code></pre>
+
+<p>This returns <code>qux value here</code> and demonstrates how the <code>foo</code> variable recursively evaluated all other values thanks to the <code>=</code> operator.</p>
+
+<p>If we tried this using <code>foo := $(bar)</code> instead, then the <code>recursive</code> target would have printed out an empty line as it uses a straightforward simple expansion algorithm, which means its right-hand side value is expanded immediately (i.e. expanded at declaration time). With this example, Make doesn’t recursively expand the values back to <code>bar</code> and subsequently back to <code>baz</code> to find the final value of <code>qux value here</code>.</p>
+
+<p>There are also other types of assigment you can use, such as conditional variable <code>?=</code>. What that will do is assign a value to the defined variable only if it doesn’t already have a value defined. For example:</p>
+
+<pre><code>assignment = foo
+assignment ?= bar
+
+conditional_assignment:
+    @echo $(assignment)
+</code></pre>
+
+<p>If we run <code>make conditional_assignment</code>, then we’ll see the value <code>foo</code> printed. The value <code>bar</code> isn’t assigned as a value was already defined.</p>
+
+<p>One other assignment type worth considering is <code>+=</code>, which works pretty much as you would expect it to if you’re a programmer (as it’s an operator that appears in many different languages). Effectively it appends the value onto the variable, keeping the original value as well. For example:</p>
+
+<pre><code>hello_world = hello
+hello_world += world
+
+say_hello:
+    @echo $(hello_world)
+</code></pre>
+
+<p>The example above prints <code>hello world</code>, as it has appended <code>world</code> onto the existing value <code>hello</code>. Interestingly, Make automatically puts in a space as well between the values assigned (notice the value printed wasn’t <code>helloworld</code>).</p>
+
+<p>One last thing I want to cover is the use of macros in Make. A macro is a collection of commands that are expanded and executed when dereferenced. It’s a lot like a function, in that it groups behavior. The following example demonstrates how it works:</p>
+
+<pre><code>define do_lots_of_things
+  echo Hi there
+  echo I do lots of things
+  echo So it\'s best I do this in this macro
+endef
+
+stuff:
+    @$(do_lots_of_things)
+</code></pre>
+
+<p>When we execute <code>make stuff</code> we see all the different messages printed to the screen. We could reuse this macro in many different target rules if we wanted to as well, which is really the whole point of them.</p>
+
+<blockquote>
+<p>Note: notice that I had to escape the use of the single quote <code>'</code>. This was done because without it the command would fail due to a syntax error in Make.</p>
+</blockquote>
+
+<p><div id="13"></div></p>
+
+<h2 id="functions">Functions</h2>
+
+<p>As mentioned in the previous section, the <code>$()</code> utility worked to dereference a value, but it can also handle a number of built-in functions. Although some of the functions could be replaced with standard shell commands.</p>
+
+<blockquote>
+<p>Note: a <a href="https://www.gnu.org/software/make/manual/html_node/Functions.html">full list of functions</a> can be found on the GNU Make website.</p>
+</blockquote>
+
+<p><div id="14"></div></p>
+
+<h3 id="filter">Filter</h3>
+
+<p>Let’s take a look at some interesting functions Make provides. The first one I like the look of is <code>filter</code>:</p>
+
+<pre><code>filter: foo.txt bar.txt baz.txt
+    @echo $(filter ba%.txt, $^)
+</code></pre>
+
+<p>In this rule we use the <code>filter</code> function, which takes as its first argument the pattern you want to try to match and the text you want to search within. In our example the text to be searched is the list of prerequisites (using <code>$^</code> which we’ve already seen). The pattern we’re hoping to match uses the <code>%</code> placeholder wildcard value and the filter returns only files that begin with <code>ba</code> and end in <code>.txt</code>. This results in <code>bar.txt baz.txt</code> that is printed.</p>
+
+<p><div id="15"></div></p>
+
+<h3 id="shell">Shell</h3>
+
+<p>Outside of a target you can have a variable dynamically pull data from the shell environment by using the <code>v := $(shell &lt;command&gt;)</code> pattern.</p>
+
+<blockquote>
+<p>Note: because we’re using the <code>shell</code> function, we use <code>:=</code> for simple expansion rather than <code>=</code>, which would allow for recursive dereferencing and could cause problems depending on what your Makefile and shell script is doing.</p>
+</blockquote>
+
+<p>In the following example we use the <code>shell</code> function to calculate the result of adding 1 and 1. We then dereference that value from within our target:</p>
+
+<pre><code>calculation := $(shell echo $$((1 + 1)))
+shelled_value:
+    @echo $(calculation)
+</code></pre>
+
+<blockquote>
+<p>Note: in the shell, to do arithmetic (and other such things) we need to use the expression utility <code>$((...))</code>, so don’t make the mistake of thinking it’s a syntax special to Make, because it’s not.</p>
+</blockquote>
+
+<p><div id="16"></div></p>
+
+<h3 id="eval">Eval</h3>
+
+<p>In the following snippet we use the <code>eval</code> function to create a Makefile variable dynamically at runtime:</p>
+
+<pre><code>dyn_eval:
+    $(eval FOOBAR:=$(shell echo 123))
+    @echo $(FOOBAR)
+</code></pre>
+
+<p>We use the <code>shell</code> function to return a dynamically generated value (in this case <code>123</code>) and we assign that to a variable FOOBAR. But to allow us to access FOOBAR from other commands within this target, as well as other unrelated targets, we use <code>eval</code> to create the variable globally. Finally, we use <code>$()</code> to dereference the variable.</p>
+
+<p><div id="17"></div></p>
+
+<h3 id="files">Files</h3>
+
+<p>The following technique allows us to carry out simple substitutions, by swapping the matched text before the <code>=</code> with the text that follows it. The defined pattern is then applied to the variable being dereferenced:</p>
+
+<pre><code>files = foo.txt bar.txt baz.txt
+change_ext:
+    @echo $(files:.txt=.doc)
+</code></pre>
+
+<p>The above example produces the following output (notice how the <code>files</code> list of files now have <code>.doc</code> extensions):</p>
+
+<pre><code>foo.doc bar.doc baz.doc
+</code></pre>
+
+<p>There are many functions and techniques to help you extend the capabilities within Make and so I would highly recommend you have a read through <a href="https://www.gnu.org/software/make/manual/html_node/Functions.html">the functions listed in the GNU Make manual</a>.</p>
+
+<p><div id="18"></div></p>
+
+<h2 id="user-defined-functions">User-Defined Functions</h2>
+
+<p>You’ve already seen the use of macros via the syntax <code>define</code>. User-defined functions work exactly the same way but you call them differently to macros (you’ll use the Make built-in <code>call</code> function), and this is so that you can pass arguments to the definition. This is best demonstrated with an example:</p>
+
+<pre><code>define foo
+  @echo &quot;I was called with the argument:$1&quot;
+endef
+
+call_foo:
+    $(call foo, &quot;hello!&quot;)
+</code></pre>
+
+<p>The example above would be executed with <code>make call_foo</code>, and would result in the following output:</p>
+
+<pre><code>I was called with the argument: hello!
+</code></pre>
+
+<blockquote>
+<p>Note: earlier we noticed that Make would include a space when using the <code>+=</code> operator. The same happens with function arguments and so when creating the string that is printed I didn’t include a space after the <code>:</code> but the output shows a space thanks to Make.</p>
+</blockquote>
+
+<p>You can pass as many arguments as you like to a function and it’ll be accessible numerically (e.g. <code>$1</code>, <code>$2</code>, <code>$3</code> and so on). You can also call other functions from within a function and pass on the arguments, or pass different arguments using the <code>$(call function_name)</code> syntax.</p>
+
+<p><div id="19"></div></p>
+
+<h2 id="conventions">Conventions</h2>
+
+<p>There are some well-known conventions and idioms used by the Make community, and a few of the most prominent ones are detailed in this section.</p>
+
+<p>The first is the inclusion of a <code>clean</code> target which should be used to remove any files created by your Makefile. This is to allow you to clean up after your tasks have executed (or if things have gone haywire). Typically the default target will specify <code>clean</code> as a prerequisite so as to clear your workspace before starting a fresh build.</p>
+
+<p>The second is to have a <code>help</code> target which <code>echo</code>s each of the targets within the file and explains its purpose. As demonstrated below:</p>
+
+<pre><code>help:
+    @echo foo: does foo stuff
+    @echo bar: does bar stuff
+    @echo baz: does baz stuff
+</code></pre>
+
+<blockquote>
+<p>Note: you could use some clever shell scripting along with Makefile comments to dynamically generate the printed commands and their descriptions (e.g. read in the Makefile source and parse out the meta data/comments as part of a sub shell <code>$(shell ...)</code>).</p>
+</blockquote>
+
+<p>The third is to include a reference to a special target called <code>.PHONY</code> at either the top or bottom of your Makefile, followed by a list of target names. The purpose of <code>.PHONY</code> is to prevent conflicts with files within your current project directory that coincidentally match the name of your Makefile targets.</p>
+
+<p>To clarify what this means in practical terms: Make has a convention whereby you would define a target’s name as matching the name of the file the commands will ultimately create; because although Make is useful for general purpose tasks, it was originally designed for creating application files. Make will associate a target with any file that matches its name and will intelligently monitor the dependencies for the target to see if it’s OK to re-execute the target’s command to regenerate the file.</p>
+
+<p>Typically a target such as <code>clean</code> won’t have any dependencies (not all the time mind you, but most of the time it won’t because the purpose of <code>clean</code> is to remove generated files; it shouldn’t depend on any other files in order to complete that action). If a target has no dependencies then Make will always run the associated commands. Remember, Make can intelligently avoid running certain commands if it knows the dependencies haven’t changed at all.</p>
+
+<p>By specifying <code>clean</code> as being a “phony” target, it means if there was ever a file called <code>clean</code> added to your project then we could avoid confusion as to how Make should handle running the target. The following demonstrates how it is used. It assumes you have a file – with no file extension – called <code>clean</code> in your main project directory:</p>
+
+<pre><code>.PHONY: clean
+
+clean:
+    @echo &quot;I'll do something like remove all files&quot;
+</code></pre>
+
+<p>In the above example, running <code>make clean</code> will display the message “I’ll do something like remove all files”. But if you remove the <code>.PHONY: clean</code> and rerun the target (using <code>make clean</code>) you’ll now find, because we have a <code>clean</code> file in our main project directory and no dependencies for that target, that Make will mistakenly think there is nothing left to do and so it displays the message:</p>
+
+<pre><code>make: 'clean' is up to date.
+</code></pre>
+
+<blockquote>
+<p>Note: like with automatic variables, there are many different special targets (so far we’ve seen <code>.PHONY</code> and <code>.SILENT</code>). One that’s worth further investigation is <code>.DELETE_ON_ERROR</code>, which indicates to Make that if any of the commands for your target rule fails then it should delete the associated target file in your project. A <a href="https://www.gnu.org/software/make/manual/html_node/Special-Targets.html">list of special targets</a> is available on the GNU Make website.</p>
+</blockquote>
+
+<p><div id="20"></div></p>
+
+<h2 id="revisiting-the-for-loop-example">Revisiting The For Loop Example</h2>
+
+<p>Earlier on we looked at a way of using a for loop as a command to loop over a list of text files and to print their names.</p>
+
+<p>Let’s now consider two alternative ways of achieving this. The first uses a few more Make functions, while the second is more readable – but ultimately they use similar solutions.</p>
+
+<p>Here is the first alternative:</p>
+
+<pre><code>my_list = $(addsuffix .dep, $(wildcard *.txt))
+print_list: $(my_list)
+%.dep: %
+  @echo &quot;Text File:&quot; $&lt;
+</code></pre>
+
+<ul>
+<li>The first thing we do is use the <code>wildcard</code> function to retrieve a list of text files (this is equivalent to <code>$(shell ls *.txt)</code>).</li>
+<li>We then use the <code>addsuffix</code> function to convert something like <code>foo.txt</code> into <code>foo.txt.dep</code>. This doesn’t actually create any files, by the way; you’ll see why we do this in a moment.</li>
+<li>Next we create a target called <code>print_list</code> and we set its dependencies to be the <code>my_list</code> list of file names (e.g. <code>foo.txt.dep bar.txt.dep baz.txt.dep</code>). But obviously there are no such targets defined in our Makefile so this leads us to the next step.</li>
+<li>We dynamically create targets that would match what’s found in <code>my_list</code> using a placeholder, and we set the dependency for these dynamic targets to be the text file itself. Remember that the target <code>%.dep</code> would match <code>foo.txt.dep</code> and so subsequently setting the dependency to just <code>%</code> would be the value <code>foo.txt</code>.</li>
+<li>From here we can now echo the file name using <code>$&lt;</code>, which gives us the first dependency in the list (of which we only have one anyway).</li>
+</ul>
+
+<p>Now here is the second alternative:</p>
+
+<pre><code>my_list = $(wildcard *.txt)
+print_list: $(my_list)
+.PHONY: $(my_list)
+$(my_list):
+  @echo &quot;Text File:&quot; $@
+</code></pre>
+
+<p>Again, let’s take a moment to break this down so we understand how it works:</p>
+
+<ul>
+<li>Like the first alternative, we retrieve the list of files using the <code>wildcard</code> function. The difference now is that we don’t need to create a copy of the list and modify the names.</li>
+<li>Next we create a target called <code>print_list</code> and we set its dependencies to be the <code>my_list</code> list of file names (e.g. <code>foo.txt bar.txt baz.txt</code>). As we mentioned before, there are no such targets defined in our Makefile.</li>
+<li>The next step is to define a <code>.PHONY</code> target. We do this because in the subsequent step we define a virtual rule, but we don’t specify any prerequisites. This means as we have actual files in our directory that match the potential target name, the rule will never be executed unless we specify it as being <code>.PHONY</code>.</li>
+<li>Now we define our virtual rule and we use the <code>$@</code> to print the name of the file when we execute <code>make print_list</code>.</li>
+</ul>
+
+<p><div id="21"></div></p>
+
+<h2 id="includes">Includes</h2>
+
+<p>Make allows you to import more Make specific-functionality via its <code>include</code> statement. If you create a file with a <code>.mk</code> extension then that file’s Make related code can be included in your running Makefile. The following example demonstrates how it works:</p>
+
+<pre><code>include foo.mk # assuming you have a foo.mk file in your project directory
+
+included_stuff:
+    @echo $(my_included_foo)
+</code></pre>
+
+<p>The above example relies on a <code>foo.mk</code> file containing the following Make contents:</p>
+
+<pre><code>my_included_foo := hi from the foo include
+</code></pre>
+
+<p>When we run <code>make included_stuff</code>, we see <code>hi from the foo include</code> printed out.</p>
+
+<blockquote>
+<p>Note: the <code>include</code> statement can also be written with a hyphen prefix like so <code>-include</code>, which means if there is an error loading the specified file then that error is ignored.</p>
+</blockquote>
+
+<p><div id="22"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We’ve barely even scratched the surface of what’s possible using Make, but hopefully this introduction has piqued your interest in learning more by either reading the GNU Make manual or picking up a book on the subject. I am myself only beginning my investigation into replacing my existing build tools with Make.</p>
+
+<p>It’s been part of my journey to rediscover original Unix tools that have stood the test of time (for good reason) rather than picking up the new shiny thing which is often nothing more than a slightly modernized abstraction built for people who want to avoid the terminal/shell environment – somewhere I’ve become much more comfortable working the past couple of years.</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/bash'>bash</a>, <a class='tag' href='/tags/build'>build</a>, <a class='tag' href='/tags/make'>make</a>, <a class='tag' href='/tags/shell'>shell</a>, <a class='tag' href='/tags/utility'>utility</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/client-cert-authentication/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Client Cert Authentication</a>
+    </div><div class='next-entry'>
+      <a href='http://www.integralist.co.uk/posts/http2/'>
+        <span class='screen-reader'>Next post: </span>HTTP/2<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="4" y1="12" x2="20" y2="12"/>
+  <polyline points="14 6 20 12 14 18"/>
+  
+</svg>
+</span>
+      </a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

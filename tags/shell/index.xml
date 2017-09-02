@@ -53,5 +53,15 @@ If so, then &amp;ldquo;Pass&amp;rdquo; might be something of interest to you as 
 Introduction This is a quick post to demonstrate how I use a simple Bash shell script to report when web pages are failing (e.g. returning a non-200 HTTP status code). It does this by sending notifications of the URL which returned a non-200 status code into a remote application (in my case Slack; but you could modify the script to suit whatever service you happen to be using).</description>
     </item>
     
+    <item>
+      <title>Building Systems With Make</title>
+      <link>http://www.integralist.co.uk/posts/building-systems-with-make/</link>
+      <pubDate>Wed, 07 Oct 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/building-systems-with-make/</guid>
+      <description>Introduction Simple Example Terminology Prerequisites How Make Decides What To Do Automatic variables Commands Targets As Prerequisites Accessing Targets Parsing Targets And Prerequisites Dynamic Targets Dereferencing (Variables and Macros) Functions  Filter Shell Eval Files  User-Defined Functions Conventions Revisiting The For Loop Example Includes Conclusion  
+Introduction Most web developers use a build tool of some sort nowadays. I’m not refering to continuous integration software like Jenkins CI (a very popular build system), but the lower-level software it uses to actually acquire dependencies and construct your applications with.</description>
+    </item>
+    
   </channel>
 </rss>
