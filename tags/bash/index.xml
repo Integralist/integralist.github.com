@@ -80,5 +80,14 @@ Introduction The purpose of this post is to demonstrate how to configure nginx t
  Before we get started, it&amp;rsquo;s worth me spending a brief moment introducing myself to you. My name is Mark (or @integralist if Twitter happens to be your communication tool of choice) and I currently work for BBC News in London England as a principal engineer/tech lead; and I&amp;rsquo;m also the author of &amp;ldquo;Pro Vim&amp;rdquo;.</description>
     </item>
     
+    <item>
+      <title>Basic Shell Scripting</title>
+      <link>http://www.integralist.co.uk/posts/basic-shell-scripting/</link>
+      <pubDate>Tue, 01 Oct 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/basic-shell-scripting/</guid>
+      <description>Introduction Basics  What directory am I currently in? How can I see what&amp;rsquo;s in this directory? Moving around Displaying content of a file Copy a file Move a file Create a file Rename a file Delete a file Delete a directory Create a directory  Find (searching for files)  Finding files over a certain size  Grep (Searching for patterns) Sed (Find and Replace) Awk (Looping Logic) Piping I/O  Input and Output Redirection Piping Piping examples Sequences and Parallelism  Processes  Viewing processes Moving processes between the fore/background  Miscellaneous Commands  tee dig ps xargs cut tr du !</description>
+    </item>
+    
   </channel>
 </rss>

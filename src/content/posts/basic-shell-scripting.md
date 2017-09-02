@@ -1,0 +1,628 @@
+---
+title: "Basic Shell Scripting"
+date: 2013-10-01T13:00:00+01:00
+categories:
+  - "code"
+  - "guide"
+tags:
+  - "bash"
+  - "shell"
+draft: false
+---
+
+- [Introduction](#1)
+- [Basics](#2)
+	- What directory am I currently in?
+	- How can I see what's in this directory?
+	- Moving around
+	- Displaying content of a file
+	- Copy a file
+	- Move a file
+    - Create a file
+	- Rename a file
+	- Delete a file
+	- Delete a directory
+	- Create a directory
+- [Find (searching for files)](#3)
+    - Finding files over a certain size
+- [Grep (Searching for patterns)](#4)
+- [Sed (Find and Replace)](#5)
+- [Awk (Looping Logic)](#6)
+- [Piping I/O](#7)
+	- Input and Output
+	- Redirection
+	- Piping
+	- Piping examples
+	- Sequences and Parallelism
+- [Processes](#8)
+    - Viewing processes
+    - Moving processes between the fore/background
+- [Miscellaneous Commands](#9)
+	- tee
+	- dig
+	- ps
+	- xargs
+	- cut
+    - tr
+    - du
+    - !!
+    - Ctrl-r
+- [Conclusion](#10)
+
+<div id="1"></div>
+## Introduction
+
+The unix command line has a hundred or so commands, and a small majority of those you can realistically find yourself using on a regular basis. In this post I want to cover some common commands that can actually be quite useful to you.
+
+Shell commands aren't something you can cover in one post. Entire books have been written on the subject. So don't expect anything other than the bare bone basics here, which should hopefully give you enough of an understanding to take your own learning forward.
+
+So let's begin… 
+
+<div id="2"></div>
+## Basics
+
+OK, so I'll assume you have absolutely no prior command line experience which means we need to start at the basics.
+
+So, first things first: open up your shell (if you're on a Mac then this will be your `Terminal.app` application.
+
+### What directory am I currently in?
+
+`pwd` - this stands for "Print Working Directory"
+
+### How can I see what's in this directory?
+
+`ls` - this tells the shell to list out any files or folders in the current working directory.
+
+You can also tell the command a directory path you want it to look inside of: `ls ~/Desktop` (this will list all files and folders on your desktop).
+
+`ls -l` - the `-l` flag tells the command to stack the list when it prints its output to the shell.
+
+`ls -la` - this is a combination of the previous flag and the `-a` flag which means "show all files" (by this I mean, it'll show you hidden files).
+
+### Moving around
+
+To move around your file system you use the 'change directory' command `cd`.
+
+So: `cd ~/Desktop` will put you in the Desktop.
+
+You can also use relative paths such as `cd ../` which will take you up one level from wherever you happen to be.
+
+### Displaying content of a file
+
+The `cat` command is a concatenation command, meaning that if you ran `cat original.txt new.txt` it would display on your screen the combination of the content from both files specified.
+
+So, with that understanding we can use `cat original.txt` (i.e. specifying just a single file) to show the contents of that file.
+
+### Copy a file
+
+To copy a file we need the `cp` command, and we tell it what file to copy and where to copy it to.
+
+So: `cp ~/Downloads/test.txt ~/Desktop/test.txt` will copy the file `test.txt` (which is inside our 'Downloads' folder) and put the copy on our Desktop.
+
+### Move a file
+
+To move a file you need the `mv` command, and we tell it what file to move and where to move it to.
+
+So: `mv ~/Downloads/test.txt ~/Desktop/test.txt` will move the file `test.txt` from our 'Downloads' folder onto our 'Desktop'.
+
+### Create a file
+
+To create a file you need the `touch` command.
+
+So: `touch ~/some-test-file.txt` will create an empty text file in your home directory
+
+### Rename a file
+
+There is no `rename` command on Unix (although there is in Linux) and so we need to use a trick, the trick being to use the `mv` command.
+
+So: `mv ~/Downloads/test.txt ~/Downloads/new.txt` will actually rename the file `test.txt` to `new.txt` as we've moved the file into the same directory it was already in but with a different name (effectively acting like we renamed it)
+
+### Delete a file
+
+To delete a file we need the 'remove' command `rm`.
+
+So: `rm ~/Downloads/test.txt` will delete our `test.txt` file.
+
+### Delete a directory
+
+To delete a folder we need the 'remove' command `rm` again but this time we need to pass in a couple of flags to the command.
+
+The first flag is `-f` which means 'force' the removal (otherwise if you try to remove a folder then the shell will try and prevent this as it'll assume you've made a mistake, and deleting a whole folder could be a big mistake if you're not careful).
+
+The second flag is `-r` which means 'recursively'. So you'll recursively delete files within the folder.
+
+So: `rm -rf ~/Desktop/some-folder` will delete our `some-folder` folder on the Desktop.
+
+### Create a directory
+
+To create a directory you can use the make directory command `mkdir my_folder_name`
+
+To make creating lots of sub directories easier you can pass a `-p` flag like so `mkdir -p Assets/{Scripts,Styles}` (notice we use interpolation `{}` which lets use specify multiple folder names in the current directory level).
+
+<div id="3"></div>
+## Find (searching for files)
+
+The `find` command is useful for walking a directory hierarchy and returning a list of files found based on a set of criteria you have determined.
+
+The most common pattern is to search for a particular file (or file type) within a project folder. Imagine you want to find a file called `package.json` within your project directory which is inside your home directory. Here is how we'd use the `find` command to do that:
+
+```
+# first we'll set-up the project directory and some files...
+
+cd ~/ # move in to the user's home directory
+mkdir project-foobar # make our project directory
+cd project-foobar # move inside the project directory
+touch test.txt {package,blah}.json # this creates 3 files inside our project directory
+ls # => blah.json   package.json    test.txt
+cd ../ # move back into the user's home directory and we'll start searching
+
+# here is the actual 'find' command
+find ./project-foobar -name 'package.json' # => ./project-foobar/package.json
+
+find ./project-foobar -name '*.json'
+# => ./project-foobar/blah.json
+# => ./project-foobar/package.json
+```
+
+As you can see from the above example the `find` command has three parameters:
+
+- the directory to search
+- an optional flag to indicate what we want to search for
+- the file we're searching for
+
+Let's see this broken down:
+
+- `./project-foobar` the directory to search
+- `-name` the flag/option we've set is "check the name of each item found"
+- `'*.json'` we've used a wildcard (asterisk `*`) to indicate we're interested in "any" json file
+
+### Recursive searching
+
+To recursively search for content you need to quote the glob you use:
+
+```
+find . -name '*.go'
+```
+    
+### Process results
+
+If you want to process the results you get, without a pipe, then use `-exec <utility> \;`
+
+```
+find . -name '*.go' -exec grep 'my_pattern_im_searching_for' {} \;
+```
+
+> Note: where `{}` is a placeholder for the file path
+
+You'll see the `\;` at the end indicates the end of the command. You need to escape the `;` otherwise it won't work. Also you can replace it with `\+` which *appends* file paths. The reason you'd use this is if you want to execute your specified utility command once and have all matching file paths added as arguments. Where as `\;` means it'll execute the command once for each file matched.
+
+### Finding files over a certain size
+
+```
+# all files greater than 1mb
+find $HOME/. -size +1024k 
+
+# all files inside current directory greater than 500k
+find . -name '*.js' -size +500k 
+
+# find all files larger than zero but less than 500bytes
+find . -size +0 -a -size -500c # (-a is AND, -c is bytes) 
+
+# find all all files larger than zero OR (-o) any that haven't been accessed in over a year
+find . -size 0 -o -atime +365
+```
+
+<div id="4"></div>
+## Grep (Searching for patterns)
+
+Grep is a command that lets you find a pattern (either a string or a regular expression) inside of a file or list of files.
+
+So: `grep 'something' test.txt` looks for the word 'something' inside of the file `test.txt`.
+
+To use grep on a directory of files then we need to use an additional flag: `-r` which means 'recursive' (similar to the `rm` command we saw previously).
+
+So: `grep -r 'something' ~/Desktop` looks for the word 'something' inside of any files on the Desktop.
+
+<div id="5"></div>
+## Sed (Find and Replace)
+
+The `sed` command stands for (S)tream (Ed)itor and allows you to  read in the contents of a file and then write the modified output to another file or pipe it through to another I/O command (we'll cover piping later).
+
+A basic example of its use would be: `sed s/day/night/ novel.txt`
+
+This replaces the first occurrence of 'day' to 'night'. If we wanted to replace multiple occurrences then you would need to pass a `g` flag (meaning global) to the regular expression like so: `sed s/day/night/g novel.txt`
+
+Sed is very powerful and there are many features of the syntax that I don't use. One that's interesting is that you can use regular expressions to match a pattern and then do stuff with the matches, such as deleting the line or duplicating it.
+
+Consider the following example:
+
+```
+echo "hi there\nmark\nit's nice to\nmeet you" > test.txt
+```
+
+If we now run the following sed command we should see the line that has the word `mark` is deleted:
+
+```
+cat test.txt | sed '/mark/d'
+```
+
+If we run the following sed command we should see any lines that start with `i` are duplicated (remove the carrot symbol `^` to see any lines that have the character `i` duplicated; regardless of whether they're at the start of the line or not):
+
+```
+cat test.txt | sed '/^i/p'
+```
+
+You can also 'edit in place' if you're feeling brave:
+
+```
+find . -name '*.go' -exec sed -i '' 's/<patten>/<replacement>/' {} \;
+```
+
+<div id="6"></div>
+## Awk (Looping Logic)
+
+The `awk` command reads in each line of a file and splits the line into fields (using whitespace - space, tab - as its default delimiter).
+
+You can then execute commands for each line and reference each field.
+
+A basic example of its use would be: `awk '{ print $1 }'` which means "print the first field found in the current line".
+
+So imagine you have the following `test.txt` file…
+
+```
+This is my first line
+This is my second line
+This is my third line
+```
+
+…you could print the line number followed by a specific word (in this case the second from last word on each line) using the following awk command: `awk '{ print "Line " NR ": " $(NF-1) }' test.txt`
+
+Which would display the following content on your screen… 
+
+```
+Line 1: first
+Line 2: second
+Line 3: third
+```
+
+Let's break this command down a little…
+
+- Awk commands are placed inside of single quotes `awk 'commands go here'`.
+- Inside the single quotes we need a set of brackets to place our specific code we want to run: `awk '{ code to run here }'`
+- We specifically tell awk to `print` something to stdout (i.e. the terminal screen).
+- In this case we tell it to print the text "Line " followed by the current line number `NR`.
+- As part of the same print command we then tell it to print ": " followed by the second from last number.
+- To do that we use two pieces of syntax `$()` and `NF`.
+- `NF` stands for (N)umber of (F)ields.
+- The `$()` wrapping around `NF` is our 'process substitution'. This means we're not just outputting some data but manipulating it by using logic to give us 1 field back from the last, hence it needs to be wrapped in `$()`
+
+<div id="7"></div>
+## Piping I/O
+
+The previous commands `awk`, `sed`, `grep` are all really useful, but it's when you can combine them that their true power shines.
+
+### Input and Output
+
+Unix is based on the principle of "input" and "output" (known as "I/O"). In the Shell you have `stdin` (standard input) and `stdout` (standard output).
+
+By default, `stdin` is your keyboard (i.e. whatever you type into the terminal shell) and `stdout` is the terminal (i.e. your screen).
+
+### Redirection
+
+Once you understand `stdin` and `stdout` you can start to look at redirecting them.
+
+For example when using the `sed` command you could use redirection to not overwrite your original file and instead direct the output `stdout` coming from the `sed` command to another file: `sed s/day/night/g original.txt > new.txt`
+
+### Piping
+
+Another way to *direct* input and output is to use pipes `|` (a vertical bar).
+
+A really simple example would be: look at the `sed` command we used earlier (`sed s/day/night/ novel.txt`). Rather than actually execute it and have it make the specified change to our file `novel.txt` we could instead test the command to make sure it does what we expect it to.
+
+To do that we would use the `cat` command (which we looked at previously) and pipe its output through to the `sed` command like so… 
+
+`cat original.txt | sed s/day/night/g`
+
+So, to clarify how this works: we're redirecting the `cat` command's `stdout` through to the `sed` command's `stdin`. 
+
+In our original `sed` example we directed the `sed` command's `stdout` to an actual file (`novel.txt`), but in this case it has no `stdout` specified so it falls back to the default `stdout` which in this case is the terminal shell itself.
+
+Hence the results of the `sed` command (the modified content) are displayed on your screen.
+
+### Piping to Vim
+
+One thing I discovered recently (via [Crystal Hirschorn](http://twitter.com/Pand0ra83)) was that you can't just pipe `stdout` into Vim unless you add a hyphen/dash `-` to the end of the command like so: `ls | vim -`
+
+Otherwise Vim will complain that: `Input is not from a terminal`
+
+That's a good one to remember!
+
+Also you can pipe the input into Vim in read-only mode using the `-R` flag as well: `ls | vim -R -`
+
+### Piping examples
+
+Here are three real world examples I've used recently…
+
+```
+phantomjs 2>&1 network-test.js | tee log.txt
+```
+
+In this example I'm executing a [PhantomJS](http://phantomjs.org/) script `network-test.js` but I wanted to capture both the results of the script (which just logs out DNS information into the terminal) and any errors that may have occurred into a log text file.
+
+The way it works might be a little confusing as it shows some things you might not have seen before: `2>&1` and `tee`.
+
+Those two commands may look confusing but it just comes down to understanding the numbers that are associated with specific processes, so…
+
+- `0` = `stdin`
+- `1` = `stdout`
+- `2` = `stderr`
+
+…this means `2>&1` is saying direct `2` (any errors) through to `1` (standard output).
+
+We then pipe the `stdout` through to the `tee` command which copies it into a file called `log.txt`.
+
+```
+ls File-* | sed 's/\(File-[^-]*\)-\(.*\)/mv & \1\2/' | sh
+```
+
+In this example I'm trying to remove a hyphen `-` from some file names.
+
+The files I have look like `File-A-B.gif` and I want them to be renamed to `File-AB.gif`.
+
+So first I list out any files in the current directory that begin `File-` and then pipe those results through to `sed`.
+
+Sed then uses Regular Expressions to store a reference to the opening part of the file name (in this case `File-A`) and then stores the end part of the file name (in this case `B.gif`).
+
+In the second part of the `sed` command, instead of doing a 'replace' of what we've found, we actually pass in a `mv` command (remember from before that we can rename a file by using `mv original.txt new.txt`). In this case the stored references to the beginning and ending parts of the file's name can be referenced within the replacement section using `\1` and `\2` (and the `&` in regular expressions means, the original string being inspected).
+
+So when we use `mv & \1\2` we're saying "move the original file and move it to the same directory but using the new name of File-AB.gif (remember `\1` is "File-A" and `\2` is "B.gif").
+
+Finally, because the `sed` command's replacement is an actual command rather than just a string replacement we pipe that replacement content (which is now `sed`'s `stdout`) over to the `sh` bin command to execute and hence actually rename the file(s).
+
+Note: whenever you write a shell script, you would store it (for example) inside a file with the extension of `sh` and then you'd use the terminal command `sh` to execute that shell script.
+
+```
+tmux ls | cut -d : -f 1 | xargs -I {} tmux kill-session -t {}
+```
+
+So in this example I wanted an easy way to destroy all my tmux sessions. 
+
+Typically I would run `tmux ls` to see what sessions I had (it returns something like `0: 1 windows (created Fri Oct  4 18:24:38 2013) [129x33]`, where the opening `0` is the number/name of the session followed by details about the session -> in this case `1 window`, and when it was created, and the size of that window).
+
+Once I had my session number (in this case `0`) I could run the command `tmux kill-session -t 0` but if I had loads of sessions open I would have to run the same command for all of them.
+
+To fix this I tried using the commands Awk and Sed but discovered an issue with 'scope' (which I'm still not 100% sure I understand, but I'll explain what happened any way)… 
+
+I was using `tmux ls | awk '{print $1}' | sed 's/://g' | xargs -I {} tmux kill-session -t {}`. This works, but not when you stick it inside an alias for easy reuse.
+
+The way it works is that it lists out all the tmux sessions and pipes it over to Awk.
+
+Awk then grabs the first field `0:` (remember Awk splits the input line into 'fields' using a space delimiter). We then pipe that over to Sed.
+
+Sed then uses a regular expression to remove the `:` from the `0:` leaving us with just `0`. We then pipe that through to xargs.
+
+xargs runs our kill-session command and passes through the value of `0` into that command using the placeholder `{}`.
+
+We define what the placeholder will be using `-I` so we could of used `-I target` instead if we wanted to like so: `tmux ls | awk '{print $1}' | sed 's/://g' | xargs -I target tmux kill-session -t target` and it would of achieved the same.
+
+Like I say, this works. But I wanted it inside an alias so I could easily reuse it (I mean, just *try* and memorise that massive chunk of commands!?). The moment it went into an alias the xargs failed to work because instead of getting `0` it got the entire line `0: 1 windows (created Fri Oct  4 18:24:38 2013) [129x33]`. The scope of the argument was being lost some how? A bit annoying really.
+
+My colleague at BBC News ([Simon Thulbourn](http://twitter.com/sthulb) - all round command line wizard, amongst many other technical talents) helped me understand a more efficient and fully functioning version (i.e. it can be safely aliased): `tmux ls | cut -d : -f 1 | xargs -I {} tmux kill-session -t {}`.
+
+So the only difference here is instead of using both Awk and Sed, we're just using Cut. I've not mentioned it before but `cut` works like this: 
+
+Cut splits the input into fields (like Awk does). We then tell it that we want the fields to be split by `:` (that's the `-d :` section). Then finally we use `-f 1` to say we want the first field, which we pipe over to xargs. Otherwise the rest of the command is the same as before.
+
+Nice huh!
+
+### Sequences and Parallelism
+
+The use of `&&` between commands means the commands are run in a sequence. So for example, if you run `x && y` the `y` command will not be run until `x` has finished (this is similar to using the semicolon to make commands run sequentially `x; y`).
+
+The use of a single `&` between commands means the commands are run in parallel (meaning they don't wait for each other). So for example, `x & y` will mean `x` and `y` both run *at the same time*.
+
+<div id="8"></div>
+## Processes
+
+Each command you execute is a "process". So when we execute the command `vim` (which opens up the Vim text editor) we have effectively started up a new "process".
+
+### Viewing processes
+
+To view a list of all processes currently running across the system use the `ps` command (you can also use `ps aux`).
+
+If you're only interested in processes within your current terminal tab then use the `jobs` command.
+
+### Moving processes between the fore/background
+
+To background a process (e.g. while we have Vim open, if we wanted to move back to the terminal) then we could execute the command `<C-z>` (which means pressing the `<Ctrl>` and `z` keys at the same time).
+
+To then bring the latest process (i.e. the last process that was put into the background) to the foreground again you would run the command `fg`. 
+
+If you have multiple processes in the background then you can look up the processes using `job` and then pick one and foreground it using the command `fg %n` where `n` is the number of the job.
+
+<div id="9"></div>
+## Miscellaneous Commands
+
+### `tee`
+
+The `tee` command you've seen already now (in our above example) but just to reiterate its use, here is how the manual describes it… 
+
+> The tee utility copies standard input to standard output, making a copy in zero or more files.
+
+### `dig`
+
+The `dig` command is used for carrying out DNS lookups: `dig integralist.co.uk` returns the DNS records found for my domain name.
+
+### `ps`
+
+The `ps` command stands for (p)rocess (s)tatus
+
+It shows you all running processes on your computer.
+
+You can use piping again to narrow down the results to something in particular you know is causing your computer to slow down and then execute another command to kill that process.
+
+So: `ps aux | grep ruby`
+
+In the above example we also pass `aux` which basically specifies table of results that should be returned (see: [http://en.wikipedia.org/wiki/Ps_(Unix)](http://en.wikipedia.org/wiki/Ps_\(Unix\)) for more information).
+
+We then pipe that through to `grep` and tell it we're interested only in processes that have the text `ruby` somewhere (that way we can narrow down the results printed to the screen).
+
+Finally to kill a particular process you'll need its PID number (which `ps aux` would have displayed) so locate that PID and then run `kill -9 xxxx` where `xxxx` is the PID number you want to stop.
+
+### `xargs`
+
+I know we've covered Xargs already in my previous examples, but it's worth mentioning that you can also use the `-0` flag which helps with some commands that won't work when passed arguments that have spaces in them (imagine a file name with spaces). Using the `-0` flag resolves that issue.
+
+Also, if the command you want to run only excepts a single argument (for example `echo 123`) then you can omit the `-I {}` placeholder definition. 
+
+### `cut`
+
+Again, we've covered Cut above already, but just to note that you can change the field delimiter using `-d` (e.g. `-d ,` would split the line on commas).
+
+Also, `-f` allows a range, not just a single field index. So if you wanted fields 3 to 4 you could do `-f 3,4`
+
+Another feature of `cut` is the `-c` flag which cuts based on 'character position' rather than 'fields' like `-f` does. 
+
+One way you could use the `-c` flag is to remove whitespace at the start and end of a line like so… 
+
+`echo " xyz " | cut -c 2- | rev | cut -c 2- | rev`
+
+…notice our text "xyz" has one character of white space at the start and end. So we specifically tell `cut` to start at character 2 `x` and cut until the end of the line `2-` and then we use the `rev` command which reverses the content so it becomes " zyx" and then we again cut from the 2nd character (this time `z`) and cut until the end of the line and finally we reverse the line one more time so we're back to where we were initially but with the white space removed.
+
+There are probably more elegant ways to achieve this but it gives you an indication of how you might want to use a command in unique ways.
+
+### tr
+
+The `tr` command stands for 'translate characters' and it allows you to change the characters in a string of text into a different set of characters. For example...
+
+```
+echo "foo\nbar\nbaz" | tr "bf" "\!"
+```
+
+...here we're saying: "any occurance of the letters 'b' and 'f' that are found in the string 'foo\nbar\n\baz'" should be replaced with a `!`. 
+
+Notice also the `\n` (new line) character within our string, which means that when `tr` executes and loops over the string it'll see this single line as three individual lines; `foo` on the first line, `bar` on the second line and `baz` on the third line.
+
+The result would be...
+
+```
+!oo
+!ar
+!az
+```
+
+We can also invert the translation; so we can say "any occurance of a letter that ISN'T 'b' or 'f' then translate them into an '!'". For example,
+
+```
+echo "foo\nbar\nbaz" | tr -c "bf" "\!"
+```
+
+This is done using the `-c` flag/option. But now if we look at the result you'll find it hasn't quite done what we'd expect"
+
+```
+f!!!b!!!b!!!%
+```
+
+As you can see we've not catered for our `\n` new lines that were within our original string. The `tr` command has seen the new lines and replaced them with an `!` because as far as it's concerned a new line isn't either a 'b' or 'f' character.
+
+So we'll need to tweak our command slightly to accommodate our need to keep the new lines:
+
+```
+echo "foo\nbar\nbaz" | tr -c "bf\n" "\!"
+```
+
+Which result in:
+
+```
+f!!
+b!!
+b!!
+```
+
+The last thing I want to show you is the 'squeeze' command which you use by adding the `-s` flag/option. What this does is any consecutive letters (e.g. the 'o' in "fooobar" is repeated consecutively) will be reduced to a single replacement. For example,
+
+```
+echo "fooobar" | tr -s "o" "\!"
+```
+
+Results in:
+
+```
+f!bar
+```
+
+Where as if we didn't use the squeeze command we would've seen `f!!!bar` instead (notice the 'o' was translated multiple times)..
+
+### du
+
+The `du` command stands for "disk usage" and it will display the amount of space a directory occupies:
+
+```
+du -s -k ~/*
+```
+
+The `-s` flag displays an entry for each specified file, while the `-k` flag displays block counts in 1024-byte (1-Kbyte) blocks.
+
+Meaning running the above command will result in the following output (for me anyway):
+
+```
+0/Users/markmcdonnell/Applications
+1355232/Users/markmcdonnell/Box Documents (backup)
+6987864/Users/markmcdonnell/Box Sync
+1931180/Users/markmcdonnell/Code
+1488196/Users/markmcdonnell/Desktop
+13070884/Users/markmcdonnell/Documents
+964816/Users/markmcdonnell/Downloads
+3578120/Users/markmcdonnell/Dropbox
+17251988/Users/markmcdonnell/Library
+0/Users/markmcdonnell/Movies
+232/Users/markmcdonnell/Music
+1992/Users/markmcdonnell/Pictures
+0/Users/markmcdonnell/Public
+38075864/Users/markmcdonnell/VirtualBox VMs
+56/Users/markmcdonnell/bin
+588988/Users/markmcdonnell/db
+528/Users/markmcdonnell/lib
+2013/Users/markmcdonnell/man
+818320/Users/markmcdonnell/src
+```
+
+If we modify the command to pipe over to the `sort` command, like so `du -s -k ~/* | sort -k1nr | less`, then we can make the feedback a little bit more useful (i.e. the directories are sorted by overall size!):
+
+```
+du: 
+38075864        /Users/markmcdonnell/VirtualBox VMs
+17253304        /Users/markmcdonnell/Library
+13070884        /Users/markmcdonnell/Documents
+6987868 /Users/markmcdonnell/Box Sync
+3578120 /Users/markmcdonnell/Dropbox
+1931180 /Users/markmcdonnell/Code
+1488196 /Users/markmcdonnell/Desktop
+1355232 /Users/markmcdonnell/Box Documents (backup)
+964816  /Users/markmcdonnell/Downloads
+818320  /Users/markmcdonnell/src
+588988  /Users/markmcdonnell/db
+1992    /Users/markmcdonnell/Pictures
+528     /Users/markmcdonnell/lib
+232     /Users/markmcdonnell/Music
+56      /Users/markmcdonnell/bin
+20      /Users/markmcdonnell/man
+0       /Users/markmcdonnell/Applications
+0       /Users/markmcdonnell/Movies
+0       /Users/markmcdonnell/Public
+```
+
+### Double exclamation !!
+
+Sometimes you need to execute a command using `sudo` priviledges. If you forget to do this, don't write out the command again but with `sudo` at the start. Don't even use the up arrow key and then move the cursor to the start of the line to type `sudo`. All you need to do is to run `sudo !!`. The `!!` expands to the last command you executed.
+
+### Ctrl-r
+
+Rather than try to remember an old command you typed a few hours ago, let the terminal remember for you. If you press `<C-r>` (which is `<Ctrl>` and `r` keys at the same time) then start typing what you think the command was, the terminal will start to autocomplete using your command history. You can even press `<C-r>` multiple times to start cycling through your command history.
+
+<div id="10"></div>
+## Conclusion
+
+This was a pretty fast paced run through of some different unix commands. As time goes on I'll update this post to include other commands and real work use cases that I think would be interesting and useful to those readers new to the command line.
+
+If there were any errors or any thing like that then just let me know by pinging me on [twitter](http://twitter.com/integralist).

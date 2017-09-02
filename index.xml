@@ -345,6 +345,15 @@ The basic principle of the pattern is to separate the different areas of logic f
     </item>
     
     <item>
+      <title>Basic Shell Scripting</title>
+      <link>http://www.integralist.co.uk/posts/basic-shell-scripting/</link>
+      <pubDate>Tue, 01 Oct 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/basic-shell-scripting/</guid>
+      <description>Introduction Basics  What directory am I currently in? How can I see what&amp;rsquo;s in this directory? Moving around Displaying content of a file Copy a file Move a file Create a file Rename a file Delete a file Delete a directory Create a directory  Find (searching for files)  Finding files over a certain size  Grep (Searching for patterns) Sed (Find and Replace) Awk (Looping Logic) Piping I/O  Input and Output Redirection Piping Piping examples Sequences and Parallelism  Processes  Viewing processes Moving processes between the fore/background  Miscellaneous Commands  tee dig ps xargs cut tr du !</description>
+    </item>
+    
+    <item>
       <title>Message Passing in Object Oriented Code</title>
       <link>http://www.integralist.co.uk/posts/message-passing-in-object-oriented-code/</link>
       <pubDate>Sun, 31 Mar 2013 13:00:00 +0100</pubDate>

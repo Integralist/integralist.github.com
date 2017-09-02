@@ -63,5 +63,14 @@ Introduction This is a quick post to demonstrate how I use a simple Bash shell s
 Introduction Most web developers use a build tool of some sort nowadays. I’m not refering to continuous integration software like Jenkins CI (a very popular build system), but the lower-level software it uses to actually acquire dependencies and construct your applications with.</description>
     </item>
     
+    <item>
+      <title>Basic Shell Scripting</title>
+      <link>http://www.integralist.co.uk/posts/basic-shell-scripting/</link>
+      <pubDate>Tue, 01 Oct 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/basic-shell-scripting/</guid>
+      <description>Introduction Basics  What directory am I currently in? How can I see what&amp;rsquo;s in this directory? Moving around Displaying content of a file Copy a file Move a file Create a file Rename a file Delete a file Delete a directory Create a directory  Find (searching for files)  Finding files over a certain size  Grep (Searching for patterns) Sed (Find and Replace) Awk (Looping Logic) Piping I/O  Input and Output Redirection Piping Piping examples Sequences and Parallelism  Processes  Viewing processes Moving processes between the fore/background  Miscellaneous Commands  tee dig ps xargs cut tr du !</description>
+    </item>
+    
   </channel>
 </rss>
