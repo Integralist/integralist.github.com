@@ -177,6 +177,11 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/posts/git-tips/</loc>
+    <lastmod>2012-12-16T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/posts/javascript-101/</loc>
     <lastmod>2012-11-24T13:00:00+01:00</lastmod>
   </url>
@@ -340,10 +345,6 @@
     <loc>http://www.integralist.co.uk/tags/git/</loc>
     <lastmod>2016-08-22T13:00:00+01:00</lastmod>
     <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://www.integralist.co.uk/posts/git-tips/</loc>
   </url>
   
   <url>

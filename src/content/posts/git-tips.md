@@ -1,5 +1,6 @@
 ---
 title: "Git Tips"
+date: 2012-12-16T13:00:00+01:00
 categories:
   - "code"
   - "guide"
