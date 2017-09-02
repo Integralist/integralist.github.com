@@ -162,6 +162,11 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/posts/object-oriented-design/</loc>
+    <lastmod>2013-02-12T13:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/posts/javascript-101/</loc>
     <lastmod>2012-11-24T13:00:00+01:00</lastmod>
   </url>
@@ -292,6 +297,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/design/</loc>
+    <lastmod>2013-02-12T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/categories/development/</loc>
     <lastmod>2017-03-29T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -322,14 +333,14 @@
   </url>
   
   <url>
-    <loc>http://www.integralist.co.uk/tags/github/</loc>
-    <lastmod>2016-08-22T13:00:00+01:00</lastmod>
+    <loc>http://www.integralist.co.uk/categories/github/</loc>
+    <lastmod>2015-11-18T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://www.integralist.co.uk/categories/github/</loc>
-    <lastmod>2015-11-18T13:00:00+01:00</lastmod>
+    <loc>http://www.integralist.co.uk/tags/github/</loc>
+    <lastmod>2016-08-22T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -450,6 +461,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/nginx/</loc>
     <lastmod>2015-10-20T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/oop/</loc>
+    <lastmod>2013-02-12T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
