@@ -249,6 +249,18 @@ The basic principle of the pattern is to separate the different areas of logic f
     </item>
     
     <item>
+      <title>Message Passing in Object Oriented Code</title>
+      <link>http://www.integralist.co.uk/posts/message-passing-in-object-oriented-code/</link>
+      <pubDate>Sun, 31 Mar 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/message-passing-in-object-oriented-code/</guid>
+      <description>Introduction Quick example The Proxy Design Pattern How Ruby handles method calls Implementing method_missing Conclusion  
+Introduction In my previous post I quoted the following description of object-oriented design…
+ Object-Oriented Design is about the messages that get sent between objects and not the objects themselves.
+ The reason I felt this quote was important for good code design was because it helped focus our attention on improving our object&amp;rsquo;s interfaces.</description>
+    </item>
+    
+    <item>
       <title>JavaScript 101</title>
       <link>http://www.integralist.co.uk/posts/javascript-101/</link>
       <pubDate>Sat, 24 Nov 2012 13:00:00 +0100</pubDate>
