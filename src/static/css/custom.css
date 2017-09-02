@@ -15,6 +15,7 @@ code, kbd, samp {
   font-size: .8em;
 }
 
+td > code,
 h1 > code,
 h2 > code,
 h3 > code,
