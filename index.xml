@@ -325,6 +325,15 @@ Introduction This post isn&amp;rsquo;t about Functional Programming per se, as t
     </item>
     
     <item>
+      <title>Refactoring Techniques</title>
+      <link>http://www.integralist.co.uk/posts/refactoring-techniques/</link>
+      <pubDate>Sun, 10 Nov 2013 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/refactoring-techniques/</guid>
+      <description>Introduction Languages Why refactor? When should refactor? Tests Refactoring Techniques  Rename Method Introduce Explaining Variable Inline Temp Split Temp Variable Replace Temp With Query Replace Temp With Chain Extract Method Inline Method Move Method Replace Method With Method Object Replace Loop With Collection Closure Method Pull Up Method Form Template Method Extract Surrounding Method Self Encapsulate Field Introduce Named Parameter Remove Redundancy Dynamic Method Definition Extract Class Hide Delegate Replace Array with Object Replace Conditional with Polymorphism Decompose Conditional Introduce Null Object  Conclusion</description>
+    </item>
+    
+    <item>
       <title>MVCP: Model, View, Controller, Presenter</title>
       <link>http://www.integralist.co.uk/posts/mvcp/</link>
       <pubDate>Tue, 22 Oct 2013 13:00:00 +0100</pubDate>

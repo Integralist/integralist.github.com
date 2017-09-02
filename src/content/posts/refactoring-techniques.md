@@ -1,0 +1,1250 @@
+---
+title: "Refactoring Techniques"
+date: 2013-11-10T13:00:00+01:00
+categories:
+  - "code"
+  - "guide"
+tags:
+  - "design"
+  - "oop"
+  - "patterns"
+  - "refactoring"
+  - "ruby"
+draft: false
+---
+
+- [Introduction](#1)
+- [Languages](#2)
+- [Why refactor?](#3)
+- [When should refactor?](#4)
+- [Tests](#5)
+- [Refactoring Techniques](#6)
+	- [Rename Method](#7)
+	- [Introduce Explaining Variable](#8)
+	- [Inline Temp](#9)
+	- [Split Temp Variable](#10)
+	- [Replace Temp With Query](#11)
+	- [Replace Temp With Chain](#12)
+	- [Extract Method](#13)
+	- [Inline Method](#14)
+	- [Move Method](#15)
+	- [Replace Method With Method Object](#16)
+	- [Replace Loop With Collection Closure Method](#17)
+	- [Pull Up Method](#18)
+	- [Form Template Method](#19)
+	- [Extract Surrounding Method](#20)
+	- [Self Encapsulate Field](#21)
+	- [Introduce Named Parameter](#22)
+  - [Remove Redundancy](#23)
+	- [Dynamic Method Definition](#24)
+	- [Extract Class](#25)
+	- [Hide Delegate](#26)
+	- [Replace Array with Object](#27)
+	- [Replace Conditional with Polymorphism](#28)
+	- [Decompose Conditional](#29)
+	- [Introduce Null Object](#30)
+- [Conclusion](#31)
+
+<div id="1"></div>
+## Introduction
+
+Let's begin by considering: "What is Refactoring?"
+
+The definition of refactoring is:
+
+> a disciplined technique for restructuring an existing body of code, altering its internal structure without changing its external behaviour
+
+Refactoring is a term originated from the [Smalltalk](http://en.wikipedia.org/wiki/Smalltalk) community of developers back in the mid-late nineties. 
+
+Two of the most prolific programmers of recent times, [Martin Fowler](http://martinfowler.com/) and [Kent Beck](http://en.wikipedia.org/wiki/Kent_Beck) literally wrote the book on the subject of refactoring called "[Refactoring: Improving the Design of Existing Code](http://www.amazon.com/gp/product/0201485672)" (well, written by Martin with contributions from Kent).
+
+In 2009 both Martin and Kent helped with a rewrite of the book that focused more on the Ruby language than the original book's target language of Java. This follow-up book was called "[Refactoring: The Ruby Edition](http://www.amazon.com/Refactoring-Ruby-Edition-Jay-Fields/dp/0321603508)" and it's that book which is the primary driving force of this post.
+
+Since reading the Ruby edition I wanted to have a short summarised version of some of the more commonly used refactoring techniques (mainly for my own reference). By that I mean the techniques described in the book that I find interesting and use a lot in my day to day programming life.
+
+<div id="2"></div>
+## Languages
+
+These refactoring techniques aren't specific to the Ruby language. You can use them when working with JavaScript or PHP (or any other language for that matter). 
+
+Programming languages don't all offer identical APIs and so sometimes you might need to tweak the examples slightly to fit your environment. 
+
+Regardless, the idioms and syntax differences between languages become redundant when you just focus on the pattern(s) behind the proposed solution.
+
+<div id="3"></div>
+## Why refactor?
+
+The purpose of refactoring is to improve the quality, clarity and maintainability of your code. Simple really.
+
+But also, refactoring can be a great lesson in understanding an unfamiliar code base.
+
+Think about it, if you inherit a poorly designed code base that you've not seen before and you now need to either fix a bug or add a new feature, then implementing the code necessary would be a lot easier once you had refactored it to be in a more stable, maintainable and ultimately 'understandable' state. 
+
+Otherwise you would be forced to retro fit your new code on top of a poorly designed foundation and that would be the start of a very unhappy relationship.
+
+<div id="4"></div>
+## When should you refactor?
+
+You'll usually find the time you start refactoring the most is when you are fixing bugs or adding new features.
+
+For example, you typically first need to understand the code that has already been written (regardless of whether it was you who wrote it originally or someone else). 
+
+The process of refactoring helps you better understand the code, in preparation for modifying it.
+
+But don't fall into the trap of thinking that refactoring is something you set aside time for, or only consider at the start/end of a project. It's not. Refactoring should be done in small chunks throughout the entire life cycle of the project.
+
+As the great [Uncle Bob](http://www.cleancoder.com/) once said:
+
+> leave a module in a better state than you found it
+
+...what this suggests is that refactoring is essential to your daily coding process.
+
+<div id="5"></div>
+## Tests
+
+Before we get started, it's important to mention that you should have tests in place when you're refactoring. 
+
+You *can* refactor without tests, but realise that without tests to back you up then you can have no confidence in the refactoring you are implementing.
+
+Refactoring can result in substantial changes to the code and architecture but still leave the top layer API the same. So while you're refactoring remember the old adage...
+
+> program to an interface, not an implementation
+
+We want to avoid changing a public API where ever possible (as that's one of the tenets of refactoring).
+
+If you don't have tests then I recommend you write some (now)... don't worry, I'll wait.
+
+Remember, the process of writing tests (even for an application you don't know) will help solidify your understanding and expectations of the code you're about to work on.
+
+Code should be tested regularly while refactoring to ensure you don't break anything. Keep the 'red, green, refactor' feedback loop tight. Tests help confirm if your refactoring has worked or not. Without them you're effectively flying blind.
+
+So although I won't explicitly mention it below when discussing the different refactoring techniques, it is implied that on every change to your code you should really be running the relevant tests to ensure no broken code appears.
+
+<div id="6"></div>
+## Refactoring Techniques
+
+There are many documented refactoring techniques and I do not attempt to cover them all, as this post would end up becoming a book in itself. So I've picked what I feel are the most common and useful refactoring techniques and I try my best to explain them in a short and concise way.
+
+I've put these techniques in order of how you might approach refactoring a piece of code, in a linear, top to bottom order. This is a personal preference and doesn't necessarily represent the best way to refactor.
+
+Final note: with some of the techniques I have provided a basic code example, but to be honest some techniques are so simple they do not need any example. The [Extract Method](#extract-method) is one such technique that although really useful and important, providing a code example would be a waste of time and space.
+
+So without further ado, let's begin...
+
+<div id="7"></div>
+### Rename Method
+
+The single most effective and simple refactoring you can implement is to rename a property/attribute, method or object.
+
+Renaming identifiers can reduce the need for code comments and nearly always helps to promote greater clarity.
+
+You'll find that renaming things is a fundamental part of other refactoring techniques to aid understanding of the code.
+
+This technique relies on giving items a descriptive name to ensure the developer knows at a glance exactly what it does. The following technique [Introduce Explaining Variable](#introduce-explaining-variable) is effectively the same.
+
+<div id="8"></div>
+### Introduce Explaining Variable
+
+So here is a technique specifically based around the premise of renaming. 
+
+If you have a complicated expression (for example, you'll typically have a long winded set of conditions within an `if` statement) then place that complex expression into a temp variable and give it a descriptive identifier. 
+
+For example:
+
+```
+unless "This is a String with some CAPS".scan(/([A-Z])/).empty?
+  puts "capitalised text was found"
+end
+```
+
+Should be:
+
+```
+caps_not_found = "This is a String with some CAPS".scan(/([A-Z])/).empty?
+
+unless caps_not_found
+  puts "capitalised text was found"
+end
+```
+
+Note: this is the only technique that finds temps (i.e. local variables) acceptable. This is because temps are deemed to be less reusable than methods (due to their very nature being 'local') and so introducing temps is something that shouldn't be considered lightly. Maybe consider using the [Extract Method](#extract-method) technique instead before using this particular technique. 
+
+Also, don't worry about performance until you know you have a performance issue to worry about. Developers will always suggest that calling methods is slower than running code inline, but good programming is about readability and maintainability, and extracted methods are not only easier to understand but are much more reusable by other methods. 
+
+So if you are considering using the [Introduce Explaining Variable](#introduce-explaining-variable) technique, first decide whether the temp would be more useful if it was available to other methods (that way you could use [Extract Method](#extract-method) instead and avoid defining a temp altogether).
+
+<div id="9"></div>
+### Inline Temp
+
+Temp variables are a bit of a code smell as they make methods longer and can make the [Extract Method](#extract-method) more awkward (as you'd have to pass through more data to the extracted method).
+
+Inline Temp effectively removes the temp variable altogether by just using the value assigned to it (I'd only suggest doing this if the temp is only used once or if the resulting value has come from a method invocation).
+
+For example:
+
+```
+def add_stuff
+    1 + 1
+end
+
+def do_something
+    temp_variable_with_descriptive_name = add_stuff
+    puts "Number is #{temp_variable_with_descriptive_name}"
+end
+```
+
+Should be:
+
+```
+def add_stuff
+    1 + 1
+end
+
+def do_something
+    puts "Number is #{add_stuff}"
+end
+```
+
+Note: a temp by itself doesn't do any harm, and in some instances can actually make the code clearer (especially if using a result from a method invocation and the method identifier doesn't indicate the intent as well as it should).
+
+But most likely you'll end up using this technique to aid the [Extract Method](#extract-method) technique as less temp vars means less requirement to pass through additional parameters to the extracted method.
+
+<div id="10"></div>
+### Split Temp Variable
+
+This technique aims to resolve the concern of violating the SRP (Single Responsibility Principle), although slightly tamer in the sense that SRP is aimed more at Classes/Objects and methods, not typically variable assignments.
+
+But regardless if a temporary variable is assigned to more than once and it is not a loop variable or a collecting/accumulator variable then it is a temp considered to have too many responsibilities.
+
+**For example**: (this is a daft example, but what the heck)
+
+```
+temp = 2 * (height + width)
+temp = height * width
+```
+
+**Becomes**:
+
+```
+perimeter = 2 * (height + width)
+area = height * width
+```
+
+As you can see, the temp variable was handling more responsibility than it should be and so by creating two appropriately distinct temps we ensure greater code clarity.
+
+<div id="11"></div>
+### Replace Temp With Query
+
+This technique has a very similar intent to [Inline Temp](#inline-temp) in that one of its primary focuses is to aid the [Extract Method](#extract-method).
+
+The subtle but important difference between this technique and [Inline Temp](#inline-temp) is that the complex expression assigned to the temp needs to be first moved to a method (where as the [Inline Temp](#inline-temp) technique is different in that the temp may already be using a method invocation).
+
+For example:
+
+```
+class Box
+  attr_reader :length, :width, :height
+
+  def initialize length, width, height
+    @length = length
+    @width  = width
+    @height = height
+  end
+
+  def volume
+    # `area` is the temp
+    area = length * width
+    area * height
+  end
+end
+```
+
+Becomes:
+
+```
+class Box
+  attr_reader :length, :width, :height
+
+  def initialize length, width, height
+    @length = length
+    @width  = width
+    @height = height
+  end
+
+  def volume
+    # notice `area` is now a direct method call
+    area * height
+  end
+
+  def area
+    length * width
+  end
+end
+```
+
+This technique can help to shorten a long method by not having to define lots of temp variables just to hold values.
+
+If the extracted query method is given an identifier that aptly describes its purpose then the code still can be considered clear and descriptive. 
+
+Also, it is considered bad form to define a variable which changes once it has been set (hence moving to a method better indicates an unstable value). 
+
+Note: this technique can sometimes be made easier to implement once you've used [Split Temp Variable](#split-temp-variable). 
+
+Remember this technique (as with other techniques) is an incremental step towards removing non-essential temps, so consider using [Inline Temp](#inline-temp) afterwards, thus removing the need for the temp altogether.
+
+<div id="12"></div>
+### Replace Temp With Chain
+
+This is yet another technique designed to rid your code of temp variables. 
+
+If you have a temp variable holding the result of calling an object's method, and follow the assignment by using that temp to carry out more method calls, then you should consider chaining method calls instead.
+
+The implementation is quite simple, you just have to ensure the methods called return `self` (or `this` if using a language like JavaScript).
+
+By allowing methods to chain we again have the opportunity to remove an unnecessary temps.
+
+**For example**:
+
+```
+class College
+    def create_course
+        puts "create course"
+    end
+
+    def add_student
+        puts "add student"
+    end
+end
+
+temp = College.new
+temp.create_course
+temp.add_student
+temp.add_student
+temp.add_student
+```
+
+**Becomes**:
+
+```
+class College
+    # static method so can be accessed without creating an instance
+    def self.create_course
+        college = College.new
+        puts "create course"
+        college # return new object instance
+    end
+
+    def add_student
+        puts "add student"
+        self # refers to the new object instance
+    end
+end
+
+college = College.create_course
+                 .add_student
+                 .add_student
+                 .add_student
+```
+
+<div id="13"></div>
+### Extract Method
+
+Here it is! In my opinion '*The*' most used and important refactoring technique.
+
+The implementation behind this technique is very simple. It consists of breaking up long methods by shifting overly complex chunks of code into new methods which have very descriptive identifiers. 
+
+For example:
+
+```
+class Foo
+  attr_reader :bar
+
+  def initialize bar
+    @bar = bar
+  end
+
+  def do_something
+    puts "my baz" # notice this is duplication
+    puts bar
+  end
+
+  def do_something_else
+    puts "my baz" # notice this is duplication
+    puts "Something else"
+    puts bar
+  end
+end
+```
+
+Becomes:
+
+```
+class Foo
+  attr_reader :bar
+
+  def initialize bar
+    @bar = bar
+  end
+
+  def do_something
+    baz
+    puts bar
+  end
+
+  def do_something_else
+    baz
+    puts "Something else"
+    puts bar
+  end
+
+  def baz
+    puts "my baz"
+  end
+end
+```
+
+But be careful with handling local variables as you'll need to pass them through to the extracted method and that can be difficult if there are lots of temps in use. Sometimes to facility the Extract Method you'll need to first incorporate other techniques such as [Replace Temp With Query](#replace-temp-with-query) and [Inline Temp](#inline-temp).
+
+<div id="14"></div>
+### Inline Method
+
+Sometimes you want the opposite of the [Extract Method](#extract-method) technique. Imagine a method exists whose content is already simple and clear, and whose identifier adds no extra benefit. In this instance we're just making an extra call for no real benefit.
+
+So to fix this problem we'll convert the method invocation into an inlined piece of code (unless of course the method is used in multiple places, in that case leave it where it is as having it in a separate method keeps our code DRY).
+
+<div id="15"></div>
+### Move Method
+
+In a previous post about [Object-Oriented Design](http://www.integralist.co.uk/posts/object-oriented-design-ood/#class-analysis) I explained that you should query your classes/objects to ensure the methods they define are actually where they should be (another reason is 'feature envy', if a method is asking another class a lot of questions then it may be an indication the method is on the wrong object).
+
+The Move Method technique ensures this decoupling by simply moving the identified misplaced method onto the correct one.
+
+Once the method has been moved you should clean up the previously passed parameters by seeing what can be moved over to the other object or whether additional data needs to be passed over now via the method invocation. 
+
+For example:
+
+```
+class Gear
+    attr_reader :chainring, :cog, :rim, :tire
+
+    def initialize (chainring, cog, rim, tire)
+      @chainring = chainring
+      @cog       = cog
+      @rim       = rim
+      @tire      = tire
+
+      # let's asked the question:
+      # "Please Mr. Gear what is your tire size?"
+      # hmm? notice this doesn't sound like it quite fits the purpose of a 'Gears' class
+    end
+
+    def ratio
+      chainring / cog.to_f
+    end
+
+    def gear_inches
+        # tire goes around rim twice for diameter
+        ratio * (rim + (tire * 2))
+    end
+end
+```
+
+Becomes:
+
+```
+class Gear
+    attr_reader :chainring, :cog, :rim, :tire
+
+    def initialize (chainring, cog, rim, tire)
+      @chainring = chainring
+      @cog       = cog
+      @rim       = rim
+      @tire      = tire.size
+    end
+
+    def ratio
+      chainring / cog.to_f
+    end
+
+    def gear_inches
+        # tire goes around rim twice for diameter
+        ratio * (rim + (tire * 2))
+    end
+end
+
+class Tire
+  def self.size
+    5
+  end
+end
+```
+
+From the original class/object keep the original method in place while you test and change it so it now delegates to the method on the new object. Then slowly refactor by replacing delegating calls throughout your code base with direct calls to the method via its new host. 
+
+Finally, remove the old method altogether and the tests should tell you if you missed a replacement somewhere.
+
+<div id="16"></div>
+### Replace Method With Method Object
+
+You may run into a problem where you have a long method you want to use [Extract Method](#extract-method) on, but the number of temporary local variables are too great to allow you to utilise the [Extract Method](#extract-method) technique (because passing around that many variables would be just as messy as the long method itself).
+
+To resolve this issue you could look at different types of smaller refactors (such as [Inline Temp](#inline-temp)) but in some cases it would actually be better to first move the contents of the long method into an entirely new object.
+
+So the first thing to do is create a new class named after the long method and add the temp local vars as properties/attributes of the class/object.
+
+Now when you try to implement [Extract Method](#extract-method) you don't have to pass around the temp vars because they are now available throughout the class/object. 
+
+Then from within the original class/object you can delegate any calls to the original method on to the object (you'll still pass on the original arguments to the method within the new object but from there on the method extraction becomes easier).
+
+For example:
+
+```
+class Foo
+  def bar
+    puts "We're doing some bar stuff"
+  end
+
+  def baz(a, b, c)
+    if a == 'something'
+      # do something
+    end
+
+    if b == 'else'
+      # do else
+    end
+
+    if c == 'none'
+      # do none
+    end
+  end
+end
+```
+
+Becomes:
+
+```
+class Foo
+  def bar
+    puts "We're doing some bar stuff"
+  end
+end
+
+class Baz
+  attr_accessor :a, :b, :c
+
+  def initialize(a, b, c)
+    @a = a
+    @b = b
+    @c = c
+
+    if a == 'something'
+      # do something
+    end
+
+    if b == 'else'
+      # do else
+    end
+
+    if c == 'none'
+      # do none
+    end
+  end
+end
+```
+
+From here we're now in a better state to use both the [Extract Method](#extract-method) and [Replace Conditional with Polymorphism](/posts/even-more-refactoring-techniques/#replace-conditional-with-polymorphism) techniques to refactor the `Baz` class.
+
+<div id="17"></div>
+### Replace Loop With Collection Closure Method
+
+If you write a loop that parses a collection and interacts with the individual elements within the collection then move that interaction out into a separate closure based method (meaning you replace the loop with an Enumerable method). 
+
+This refactoring may not be as clear or impressive as other refactoring techniques but the motivation behind it is that you hide the ugly details of the loop behind a nicer iteration method, allowing the developer looking at the code to focus on the business logic instead.
+
+**For example**:
+
+```
+managers = []
+employees.each do |e|
+    managers << e if e.manager?
+end
+```
+
+**Becomes**:
+
+```
+managers = employees.select { |e| e.manager? }
+```
+
+Ruby has a few of these types of enumerable methods but other languages such as PHP and JavaScript aren't so lucky. 
+
+JavaScript has a couple of accumulators: `Array#reduce` and `Array#reduceRight` but they aren't very useful as closure based collection methods compared to Ruby which has methods such as `Enumerable#inject`, `Enumerable#select` (seen in above example) or `Enumerable#collect`. 
+
+Note: in JavaScript you can implement a similar effect with clever use of closures.
+
+<div id="18"></div>
+### Pull Up Method
+
+When you have duplicated code across two separate classes then the best refactoring technique to implement is to pull that duplicate code up into a super class so we DRY (Don't Repeat Yourself) out the code and allow it to be used in multiple places without duplication (meaning changes in future only have to happen in one place).
+
+For example:
+
+```
+class Person
+  attr_reader :first_name, :last_name
+
+  def initialize first_name, last_name
+    @first_name = first_name
+    @last_name = last_name
+  end
+
+end
+
+class MalePerson < Person
+  # This is duplicated in the `FemalePerson` class
+  def full_name
+    first_name + " " + last_name
+  end
+
+  def gender
+    "M"
+  end
+end
+
+class FemalePerson < Person
+  # This is duplicated in the `MalePerson` class
+  def full_name
+    first_name + " " + last_name
+  end
+
+  def gender
+    "F"
+  end
+end
+```
+
+Becomes:
+
+```
+class Person
+  attr_reader :first_name, :last_name
+
+  def initialize first_name, last_name
+    @first_name = first_name
+    @last_name = last_name
+  end
+
+  def full_name
+    first_name + " " + last_name
+  end
+end
+
+class MalePerson < Person
+  def gender
+    "M"
+  end
+end
+
+class FemalePerson < Person
+  def gender
+    "F"
+  end
+end
+```
+
+<div id="19"></div>
+### Form Template Method
+
+The technique is reliant on inheritance: a parent class and two sub classes of
+that parent. The two sub classes have methods which have similar steps, in the
+same order and yet the steps themselves are different.
+
+The technique involves moving the sequence of steps into the parent class and
+then using polymorphism to allow the sub classes to handle the differences in
+the steps.
+
+Here is a silly example (I’m no good at giving real examples; you may have noticed), here is an
+example of our problematic code…
+
+```
+class Foo; end
+
+class Bar < Foo
+  def initialize
+    @hey = 1
+    @hai = 2
+  end
+
+  def qux
+    @a = @hey + @hai
+    @b = @a * 10
+    @a + @b
+  end
+end
+
+class Baz < Foo
+  def initialize
+    @hey = 5
+    @hai = 7
+  end
+
+  def qux
+    @a = @hey + @hai
+    @b = @a * 10 * 20
+    @a + @b
+  end
+end
+
+bar = Bar.new
+baz = Baz.new
+
+puts bar.qux
+puts baz.qux
+```
+
+…we could try to inject the values each sub class requires but then we still
+have a lot of duplication in this code.
+
+We can see the sequence of steps is:
+
+determine what `a` should be  
+determine what `b` should be  
+return a specific calculation
+
+…so we can clean up our code a little by abstracting the commonality...
+
+```
+class Foo
+  def initialize(hey=1, hai=1)
+    @hey = hey
+    @hai = hai
+  end
+
+  def qux
+    determine_a
+    determine_b
+    result
+  end
+
+  def determine_a
+    @a = @hey + @hai
+  end
+
+  def result
+    @a + @b
+  end
+end
+
+class Bar < Foo
+  protected
+
+  def determine_b
+    @b = @a * 10
+  end
+end
+
+class Baz < Foo
+  protected
+
+  def determine_b
+    @b = @a * 10 * 20
+  end
+end
+
+bar = Bar.new(1, 2)
+baz = Baz.new(5, 7)
+
+puts bar.qux
+puts baz.qux
+```
+
+<div id="20"></div>
+### Extract Surrounding Method
+
+If you find you have different methods which contain almost identical code but with a slight variant in the middle, then pull up the duplicated code into a single method and pass a code block to the newly created method which it yields to in order to execute the unique behaviour...
+
+```
+def do_something
+    puts 1
+    yield
+    puts 3
+end
+
+do_something { puts 2 }
+```
+
+This is actually a common pattern in Ruby known as the 'wrap around' method. This technique is similar to the [Form Template Method](#form-template-method), but is different in that you can use it without forcing an inheritance model on your code.
+
+Note: JavaScript doesn't have the ability to pass a code block but it can be replicated by passing a function that acts like a callback...
+
+```
+function doSomething (callback) {
+        console.log(1);
+        callback();
+        console.log(3);
+}
+
+doSomething(function(){
+        console.log(2);
+});
+```
+
+...although in the latest versions of Node (as of November 2013) Generators are implemented and would allow JavaScript code to `yield` similar to how Ruby works.
+
+<div id="21"></div>
+### Self Encapsulate Field
+
+When inheriting properties from a parent class/object then it can be more flexible if the parent class only allows access to the properties from within a getter/setter.
+
+The motivation for this technique is that a sub class can override and modify the behaviour of the getter/setter without affecting the parent class' implementation. Which is similar to how the Decorator design pattern works (e.g. modifying the behaviour without affecting the original).
+
+This technique should only be used once you find the coupling between objects is becoming a problem. Otherwise direct access to properties and instance variables should be acceptable initially.
+
+For example:
+
+```
+def total
+  @base_price * (1 + @tax_rate)
+end
+```
+
+Becomes:
+
+```
+attr_reader :base_price, :tax_rate
+
+def total
+  base_price * (1 + tax_rate)
+end
+```
+
+<div id="22"></div>
+### Introduce Named Parameter
+
+When method arguments are unclear then convert them into named parameters so they become clearer (and easier to remember). 
+
+Although Ruby supports named parameters...
+
+```
+def turnOnTheTV (channel: 1, volume: 1); end
+turnOnTheTV(channel: 101, volume: 10)
+```
+
+...neither PHP or JavaScript do, so for PHP you can pass an associated Array and with JavaScript you can pass an Object/Hash.
+
+**For example (JavaScript)**:
+
+```
+function turnOnTheTV(c, v){}
+turnOnTheTV(101, 10);
+```
+
+**Becomes**:
+
+```
+function turnOnTheTV (config) {
+    // config.channel === 101
+    // config.volume  === 10
+}
+turnOnTheTV({ channel: 101, volume: 10 });
+```
+
+Note: ECMAScript 6.0 (the latest JavaScript specification - which is still being worked on as of Nov 2013) implements named parameters.
+
+<div id="23"></div>
+### Remove Redundancy
+
+This isn't an explicit technique, more a grouping of techniques.
+
+The principle idea being that: code evolves, and as it evolves you may find techniques you previously implemented (as part of an earlier refactoring) have since become redundant. 
+
+Imagine you implemented the "[Introduce Named Parameter](refactoring-techniques.html#22)" technique (passing a hash with named properties as a single argument instead of multiple unidentified arguments). 
+
+Now, after some other refactorings have taken place, you discover the method originally refactored is no longer as complex and so your argument hash refactor has been reduced down to just a single named property. 
+
+In this particular scenario you should remove the named parameter and simply pass a single argument instead.
+
+This principle applies with other refactoring techniques. 
+
+Imagine an earlier refactoring included implementing a default parameter value for a method call. As your code evolves, if you discover you now only ever call the method *with* an argument then the default value becomes redundant and makes the code more complex than it needs to be by providing a default value. So just remove the redundant code.
+
+<div id="24"></div>
+### Dynamic Method Definition
+
+Sometimes defining multiple methods can be wasteful when functionally they carry out similar steps. 
+
+For example, imagine we had the following code... 
+
+```
+def failure do 
+  self.result = "failure" 
+end 
+
+def success do 
+  self.result = "success" 
+end 
+
+def error do 
+  self.result = "error" 
+end 
+```
+
+Notice how the functions are structurally identical. They simply set a `result` property to have a value
+This can be refactored using Ruby's `define_method` method (which let's you create methods dynamically at run time)... 
+
+```
+[:failure, :success, :error].each do |method| 
+  define_method method do 
+    self.result = method.to_s 
+  end 
+end 
+```
+
+Note: you could also abstract this code into a more reusable (and easier to maintain) function like so... 
+
+```
+def dynamic_methods(*method_names, &block) 
+  method_names.each do |method_name| 
+    define_method method_name do 
+      instance_exec(method_name, &block)
+    end 
+  end 
+end 
+```
+
+You can also use this technique to help ease creating properties on an object. For example, I used this technique in my [MVCP](mvcp.html) blog post to dynamically create instance variables... 
+
+```
+require 'app/presenters/base' 
+require 'app/models/person' 
+
+class Presenters::Person < Presenters::Base 
+  attr_reader :run, :name, :age 
+
+  def initialize 
+    @run = true 
+
+    model = Person.new('Mark', '99') 
+    prepare_view_data({ :name => model.name, :age => model.age }) 
+  end 
+end 
+
+module Presenters 
+  class Base 
+    attr_accessor :model 
+
+    def prepare_view_data hash 
+      hash.each do |name, value| 
+        instance_variable_set("@#{name}", value) 
+      end 
+    end 
+  end 
+end 
+```
+
+<div id="25"></div>
+### Extract Class
+
+This is a pretty standard technique which helps ensure your objects abide by the SRP (Single Responsibility Principle). 
+
+If you find your classes are doing too much then simply create a new class and move the relevant fields and methods over one by one (while running the tests as you go to ensure all code continues working as expected).
+
+Doing so you'll end up with two small, focused and clean classes which are easier to manage. 
+
+<div id="26"></div>
+### Hide Delegate
+
+This technique focuses on the principle of object encapsulation. Specifically decoupling two or more objects by reducing the context the objects have of each other. 
+
+The following code demonstrates the idea...
+
+```
+module Bar
+  def display
+    puts "Bar Stuff"
+  end
+end
+
+module Baz
+  def display
+    puts "Baz Stuff"
+  end
+end
+
+class Foo
+  include Bar
+
+  def do_something
+    display
+  end
+end
+
+foo = Foo.new
+foo.do_something
+```
+
+...as you can see, the user only needs to rely on the interface having a `do_something` method. 
+
+The implementation details of `do_somthing` (in this case the delegation off to another method) are hidden.
+
+If we changed `include Bar` for `include Baz`, or maybe we don't mixin a module at all and just write some code inside of `do_something`, it doesn't matter because the public interface is set as far as the user is concerned.
+
+<div id="27"></div>
+### Replace Array with Object
+
+The motivation for this technique is to convert a simple data container which holds multiple data types into an object with clear and descriptive identifiers. 
+
+This principle helps to present your complex data into a more sensible format (I demonstrated this in a previous post on [object-oriented design](/posts/object-oriented-design-ood/#direct-references)). This technique also makes the data interaction more maintainable by providing an easier and understandable interface to the data. 
+
+Here is an example where we're violating the principle of a clean data interaction...
+
+```
+class Foo 
+  attr_reader :data 
+
+  def initialize(data) 
+    @data = data 
+  end 
+
+  def do_something 
+    data.each do |item| 
+      puts item[0] 
+      puts item[1] 
+      puts '---' 
+    end 
+  end 
+end 
+
+obj = Foo.new([[10, 25],[3, 9],[41, 7]]) 
+obj.do_something 
+```
+
+Notice in the first example how our code has far too much knowledge (context) about the object it's interacting with. It knows that the Array index zero holds an X coordinate and the Array index one holds a Y coordinate. 
+
+If that format was to change (let's say the X and Y swap places) then that would cause our code to break in unexpected ways.
+
+But now take a look at the following example which works around this issue by converting our complex data structure into a cleaner data format... 
+
+```
+class Foo 
+  attr_reader :new_data 
+
+  def initialize(data) 
+    @new_data = transform(data) 
+  end 
+
+  def do_something 
+    new_data.each do |item| 
+      # now we are able to reference easily understandable 
+      # property names (rather than item[0], item[1]) 
+      puts item.coord_x 
+      puts item.coord_y 
+      puts '---' 
+    end 
+  end 
+
+  Transform = Struct.new(:coord_x, :coord_y) 
+
+  def transform(data) 
+    data.collect { |item| Transform.new(item[0], item[1]) } 
+  end 
+end 
+
+obj = Foo.new([[10, 25],[3, 9],[41, 7]]) 
+obj.do_something 
+```
+
+...here we convert the Array into an object and instead can more easily and safely reference the data we're interested in via recognisable property identifiers. This doesn't mean if the data source changes that we'll totally avoid all problems but it'll be clearer where the problem is arising.
+
+<div id="28"></div>
+### Replace Conditional with Polymorphism
+
+This is one of the most useful refactoring techniques available to you, and there are two ways it can help: 
+
+1. It removes the code smell of conditional logic 
+2. It demonstrates perfectly the principle of object-oriented design 
+
+The following example shows the typical procedural attempt to handle different scenarios based on the data object type being passed...
+
+```
+class Foo
+  def initialize(data)
+    @data = data
+  end
+
+  def do_something
+    if @data.class == Bar
+      puts "Bar!"
+    elsif @data.class == Baz
+      puts "Baz!"
+    elsif @data.class == Qux
+      puts "Qux!"
+    end
+  end
+end
+
+class Bar; end
+class Baz; end
+class Qux; end
+
+foo_bar = Foo.new(Bar.new)
+foo_bar.do_something
+
+foo_baz = Foo.new(Baz.new)
+foo_baz.do_something
+
+foo_qux = Foo.new(Qux.new)
+foo_qux.do_something
+```
+
+...as you can see, if we have a new Class type we need to go back and to modify the `Foo` base class. This violates the OCP (Open/Closed Principle) which states a file should be open for extension but closed for modification.
+
+For us to abide by OCP we can use polymorphism and a trusted interface/duck typing to solve the problem...
+
+```
+class Foo
+  def initialize(data)
+    @data = data
+  end
+
+  def do_something
+    @data.identifier
+  end
+end
+
+class Bar
+  def identifier
+    puts "#{self.class}!"
+  end
+end
+
+class Baz
+  def identifier
+    puts "#{self.class}!"
+  end
+end
+
+class Qux
+  def identifier
+    puts "#{self.class}!"
+  end
+end
+
+foo_bar = Foo.new(Bar.new)
+foo_bar.do_something
+
+foo_baz = Foo.new(Baz.new)
+foo_baz.do_something
+
+foo_qux = Foo.new(Qux.new)
+foo_qux.do_something
+```
+
+Notice we have removed the need for a conditional and just sent the message to the relevant object to be handled. Much cleaner and easier to maintain and scale.
+
+<div id="29"></div>
+### Decompose Conditional
+
+Not all conditional statements can be avoided through the use of polymorphism. In those cases you can simplify the conditional logic (and the subsequent statements) by [extracting them into external methods](/posts/refactoring-techniques/#extract-method). 
+
+Here is a simple example...
+
+```
+if date < SUMMER_START || date > SUMMER_END 
+  charge = # some complex calculation if it's winter 
+else 
+  charge = # some other complex calculation if it's summer 
+end 
+```
+
+...which we can refactor like so... 
+
+```
+if not_summer(date) 
+  charge = winter_charge 
+else 
+  charge = summer_charge 
+end 
+```
+
+...much better.
+
+<div id="30"></div>
+### Introduce Null Object
+
+The motivation behind this technique is to avoid using a conditional whose purpose is to check whether a property exists or not before using it.
+
+Here is a simple example of what we want to avoid...
+
+```
+class Post
+  attr_reader :id
+
+  def initialize id
+    @id        = id
+    @published = false
+  end
+
+  def self.find_and_publish id
+    # Simulated database operation
+    post = Posts.find { |post| post.id == id }
+    post.publish unless post.nil?
+  end
+
+  def publish
+    puts @published = true
+  end
+end
+
+Posts = [Post.new(1), Post.new(2)]
+
+Post.find_and_publish(0) # displays nothing
+Post.find_and_publish(1) # displays true
+```
+
+...in the above example we check whether `post` is `nil` or not. If it isn't `nil` then we call the `publish` method, otherwise we don't do anything.
+
+This is kind of ugly.
+
+The following code demonstrates how we can avoid that problem by introducing the concept of having an object to handle null scenarios (it's the same principle of using duck typing/trusted interfaces/polymorphism)...
+
+```
+class Post
+  attr_reader :id
+
+  def initialize id
+    @id        = id
+    @published = false
+  end
+
+  def self.find_and_publish id
+    # Simulated database operation
+    post = Posts.find { |post| post.id == id } || NullPost.new
+    post.publish
+  end
+
+  def publish
+    puts @published = true
+  end
+end
+
+class NullPost
+  def publish
+    # noop
+  end
+end
+
+Posts = [Post.new(1), Post.new(2)]
+
+Post.find_and_publish(0) # displays nothing
+Post.find_and_publish(1) # displays true
+```
+
+...as you can see, effectively we have the same code with the exception that we no longer check for `nil?` in the second example and instead we rely on another object `NullPost` implementing the same interface but returns a null related value.
+
+This way we're using objects to handle our logic. Yes, we end up with more code (one extra Class) but ultimately this is more maintainable and understandable than lots of inline logic.
+
+<div id="31"></div>
+## Conclusion
+
+There are still many different refactoring techniques that I've not included. But hopefully you've found this quick reference useful so far.

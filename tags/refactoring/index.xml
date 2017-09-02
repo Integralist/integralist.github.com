@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Design on integralist</title>
-    <link>http://www.integralist.co.uk/tags/design/</link>
-    <description>Recent content in Design on integralist</description>
+    <title>Refactoring on integralist</title>
+    <link>http://www.integralist.co.uk/tags/refactoring/</link>
+    <description>Recent content in Refactoring on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
     <lastBuildDate>Sun, 10 Nov 2013 13:00:00 +0100</lastBuildDate>
     
-	<atom:link href="http://www.integralist.co.uk/tags/design/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://www.integralist.co.uk/tags/refactoring/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -18,17 +18,6 @@
       
       <guid>http://www.integralist.co.uk/posts/refactoring-techniques/</guid>
       <description>Introduction Languages Why refactor? When should refactor? Tests Refactoring Techniques  Rename Method Introduce Explaining Variable Inline Temp Split Temp Variable Replace Temp With Query Replace Temp With Chain Extract Method Inline Method Move Method Replace Method With Method Object Replace Loop With Collection Closure Method Pull Up Method Form Template Method Extract Surrounding Method Self Encapsulate Field Introduce Named Parameter Remove Redundancy Dynamic Method Definition Extract Class Hide Delegate Replace Array with Object Replace Conditional with Polymorphism Decompose Conditional Introduce Null Object  Conclusion</description>
-    </item>
-    
-    <item>
-      <title>Object Oriented Design</title>
-      <link>http://www.integralist.co.uk/posts/object-oriented-design/</link>
-      <pubDate>Tue, 12 Feb 2013 13:00:00 +0100</pubDate>
-      
-      <guid>http://www.integralist.co.uk/posts/object-oriented-design/</guid>
-      <description>Quick Summary Introduction Objects Class Analysis Dependencies Flexible Interfaces Duck Typing Inheritance Inheritance vs Composition Further good rules of development from Sandi Metz Summary  
-Quick Summary Here is a short summary for those of you who prefer to see a quick bullet-point list of items covered&amp;hellip;
- Decouple your code (we discuss this in more detail below) Describe your class to see if it does too much</description>
     </item>
     
   </channel>
