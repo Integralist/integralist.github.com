@@ -55,8 +55,8 @@ In the first, we have concepts such as Threads, Locks and Mutexes. In the latter
 
 The following diagram is an extremely simplistic view of how CPUs, Processes and Threads interact but should help us to better understand why code can become **NON** thread-safe (as far as the "Shared Memory" model is concerned; we'll see shortly that the "message passing" model side steps this issue):
 
-<a href="../images/cpu-processes-and-threads.png">
-    <img src="../images/cpu-processes-and-threads.png">
+<a href="../../images/cpu-processes-and-threads.png">
+    <img src="../../images/cpu-processes-and-threads.png">
 </a>
 
 ...for those of you who cannot see the image, effectively a process can spawn multiple threads and each thread belonging to a specific process shares the memory related to the process.
