@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Memory Management Types of Profiling Analysis Steps Base Example Timer Built-in module: timeit Built-in module: profiler Line Profiler Basic Memory Profiler Tracemalloc PyFlame (Flame Graphs) Conclusion  
+Memory Management Before we dive into the techniques and tools available for profiling Python applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.'>
+
+<meta property='og:title' content='Profiling Python ⋆ Mark McDonnell'>
+<meta property='og:description' content='Memory Management Types of Profiling Analysis Steps Base Example Timer Built-in module: timeit Built-in module: profiler Line Profiler Basic Memory Profiler Tracemalloc PyFlame (Flame Graphs) Conclusion  
+Memory Management Before we dive into the techniques and tools available for profiling Python applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/profiling-python/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='bash'><meta property='article:tag' content='profiling'><meta property='article:tag' content='python'><meta property='article:published_time' content='2017-10-31T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2017-10-31T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Profiling Python ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/profiling-python/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Profiling Python</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2017-10-31T13:00:00&#43;01:00'>2017-10-31</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    10 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Memory Management</a></li>
+<li><a href="#2">Types of Profiling</a></li>
+<li><a href="#3">Analysis Steps</a></li>
+<li><a href="#4">Base Example</a></li>
+<li><a href="#5">Timer</a></li>
+<li><a href="#6">Built-in module: timeit</a></li>
+<li><a href="#7">Built-in module: profiler</a></li>
+<li><a href="#8">Line Profiler</a></li>
+<li><a href="#9">Basic Memory Profiler</a></li>
+<li><a href="#10">Tracemalloc</a></li>
+<li><a href="#11">PyFlame (Flame Graphs)</a></li>
+<li><a href="#12">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="memory-management">Memory Management</h2>
+
+<p>Before we dive into the techniques and tools available for profiling Python applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.</p>
+
+<p>Python manages memory using <strong>reference counting</strong> semantics. What this means is, every time an object is referenced, either by a variable assignment or similar, the counter for that object is incremented. Once an object is not referenced anymore its memory is deallocated (its counter is decremented every time a reference is removed, until it reaches zero). But as long as there is a reference (somewhere in the program), then the object will not be deallocated (as the internal counter will be greater than zero).</p>
+
+<p>Now this can cause <a href="http://engineering.hearsaysocial.com/2013/06/16/circular-references-in-python/">problems</a> when dealing with <a href="https://stackoverflow.com/questions/9910774/what-is-a-reference-cycle-in-python">cyclical references</a>, so that&rsquo;s something to be aware of when investigating memory leaks and other memory related concerns.</p>
+
+<blockquote>
+<p>Note: for lots of details of how Python allocates memory, I highly recommend this presentation.</p>
+</blockquote>
+
+<p><div id="2"></div></p>
+
+<h2 id="types-of-profiling">Types of Profiling</h2>
+
+<p>There are a couple of approaches available to us for monitoring performance&hellip;</p>
+
+<ul>
+<li><strong>Timers</strong>: useful for benchmarking, as well as comparing <em>before</em> and <em>after</em> fixes.</li>
+<li><strong>Profilers</strong>: useful for high-level verification.</li>
+</ul>
+
+<p><div id="3"></div></p>
+
+<h2 id="analysis-steps">Analysis Steps</h2>
+
+<p>Regardless of the tool you use for analysis, a general rule of thumb is to:</p>
+
+<ol>
+<li><strong>Identify a bottleneck at a high-level</strong>
+
+<ul>
+<li>For example, you might notice a long running function call.</li>
+</ul></li>
+<li><strong>Reduce the operations</strong>
+
+<ul>
+<li>Look at time spent, or number of calls, and figure out an alternative approach.</li>
+<li>Look at the number of memory allocations, figure out an alternative approach.</li>
+</ul></li>
+<li><strong>Drill down</strong>
+
+<ul>
+<li>Use a tool that gives you data at a lower-level.</li>
+</ul></li>
+</ol>
+
+<p>Think about more performant algorithms or data structures.<br />
+There may also be simpler solutions.<br />
+Take a pragmatic look at your code.</p>
+
+<p><div id="4"></div></p>
+
+<h2 id="base-example">Base Example</h2>
+
+<p>Let’s begin with a simple program written using Python 3…</p>
+
+<pre><code>def get_number():
+    for i in range(10000000):
+        yield i
+
+
+def expensive_function():
+    for n in get_number():
+        r = n ^ n ^ n
+    return f&quot;some result! {r}&quot;
+
+
+print(expensive_function())
+</code></pre>
+
+<blockquote>
+<p>Note: I’m currently using Python version 3.6.3</p>
+</blockquote>
+
+<p>Running this program can take ~1.8 seconds and returns the value:</p>
+
+<pre><code>some result! 9999999
+</code></pre>
+
+<p><div id="5"></div></p>
+
+<h2 id="timer">Timer</h2>
+
+<p>We can use a simple decorator to time the length of our <code>expensive_function</code> call&hellip;</p>
+
+<pre><code>from time import time
+from functools import wraps
+
+
+def timefn(fn):
+    &quot;&quot;&quot;Simple timer decorator.&quot;&quot;&quot;
+    @wraps(fn)
+    def measure_time(*args, **kwargs):
+        t1 = time()
+        result = fn(*args, **kwargs)
+        t2 = time()
+        print(f&quot;@timefn: {fn.__name__} took {str(t2 - t1)} seconds&quot;)
+        return result
+    return measure_time
+</code></pre>
+
+<p>The problem with this approach is that the decorator results in additional latency. Meaning the program takes slightly longer to complete. Not a lot, but if you’re after precision then this can skew the results (which is a common theme when benchmarking or profiling).</p>
+
+<p><div id="6"></div></p>
+
+<h2 id="built-in-module-timeit">Built-in module: timeit</h2>
+
+<p>The built-in <a href="https://docs.python.org/3/library/timeit.html"><code>timeit</code></a> module is another simple way of benchmarking the time it takes for a function to execute. Simply import the module and call its interface.</p>
+
+<pre><code>import timeit
+…
+result = timeit.timeit(expensive_function, number=1)  # one repetition
+print(result)
+</code></pre>
+
+<blockquote>
+<p>Note: you can tweak the number param to determine how many repetitions it’ll run.</p>
+</blockquote>
+
+<p>Along with the <code>timeit</code> method, there is a <code>repeat</code> method that returns a set of averages across the number of repeated code executions.</p>
+
+<pre><code>result = timeit.repeat(expensive_function, number=1, repeat=5)
+</code></pre>
+
+<p>In this case result would contain something like:</p>
+
+<pre><code>[1.7263835030025803, 1.7080924350011628, 1.6802870190003887, 1.6736655100103235, 1.7003267239924753]
+</code></pre>
+
+<blockquote>
+<p>Note: according to the Python documentation when utilising the <code>repeat</code> method you should only be interested in the <code>min()</code> because…</p>
+
+<p>“In a typical case, the lowest value gives a lower bound for how fast your machine can run the given code snippet; higher values in the result vector are typically not caused by variability in Python’s speed, but by other processes interfering with your timing accuracy”.</p>
+</blockquote>
+
+<p>Finally, there is also a command line version you can utilise:<br />
+<code>python -m timeit</code></p>
+
+<p><div id="7"></div></p>
+
+<h2 id="built-in-module-profiler">Built-in module: profiler</h2>
+
+<p>There are two flavours of <a href="https://docs.python.org/3/library/profile.html">profiler</a>, a pure Python version (<code>import profile</code>) and a C extension version (<code>import cProfile</code>) which is preferred, as the former is remarkably slower.</p>
+
+<p>For example, the C profile took ~3 seconds to complete,
+whereas the Python version took over a minute.</p>
+
+<blockquote>
+<p>Note: if using <code>cProfile</code> you would execute: <code>cProfile.run(&quot;expensive_function()&quot;)</code> otherwise you would execute <code>profile.run(&quot;expensive_function()&quot;)</code>.</p>
+</blockquote>
+
+<p>You should see something like the following displayed after executing your program:</p>
+
+<pre><code>         10000005 function calls in 3.132 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+ 10000001    1.042    0.000    1.042    0.000 3_profile.py:4(get_number)
+        1    2.090    2.090    3.132    3.132 3_profile.py:9(expensive_function)
+        1    0.000    0.000    3.132    3.132 &lt;string&gt;:1(&lt;module&gt;)
+        1    0.000    0.000    3.132    3.132 {built-in method builtins.exec}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+</code></pre>
+
+<p>So from these results we can see:</p>
+
+<ul>
+<li>There were a total of <code>10000005</code> function calls.</li>
+<li>The <code>get_number</code> function was called the most (<code>10000001</code>).</li>
+<li>Every other function in the total recorded, were called just the once.</li>
+<li>The <code>expensive_function</code> took a total of 2.090 seconds (exc. sub function calls).</li>
+<li>The cumulative time (<code>cumtime</code>) is the <code>tottime</code> plus sub function calls.</li>
+</ul>
+
+<blockquote>
+<p>Note: when there are two numbers in the first column (for example <code>3/1</code>), it means that the function recursed. The second value is the number of primitive calls and the former is the total number of calls. Note that when the function does not recurse, these two values are the same, and only the single figure is printed.</p>
+</blockquote>
+
+<p>Instead of printing the results you can pass the run method a second argument which is a filename you want to store the results in. Once there you can use the <a href="https://docs.python.org/3/library/profile.html#pstats.Stats">pstats.Stats</a> module to carry out some post-processing on those results.</p>
+
+<p>Finally, there is also a command line version you can utilise:<br />
+<code>python -m cProfile [-o output_file] [-s sort_order] &lt;your_script.py&gt;</code></p>
+
+<p><div id="8"></div></p>
+
+<h2 id="line-profiler">Line Profiler</h2>
+
+<p>The <a href="https://pypi.python.org/pypi/line_profiler">Line Profiler</a> option gives much more granular detail than the built-in profile module, but it is an external package and so needs to be installed:</p>
+
+<pre><code>pip install line_profiler
+</code></pre>
+
+<p>Once installed you can write a decorator to wrap the functionality and make it easier for applying to specific functions you want to profile (as demonstrated below).</p>
+
+<pre><code>from line_profiler import LineProfiler
+
+
+def do_profile(follow=None):
+    if not follow:
+        follow = []
+
+    def inner(func):
+        def profiled_func(*args, **kwargs):
+            try:
+                profiler = LineProfiler()
+                profiler.add_function(func)
+                for f in follow:
+                    profiler.add_function(f)
+                profiler.enable_by_count()
+                return func(*args, **kwargs)
+            finally:
+                profiler.print_stats()
+        return profiled_func
+    return inner
+
+
+def get_number():
+    for i in range(10000000):
+        yield i
+
+
+@do_profile(follow=[get_number])
+def expensive_function():
+    for n in get_number():
+        r = n ^ n ^ n
+    return f&quot;some result! {r}&quot;
+
+
+print(expensive_function())
+</code></pre>
+
+<p>We can see the result of executing this program below…</p>
+
+<pre><code>Timer unit: 1e-06 s
+
+Total time: 7.59566 s
+File: 4_line_profile.py
+Function: get_number at line 23
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    23                                           def get_number():
+    24  10000001      3924533      0.4     51.7      for i in range(10000000):
+    25  10000000      3671129      0.4     48.3          yield i
+
+Total time: 27.477 s
+File: 4_line_profile.py
+Function: expensive_function at line 28
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    28                                           @do_profile(follow=[get_number])
+    29                                           def expensive_function():
+    30  10000001     22122124      2.2     80.5      for n in get_number():
+    31  10000000      5354911      0.5     19.5          r = n ^ n ^ n
+    32         1            3      3.0      0.0      return f&quot;some result! {r}&quot;
+
+some result! 9999999
+</code></pre>
+
+<blockquote>
+<p>Note: the Line Profiler is pretty slow (~35s) in comparison to the cProfiler (~4s)</p>
+</blockquote>
+
+<p>The Line Profiler will typically only analyse the function being decorated. In order for it to include sub function calls, you’ll need to specify them (hence the decorator allows you to provide a list of functions and in there we’ve specified the <code>get_number</code> function).</p>
+
+<p>The order in which you list the sub functions to ‘follow’ doesn’t matter, as the results will always display (top to bottom) the deepest nested sub function to the top level function (so we can see that <code>get_number</code> is nested inside of <code>expensive_function</code> and so it is top of the output).</p>
+
+<p>From these results we can get a line-by-line breakdown of how long (in percentages) each function took to complete. So <code>expensive_function</code> spent ~20% of its time calculating a value to assign to the variable <code>r</code>, and the remaining 80% was spent calculating a value to assign to the variable <code>n</code> (which was the call out to the <code>get_number</code> function).</p>
+
+<p>As for <code>get_number</code>, it was approximately <sup>50</sup>&frasl;<sub>50</sub> for time between looping the <code>range(10000000)</code> and <code>yield</code>’ing a value back to the caller context (i.e. <code>expensive_function</code>).</p>
+
+<p><div id="9"></div></p>
+
+<h2 id="basic-memory-profiler">Basic Memory Profiler</h2>
+
+<p>There is a module called <code>memory_profiler</code> which is very simple to use, although with the example code we’ve been using it was so painfully slow it was pretty much unusable (I gave up after 5 minutes of waiting). So, because of that issue, I’ll demonstrate a simpler example.</p>
+
+<p>But first you need to install the module:</p>
+
+<pre><code>pip install memory_profiler
+pip install psutil  # recommended to help speed up the reporting time
+</code></pre>
+
+<p>Now you can import the decorator, and apply that to our <em>new</em> ‘slow’ function:</p>
+
+<pre><code>from memory_profiler import profile
+
+@profile
+def expensive_memory_allocations():
+    a = [1] * (10 ** 6)
+    b = [2] * (2 * 10 ** 7)
+    del b
+    return a
+
+print(len(expensive_memory_allocations()))
+</code></pre>
+
+<p>When you run this program, you’ll see a memory breakdown similar to the following:</p>
+
+<pre><code>Line #    Mem usage    Increment   Line Contents
+================================================
+    35     27.8 MiB      0.0 MiB   @profile
+    36                             def beep():
+    37     35.4 MiB      7.6 MiB       a = [1] * (10 ** 6)
+    38    188.0 MiB    152.6 MiB       b = [2] * (2 * 10 ** 7)
+    39     35.4 MiB   -152.6 MiB       del b
+    40     35.4 MiB      0.0 MiB       return a
+</code></pre>
+
+<p>The second column “Mem usage” indicates the memory consumption for the Python interpreter after that line was executed. The third column “Increment” indicates the difference in increased memory compared to the previous line that was executed. So you can see, for example, when we delete the <code>b</code> variable we are able to reclaim the memory it was holding on to.</p>
+
+<p><div id="10"></div></p>
+
+<h2 id="tracemalloc">Tracemalloc</h2>
+
+<p>There is another basic memory profiler that provides similar features called <a href="https://docs.python.org/3/library/tracemalloc.html">tracemalloc</a> but this particular tool is part of the standard library in Python so it might be preferable to the external library <a href="#9">memory_profiler</a> (shown earlier).</p>
+
+<pre><code>import tracemalloc
+
+
+def get_number():
+    for i in range(10000000):
+        yield i
+
+
+def expensive_function():
+    for n in get_number():
+        r = n ^ n ^ n
+    return f&quot;some result! {r}&quot;
+
+
+tracemalloc.start()
+
+print(expensive_function())
+
+snapshot = tracemalloc.take_snapshot()
+top_stats = snapshot.statistics(&quot;lineno&quot;)
+
+print(&quot;[ Top 10 ]&quot;)
+for stat in top_stats[:10]:
+    print(stat)
+</code></pre>
+
+<p>The output from this example is as follows:</p>
+
+<pre><code>$ time python tracemalloc_example.py
+
+some result! 9999999
+
+[ Top 10 ]
+tracemalloc_example.py:17: size=106 B, count=2, average=53 B
+</code></pre>
+
+<blockquote>
+<p>Note: You might also consider <a href="https://pythonhosted.org/Pympler/muppy.html">Pympler</a> or <a href="http://mg.pov.lt/objgraph/">ObjGraph</a> for tracking memory usage &amp; object refs.</p>
+</blockquote>
+
+<p><div id="11"></div></p>
+
+<h2 id="pyflame-flame-graphs">PyFlame (Flame Graphs)</h2>
+
+<p>Flame graphs are a visualization of profiled software (stack traces), allowing the most frequent code-paths to be identified quickly and accurately. Flame graphs allows hot code-paths to be identified quickly.</p>
+
+<p><a href="https://github.com/uber/pyflame">PyFlame</a> is an effective tool (written in C++) for generating flame graph data, which can help you to understand the CPU and memory characteristics of your services. In some cases it can report more accurate results than those provided by the built-in Python modules.</p>
+
+<p>For more details on the design decisions behind PyFlame and the shortcomings of the other built-in options, then I would recommend reading <a href="https://eng.uber.com/pyflame/">this article</a>.</p>
+
+<p>PyFlame only works with Linux operating systems and so in order to profile our code (if you’re using macOS like I am), then we’ll have to utilise <a href="https://www.docker.com/">Docker</a> to help us. Below is a <code>Dockerfile</code> you can use as a basic starting point to try out PyFlame.</p>
+
+<blockquote>
+<p>Note: we also require <a href="https://github.com/brendangregg/FlameGraph">FlameGraph</a> in order to generate the flame graphs.</p>
+</blockquote>
+
+<pre><code>FROM python:3.6.3
+
+WORKDIR /pyflame
+
+# Install dependencies required to ‘build’ PyFlame
+RUN apt-get update -y
+RUN apt-get install -y git autoconf automake autotools-dev g++ pkg-config python-dev python3-dev libtool make
+
+# Build PyFlame
+RUN git clone https://github.com/uber/pyflame.git &amp;&amp; \
+    cd pyflame &amp;&amp; ./autogen.sh &amp;&amp; ./configure &amp;&amp; make
+
+WORKDIR /flamegraph
+
+RUN git clone https://github.com/brendangregg/FlameGraph
+
+COPY 7_pyflame.py /app/app.py
+
+WORKDIR /app
+
+CMD /pyflame/pyflame/src/pyflame -o prof.txt -t python app.py &amp;&amp;\
+    /flamegraph/FlameGraph/flamegraph.pl ./prof.txt
+</code></pre>
+
+<p>In order to build and run this <code>Dockerfile</code>, you’ll need to execute the following code…</p>
+
+<pre><code>docker build -t pyflame .
+
+docker run --privileged pyflame &gt; output.svg &amp;&amp; tail -n+2 output.svg &gt; output_stripped.svg
+</code></pre>
+
+<blockquote>
+<p>Note: our application sends data to stdout (e.g. <code>some result! 9999999</code>) and so this ends up at the top of our <code>output.svg</code> file. This means we need to remove it. We could either modify the application code or you could do what I’ve done and strip it after the file is created by using the <code>tail</code> command and redirecting the stripped output to a new file: <code>output_stripped.svg</code>.</p>
+</blockquote>
+
+<p>If we now open <code>output_stripped.svg</code> we should see the following interactive flame graph.</p>
+
+<p><a href="../../images/pyflame.png">
+    <img src="../../images/pyflame.png">
+</a></p>
+
+<p><div id="12"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s our tour of various tools for profiling your Python code. I&rsquo;ll follow this article up with a Go based one in the very near future.</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/development'>development</a>, <a class='category' href='/categories/guide'>guide</a>, <a class='category' href='/categories/performance'>performance</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/bash'>bash</a>, <a class='tag' href='/tags/profiling'>profiling</a>, <a class='tag' href='/tags/python'>python</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/dev-environments-within-docker-containers/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Dev Environments Within Docker Containers</a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

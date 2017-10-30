@@ -32,7 +32,7 @@
     <item>
       <title>Code</title>
       <link>http://www.integralist.co.uk/categories/code/</link>
-      <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
+      <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/categories/code/</guid>
       <description></description>
@@ -50,7 +50,7 @@
     <item>
       <title>Development</title>
       <link>http://www.integralist.co.uk/categories/development/</link>
-      <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
+      <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/categories/development/</guid>
       <description></description>
@@ -68,7 +68,7 @@
     <item>
       <title>Guide</title>
       <link>http://www.integralist.co.uk/categories/guide/</link>
-      <pubDate>Mon, 28 Nov 2016 13:00:00 +0100</pubDate>
+      <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/categories/guide/</guid>
       <description></description>
@@ -98,6 +98,15 @@
       <pubDate>Fri, 27 May 2016 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/categories/opinion/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Performance</title>
+      <link>http://www.integralist.co.uk/categories/performance/</link>
+      <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/categories/performance/</guid>
       <description></description>
     </item>
     

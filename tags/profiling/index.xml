@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Profiling on integralist</title>
+    <link>http://www.integralist.co.uk/tags/profiling/</link>
+    <description>Recent content in Profiling on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Tue, 31 Oct 2017 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/profiling/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Profiling Python</title>
+      <link>http://www.integralist.co.uk/posts/profiling-python/</link>
+      <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/profiling-python/</guid>
+      <description>Memory Management Types of Profiling Analysis Steps Base Example Timer Built-in module: timeit Built-in module: profiler Line Profiler Basic Memory Profiler Tracemalloc PyFlame (Flame Graphs) Conclusion  
+Memory Management Before we dive into the techniques and tools available for profiling Python applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.</description>
+    </item>
+    
+  </channel>
+</rss>
