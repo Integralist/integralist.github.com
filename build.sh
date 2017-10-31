@@ -8,7 +8,7 @@ function contains {
 }
 
 function remove_toplevel {
-  local blacklist=(build.sh CNAME keybase.txt README.md src)
+  local blacklist=(build.sh CNAME keybase.txt README.md .nojekyll src)
   local trigger=0
 
   for i in *; do
