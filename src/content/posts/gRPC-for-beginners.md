@@ -5,10 +5,9 @@ categories:
   - "code"
   - "guide"
 tags:
+  - "go"
   - "grpc"
   - "rpc"
-  - "golang"
-  - "go"
 draft: false
 ---
 

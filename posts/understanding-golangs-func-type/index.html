@@ -14,7 +14,7 @@ Introduction Here is some code that demonstrates the typical &lsquo;hello world&
 package main import ( &quot;fmt&quot; &quot;net/http&quot; ) func handler(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, &quot;Hello %s&quot;, r.URL.Path[1:]) } func main() { http.HandleFunc(&quot;/World&quot;, handler) http.ListenAndServe(&quot;:8080&quot;, nil) }   Note: http://localhost:8080/World will return Hello World'>
 <meta property='og:url' content='http://www.integralist.co.uk/posts/understanding-golangs-func-type/'>
 <meta property='og:site_name' content='integralist'>
-<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='grpc'><meta property='article:tag' content='rpc'><meta property='article:tag' content='golang'><meta property='article:tag' content='go'><meta property='article:published_time' content='2015-11-23T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2015-11-23T13:00:00&#43;01:00'/>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='go'><meta property='article:tag' content='grpc'><meta property='article:tag' content='rpc'><meta property='article:published_time' content='2015-11-23T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2015-11-23T13:00:00&#43;01:00'/>
 
 <meta name="generator" content="Hugo 0.26" />
 
@@ -558,7 +558,7 @@ func main() {
 </svg>
 
   </span>
-  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/grpc'>grpc</a>, <a class='tag' href='/tags/rpc'>rpc</a>, <a class='tag' href='/tags/golang'>golang</a>, <a class='tag' href='/tags/go'>go</a></div>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/go'>go</a>, <a class='tag' href='/tags/grpc'>grpc</a>, <a class='tag' href='/tags/rpc'>rpc</a></div>
 
     
   

@@ -8,7 +8,6 @@ tags:
   - "clojure"
   - "concurrency"
   - "go"
-  - "golang"
   - "jruby"
   - "threads"
 draft: false

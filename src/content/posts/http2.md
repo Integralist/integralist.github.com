@@ -7,11 +7,10 @@ categories:
 tags:
   - "HTTP"
   - "HTTP2"
-  - "network"
-  - "performance"
-  - "golang"
   - "go"
+  - "network"
   - "nginx"
+  - "performance"
 draft: false
 ---
 

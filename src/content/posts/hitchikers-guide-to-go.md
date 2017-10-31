@@ -6,7 +6,6 @@ categories:
   - "guides"
 tags:
   - "go"
-  - "golang"
 draft: false
 ---
 

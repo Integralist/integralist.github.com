@@ -24,6 +24,17 @@
     </item>
     
     <item>
+      <title>Profiling Go</title>
+      <link>http://www.integralist.co.uk/posts/profiling-go/</link>
+      <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/profiling-go/</guid>
+      <description>Memory Management Types of Profiling Analysis Steps Base Example ReadMemStats Pprof Trace Conclusion  
+Memory Management Before we dive into the techniques and tools available for profiling Go applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.
+Go’s implementation is a parallel mark-and-sweep garbage collector. In the traditional mark-and-sweep model, the garbage collector would stop the program from running (i.</description>
+    </item>
+    
+    <item>
       <title>Profiling Python</title>
       <link>http://www.integralist.co.uk/posts/profiling-python/</link>
       <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
