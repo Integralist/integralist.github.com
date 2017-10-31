@@ -35,7 +35,7 @@ Python manages memory using **reference counting** semantics. What this means is
 
 Now this can cause [problems](http://engineering.hearsaysocial.com/2013/06/16/circular-references-in-python/) when dealing with [cyclical references](https://stackoverflow.com/questions/9910774/what-is-a-reference-cycle-in-python), so that's something to be aware of when investigating memory leaks and other memory related concerns.
 
-> Note: for lots of details of how Python allocates memory, I highly recommend this presentation.
+> Note: for lots of details of how Python allocates memory, I highly recommend [this presentation](https://dmalcolm.fedorapeople.org/presentations/PyCon-US-2011/MemoryUsage.pdf).
 
 <div id="2"></div>
 ## Types of Profiling
