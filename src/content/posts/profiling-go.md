@@ -364,7 +364,7 @@ This indicates where all our memory is allocated on a “line-by-line” basis.
 
 In the following example we’ve modified the application to start up a web server and we’ve imported the `"net/http/pprof"` [package](https://golang.org/pkg/net/http/pprof/) which automatically profiles what’s happening.
 
-> Note: if your application already uses a web server, then you don’t need to start your own
+> Note: if your application already uses a web server, then you don’t need to start another. The pprof package will hook into your web server’s multiplexer.
 
 ```
 package main

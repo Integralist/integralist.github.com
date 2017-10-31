@@ -510,7 +510,7 @@ ROUTINE ======================== main.main in /.../code/go/profiling/main.go
 <p>In the following example we’ve modified the application to start up a web server and we’ve imported the <code>&quot;net/http/pprof&quot;</code> <a href="https://golang.org/pkg/net/http/pprof/">package</a> which automatically profiles what’s happening.</p>
 
 <blockquote>
-<p>Note: if your application already uses a web server, then you don’t need to start your own</p>
+<p>Note: if your application already uses a web server, then you don’t need to start another. The pprof package will hook into your web server’s multiplexer.</p>
 </blockquote>
 
 <pre><code>package main
