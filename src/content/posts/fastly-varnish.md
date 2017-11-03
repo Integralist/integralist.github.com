@@ -226,3 +226,7 @@ In this scenario we don't find a stale object in either `vcl_fetch` or `vcl_deli
 ## Conclusion
 
 So there we have it, a quick run down of how some important aspects of Varnish and VCL work (and specifically for Fastly's implementation).
+
+One thing I want to mention is that I am personally a HUGE fan of Fastly and the tools they provide. They are an amazing company and their software has helped BuzzFeed (and many other large organisations) to scale massively with ease.
+
+I would also highly recommend watching this talk by Rogier Mulhuijzen (Senior Varnish Engineer - who currently works for Fastly) on "Advanced VCL": [vimeo.com/226067901](https://vimeo.com/226067901). It goes into great detail about some complex aspects of VCL and Varnish and really does a great job of elucidating them.
