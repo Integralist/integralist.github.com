@@ -93,6 +93,15 @@
     </item>
     
     <item>
+      <title>Cdn</title>
+      <link>http://www.integralist.co.uk/tags/cdn/</link>
+      <pubDate>Thu, 02 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/cdn/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Certificates</title>
       <link>http://www.integralist.co.uk/tags/certificates/</link>
       <pubDate>Sat, 03 Oct 2015 13:00:00 +0100</pubDate>
@@ -179,6 +188,15 @@
       <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/docker/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Fastly</title>
+      <link>http://www.integralist.co.uk/tags/fastly/</link>
+      <pubDate>Thu, 02 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/fastly/</guid>
       <description></description>
     </item>
     
@@ -593,6 +611,24 @@
       <pubDate>Wed, 07 Oct 2015 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/utility/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Varnish</title>
+      <link>http://www.integralist.co.uk/tags/varnish/</link>
+      <pubDate>Thu, 02 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/varnish/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Vcl</title>
+      <link>http://www.integralist.co.uk/tags/vcl/</link>
+      <pubDate>Thu, 02 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/vcl/</guid>
       <description></description>
     </item>
     

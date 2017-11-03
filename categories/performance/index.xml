@@ -6,10 +6,22 @@
     <description>Recent content in Performance on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Tue, 31 Oct 2017 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 02 Nov 2017 13:00:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/categories/performance/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Fastly Varnish</title>
+      <link>http://www.integralist.co.uk/posts/fastly-varnish/</link>
+      <pubDate>Thu, 02 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/fastly-varnish/</guid>
+      <description>Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Hit for Pass Serving Stale Conclusion  
+Introduction Varnish is an open-source HTTP accelerator.
+More concretely it is a web application that acts like a HTTP reverse-proxy.
+You place Varnish in front of your application servers (those that are serving HTTP content) and it will cache that content for you. If you want more information on what Varnish cache can do for you, then I recommend reading through their introduction article (and watching the video linked there as well).</description>
+    </item>
     
     <item>
       <title>Profiling Go</title>

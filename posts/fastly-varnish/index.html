@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Hit for Pass Serving Stale Conclusion  
+Introduction Varnish is an open-source HTTP accelerator.
+More concretely it is a web application that acts like a HTTP reverse-proxy.
+You place Varnish in front of your application servers (those that are serving HTTP content) and it will cache that content for you. If you want more information on what Varnish cache can do for you, then I recommend reading through their introduction article (and watching the video linked there as well).'>
+
+<meta property='og:title' content='Fastly Varnish ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Hit for Pass Serving Stale Conclusion  
+Introduction Varnish is an open-source HTTP accelerator.
+More concretely it is a web application that acts like a HTTP reverse-proxy.
+You place Varnish in front of your application servers (those that are serving HTTP content) and it will cache that content for you. If you want more information on what Varnish cache can do for you, then I recommend reading through their introduction article (and watching the video linked there as well).'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/fastly-varnish/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='cdn'><meta property='article:tag' content='fastly'><meta property='article:tag' content='varnish'><meta property='article:tag' content='vcl'><meta property='article:published_time' content='2017-11-02T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2017-11-02T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Fastly Varnish ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/fastly-varnish/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Fastly Varnish</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2017-11-02T13:00:00&#43;01:00'>2017-11-02</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    11 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Varnish Default VCL</a></li>
+<li><a href="#3">Fastly Custom VCL</a></li>
+<li><a href="#4">Fastly Request Flow Diagram</a></li>
+<li><a href="#5">Hit for Pass</a></li>
+<li><a href="#6">Serving Stale</a></li>
+<li><a href="#7">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p><a href="https://varnish-cache.org/">Varnish</a> is an open-source HTTP accelerator.<br />
+More concretely it is a web application that acts like a <a href="https://en.wikipedia.org/wiki/Reverse_proxy">HTTP reverse-proxy</a>.</p>
+
+<p>You place Varnish in front of your application servers (those that are serving HTTP content) and it will cache that content for you. If you want more information on what Varnish cache can do for you, then I recommend reading through their <a href="https://varnish-cache.org/intro/index.html">introduction article</a> (and watching the video linked there as well).</p>
+
+<p><a href="https://www.fastly.com/">Fastly</a> is many things, but for most people they are a CDN provider who utilise a highly customised version of Varnish. This post is about Varnish and explaining a couple of specific features (such as hit-for-pass and serving stale) and how they work in relation to Fastly&rsquo;s implementation of Varnish.</p>
+
+<p>This is not a &ldquo;VCL 101&rdquo;. If you need help understanding anything mentioned in this post, then I recommend reading:</p>
+
+<ul>
+<li><a href="http://book.varnish-software.com/4.0/">Varnish Book</a></li>
+<li><a href="https://info.varnish-software.com/blog">Varnish Blog</a></li>
+<li><a href="https://www.fastly.com/blog">Fastly Blog</a></li>
+</ul>
+
+<blockquote>
+<p>Fastly has a couple of <em>excellent</em> articles on utilising the <code>Vary</code> HTTP header (highly recommended reading).</p>
+</blockquote>
+
+<p>The reason for this post is because when dealing with Varnish and VCL it gets very confusing having to jump between official documentation for VCL and Fastly&rsquo;s specific implementation of it. Even more so because the version of Varnish Fastly are using is now quite old and yet they&rsquo;ve also implemented some features from more recent Varnish versions. Meaning you end up getting in a muddle about what should and should not be the expected behaviour (especially around the general request flow cycle).</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="varnish-default-vcl">Varnish Default VCL</h2>
+
+<p>When using the open-source version of Varnish, you&rsquo;ll typically implement your own custom VCL logic (e.g. add code to <code>vcl_recv</code> or any of the other common VCL subroutines). But it&rsquo;s important to be aware that if you don&rsquo;t <code>return</code> an action (e.g. <code>return(pass)</code>, or trigger any of the other available Varnish &lsquo;states&rsquo;), then Varnish will continue to execute its own built-in VCL logic (i.e. its built-in logic is <em>appended</em> to your custom VCL).</p>
+
+<p>You can view the &lsquo;default&rsquo; (or &lsquo;builtin&rsquo;) logic for each version of Varnish via GitHub:</p>
+
+<ul>
+<li><a href="https://github.com/varnishcache/varnish-cache/blob/2.1/bin/varnishd/default.vcl">Varnish v2.1</a> (the version used by Fastly)</li>
+<li><a href="https://github.com/varnishcache/varnish-cache/blob/3.0/bin/varnishd/default.vcl">Varnish v3.0</a></li>
+<li><a href="https://github.com/varnishcache/varnish-cache/blob/4.0/bin/varnishd/builtin.vcl">Varnish v4.0</a></li>
+<li><a href="https://github.com/varnishcache/varnish-cache/blob/5.0/bin/varnishd/builtin.vcl">Varnish v5.0</a></li>
+</ul>
+
+<blockquote>
+<p>Note: after v3 Varnish renamed the file from <code>default.vcl</code> to <code>builtin.vcl</code>.</p>
+</blockquote>
+
+<p>But things are slightly different with Fastly&rsquo;s Varnish implementation (which is based off Varnish open-source version 2.1.5).</p>
+
+<p>Specifically:</p>
+
+<ul>
+<li>no <code>return(pipe)</code> in <code>vcl_recv</code>, they do <code>pass</code> there</li>
+<li>some modifications to the <code>synthetic</code> in <code>vcl_error</code></li>
+</ul>
+
+<p><div id="3"></div></p>
+
+<h2 id="fastly-custom-vcl">Fastly Custom VCL</h2>
+
+<p>On top of the built-in VCL the open-source version of Varnish uses, Fastly also includes its own &lsquo;custom&rsquo; VCL logic alongside your own additions.</p>
+
+<p>You can see Fastly&rsquo;s VCL boilerplate, and learn more about their custom VCL implementation <a href="https://docs.fastly.com/guides/vcl/mixing-and-matching-fastly-vcl-with-custom-vcl">here</a>.</p>
+
+<p>You can also view their generated custom VCL here in this isolated gist (for reference purposes):</p>
+
+<ul>
+<li><a href="https://gist.github.com/Integralist/56cf991ae97551583d5a2f0d69f37788">Fastly&rsquo;s Custom VCL</a></li>
+</ul>
+
+<p><div id="4"></div></p>
+
+<h2 id="fastly-request-flow-diagram">Fastly Request Flow Diagram</h2>
+
+<p>Below is a diagram of Fastly&rsquo;s VCL request flow (including its WAF and Clustering logic)&hellip;</p>
+
+<p><a href="../../images/fastly-request-flow.png">
+    <img src="../../images/fastly-request-flow.png">
+</a></p>
+
+<p>This is very useful for confirming how your VCL logic is expected to behave.</p>
+
+<p><div id="5"></div></p>
+
+<h2 id="hit-for-pass">Hit for Pass</h2>
+
+<p>You may notice in Varnish&rsquo;s built-in <code>vcl_fetch</code> the following logic:</p>
+
+<pre><code class="language-vcl">sub vcl_fetch {
+    if (!beresp.cacheable) {
+        return (pass);
+    }
+    if (beresp.http.Set-Cookie) {
+        return (pass);
+    }
+    return (deliver);
+}
+</code></pre>
+
+<p>Now typically when you <code>return(pass)</code> you do that in <code>vcl_recv</code> to indicate to Varnish you do not want to lookup the content in the cache and to skip ahead to fetching the content from the origin. But when you <code>return(pass)</code> from <code>vcl_fetch</code> it causes a slightly different behaviour. Effectively we&rsquo;re telling Varnish we don&rsquo;t want to cache the content we&rsquo;ve received from the origin.</p>
+
+<blockquote>
+<p>In the case of the VCL logic above, we&rsquo;re not caching this content because we can see there is a cookie set (indicating possibly unique user content).</p>
+</blockquote>
+
+<p>You&rsquo;ll probably also notice in some organisation&rsquo;s own custom <code>vcl_fetch</code> the following additional logic:</p>
+
+<pre><code class="language-vcl">if (beresp.http.Cache-Control ~ &quot;private&quot;) {
+  return(pass);
+}
+</code></pre>
+
+<p>This content isn&rsquo;t cached simply because the backend has indicated (via the <code>Cache-Control</code> header) that the content is <code>private</code> and so should not be cached.</p>
+
+<p>But you&rsquo;ll find that even though you&rsquo;ve executed a <code>return(pass)</code> operation, Varnish will <em>still</em> create an object and cache it.</p>
+
+<p>The object it creates is called a &ldquo;hit-for-pass&rdquo; (if you look back at the Fastly request flow diagram above you&rsquo;ll see it referenced) and it is given a ttl of 120s (i.e. it&rsquo;ll be cached for 120 seconds).</p>
+
+<blockquote>
+<p>Note: the ttl can be changed using vcl but it should be kept small</p>
+</blockquote>
+
+<p>The reason Varnish creates an object and caches it is because if it <em>didn&rsquo;t</em>, when <code>return(pass)</code> is executed and the content subsequently is not cached, then if another request is made for that same resource, we would find &ldquo;request collapsing&rdquo; causes a performance issue for users.</p>
+
+<p>Request collapsing is where Varnish blocks requests for what looks to be the same uncached resource. It does this in order to prevent overloading your origin. So for example, if there are ten requests for an uncached resource, it&rsquo;ll allow one request through to origin and block the other nine until the origin has responded and the content has been cached. The nine requests would then get the content from the cache.</p>
+
+<p>But in the case of uncachable content (e.g. content that uses cookies typically will contain content that is unique to the user requesting the resource) users are blocked waiting for an existing request for that resource to complete, only to find that as the resource is uncacheable the request needs to be made again (this cycle would repeat for each user requesting this unique/uncacheable resource).</p>
+
+<p>As you can imagine, this is very bad because the requests for this uncachable content has resulted in sequential processing.</p>
+
+<p>So when we &ldquo;pass&rdquo; inside of <code>vcl_fetch</code> Varnish prevents this bad sequential processing. It does this by creating a &ldquo;hit-for-pass&rdquo; object which has a short ttl of 120s, and so for the next 120s any requests for this same resource will <em>not</em> result in request collapsing (i.e. user requests to origin will not be blocked waiting for an already &ldquo;in-flight&rdquo; origin request to complete). Meaning, <em>all</em> requests will be sent straight through to the origin.</p>
+
+<p>In order for this processing to work, we need <code>vcl_hit</code> to check for a &ldquo;hit-for-pass&rdquo; object. If we check Varnish&rsquo;s built-in logic we can see:</p>
+
+<pre><code class="language-vcl">sub vcl_hit {
+    if (!obj.cacheable) {
+        return (pass);
+    }
+    return (deliver);
+}
+</code></pre>
+
+<p>What this does is it checks whether the object we found in the cache has the attribute <code>cacheable</code> set to &lsquo;false&rsquo;, and if it does we&rsquo;ll not deliver that cached object to the user but instead skip ahead to fetching the resource again from origin.</p>
+
+<p>By default this <code>cacheable</code> attribute is set to &lsquo;true&rsquo;, but when Varnish executes <code>return(pass)</code> from inside of <code>vcl_fetch</code> it caches the &ldquo;hit-for-pass&rdquo; object with the <code>cacheable</code> attribute set to &lsquo;false&rsquo;.</p>
+
+<p>The reason the ttl for a &ldquo;hit-for-pass&rdquo; object is supposed to be short is because, for that period of time, your origin is susceptible to multiple requests. So you don&rsquo;t want your origin to become overloaded by lots of traffic for uncacheable content.</p>
+
+<blockquote>
+<p>See <a href="https://info.varnish-software.com/blog/hit-for-pass-varnish-cache">this Varnish blog post</a> for the full details.</p>
+</blockquote>
+
+<p><div id="6"></div></p>
+
+<h2 id="serving-stale">Serving Stale</h2>
+
+<p>If we get a 5xx error from our origins we don&rsquo;t cache them.</p>
+
+<p>But instead of serving that 5xx to the user (or our <a href="https://s3.amazonaws.com/buzzfeed-static/static/500-error-page.html">custom &ldquo;Uh-oh&rdquo; 500 error page</a>), we&rsquo;ll attempt to locate a &lsquo;stale&rsquo; version of the content and serve that to the user instead (i.e. &lsquo;stale&rsquo; in this case means a resource that was requested and cached previously, but the object was marked as being something that could be served stale if its &lsquo;stale ttl&rsquo; has yet to expire).</p>
+
+<p>The reason we do this is because serving old (i.e. stale) content is better than serving an error.</p>
+
+<p>In order to serve stale we need to add some conditional checks into our VCL logic.</p>
+
+<p>You&rsquo;ll typically notice in both <code>vcl_fetch</code> and <code>vcl_deliver</code> there are checks for a 5xx status code in the response we got back from origin, and subsequently a further check for <code>stale.exists</code> if we found a match for a 5xx status code. It looks something like the following:</p>
+
+<pre><code class="language-vcl">if (&lt;object&gt;.status &gt;= 500 &amp;&amp; &lt;object&gt;.status &lt; 600) {
+  if (stale.exists) {
+    # ...
+  }
+}
+</code></pre>
+
+<blockquote>
+<p>Where <code>&lt;object&gt;</code> is either <code>beresp</code> (<code>vcl_fetch</code>) or <code>resp</code> (<code>vcl_deliver</code>).</p>
+</blockquote>
+
+<p>When looking at the value for <code>stale.exists</code>, if it returns &lsquo;true&rsquo;, it is telling us that there is an object in the cache whose ttl has expired but as far as Varnish is concerned is still valid for serving as stale content. The way Varnish knows whether to keep a stale object around so it can be used for serving as stale content depends on the following settings:</p>
+
+<pre><code class="language-vcl">set beresp.stale_while_revalidate = &lt;N&gt;s;
+set beresp.stale_if_error = &lt;N&gt;s;
+</code></pre>
+
+<blockquote>
+<p>Where <code>&lt;N&gt;</code> is the amount of time in seconds you want to keep the object for after its ttl has expired.</p>
+</blockquote>
+
+<ul>
+<li><code>stale_while_revalidate</code>: when cache ttl expires, we&rsquo;ll serve stale for 60s while we acquire fresh content</li>
+<li><code>stale_if_error</code>: if we have an error, we&rsquo;ll serve stale for 1hr while we acquire fresh content</li>
+</ul>
+
+<blockquote>
+<p>You can find more details on Fastly&rsquo;s implementation <a href="https://docs.fastly.com/guides/performance-tuning/serving-stale-content">here</a> as well as a blog post announcing this feature <a href="https://www.fastly.com/blog/stale-while-revalidate-stale-if-error-available-today/">here</a>.</p>
+</blockquote>
+
+<h3 id="different-actions-for-different-states">Different actions for different states</h3>
+
+<p>So if we find a stale object, we need to deliver it to the user. But the action you take (as far as Fastly&rsquo;s implementation of Varnish is concerned) depends on which state Varnish currently is in (<code>vcl_fetch</code> or <code>vcl_deliver</code>).</p>
+
+<p>When you&rsquo;re in <code>vcl_fetch</code> you&rsquo;ll <code>return(deliver_stale)</code> and in <code>vcl_deliver</code> you&rsquo;ll <code>return(restart)</code>.</p>
+
+<h4 id="why-the-difference">Why the difference?</h4>
+
+<p>The reason for this difference is to do with Fastly&rsquo;s Varnish implementation and how they handle &lsquo;clustering&rsquo;.</p>
+
+<p>According to Fastly you&rsquo;ll typically find, due to the way their &lsquo;clustering&rsquo; works, that <code>vcl_fetch</code> and <code>vcl_deliver</code> generally run on <em>different</em> servers (although that&rsquo;s not always the case, as we&rsquo;ll soon see) and so different servers will have different caches.</p>
+
+<blockquote>
+<p>&ldquo;What we refer to as &lsquo;clustering&rsquo; is when two servers within the same POP communicate with each other for cache optimization purposes&rdquo; &ndash; Fastly</p>
+</blockquote>
+
+<h4 id="the-happy-path-stale-found-in-vcl-fetch">The happy path (stale found in <code>vcl_fetch</code>)</h4>
+
+<p>If a stale object is found in <code>vcl_fetch</code>, then <code>deliver_stale</code> will send the found stale content to <code>vcl_deliver</code> with a status of 200. This means when <code>vcl_deliver</code> checks the status code it&rsquo;ll not see a 5xx and so it&rsquo;ll just deliver that stale content to the user.</p>
+
+<h4 id="the-longer-path-stale-found-in-vcl-deliver">The longer path (stale found in <code>vcl_deliver</code>)</h4>
+
+<p>Imagine <code>vcl_fetch</code> is running on server <code>A</code> and <code>vcl_deliver</code> is running on server <code>B</code> (due to Fastly&rsquo;s &lsquo;clustering&rsquo; infrastructure) and you looked for a stale object in <code>vcl_fetch</code>. The stale object might not exist there and so you would end up passing whatever the origin&rsquo;s 5xx response was onto <code>vcl_deliver</code> running on server <code>B</code>.</p>
+
+<p>Now in <code>vcl_deliver</code> we check <code>stale.exists</code> and it might tell us that an object <em>was</em> found, remember: this is a different server with a different cache.</p>
+
+<p>In this scenario we have a 5xx object that we&rsquo;re about to deliver to the client, but on this particular server (<code>B</code>) we&rsquo;ve since discovered there is actually a stale object we can serve to the user instead. So how do we now give the user this stale object and not the 5xx content that came from origin?</p>
+
+<p>In order to do that, we need to restart the request cycle. When we <code>return(restart)</code> in <code>vcl_deliver</code> it forces Fastly&rsquo;s version of Varnish to break its clustering behaviour and to now route the request completely through whatever server <code>vcl_deliver</code> is currently running on (in this example it&rsquo;ll ensure the entire request flow will go through server <code>B</code> - which we know has a stale object available).</p>
+
+<p>This means we end up processing the request again, but this time when we make a request to origin and get a 5xx back, we will (in <code>vcl_fetch</code>) end up finding the stale object (remember: our earlier restart has forced clustering behaviour to be broken so we&rsquo;re routing through the same server <code>B</code>). Now we find <code>stale.exists</code> has matched in <code>vcl_fetch</code> we will <code>return(deliver_stale)</code> (which we failed to do previously due to the stale object not existing on server <code>A</code>) and this means the stale content with a status of 200 is passed to <code>vcl_deliver</code> and that will subsequently deliver the stale object to the client.</p>
+
+<h4 id="the-unhappy-path-stale-not-found-anywhere">The unhappy path (stale not found anywhere)</h4>
+
+<p>In this scenario we don&rsquo;t find a stale object in either <code>vcl_fetch</code> or <code>vcl_deliver</code> and so we end up serving the 5xx content that we got from origin to the client. Although in the case of BuzzFeed we will attempt to restart the request and through the use of a new header (<code>set req.http.X-Serve-500-Page = &quot;true&quot;</code>) this will indicate to <code>vcl_recv</code> that we want to short-circuit the request cycle and serve our custom &ldquo;Uh-oh&rdquo; error page instead.</p>
+
+<p><div id="7"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>So there we have it, a quick run down of how some important aspects of Varnish and VCL work (and specifically for Fastly&rsquo;s implementation).</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/development'>development</a>, <a class='category' href='/categories/guide'>guide</a>, <a class='category' href='/categories/performance'>performance</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/cdn'>cdn</a>, <a class='tag' href='/tags/fastly'>fastly</a>, <a class='tag' href='/tags/varnish'>varnish</a>, <a class='tag' href='/tags/vcl'>vcl</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/profiling-go/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Profiling Go</a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

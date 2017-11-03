@@ -10,24 +10,24 @@
   text-decoration: none;
 }
 
-code, kbd, samp {
-  color: #ffcd00;
-  font-size: .8em;
-}
+/* code, kbd, samp { */
+/*   color: #ffcd00; */
+/*   font-size: .8em; */
+/* } */
 
-td > code,
-h1 > code,
-h2 > code,
-h3 > code,
-h4 > code,
-h5 > code,
-h6 > code,
-li > code,
-a > code,
-p > code {
-  color: #c31900;
-}
+/* td > code, */
+/* h1 > code, */
+/* h2 > code, */
+/* h3 > code, */
+/* h4 > code, */
+/* h5 > code, */
+/* h6 > code, */
+/* li > code, */
+/* a > code, */
+/* p > code { */
+/*   color: #c31900; */
+/* } */
 
-pre {
-  border-radius: .3em;
-}
+/* pre { */
+/*   border-radius: .3em; */
+/* } */
