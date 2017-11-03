@@ -156,7 +156,7 @@ The reason the ttl for a "hit-for-pass" object is supposed to be short is becaus
 
 If we get a 5xx error from our origins we don't cache them.
 
-But instead of serving that 5xx to the user (or our [custom "Uh-oh" 500 error page](https://s3.amazonaws.com/buzzfeed-static/static/500-error-page.html)), we'll attempt to locate a 'stale' version of the content and serve that to the user instead (i.e. 'stale' in this case means a resource that was requested and cached previously, but the object was marked as being something that could be served stale if its 'stale ttl' has yet to expire).
+But instead of serving that 5xx to the user (or even a custom 500 error page), we'll attempt to locate a 'stale' version of the content and serve that to the user instead (i.e. 'stale' in this case means a resource that was requested and cached previously, but the object was marked as being something that could be served stale if its 'stale ttl' has yet to expire).
 
 The reason we do this is because serving old (i.e. stale) content is better than serving an error.
 

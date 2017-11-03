@@ -305,7 +305,7 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 
 <p>If we get a 5xx error from our origins we don&rsquo;t cache them.</p>
 
-<p>But instead of serving that 5xx to the user (or our <a href="https://s3.amazonaws.com/buzzfeed-static/static/500-error-page.html">custom &ldquo;Uh-oh&rdquo; 500 error page</a>), we&rsquo;ll attempt to locate a &lsquo;stale&rsquo; version of the content and serve that to the user instead (i.e. &lsquo;stale&rsquo; in this case means a resource that was requested and cached previously, but the object was marked as being something that could be served stale if its &lsquo;stale ttl&rsquo; has yet to expire).</p>
+<p>But instead of serving that 5xx to the user (or even a custom 500 error page), we&rsquo;ll attempt to locate a &lsquo;stale&rsquo; version of the content and serve that to the user instead (i.e. &lsquo;stale&rsquo; in this case means a resource that was requested and cached previously, but the object was marked as being something that could be served stale if its &lsquo;stale ttl&rsquo; has yet to expire).</p>
 
 <p>The reason we do this is because serving old (i.e. stale) content is better than serving an error.</p>
 
