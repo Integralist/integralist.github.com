@@ -1,3 +1,5 @@
+# https://gohugo.io/getting-started/configuration/
+
 baseURL = "http://www.integralist.co.uk/"
 languageCode = "en-gb"
 title = "integralist"
