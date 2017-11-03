@@ -220,7 +220,7 @@ This means we end up processing the request again, but this time when we make a 
 
 #### The unhappy path (stale not found anywhere)
 
-In this scenario we don't find a stale object in either `vcl_fetch` or `vcl_deliver` and so we end up serving the 5xx content that we got from origin to the client. Although in the case of BuzzFeed we will attempt to restart the request and through the use of a new header (`set req.http.X-Serve-500-Page = "true"`) this will indicate to `vcl_recv` that we want to short-circuit the request cycle and serve our custom "Uh-oh" error page instead.
+In this scenario we don't find a stale object in either `vcl_fetch` or `vcl_deliver` and so we end up serving the 5xx content that we got from origin to the client. Although you may want to attempt to restart the request and use a custom header (e.g. `set req.http.X-Serve-500-Page = "true"`) in order to indicate to `vcl_recv` that you want to short-circuit the request cycle and serve a custom error page instead.
 
 <div id="7"></div>
 ## Conclusion

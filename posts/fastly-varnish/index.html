@@ -377,7 +377,7 @@ set beresp.stale_if_error = &lt;N&gt;s;
 
 <h4 id="the-unhappy-path-stale-not-found-anywhere">The unhappy path (stale not found anywhere)</h4>
 
-<p>In this scenario we don&rsquo;t find a stale object in either <code>vcl_fetch</code> or <code>vcl_deliver</code> and so we end up serving the 5xx content that we got from origin to the client. Although in the case of BuzzFeed we will attempt to restart the request and through the use of a new header (<code>set req.http.X-Serve-500-Page = &quot;true&quot;</code>) this will indicate to <code>vcl_recv</code> that we want to short-circuit the request cycle and serve our custom &ldquo;Uh-oh&rdquo; error page instead.</p>
+<p>In this scenario we don&rsquo;t find a stale object in either <code>vcl_fetch</code> or <code>vcl_deliver</code> and so we end up serving the 5xx content that we got from origin to the client. Although you may want to attempt to restart the request and use a custom header (e.g. <code>set req.http.X-Serve-500-Page = &quot;true&quot;</code>) in order to indicate to <code>vcl_recv</code> that you want to short-circuit the request cycle and serve a custom error page instead.</p>
 
 <p><div id="7"></div></p>
 
