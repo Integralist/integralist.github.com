@@ -420,4 +420,7 @@ If we now open `output_stripped.svg` we should see the following interactive fla
 <div id="12"></div>
 ## Conclusion
 
-That's our tour of various tools for profiling your Python code. I'll follow this article up with a Go based one in the very near future.
+That's our tour of various tools for profiling your Python code. I'll follow this article up with a Go based one in the very near future. But if you're interested in further reading then the following blog posts from rushter.com are worth a look: 
+
+- [Python Garbage Collection](https://rushter.com/blog/python-garbage-collector/)
+- [Python Memory Management](https://rushter.com/blog/python-memory-managment/)
