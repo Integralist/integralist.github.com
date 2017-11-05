@@ -32,15 +32,38 @@ You place Varnish in front of your application servers (those that are serving H
 
 [Fastly](https://www.fastly.com/) is many things, but for most people they are a CDN provider who utilise a highly customised version of Varnish. This post is about Varnish and explaining a couple of specific features (such as hit-for-pass and serving stale) and how they work in relation to Fastly's implementation of Varnish.
 
-This is not a "VCL 101". If you need help understanding anything mentioned in this post, then I recommend reading:
+One stumbling block for Varnish is the fact that it only accelerates HTTP, not HTTPS. In order to handle HTTPS you would need a TLS/SSL termination process sitting in front of Varnish to convert HTTPS to HTTP. Alternatively you could use a termination process (such as nginx) _behind_ Varnish to fetch the content from your origins over HTTPS and to return it as HTTP for Varnish to then process and cache.
+
+> Note: Fastly helps both with the HTTPS problem, and also with scaling Varnish in general.
+
+### Varnish Basics
+
+Varnish is a 'state machine' and it switches between these states via calls to a `return` function (where you tell the `return` function which state to move to). The various states are:
+
+- `recv`: request is received and can be inspected/modified.
+- `hash`: generate a hash key from host/path and lookup key in cache.
+- `hit`: hash key was found in the cache.
+- `miss`: hash key was not found in the cache.
+- `pass`: content should be fetched from origin, regardless of if it exists in cache or not, and response will not be cached.
+- `pipe`: content should be fetched from origin, and no other VCL will be executed.
+- `fetch`: content has been fetched, we can now inspect/modify it before delivering it to the user.
+- `deliver`: content has been cached (or not, if we had used `return(pass)`) and ready to be delivered to the user.
+
+For each state there is a corresponding subroutine that is executed. It has the form `vcl_<state>`, and so there is a `vcl_recv`, `recv_hash`, `recv_hit` etc.
+
+So in `vcl_recv` to change state to "pass" you would execute `return(pass)`. If you were in `vcl_fetch` and wanted to move to `vcl_deliver`, then you would execute `return(deliver)`.
+
+> Note: `vcl_hash` is the only exception because it's not a _state_ per se, so you don't execute `return(hash)` but `return(lookup)` as this helps distinguish that we're performing an action and not a state change (i.e. we're going to _lookup_ in the cache).
+
+The reason for this post is because when dealing with Varnish and VCL it gets very confusing having to jump between official documentation for VCL and Fastly's specific implementation of it. Even more so because the version of Varnish Fastly are using is now quite old and yet they've also implemented some features from more recent Varnish versions. Meaning you end up getting in a muddle about what should and should not be the expected behaviour (especially around the general request flow cycle).
+
+Ultimately this is not a "VCL 101". If you need help understanding anything mentioned in this post, then I recommend reading:
 
 - [Varnish Book](http://book.varnish-software.com/4.0/)
 - [Varnish Blog](https://info.varnish-software.com/blog)
 - [Fastly Blog](https://www.fastly.com/blog)
 
 > Fastly has a couple of _excellent_ articles on utilising the `Vary` HTTP header (highly recommended reading).
-
-The reason for this post is because when dealing with Varnish and VCL it gets very confusing having to jump between official documentation for VCL and Fastly's specific implementation of it. Even more so because the version of Varnish Fastly are using is now quite old and yet they've also implemented some features from more recent Varnish versions. Meaning you end up getting in a muddle about what should and should not be the expected behaviour (especially around the general request flow cycle).
 
 <div id="2"></div>
 ## Varnish Default VCL
@@ -77,13 +100,19 @@ You can also view their generated custom VCL here in this isolated gist (for ref
 <div id="4"></div>
 ## Fastly Request Flow Diagram
 
-Below is a diagram of Fastly's VCL request flow (including its WAF and Clustering logic)...
+There are various request flow diagrams for Varnish ([example](http://book.varnish-software.com/4.0/_images/simplified_fsm.svg)) and generally they separate the request flow into two sections: request and backend. 
+
+So handling the request, looking up the hash key in the cache, getting a hit or miss, or opening a pipe to the origin are all considered part of the "request" section. Where as fetching of the content is considered part of the "backend" section.
+
+The purpose of the distinction is because Varnish likes to handle backend fetches _asynchronously_. This means Varnish can serve stale data while a new version of the cached object is being fetched. This means less request queuing when the backend is slow.
+
+But the issue with these diagrams is that they're not all the same. Changes between Varnish versions and also the difference in Fastly's implementation make identifying the right request flow tricky.
+
+Below is a diagram of Fastly's VCL request flow (including its WAF and Clustering logic). This is a great reference for confirming how your VCL logic is expected to behave.
 
 <a href="../../images/fastly-request-flow.png">
     <img src="../../images/fastly-request-flow.png">
 </a>
-
-This is very useful for confirming how your VCL logic is expected to behave.
 
 <div id="5"></div>
 ## Hit for Pass
@@ -120,7 +149,7 @@ But you'll find that even though you've executed a `return(pass)` operation, Var
 
 The object it creates is called a "hit-for-pass" (if you look back at the Fastly request flow diagram above you'll see it referenced) and it is given a ttl of 120s (i.e. it'll be cached for 120 seconds).
 
-> Note: the ttl can be changed using vcl but it should be kept small
+> Note: the ttl can be changed using vcl but it should be kept small. Varnish implements a type known as a 'duration' and takes many forms: ms (milliseconds), s (seconds), m (minutes), h (hours), d (days), w (weeks), y (years). For example, `beresp.ttl = 1h`.
 
 The reason Varnish creates an object and caches it is because if it _didn't_, when `return(pass)` is executed and the content subsequently is not cached, then if another request is made for that same resource, we would find "request collapsing" causes a performance issue for users.
 

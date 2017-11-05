@@ -129,7 +129,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    11 mins read
+    13 mins read
   </span>
   
 </div>
@@ -161,7 +161,38 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 
 <p><a href="https://www.fastly.com/">Fastly</a> is many things, but for most people they are a CDN provider who utilise a highly customised version of Varnish. This post is about Varnish and explaining a couple of specific features (such as hit-for-pass and serving stale) and how they work in relation to Fastly&rsquo;s implementation of Varnish.</p>
 
-<p>This is not a &ldquo;VCL 101&rdquo;. If you need help understanding anything mentioned in this post, then I recommend reading:</p>
+<p>One stumbling block for Varnish is the fact that it only accelerates HTTP, not HTTPS. In order to handle HTTPS you would need a TLS/SSL termination process sitting in front of Varnish to convert HTTPS to HTTP. Alternatively you could use a termination process (such as nginx) <em>behind</em> Varnish to fetch the content from your origins over HTTPS and to return it as HTTP for Varnish to then process and cache.</p>
+
+<blockquote>
+<p>Note: Fastly helps both with the HTTPS problem, and also with scaling Varnish in general.</p>
+</blockquote>
+
+<h3 id="varnish-basics">Varnish Basics</h3>
+
+<p>Varnish is a &lsquo;state machine&rsquo; and it switches between these states via calls to a <code>return</code> function (where you tell the <code>return</code> function which state to move to). The various states are:</p>
+
+<ul>
+<li><code>recv</code>: request is received and can be inspected/modified.</li>
+<li><code>hash</code>: generate a hash key from host/path and lookup key in cache.</li>
+<li><code>hit</code>: hash key was found in the cache.</li>
+<li><code>miss</code>: hash key was not found in the cache.</li>
+<li><code>pass</code>: content should be fetched from origin, regardless of if it exists in cache or not, and response will not be cached.</li>
+<li><code>pipe</code>: content should be fetched from origin, and no other VCL will be executed.</li>
+<li><code>fetch</code>: content has been fetched, we can now inspect/modify it before delivering it to the user.</li>
+<li><code>deliver</code>: content has been cached (or not, if we had used <code>return(pass)</code>) and ready to be delivered to the user.</li>
+</ul>
+
+<p>For each state there is a corresponding subroutine that is executed. It has the form <code>vcl_&lt;state&gt;</code>, and so there is a <code>vcl_recv</code>, <code>recv_hash</code>, <code>recv_hit</code> etc.</p>
+
+<p>So in <code>vcl_recv</code> to change state to &ldquo;pass&rdquo; you would execute <code>return(pass)</code>. If you were in <code>vcl_fetch</code> and wanted to move to <code>vcl_deliver</code>, then you would execute <code>return(deliver)</code>.</p>
+
+<blockquote>
+<p>Note: <code>vcl_hash</code> is the only exception because it&rsquo;s not a <em>state</em> per se, so you don&rsquo;t execute <code>return(hash)</code> but <code>return(lookup)</code> as this helps distinguish that we&rsquo;re performing an action and not a state change (i.e. we&rsquo;re going to <em>lookup</em> in the cache).</p>
+</blockquote>
+
+<p>The reason for this post is because when dealing with Varnish and VCL it gets very confusing having to jump between official documentation for VCL and Fastly&rsquo;s specific implementation of it. Even more so because the version of Varnish Fastly are using is now quite old and yet they&rsquo;ve also implemented some features from more recent Varnish versions. Meaning you end up getting in a muddle about what should and should not be the expected behaviour (especially around the general request flow cycle).</p>
+
+<p>Ultimately this is not a &ldquo;VCL 101&rdquo;. If you need help understanding anything mentioned in this post, then I recommend reading:</p>
 
 <ul>
 <li><a href="http://book.varnish-software.com/4.0/">Varnish Book</a></li>
@@ -172,8 +203,6 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 <blockquote>
 <p>Fastly has a couple of <em>excellent</em> articles on utilising the <code>Vary</code> HTTP header (highly recommended reading).</p>
 </blockquote>
-
-<p>The reason for this post is because when dealing with Varnish and VCL it gets very confusing having to jump between official documentation for VCL and Fastly&rsquo;s specific implementation of it. Even more so because the version of Varnish Fastly are using is now quite old and yet they&rsquo;ve also implemented some features from more recent Varnish versions. Meaning you end up getting in a muddle about what should and should not be the expected behaviour (especially around the general request flow cycle).</p>
 
 <p><div id="2"></div></p>
 
@@ -221,13 +250,19 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 
 <h2 id="fastly-request-flow-diagram">Fastly Request Flow Diagram</h2>
 
-<p>Below is a diagram of Fastly&rsquo;s VCL request flow (including its WAF and Clustering logic)&hellip;</p>
+<p>There are various request flow diagrams for Varnish (<a href="http://book.varnish-software.com/4.0/_images/simplified_fsm.svg">example</a>) and generally they separate the request flow into two sections: request and backend.</p>
+
+<p>So handling the request, looking up the hash key in the cache, getting a hit or miss, or opening a pipe to the origin are all considered part of the &ldquo;request&rdquo; section. Where as fetching of the content is considered part of the &ldquo;backend&rdquo; section.</p>
+
+<p>The purpose of the distinction is because Varnish likes to handle backend fetches <em>asynchronously</em>. This means Varnish can serve stale data while a new version of the cached object is being fetched. This means less request queuing when the backend is slow.</p>
+
+<p>But the issue with these diagrams is that they&rsquo;re not all the same. Changes between Varnish versions and also the difference in Fastly&rsquo;s implementation make identifying the right request flow tricky.</p>
+
+<p>Below is a diagram of Fastly&rsquo;s VCL request flow (including its WAF and Clustering logic). This is a great reference for confirming how your VCL logic is expected to behave.</p>
 
 <p><a href="../../images/fastly-request-flow.png">
     <img src="../../images/fastly-request-flow.png">
 </a></p>
-
-<p>This is very useful for confirming how your VCL logic is expected to behave.</p>
 
 <p><div id="5"></div></p>
 
@@ -266,7 +301,7 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 <p>The object it creates is called a &ldquo;hit-for-pass&rdquo; (if you look back at the Fastly request flow diagram above you&rsquo;ll see it referenced) and it is given a ttl of 120s (i.e. it&rsquo;ll be cached for 120 seconds).</p>
 
 <blockquote>
-<p>Note: the ttl can be changed using vcl but it should be kept small</p>
+<p>Note: the ttl can be changed using vcl but it should be kept small. Varnish implements a type known as a &lsquo;duration&rsquo; and takes many forms: ms (milliseconds), s (seconds), m (minutes), h (hours), d (days), w (weeks), y (years). For example, <code>beresp.ttl = 1h</code>.</p>
 </blockquote>
 
 <p>The reason Varnish creates an object and caches it is because if it <em>didn&rsquo;t</em>, when <code>return(pass)</code> is executed and the content subsequently is not cached, then if another request is made for that same resource, we would find &ldquo;request collapsing&rdquo; causes a performance issue for users.</p>
