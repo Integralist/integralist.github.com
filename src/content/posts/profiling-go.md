@@ -439,6 +439,38 @@ The web server can also generate a “trace” file, which you can access via [h
 
 > Note: more info on pprof options can be found here: [golang.org/pkg/net/http/pprof/](https://golang.org/pkg/net/http/pprof/) 
 
+---
+
+If you're using a custom URL router, you'll need to register the individual `pprof` endpoints:
+
+```
+package main
+
+import (
+    "net/http"
+    "net/http/pprof"
+)
+
+func message(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte("Hello World"))
+}
+
+func main() {
+    r := http.NewServeMux()
+    r.HandleFunc("/", message)
+
+    r.HandleFunc("/debug/pprof/", pprof.Index)
+    r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+    r.HandleFunc("/debug/pprof/profile", pprof.Profile)
+    r.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+    r.HandleFunc("/debug/pprof/trace", pprof.Trace)
+
+    http.ListenAndServe(":8080", r)
+}
+```
+
+---
+
 So ideally you would use `go tool pprof` on the command line.  
 As this allows you to more easily interpret and interrogate the data interactively.
 
@@ -549,6 +581,8 @@ This generates an image that looks like the following (notice how the bigger the
 <a href="../../images/profiling_go.png">
     <img src="../../images/profiling_go.png">
 </a>
+
+> Note: you can also output as a PDF with `-pdf`.
 
 <div id="7"></div>
 ## Trace

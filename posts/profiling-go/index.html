@@ -588,6 +588,37 @@ full goroutine stack dump
 <p>Note: more info on pprof options can be found here: <a href="https://golang.org/pkg/net/http/pprof/">golang.org/pkg/net/http/pprof/</a></p>
 </blockquote>
 
+<hr />
+
+<p>If you&rsquo;re using a custom URL router, you&rsquo;ll need to register the individual <code>pprof</code> endpoints:</p>
+
+<pre><code>package main
+
+import (
+    &quot;net/http&quot;
+    &quot;net/http/pprof&quot;
+)
+
+func message(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte(&quot;Hello World&quot;))
+}
+
+func main() {
+    r := http.NewServeMux()
+    r.HandleFunc(&quot;/&quot;, message)
+
+    r.HandleFunc(&quot;/debug/pprof/&quot;, pprof.Index)
+    r.HandleFunc(&quot;/debug/pprof/cmdline&quot;, pprof.Cmdline)
+    r.HandleFunc(&quot;/debug/pprof/profile&quot;, pprof.Profile)
+    r.HandleFunc(&quot;/debug/pprof/symbol&quot;, pprof.Symbol)
+    r.HandleFunc(&quot;/debug/pprof/trace&quot;, pprof.Trace)
+
+    http.ListenAndServe(&quot;:8080&quot;, r)
+}
+</code></pre>
+
+<hr />
+
 <p>So ideally you would use <code>go tool pprof</code> on the command line.<br />
 As this allows you to more easily interpret and interrogate the data interactively.</p>
 
@@ -700,6 +731,10 @@ ROUTINE ======================== main.bigBytes in /.../go/profiling/main.go
 <p><a href="../../images/profiling_go.png">
     <img src="../../images/profiling_go.png">
 </a></p>
+
+<blockquote>
+<p>Note: you can also output as a PDF with <code>-pdf</code>.</p>
+</blockquote>
 
 <p><div id="7"></div></p>
 
