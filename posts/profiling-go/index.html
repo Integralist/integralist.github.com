@@ -4,12 +4,12 @@
 <head>
   <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta name='description' content='Memory Management Types of Profiling Analysis Steps Base Example ReadMemStats Pprof Trace Conclusion  
+<meta name='description' content='Memory Management Types of Profiling Tools Matrix Analysis Steps Base Example ReadMemStats Pprof Trace Conclusion  
 Memory Management Before we dive into the techniques and tools available for profiling Go applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.
 Go’s implementation is a parallel mark-and-sweep garbage collector. In the traditional mark-and-sweep model, the garbage collector would stop the program from running (i.'>
 
 <meta property='og:title' content='Profiling Go ⋆ Mark McDonnell'>
-<meta property='og:description' content='Memory Management Types of Profiling Analysis Steps Base Example ReadMemStats Pprof Trace Conclusion  
+<meta property='og:description' content='Memory Management Types of Profiling Tools Matrix Analysis Steps Base Example ReadMemStats Pprof Trace Conclusion  
 Memory Management Before we dive into the techniques and tools available for profiling Go applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.
 Go’s implementation is a parallel mark-and-sweep garbage collector. In the traditional mark-and-sweep model, the garbage collector would stop the program from running (i.'>
 <meta property='og:url' content='http://www.integralist.co.uk/posts/profiling-go/'>
@@ -127,7 +127,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    18 mins read
+    19 mins read
   </span>
   
 </div>
@@ -141,6 +141,7 @@ ga('send', 'pageview');
 <ul>
 <li><a href="#1">Memory Management</a></li>
 <li><a href="#2">Types of Profiling</a></li>
+<li><a href="#2.1">Tools Matrix</a></li>
 <li><a href="#3">Analysis Steps</a></li>
 <li><a href="#4">Base Example</a></li>
 <li><a href="#5">ReadMemStats</a></li>
@@ -167,6 +168,40 @@ ga('send', 'pageview');
 <li><strong>Timers</strong>: useful for benchmarking, as well as comparing <em>before</em> and <em>after</em> fixes.</li>
 <li><strong>Profilers</strong>: useful for high-level verification.</li>
 </ul>
+
+<p><div id="2.1"></div></p>
+
+<h2 id="tools-matrix">Tools Matrix</h2>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><a href="#5">ReadMemStats</a></td>
+<td>- Simple, quick and easy.<br>- Only details memory usage.</td>
+<td>- Requires code change.</td>
+</tr>
+
+<tr>
+<td><a href="#6">pprof</a></td>
+<td>- Details CPU and Memory.<br>- Remote analysis possible.<br>- Image generation.</td>
+<td>- Requires code change.<br>- More complicated API.</td>
+</tr>
+
+<tr>
+<td><a href="#7">trace</a></td>
+<td>- Helps analyse data over time.<br>- Powerful debugging UI.<br>- Visualise problem area easily.</td>
+<td>- Requires code change.<br>- UI is complex.<br>- Takes time to understand.</td>
+</tr>
+</tbody>
+</table>
 
 <p><div id="3"></div></p>
 

@@ -15,6 +15,7 @@ draft: false
 
 - [Memory Management](#1)
 - [Types of Profiling](#2)
+- [Tools Matrix](#2.1)
 - [Analysis Steps](#3)
 - [Base Example](#4)
 - [ReadMemStats](#5)
@@ -36,6 +37,15 @@ There are a couple of approaches available to us for monitoring performance...
 
 - **Timers**: useful for benchmarking, as well as comparing _before_ and _after_ fixes.
 - **Profilers**: useful for high-level verification.
+
+<div id="2.1"></div>
+## Tools Matrix
+
+||Pros|Cons|
+|---|---|---|
+|[ReadMemStats](#5)|- Simple, quick and easy.<br>- Only details memory usage.|- Requires code change.|
+|[pprof](#6)|- Details CPU and Memory.<br>- Remote analysis possible.<br>- Image generation.|- Requires code change.<br>- More complicated API.|
+|[trace](#7)|- Helps analyse data over time.<br>- Powerful debugging UI.<br>- Visualise problem area easily.|- Requires code change.<br>- UI is complex.<br>- Takes time to understand.|
 
 <div id="3"></div>
 ## Analysis Steps

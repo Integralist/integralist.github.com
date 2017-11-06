@@ -15,6 +15,7 @@ draft: false
 
 - [Memory Management](#1)
 - [Types of Profiling](#2)
+- [Tools Matrix](#2.1)
 - [Analysis Steps](#3)
 - [Base Example](#4)
 - [Timer](#5)
@@ -44,6 +45,19 @@ There are a couple of approaches available to us for monitoring performance...
 
 - **Timers**: useful for benchmarking, as well as comparing _before_ and _after_ fixes.
 - **Profilers**: useful for high-level verification.
+
+<div id="2.1"></div>
+## Tools Matrix
+
+|   |Pros|Cons|
+|---|---|---|
+|[timer (decorator)](#5)|- Simple, quick and easy.|- Requires code change.<br>- Adds latency & skews results.|
+|[timeit module](#6)|- Calculate repeat averages.<br>- Doesn’t require code change.|- More complicated API.|
+|[profiler module](#7)|- Granular CPU by file.<br>- Can be run from terminal.|- More complicated results.<br>- Read docs to understand.|
+|[line_profiler](#8)|- Granular line-by-line CPU.|- Slow.<br>- Not built-in package.<br>- Requires code change.|
+|[memory_profiler](#9)|- Clear and easy results.|- Slow †<br>- Not built-in package.<br>- † additional packages help.|
+|[tracemalloc](#10)|- Built-in memory package.|- Requires code change.<br>- More complicated API.|
+|[pyflame](#11)|- Visualise problem area easily.<br>- Details CPU and Memory|- Requires Linux.<br>- Most complex to setup.|
 
 <div id="3"></div>
 ## Analysis Steps
@@ -275,6 +289,18 @@ The order in which you list the sub functions to ‘follow’ doesn’t matter, 
 From these results we can get a line-by-line breakdown of how long (in percentages) each function took to complete. So `expensive_function` spent ~20% of its time calculating a value to assign to the variable `r`, and the remaining 80% was spent calculating a value to assign to the variable `n` (which was the call out to the `get_number` function).
 
 As for `get_number`, it was approximately 50/50 for time between looping the `range(10000000)` and `yield`’ing a value back to the caller context (i.e. `expensive_function`).
+
+Finally, there is also a command line version you can utilise:  
+
+```
+kernprof -l [-v view_results] <your_script.py>
+```
+
+If you omit the `-l` flag, then you can view the results at a later time using:
+
+```
+python -m line_profiler <your_script.py>.lprof
+```
 
 <div id="9"></div>
 ## Basic Memory Profiler

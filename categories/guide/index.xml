@@ -29,7 +29,7 @@ You place Varnish in front of your application servers (those that are serving H
       <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/posts/profiling-go/</guid>
-      <description>Memory Management Types of Profiling Analysis Steps Base Example ReadMemStats Pprof Trace Conclusion  
+      <description>Memory Management Types of Profiling Tools Matrix Analysis Steps Base Example ReadMemStats Pprof Trace Conclusion  
 Memory Management Before we dive into the techniques and tools available for profiling Go applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.
 Go’s implementation is a parallel mark-and-sweep garbage collector. In the traditional mark-and-sweep model, the garbage collector would stop the program from running (i.</description>
     </item>
@@ -40,7 +40,7 @@ Go’s implementation is a parallel mark-and-sweep garbage collector. In the tra
       <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/posts/profiling-python/</guid>
-      <description>Memory Management Types of Profiling Analysis Steps Base Example Timer Built-in module: timeit Built-in module: profiler Line Profiler Basic Memory Profiler Tracemalloc PyFlame (Flame Graphs) Conclusion  
+      <description>Memory Management Types of Profiling Tools Matrix Analysis Steps Base Example Timer Built-in module: timeit Built-in module: profiler Line Profiler Basic Memory Profiler Tracemalloc PyFlame (Flame Graphs) Conclusion  
 Memory Management Before we dive into the techniques and tools available for profiling Python applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.</description>
     </item>
     

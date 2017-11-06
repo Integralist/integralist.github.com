@@ -4,11 +4,11 @@
 <head>
   <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta name='description' content='Memory Management Types of Profiling Analysis Steps Base Example Timer Built-in module: timeit Built-in module: profiler Line Profiler Basic Memory Profiler Tracemalloc PyFlame (Flame Graphs) Conclusion  
+<meta name='description' content='Memory Management Types of Profiling Tools Matrix Analysis Steps Base Example Timer Built-in module: timeit Built-in module: profiler Line Profiler Basic Memory Profiler Tracemalloc PyFlame (Flame Graphs) Conclusion  
 Memory Management Before we dive into the techniques and tools available for profiling Python applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.'>
 
 <meta property='og:title' content='Profiling Python ⋆ Mark McDonnell'>
-<meta property='og:description' content='Memory Management Types of Profiling Analysis Steps Base Example Timer Built-in module: timeit Built-in module: profiler Line Profiler Basic Memory Profiler Tracemalloc PyFlame (Flame Graphs) Conclusion  
+<meta property='og:description' content='Memory Management Types of Profiling Tools Matrix Analysis Steps Base Example Timer Built-in module: timeit Built-in module: profiler Line Profiler Basic Memory Profiler Tracemalloc PyFlame (Flame Graphs) Conclusion  
 Memory Management Before we dive into the techniques and tools available for profiling Python applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.'>
 <meta property='og:url' content='http://www.integralist.co.uk/posts/profiling-python/'>
 <meta property='og:site_name' content='integralist'>
@@ -139,6 +139,7 @@ ga('send', 'pageview');
 <ul>
 <li><a href="#1">Memory Management</a></li>
 <li><a href="#2">Types of Profiling</a></li>
+<li><a href="#2.1">Tools Matrix</a></li>
 <li><a href="#3">Analysis Steps</a></li>
 <li><a href="#4">Base Example</a></li>
 <li><a href="#5">Timer</a></li>
@@ -175,6 +176,64 @@ ga('send', 'pageview');
 <li><strong>Timers</strong>: useful for benchmarking, as well as comparing <em>before</em> and <em>after</em> fixes.</li>
 <li><strong>Profilers</strong>: useful for high-level verification.</li>
 </ul>
+
+<p><div id="2.1"></div></p>
+
+<h2 id="tools-matrix">Tools Matrix</h2>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><a href="#5">timer (decorator)</a></td>
+<td>- Simple, quick and easy.</td>
+<td>- Requires code change.<br>- Adds latency &amp; skews results.</td>
+</tr>
+
+<tr>
+<td><a href="#6">timeit module</a></td>
+<td>- Calculate repeat averages.<br>- Doesn’t require code change.</td>
+<td>- More complicated API.</td>
+</tr>
+
+<tr>
+<td><a href="#7">profiler module</a></td>
+<td>- Granular CPU by file.<br>- Can be run from terminal.</td>
+<td>- More complicated results.<br>- Read docs to understand.</td>
+</tr>
+
+<tr>
+<td><a href="#8">line_profiler</a></td>
+<td>- Granular line-by-line CPU.</td>
+<td>- Slow.<br>- Not built-in package.<br>- Requires code change.</td>
+</tr>
+
+<tr>
+<td><a href="#9">memory_profiler</a></td>
+<td>- Clear and easy results.</td>
+<td>- Slow †<br>- Not built-in package.<br>- † additional packages help.</td>
+</tr>
+
+<tr>
+<td><a href="#10">tracemalloc</a></td>
+<td>- Built-in memory package.</td>
+<td>- Requires code change.<br>- More complicated API.</td>
+</tr>
+
+<tr>
+<td><a href="#11">pyflame</a></td>
+<td>- Visualise problem area easily.<br>- Details CPU and Memory</td>
+<td>- Requires Linux.<br>- Most complex to setup.</td>
+</tr>
+</tbody>
+</table>
 
 <p><div id="3"></div></p>
 
@@ -427,6 +486,16 @@ some result! 9999999
 <p>From these results we can get a line-by-line breakdown of how long (in percentages) each function took to complete. So <code>expensive_function</code> spent ~20% of its time calculating a value to assign to the variable <code>r</code>, and the remaining 80% was spent calculating a value to assign to the variable <code>n</code> (which was the call out to the <code>get_number</code> function).</p>
 
 <p>As for <code>get_number</code>, it was approximately <sup>50</sup>&frasl;<sub>50</sub> for time between looping the <code>range(10000000)</code> and <code>yield</code>’ing a value back to the caller context (i.e. <code>expensive_function</code>).</p>
+
+<p>Finally, there is also a command line version you can utilise:</p>
+
+<pre><code>kernprof -l [-v view_results] &lt;your_script.py&gt;
+</code></pre>
+
+<p>If you omit the <code>-l</code> flag, then you can view the results at a later time using:</p>
+
+<pre><code>python -m line_profiler &lt;your_script.py&gt;.lprof
+</code></pre>
 
 <p><div id="9"></div></p>
 
