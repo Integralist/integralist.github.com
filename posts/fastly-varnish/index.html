@@ -4,13 +4,13 @@
 <head>
   <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta name='description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Hit for Pass Serving Stale Conclusion  
+<meta name='description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Variables Hit for Pass Serving Stale Conclusion  
 Introduction Varnish is an open-source HTTP accelerator.
 More concretely it is a web application that acts like a HTTP reverse-proxy.
 You place Varnish in front of your application servers (those that are serving HTTP content) and it will cache that content for you. If you want more information on what Varnish cache can do for you, then I recommend reading through their introduction article (and watching the video linked there as well).'>
 
 <meta property='og:title' content='Fastly Varnish ⋆ Mark McDonnell'>
-<meta property='og:description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Hit for Pass Serving Stale Conclusion  
+<meta property='og:description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Variables Hit for Pass Serving Stale Conclusion  
 Introduction Varnish is an open-source HTTP accelerator.
 More concretely it is a web application that acts like a HTTP reverse-proxy.
 You place Varnish in front of your application servers (those that are serving HTTP content) and it will cache that content for you. If you want more information on what Varnish cache can do for you, then I recommend reading through their introduction article (and watching the video linked there as well).'>
@@ -129,7 +129,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    13 mins read
+    15 mins read
   </span>
   
 </div>
@@ -145,6 +145,7 @@ ga('send', 'pageview');
 <li><a href="#2">Varnish Default VCL</a></li>
 <li><a href="#3">Fastly Custom VCL</a></li>
 <li><a href="#4">Fastly Request Flow Diagram</a></li>
+<li><a href="#4.1">Variables</a></li>
 <li><a href="#5">Hit for Pass</a></li>
 <li><a href="#6">Serving Stale</a></li>
 <li><a href="#7">Conclusion</a></li>
@@ -263,6 +264,151 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 <p><a href="../../images/fastly-request-flow.png">
     <img src="../../images/fastly-request-flow.png">
 </a></p>
+
+<p><div id="4.1"></div></p>
+
+<h2 id="variables">Variables</h2>
+
+<p>Each Varnish &lsquo;state&rsquo; has a set of built-in variables you can use.</p>
+
+<p>Below is a list of available variables and which states they&rsquo;re available to:</p>
+
+<blockquote>
+<p>Based on Varnish 3.0 (which is the only explicit documentation I could find on this), although you can see in various request flow diagrams for different Varnish versions the variables listed next to each state. But <a href="http://book.varnish-software.com/3.0/VCL_functions.html#variable-availability-in-vcl">this</a> was the first explicit list I found.</p>
+</blockquote>
+
+<table>
+<thead>
+<tr>
+<th align="left">variable</th>
+<th>recv</th>
+<th>fetch</th>
+<th>pass</th>
+<th>miss</th>
+<th>hit</th>
+<th>error</th>
+<th>deliver</th>
+<th>pipe</th>
+<th>hash</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left"><code>req.*</code></td>
+<td>R/W</td>
+<td>R/W</td>
+<td>R/W</td>
+<td>R/W</td>
+<td>R/W</td>
+<td>R/W</td>
+<td>R/W</td>
+<td>R/W</td>
+<td>R/W</td>
+</tr>
+
+<tr>
+<td align="left"><code>bereq.*</code></td>
+<td></td>
+<td>R/W</td>
+<td>R/W</td>
+<td>R/W</td>
+<td></td>
+<td></td>
+<td></td>
+<td>R/W</td>
+<td></td>
+</tr>
+
+<tr>
+<td align="left"><code>obj.hits</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>R</td>
+<td></td>
+<td>R</td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td align="left"><code>obj.ttl</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>R/W</td>
+<td>R/W</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td align="left"><code>obj.grace</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>R/W</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td align="left"><code>obj.*</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>R</td>
+<td>R/W</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td align="left"><code>beresp.*</code></td>
+<td></td>
+<td>R/W</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td align="left"><code>resp.*</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>R/W</td>
+<td>R/W</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+<p>When you&rsquo;re dealing with <code>vcl_recv</code> you pretty much only ever interact with the <code>req</code> object. You generally will want to manipulate the incoming request <em>before</em> doing anything else.</p>
+
+<p>Once a lookup in the cache is complete (i.e. <code>vcl_hash</code>) we&rsquo;ll end up in either <code>vcl_miss</code> or <code>vcl_hit</code>. If you end up in <code>vcl_hit</code>, then generally you&rsquo;ll look at and work with the <code>obj</code> object (this <code>obj</code> is what is pulled from the cache - so you&rsquo;ll check properties such as <code>obj.cacheable</code> for dealing with things like &lsquo;hit-for-pass&rsquo;).</p>
+
+<p>If you were to end up at <code>vcl_miss</code> instead, then you&rsquo;ll probably want to manipulate the <code>bereq</code> object and not the <code>req</code> object because manipulating the <code>req</code> object doesn&rsquo;t affect the request that will shortly be made to the origin. If you decide at this last moment you want to send an additional header to the origin, then you would set that header on the <code>bereq</code> and that would mean the request to origin would include that header.</p>
+
+<p>Once a request is made, the content is copied into the <code>beresp</code> variable and made available within the <code>vcl_fetch</code> state. You would likely want to modify this object in order to change its ttl or cache headers because this is the last chance you have to do that before the content is stored in the cache.</p>
+
+<p>Finally, the <code>beresp</code> object is copied into <code>resp</code> and that is what&rsquo;s made available within the <code>vcl_deliver</code> state. This is the last chance you have for manipulating the response that the client will receive. Changes you make to this object doesn&rsquo;t affect what was stored in the cache (because that time, <code>vcl_fetch</code>, has already passed).</p>
 
 <p><div id="5"></div></p>
 

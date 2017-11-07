@@ -17,7 +17,7 @@
       <pubDate>Thu, 02 Nov 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/posts/fastly-varnish/</guid>
-      <description>Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Hit for Pass Serving Stale Conclusion  
+      <description>Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Variables Hit for Pass Serving Stale Conclusion  
 Introduction Varnish is an open-source HTTP accelerator.
 More concretely it is a web application that acts like a HTTP reverse-proxy.
 You place Varnish in front of your application servers (those that are serving HTTP content) and it will cache that content for you. If you want more information on what Varnish cache can do for you, then I recommend reading through their introduction article (and watching the video linked there as well).</description>

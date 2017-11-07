@@ -18,6 +18,7 @@ draft: false
 - [Varnish Default VCL](#2)
 - [Fastly Custom VCL](#3)
 - [Fastly Request Flow Diagram](#4)
+- [Variables](#4.1)
 - [Hit for Pass](#5)
 - [Serving Stale](#6)
 - [Conclusion](#7)
@@ -113,6 +114,36 @@ Below is a diagram of Fastly's VCL request flow (including its WAF and Clusterin
 <a href="../../images/fastly-request-flow.png">
     <img src="../../images/fastly-request-flow.png">
 </a>
+
+<div id="4.1"></div>
+## Variables
+
+Each Varnish 'state' has a set of built-in variables you can use.
+
+Below is a list of available variables and which states they're available to:
+
+> Based on Varnish 3.0 (which is the only explicit documentation I could find on this), although you can see in various request flow diagrams for different Varnish versions the variables listed next to each state. But [this](http://book.varnish-software.com/3.0/VCL_functions.html#variable-availability-in-vcl) was the first explicit list I found.
+
+|variable|recv|fetch|pass|miss|hit|error|deliver|pipe|hash|
+|:---|---|---|---|---|---|---|---|---|---|
+|`req.*`|R/W|R/W|R/W|R/W|R/W|R/W|R/W|R/W|R/W|
+|`bereq.*`||R/W|R/W|R/W||||R/W||
+|`obj.hits`|||||R||R|||
+|`obj.ttl`|||||R/W|R/W||||
+|`obj.grace`|||||R/W|||||
+|`obj.*`|||||R|R/W||||
+|`beresp.*`||R/W||||||||
+|`resp.*`||||||R/W|R/W|||
+
+When you're dealing with `vcl_recv` you pretty much only ever interact with the `req` object. You generally will want to manipulate the incoming request _before_ doing anything else.
+
+Once a lookup in the cache is complete (i.e. `vcl_hash`) we'll end up in either `vcl_miss` or `vcl_hit`. If you end up in `vcl_hit`, then generally you'll look at and work with the `obj` object (this `obj` is what is pulled from the cache - so you'll check properties such as `obj.cacheable` for dealing with things like 'hit-for-pass'). 
+
+If you were to end up at `vcl_miss` instead, then you'll probably want to manipulate the `bereq` object and not the `req` object because manipulating the `req` object doesn't affect the request that will shortly be made to the origin. If you decide at this last moment you want to send an additional header to the origin, then you would set that header on the `bereq` and that would mean the request to origin would include that header.
+
+Once a request is made, the content is copied into the `beresp` variable and made available within the `vcl_fetch` state. You would likely want to modify this object in order to change its ttl or cache headers because this is the last chance you have to do that before the content is stored in the cache.
+
+Finally, the `beresp` object is copied into `resp` and that is what's made available within the `vcl_deliver` state. This is the last chance you have for manipulating the response that the client will receive. Changes you make to this object doesn't affect what was stored in the cache (because that time, `vcl_fetch`, has already passed).
 
 <div id="5"></div>
 ## Hit for Pass
