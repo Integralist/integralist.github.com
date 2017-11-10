@@ -4,13 +4,13 @@
 <head>
   <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta name='description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Variables Hit for Pass Serving Stale Conclusion  
+<meta name='description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram State Variables Persisting State Hit for Pass Serving Stale Conclusion  
 Introduction Varnish is an open-source HTTP accelerator.
 More concretely it is a web application that acts like a HTTP reverse-proxy.
 You place Varnish in front of your application servers (those that are serving HTTP content) and it will cache that content for you. If you want more information on what Varnish cache can do for you, then I recommend reading through their introduction article (and watching the video linked there as well).'>
 
 <meta property='og:title' content='Fastly Varnish ⋆ Mark McDonnell'>
-<meta property='og:description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram Variables Hit for Pass Serving Stale Conclusion  
+<meta property='og:description' content='Introduction Varnish Default VCL Fastly Custom VCL Fastly Request Flow Diagram State Variables Persisting State Hit for Pass Serving Stale Conclusion  
 Introduction Varnish is an open-source HTTP accelerator.
 More concretely it is a web application that acts like a HTTP reverse-proxy.
 You place Varnish in front of your application servers (those that are serving HTTP content) and it will cache that content for you. If you want more information on what Varnish cache can do for you, then I recommend reading through their introduction article (and watching the video linked there as well).'>
@@ -129,7 +129,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    15 mins read
+    26 mins read
   </span>
   
 </div>
@@ -145,7 +145,8 @@ ga('send', 'pageview');
 <li><a href="#2">Varnish Default VCL</a></li>
 <li><a href="#3">Fastly Custom VCL</a></li>
 <li><a href="#4">Fastly Request Flow Diagram</a></li>
-<li><a href="#4.1">Variables</a></li>
+<li><a href="#4.1">State Variables</a></li>
+<li><a href="#4.2">Persisting State</a></li>
 <li><a href="#5">Hit for Pass</a></li>
 <li><a href="#6">Serving Stale</a></li>
 <li><a href="#7">Conclusion</a></li>
@@ -267,7 +268,7 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 
 <p><div id="4.1"></div></p>
 
-<h2 id="variables">Variables</h2>
+<h2 id="state-variables">State Variables</h2>
 
 <p>Each Varnish &lsquo;state&rsquo; has a set of built-in variables you can use.</p>
 
@@ -277,19 +278,33 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 <p>Based on Varnish 3.0 (which is the only explicit documentation I could find on this), although you can see in various request flow diagrams for different Varnish versions the variables listed next to each state. But <a href="http://book.varnish-software.com/3.0/VCL_functions.html#variable-availability-in-vcl">this</a> was the first explicit list I found.</p>
 </blockquote>
 
+<p>Here&rsquo;s a quick key for the various states:</p>
+
+<ul>
+<li><em>R</em>: recv</li>
+<li><em>F</em>: fetch</li>
+<li><em>P</em>: pass</li>
+<li><em>M</em>: miss</li>
+<li><em>H</em>: hit</li>
+<li><em>E</em>: error</li>
+<li><em>D</em>: deliver</li>
+<li><em>I</em>: pipe</li>
+<li><em>#</em>: hash</li>
+</ul>
+
 <table>
 <thead>
 <tr>
-<th align="left">variable</th>
-<th>recv</th>
-<th>fetch</th>
-<th>pass</th>
-<th>miss</th>
-<th>hit</th>
-<th>error</th>
-<th>deliver</th>
-<th>pipe</th>
-<th>hash</th>
+<th align="left"></th>
+<th>R</th>
+<th>F</th>
+<th>P</th>
+<th>M</th>
+<th>H</th>
+<th>E</th>
+<th>D</th>
+<th>I</th>
+<th>#</th>
 </tr>
 </thead>
 
@@ -400,7 +415,18 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 </tbody>
 </table>
 
+<blockquote>
+<p>For the values assigned to each variable:<br />
+<code>R/W</code> is &ldquo;Read and Write&rdquo;,<br />
+and <code>R</code> is &ldquo;Read&rdquo;<br />
+and <code>W</code> is &ldquo;Write&rdquo;</p>
+</blockquote>
+
 <p>When you&rsquo;re dealing with <code>vcl_recv</code> you pretty much only ever interact with the <code>req</code> object. You generally will want to manipulate the incoming request <em>before</em> doing anything else.</p>
+
+<blockquote>
+<p>Note: the only other reason for setting data on the <code>req</code> object is when you want to keep track of things (because, as we can see from the above table matrix, the <code>req</code> object is available to R/W from <em>all</em> available states).</p>
+</blockquote>
 
 <p>Once a lookup in the cache is complete (i.e. <code>vcl_hash</code>) we&rsquo;ll end up in either <code>vcl_miss</code> or <code>vcl_hit</code>. If you end up in <code>vcl_hit</code>, then generally you&rsquo;ll look at and work with the <code>obj</code> object (this <code>obj</code> is what is pulled from the cache - so you&rsquo;ll check properties such as <code>obj.cacheable</code> for dealing with things like &lsquo;hit-for-pass&rsquo;).</p>
 
@@ -409,6 +435,224 @@ More concretely it is a web application that acts like a <a href="https://en.wik
 <p>Once a request is made, the content is copied into the <code>beresp</code> variable and made available within the <code>vcl_fetch</code> state. You would likely want to modify this object in order to change its ttl or cache headers because this is the last chance you have to do that before the content is stored in the cache.</p>
 
 <p>Finally, the <code>beresp</code> object is copied into <code>resp</code> and that is what&rsquo;s made available within the <code>vcl_deliver</code> state. This is the last chance you have for manipulating the response that the client will receive. Changes you make to this object doesn&rsquo;t affect what was stored in the cache (because that time, <code>vcl_fetch</code>, has already passed).</p>
+
+<p><div id="4.2"></div></p>
+
+<h2 id="persisting-state">Persisting State</h2>
+
+<p>Now that we know there are state variables available, and we understand generally when and why we would use them, let&rsquo;s now consider the problem of clustering (in the realm of Fastly&rsquo;s Varnish implementation) and how that plays an important part in understanding these behaviours. Because, if you don&rsquo;t understand Fastly&rsquo;s design you&rsquo;ll end up in a situation where data you&rsquo;re setting on these variables are being lost and you won&rsquo;t know why.</p>
+
+<p>So let&rsquo; me give you a <em>real</em> example: creating a HTTP header <code>X-VCL-Route</code> breadcrumb trail of the various states a request moves through (this is good for debugging, when you want to be sure your VCL logic is taking you down the correct path and through the expected state changes).</p>
+
+<p>To make this easier to understand I&rsquo;ve created a diagram&hellip;</p>
+
+<p><a href="../../images/varnish-request-flow.png">
+    <img src="../../images/varnish-request-flow.png">
+</a></p>
+
+<p>In this diagram we can see the various states available to Varnish, but also we can see that the states are separated by an &ldquo;edge&rdquo; and &ldquo;cluster&rdquo; section.</p>
+
+<blockquote>
+<p>Note: this graph is a little misleading in that <code>vcl_error</code> should appear in both the &ldquo;edge&rdquo; sections, as well as the &ldquo;cluster&rdquo; section. We&rsquo;ll come back to this later on and explain why that is.</p>
+</blockquote>
+
+<p>Now the directional lines drawn on the diagram represent the request flow you might see in a typical Varnish implementation (definitely in my case at any rate).</p>
+
+<p>Let&rsquo;s consider one of the example routes given: we can see a request comes into <code>vcl_recv</code> and from there it could trigger a <code>return(pass)</code> and so it would result in the request skipping the cache and going straight to <code>vcl_pass</code>, where it will then fetch the content from origin and subsequently end up in <code>vcl_fetch</code>. From there the content fetched from origin is stored in the cache and the cached content delivered to the client via <code>vcl_deliver</code>.</p>
+
+<p>That&rsquo;s one example route that could be taken. As you can see there are many more shown on the diagram, and many more I&rsquo;ve not included.</p>
+
+<p>But what&rsquo;s important to understand is that Fastly&rsquo;s infrastructure means that <code>vcl_recv</code>, <code>vcl_hash</code> and <code>vcl_deliver</code> are all executed on an edge node (the node nearest the client). Where as the other states are executed on a &ldquo;cluster&rdquo; node (or cache node).</p>
+
+<p>We can see in <a href="https://docs.fastly.com/guides/performance-tuning/request-collapsing">Fastly&rsquo;s documentation</a>, certain VCL subroutines run on the edge and some on the shield (i.e. what we&rsquo;re calling &ldquo;cluster&rdquo;):</p>
+
+<ul>
+<li>Edge:
+
+<ul>
+<li><code>vcl_recv</code>, <code>vcl_hash</code> †, <code>vcl_deliver</code>, <code>vcl_log</code>, <code>vcl_error</code><br /></li>
+</ul></li>
+<li>Shield (cluster):
+
+<ul>
+<li><code>vcl_miss</code>, <code>vcl_hit</code>, <code>vcl_pass</code>, <code>vcl_fetch</code>, <code>vcl_error</code></li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p>† not documented, but Fastly support suggested it would execute at the edge.</p>
+</blockquote>
+
+<p>OK, so two more <em>really</em> important things to be aware of at this point:</p>
+
+<ol>
+<li>Data added to the <code>req</code> object <em>cannot</em> persist across boundaries (except for when initially moving from the edge to the cluster).</li>
+<li>Data added to the <code>req</code> object <em>can</em> persist a restart, but <em>not</em> when they are added from the cluster environment.</li>
+</ol>
+
+<p>For number 1. that means: <code>req</code> data you set in <code>vcl_recv</code> and <code>vcl_hash</code> will be available in states like <code>vcl_pass</code> and <code>vcl_miss</code>.</p>
+
+<p>For number 2. that means: if you were in <code>vcl_deliver</code> and you set a value on <code>req</code> and then triggered a restart, the value would be available in <code>vcl_recv</code>. Yet, if you were in <code>vcl_miss</code> for example and you set <code>req.http.X-Foo</code> and let&rsquo;s say in <code>vcl_fetch</code> you look at the response from the origin and see the origin sent you back a 5xx status, you might decide you want to restart the request and try again. But if you were expecting <code>X-Foo</code> to be set on the <code>req</code> object when the code in <code>vcl_recv</code> was re-executed, you&rsquo;d be wrong. That&rsquo;s because the header was set on the <code>req</code> object while it was in a state that is executed on a cluster node; and so the <code>req</code> data set there doesn&rsquo;t persist a restart.</p>
+
+<blockquote>
+<p>If you&rsquo;re starting to think: &ldquo;this makes things tricky&rdquo;, you&rsquo;d be right :-)</p>
+</blockquote>
+
+<p>Let&rsquo;s now revisit our requirement, which was to create a breadcrumb trail using a HTTP header (this is where all this context becomes important).</p>
+
+<p>The first thing we have to do (in <code>vcl_recv</code>) is:</p>
+
+<pre><code>if (req.restarts == 0) {
+  set req.http.X-VCL-Route = &quot;VCL_RECV&quot;;
+} else {
+  set req.http.X-VCL-Route = req.http.X-VCL-Route &quot;,VCL_RECV&quot;;
+}
+</code></pre>
+
+<blockquote>
+<p>Note: we check <code>req.restarts</code> to make sure we don&rsquo;t include a leading <code>,</code> unnecessarily.</p>
+</blockquote>
+
+<p>So we know from the &ldquo;<a href="#4.1">State Variables</a>&rdquo; section earlier, that the <code>req</code> object is available for reading and writing.</p>
+
+<p>Varnish pretty much always calls <code>vcl_hash</code> at the end of <code>vcl_recv</code> so we add the following into <code>vcl_hash</code>:</p>
+
+<pre><code>set req.http.X-VCL-Route = req.http.X-VCL-Route &quot;,VCL_HASH(host: &quot; req.http.host &quot;, url: &quot; req.url &quot;)&quot;;
+</code></pre>
+
+<p>You can see we&rsquo;re not setting the value anew on the header, but am <em>appending</em> to the header.</p>
+
+<blockquote>
+<p>The idea of appending to the header, again makes things tricky (as we&rsquo;ll see) when we come to trying to persist data across not only the cluster but the caching of an object as well.</p>
+</blockquote>
+
+<p>With the above &lsquo;note&rsquo; fresh in your mind, let&rsquo;s look at <code>vcl_miss</code> and what we do there (remember <code>vcl_miss</code> is executing on a cluster node so anything we set on <code>req</code> won&rsquo;t persist a restart):</p>
+
+<pre><code>set req.http.X-PreFetch-Miss = &quot;,VCL_MISS(&quot; bereq.http.host bereq.url &quot;)&quot;;
+</code></pre>
+
+<p>So we still set a value on the <code>req</code> object, but we don&rsquo;t append to <code>X-VCL-Route</code>, we instead create a new header <code>X-PreFetch-Miss</code>.</p>
+
+<blockquote>
+<p>The eagle eyed amongst you may notice we took the value we assigned to the new header from <code>bereq</code>. I do this for semantic reasons rather than any real <em>need</em>. When we move to <code>vcl_miss</code> the <code>req</code> object is copied to <code>bereq</code>. So to make the distinction that <code>req</code> (once outside of <code>vcl_recv</code>) is only useful for tracking information, I use <code>bereq</code> as the value source. But I could have just used <code>req.http.host</code> and <code>req.url</code> as the value assigned to the header.</p>
+</blockquote>
+
+<p>Similarly in <code>vcl_pass</code> (that also executes on a cluster node), we create a new header again and don&rsquo;t append to <code>X-VCL-Route</code>:</p>
+
+<pre><code>set req.http.X-PreFetch-Pass = &quot;,VCL_PASS&quot;;
+</code></pre>
+
+<p>Now at this point in the request cycle we know that <code>vcl_pass</code> and <code>vcl_miss</code> are both going to make a request to origin for content and subsequently end up in <code>vcl_fetch</code>. But as we&rsquo;ll see in a moment, in <code>vcl_fetch</code> we don&rsquo;t assign data to the <code>req</code> object this time, instead we assign to <code>beresp</code>:</p>
+
+<pre><code>set beresp.http.X-VCL-Route = req.http.X-VCL-Route;
+set beresp.http.X-PreFetch-Pass = req.http.X-PreFetch-Pass;
+set beresp.http.X-PreFetch-Miss = req.http.X-PreFetch-Miss;
+set beresp.http.X-PostFetch = &quot;,VCL_FETCH(status: &quot; beresp.status &quot;, url: &quot; req.url &quot;)&quot;;
+</code></pre>
+
+<p>So there are a few things happening here:</p>
+
+<ul>
+<li>We take the <code>X-VCL-Route</code> and we assign it to a header of the same name, but on the <code>beresp</code> object.</li>
+<li>We take the <code>X-PreFetch-Pass</code> and <code>X-PreFetch-Miss</code> headers and also assign those to the <code>beresp</code> object.</li>
+<li>Finally we create a new header <code>X-PostFetch</code> and give it a fresh value that indicates we&rsquo;re in the fetch state.</li>
+</ul>
+
+<p>Why do we do this?</p>
+
+<p>Firstly, when we move from <code>vcl_pass</code> or <code>vcl_miss</code> to <code>vcl_fetch</code> the content we fetched from origin is assigned to the object <code>beresp</code>. When we leave <code>vcl_fetch</code> the object <code>beresp</code> will be stored in the cache. So any header we set on that object will exist when we pull the object from the cache at a later time (e.g. when we lookup content in the cache and we move to <code>vcl_hit</code> that subroutine will have access to an <code>obj</code> object, which is the <code>beresp</code> object pulled from the cache).</p>
+
+<p>Also when we leave <code>vcl_fetch</code> and move to <code>vcl_deliver</code>, the <code>beresp</code> object is copied into a new object (available in <code>vcl_deliver</code>) called <code>resp</code>. You&rsquo;ll find when <code>vcl_hit</code> moves to <code>vcl_deliver</code> the <code>obj</code> object which was pulled from the cache is also copied over to <code>resp</code> in <code>vcl_deliver</code>.</p>
+
+<p>Now the reason why we set data onto <code>beresp</code> in <code>vcl_fetch</code> is because we&rsquo;re ultimately about to cross the boundary of a cluster node (<code>vcl_fetch</code>) to an edge node (<code>vcl_deliver</code>) and so if we were to continue setting data onto <code>req</code> (like we did in <code>vcl_pass</code> and <code>vcl_miss</code>), then that data would be lost by the time we changed state from <code>vcl_fetch</code> to <code>vcl_deliver</code>.</p>
+
+<p>The reason we set separate headers for the <code>vcl_pass</code>, <code>vcl_miss</code> and <code>vcl_fetch</code> states is because we wanted to ensure the <code>beresp</code> object stored in the cache had a clean request history at the point in time when it was cached. Otherwise we would have issues later on when pulling the object from the cache and trying to append values in <code>vcl_deliver</code> (we could end up with large chunks of the breadcrumb trail duplicated).</p>
+
+<p>So for this reason, we separate the baseline routing (i.e. <code>vcl_recv</code> and <code>vcl_hash</code>) from all the other states (e.g. <code>vcl_pass</code>, <code>vcl_miss</code>, <code>vcl_fetch</code>) and then when we arrive at <code>vcl_deliver</code> we grab the baseline <code>X-VCL-Route</code> header and append to it the values from <code>X-PreFetch-Pass</code>, <code>X-PreFetch-Miss</code> and <code>X-PostFetch</code> only once we identify (via other inputs - which we&rsquo;ll see shortly) the actual route taken.</p>
+
+<p>Let&rsquo;s look at <code>vcl_deliver</code> and see what it is we do there to collate everything together:</p>
+
+<pre><code>if (resp.http.X-VCL-Route) {
+  set req.http.X-VCL-Route = resp.http.X-VCL-Route;
+}
+
+if (fastly_info.state ~ &quot;^HITPASS&quot;) {
+  set req.http.X-VCL-Route = req.http.X-VCL-Route &quot;,VCL_HIT(object: uncacheable, return: pass)&quot;;
+}
+elseif (fastly_info.state ~ &quot;^HIT&quot;) {
+  set req.http.X-VCL-Route = req.http.X-VCL-Route &quot;,VCL_HIT(&quot; req.http.host req.url &quot;)&quot;;
+}
+else {
+  if (resp.http.X-PreFetch-Pass) {
+    set req.http.X-VCL-Route = req.http.X-VCL-Route resp.http.X-PreFetch-Pass;
+  }
+
+  if (resp.http.X-PreFetch-Miss) {
+    set req.http.X-VCL-Route = req.http.X-VCL-Route resp.http.X-PreFetch-Miss;
+  }
+
+  if (resp.http.X-PostFetch) {
+    set req.http.X-VCL-Route = req.http.X-VCL-Route resp.http.X-PostFetch;
+  }
+}
+
+set req.http.X-VCL-Route = req.http.X-VCL-Route &quot;,VCL_DELIVER&quot;;
+</code></pre>
+
+<p>So we start by checking if there is a <code>X-VCL-Route</code> header available on the incoming object, and if so we overwrite the existing <code>req.http.X-VCL-Route</code> header with that <code>resp</code> object&rsquo;s value. This is important because we could have arrived at <code>vcl_deliver</code> from the edge node (or never even left the edge node) depending on specific scenarios such as going from <code>vcl_recv</code> straight to <code>vcl_error</code>.</p>
+
+<p>This point about <code>vcl_error</code> is <em>very</em> important, we&rsquo;ll skip that discussion for moment and come back to it.</p>
+
+<p>Next in <code>vcl_deliver</code>, once we have reset the <code>X-VCL-Route</code> header on the <code>req</code> object, we look at <code>fastly_info.state</code> which is Fastly&rsquo;s own internal system for tracking the current state of Varnish. We first look to see if we&rsquo;ve had a &lsquo;hit-for-pass&rsquo; (see the <a href="#5">next section</a> for details on that), and if so we append the relevant information to the header. Next we check we had a hit from an earlier cache lookup, again, if we have then we append the relevant information.</p>
+
+<p>After that we check if the <code>X-PreFetch-Pass</code>, <code>X-PreFetch-Miss</code> or <code>X-PostFetch</code> headers exist, and if so we append the relevant details to the <code>X-VCL-Route</code> header. Finally leaving us with appending the <em>current</em> state (i.e. we&rsquo;re in <code>vcl_deliver</code>) to the header.</p>
+
+<p>Right, OK so now let&rsquo;s go back and revisit <code>vcl_error</code>&hellip;</p>
+
+<p>The <code>vcl_error</code> subroutine is a tricky one because it exists in <em>both</em> the edge and the cluster environments.</p>
+
+<p>Meaning if you execute <code>error 401</code> from <code>vcl_recv</code>, then <code>vcl_error</code> will execute in the context of the edge node; whereas if you executed an <code>error</code> from a cluster environment like <code>vcl_fetch</code>, then <code>vcl_error</code> would execute in the context of the cluster node.</p>
+
+<p>Meaning, how you transition information between <code>vcl_error</code> and <code>vcl_deliver</code> could depend on whether you&rsquo;re on a edge or cluster node.</p>
+
+<p>To help explain this I&rsquo;m going to give another <em>real</em> example, where I wanted to lookup some content in our cache and if it didn&rsquo;t exist I wanted to restart the request and use a different origin server to serve the content.</p>
+
+<p>To do this I expected the route to go from <code>vcl_recv</code>, to <code>vcl_hash</code> and the lookup to fail so we would end up in <code>vcl_miss</code>. Now from <code>vcl_miss</code> I could have triggered a restart, but anything I set on the <code>req</code> object at that point (such as any breadcrumb data appended to <code>X-VCL-Route</code>) would have been lost as we transitioned from the cluster back to the edge (where <code>vcl_recv</code> is).</p>
+
+<p>I needed a way to persist the &ldquo;miss&rdquo; breadcrumb, so instead of returning a restart from <code>vcl_miss</code> I would trigger a custom error such as <code>error 901</code> and inside of <code>vcl_error</code> I have the following logic:</p>
+
+<pre><code>set obj.http.X-VCL-Route = req.http.X-VCL-Route;
+
+if (fastly_info.state ~ &quot;^MISS&quot;) {
+  set obj.http.X-VCL-Route = obj.http.X-VCL-Route &quot;,VCL_MISS(&quot; req.http.host req.url &quot;)&quot;;
+}
+
+set obj.http.X-VCL-Route = obj.http.X-VCL-Route &quot;,VCL_ERROR&quot;;
+
+if (obj.status == 901) {
+  set obj.http.X-VCL-Route = obj.http.X-VCL-Route &quot;,VCL_ERROR(status: 908, return: deliver)&quot;;
+
+  return(deliver);
+}
+</code></pre>
+
+<p>When we trigger an error an object is created for us. On that object I set our <code>X-VCL-Route</code> and assign it whatever was inside <code>req.http.X-VCL-Route</code> at that time †</p>
+
+<blockquote>
+<p>† which would include <code>vcl_recv</code>, <code>vcl_hash</code> and <code>vcl_miss</code>. Remember the <code>req</code> object <em>does</em> persist across the edge/cluster boundaries, but <em>only</em> when going from <code>vcl_recv</code>. After that, anything set on <code>req</code> is lost when crossing boundaries.</p>
+</blockquote>
+
+<p>Now we could have arrived at <code>vcl_error</code> from <code>vcl_recv</code> (e.g. if in our <code>vcl_recv</code> we had logic for checking Basic Authentication and none was found on the incoming request we could decide from <code>vcl_recv</code> to execute <code>error 401</code>) or we could have arrived at <code>vcl_error</code> from <code>vcl_miss</code> (as per our earlier example). So we need to check the internal Fastly state to identify this, hence checking <code>fastly_info.state ~ &quot;^MISS&quot;</code>.</p>
+
+<p>After that we append to the <code>obj</code> object&rsquo;s <code>X-VCL-Route</code> header our current state (i.e. so we know we came into <code>vcl_error</code>). Finally we look at the status on the <code>obj</code> object and see it&rsquo;s a 901 custom status code and so so we append that information so we know what happened.</p>
+
+<p>But you&rsquo;ll notice we don&rsquo;t restart the request from <code>vcl_error</code>, because if we did come from <code>vcl_miss</code> the data in <code>obj</code> would be lost because ultimately it was set in a cluster environment (as <code>vcl_error</code> would be running in a cluster environment when coming from <code>vcl_miss</code>).</p>
+
+<p>Instead we <code>return(deliver)</code>, because all that data assigned to <code>obj</code> is guaranteed to be copied into <code>resp</code> for us to reference when transitioning to <code>vcl_deliver</code> at the edge.</p>
+
+<p>Once we&rsquo;re at <code>vcl_deliver</code> we continue to set breadcrumb tracking onto <code>req.http.X-VCL-Route</code> as we know that will persist a restart from the edge.</p>
+
+<p>Phew! Well that was easy wasn&rsquo;t it&hellip;</p>
 
 <p><div id="5"></div></p>
 
