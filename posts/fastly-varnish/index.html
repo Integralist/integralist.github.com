@@ -442,7 +442,7 @@ and <code>W</code> is &ldquo;Write&rdquo;</p>
 
 <p>Now that we know there are state variables available, and we understand generally when and why we would use them, let&rsquo;s now consider the problem of clustering (in the realm of Fastly&rsquo;s Varnish implementation) and how that plays an important part in understanding these behaviours. Because, if you don&rsquo;t understand Fastly&rsquo;s design you&rsquo;ll end up in a situation where data you&rsquo;re setting on these variables are being lost and you won&rsquo;t know why.</p>
 
-<p>So let&rsquo; me give you a <em>real</em> example: creating a HTTP header <code>X-VCL-Route</code> breadcrumb trail of the various states a request moves through (this is good for debugging, when you want to be sure your VCL logic is taking you down the correct path and through the expected state changes).</p>
+<p>So let me give you a <em>real</em> example: creating a HTTP header <code>X-VCL-Route</code> breadcrumb trail of the various states a request moves through (this is good for debugging, when you want to be sure your VCL logic is taking you down the correct path and through the expected state changes).</p>
 
 <p>To make this easier to understand I&rsquo;ve created a diagram&hellip;</p>
 

@@ -170,7 +170,7 @@ Finally, the `beresp` object is copied into `resp` and that is what's made avail
 
 Now that we know there are state variables available, and we understand generally when and why we would use them, let's now consider the problem of clustering (in the realm of Fastly's Varnish implementation) and how that plays an important part in understanding these behaviours. Because, if you don't understand Fastly's design you'll end up in a situation where data you're setting on these variables are being lost and you won't know why.
 
-So let' me give you a _real_ example: creating a HTTP header `X-VCL-Route` breadcrumb trail of the various states a request moves through (this is good for debugging, when you want to be sure your VCL logic is taking you down the correct path and through the expected state changes). 
+So let me give you a _real_ example: creating a HTTP header `X-VCL-Route` breadcrumb trail of the various states a request moves through (this is good for debugging, when you want to be sure your VCL logic is taking you down the correct path and through the expected state changes). 
 
 To make this easier to understand I've created a diagram...
 
