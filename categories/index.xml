@@ -6,10 +6,19 @@
     <description>Recent content in Categories on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Tue, 28 Jun 2016 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 12 Nov 2017 13:00:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>101</title>
+      <link>http://www.integralist.co.uk/categories/101/</link>
+      <pubDate>Sun, 12 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/categories/101/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Algorithms</title>
@@ -50,7 +59,7 @@
     <item>
       <title>Development</title>
       <link>http://www.integralist.co.uk/categories/development/</link>
-      <pubDate>Thu, 02 Nov 2017 13:00:00 +0100</pubDate>
+      <pubDate>Sun, 12 Nov 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/categories/development/</guid>
       <description></description>
@@ -68,7 +77,7 @@
     <item>
       <title>Guide</title>
       <link>http://www.integralist.co.uk/categories/guide/</link>
-      <pubDate>Thu, 02 Nov 2017 13:00:00 +0100</pubDate>
+      <pubDate>Sun, 12 Nov 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/categories/guide/</guid>
       <description></description>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>101 on integralist</title>
+    <link>http://www.integralist.co.uk/categories/101/</link>
+    <description>Recent content in 101 on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sun, 12 Nov 2017 13:00:00 +0100</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/categories/101/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Logging 101</title>
+      <link>http://www.integralist.co.uk/posts/logging-101/</link>
+      <pubDate>Sun, 12 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/logging-101/</guid>
+      <description>Logs? Levels Quality  
+Logs? Applications should record information/events to make debugging and understand what the program is doing easier.
+Typically this information is recorded into a log file.
+But in some cases it is preferred to send this information to stdout.
+It then becomes the responsibility of the operating system/environment to determine where and how logs are stored.
+To quote 12factor:
+ A (service) never concerns itself with routing or storage of its output stream.</description>
+    </item>
+    
+    <item>
+      <title>DNS 101</title>
+      <link>http://www.integralist.co.uk/posts/dns-101/</link>
+      <pubDate>Wed, 30 Sep 2015 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/dns-101/</guid>
+      <description>DNS (Domain Name System) Lookup Process  Resolver Root Name Server(s) TLD Name Server(s) SLD Name Server(s)  Tree Hierarchy DNS Structure Authority Zones Name Servers Commands  whois dig  Flags option: nostats option: nocomments option: trace Other options  host nslookup  Record Types  NS A CNAME MX SOA SRV PTR TXT  TTL (Time to Live)  Local Caching  References Conclusion</description>
+    </item>
+    
+    <item>
+      <title>JavaScript 101</title>
+      <link>http://www.integralist.co.uk/posts/javascript-101/</link>
+      <pubDate>Sat, 24 Nov 2012 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/javascript-101/</guid>
+      <description>Introduction What is JavaScript Terminology Global Object Variables Types Objects Arrays Conditional Statements Coercion Functions Code Reuse (inheritance) Conclusion  
+Introduction I&amp;rsquo;ve written this very brief guide to JavaScript just as an aid for people new to the language and who need a basic starting point to see what the syntax looks like and to get a feeling for some of its features.
+This article&amp;rsquo;s main purpose is to give readers new to the language a glimpse of the JavaScript environment and to hopefully spur them onto further reading/learning.</description>
+    </item>
+    
+  </channel>
+</rss>

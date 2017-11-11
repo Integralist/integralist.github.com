@@ -6,10 +6,25 @@
     <description>Recent content in Posts on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Thu, 02 Nov 2017 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 12 Nov 2017 13:00:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Logging 101</title>
+      <link>http://www.integralist.co.uk/posts/logging-101/</link>
+      <pubDate>Sun, 12 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/logging-101/</guid>
+      <description>Logs? Levels Quality  
+Logs? Applications should record information/events to make debugging and understand what the program is doing easier.
+Typically this information is recorded into a log file.
+But in some cases it is preferred to send this information to stdout.
+It then becomes the responsibility of the operating system/environment to determine where and how logs are stored.
+To quote 12factor:
+ A (service) never concerns itself with routing or storage of its output stream.</description>
+    </item>
     
     <item>
       <title>Fastly Varnish</title>

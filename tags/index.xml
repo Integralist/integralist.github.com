@@ -6,19 +6,10 @@
     <description>Recent content in Tags on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Sat, 24 Nov 2012 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 30 Mar 2015 13:00:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/tags/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>101</title>
-      <link>http://www.integralist.co.uk/tags/101/</link>
-      <pubDate>Sat, 24 Nov 2012 13:00:00 +0100</pubDate>
-      
-      <guid>http://www.integralist.co.uk/tags/101/</guid>
-      <description></description>
-    </item>
     
     <item>
       <title>Aws</title>
@@ -323,6 +314,24 @@
       <pubDate>Sat, 03 Oct 2015 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/keys/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Logging</title>
+      <link>http://www.integralist.co.uk/tags/logging/</link>
+      <pubDate>Sun, 12 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/logging/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Logs</title>
+      <link>http://www.integralist.co.uk/tags/logs/</link>
+      <pubDate>Sun, 12 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/logs/</guid>
       <description></description>
     </item>
     

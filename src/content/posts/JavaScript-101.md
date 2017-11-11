@@ -2,10 +2,10 @@
 title: "JavaScript 101"
 date: 2012-11-24T13:00:00+01:00
 categories:
+  - "101"
   - "code"
   - "guide"
 tags:
-  - "101"
   - "javascript"
 draft: false
 ---

@@ -31,3 +31,23 @@ p > code {
 pre {
   border-radius: .3em;
 }
+
+.ll-fatal {
+  color: red;
+}
+
+.ll-error {
+  color: orange;
+}
+
+.ll-warn {
+  color: gold;
+}
+
+.ll-info {
+  color: green;
+}
+
+.ll-debug {
+  color: blue;
+}
