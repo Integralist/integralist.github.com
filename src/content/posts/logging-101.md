@@ -18,13 +18,11 @@ draft: false
 <div id="1"></div>
 ## Logs?
 
-Applications should record information/events to make debugging and understand what the program is doing easier.
+Applications should record information/events to help make debugging (and understanding) what a program is doing easier.
 
 Typically this information is recorded into a [log file](https://en.wikipedia.org/wiki/Log_file).
 
-But in some cases it is preferred to send this information to [stdout](https://en.wikipedia.org/wiki/Standard_streams). 
-
-It then becomes the responsibility of the operating system/environment to determine where and how logs are stored. 
+But in some cases it is preferred to send this information to [stdout](https://en.wikipedia.org/wiki/Standard_streams) because it then becomes the responsibility of the operating system/environment to determine where and how those logs are stored. 
 
 To quote [12factor](https://12factor.net/logs):
 
@@ -34,14 +32,14 @@ Applications should be conscious of the volume and [quality](#3) of the logs the
 
 You may discover that some log information is better off not logged but recorded as time series metrics so they can be provided and analysed by tools such as [Datadog](https://www.datadoghq.com/). The benefit of doing this is that you can more easily measure those metrics (and gain more insights) _over time_.
 
-It can also, depending on the tools you use to analyse your log data (e.g. external log analysis system, such as [Papertrail](https://papertrailapp.com/)), be better to log data in a more structured format in order to provide better contextual information and to make filtering logs easier.
+It can also, depending on the tools you use to analyse your log data (e.g. external log analysis system, such as [Papertrail](https://papertrailapp.com/)), be better to log data in a more structured format in order to provide better contextual information and to make filtering logs easier. For more information on structured logging, I recommend [this article](https://kartar.net/2015/12/structured-logging/) inspired from "The Art of Monitoring".
 
 <div id="2"></div>
 ## Levels
 
 When recording log data, there are various 'levels' you can utilise that indicate different [severities](https://en.wikipedia.org/wiki/Syslog#Severity_level).
 
-Below are some common log levels and a short description that should help indicate when you should use that particular level...
+Below are some common log levels along with a short description that describes when you would/should expect to use that particular level...
 
 > Note: I saw these descriptions in a tweet a long time ago, and saved them off, and then months later when I've come to write this post I have since lost the link to the original tweet. If someone knows what it is, could you ping me on twitter and I'll get the author credited appropriately.
 

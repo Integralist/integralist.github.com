@@ -30,10 +30,9 @@
       
       <guid>http://www.integralist.co.uk/posts/logging-101/</guid>
       <description>Logs? Levels Quality  
-Logs? Applications should record information/events to make debugging and understand what the program is doing easier.
+Logs? Applications should record information/events to help make debugging (and understanding) what a program is doing easier.
 Typically this information is recorded into a log file.
-But in some cases it is preferred to send this information to stdout.
-It then becomes the responsibility of the operating system/environment to determine where and how logs are stored.
+But in some cases it is preferred to send this information to stdout because it then becomes the responsibility of the operating system/environment to determine where and how those logs are stored.
 To quote 12factor:
  A (service) never concerns itself with routing or storage of its output stream.</description>
     </item>
