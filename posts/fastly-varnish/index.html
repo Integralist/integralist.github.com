@@ -605,6 +605,10 @@ set req.http.X-VCL-Route = req.http.X-VCL-Route &quot;,VCL_DELIVER&quot;;
 
 <p>Next in <code>vcl_deliver</code>, once we have reset the <code>X-VCL-Route</code> header on the <code>req</code> object, we look at <code>fastly_info.state</code> which is Fastly&rsquo;s own internal system for tracking the current state of Varnish. We first look to see if we&rsquo;ve had a &lsquo;hit-for-pass&rsquo; (see the <a href="#5">next section</a> for details on that), and if so we append the relevant information to the header. Next we check we had a hit from an earlier cache lookup, again, if we have then we append the relevant information.</p>
 
+<blockquote>
+<p>If you want more information on <code>fastly_info.state</code> see <a href="https://community.fastly.com/t/useful-variables-to-log/303/3">this community comment</a>.</p>
+</blockquote>
+
 <p>After that we check if the <code>X-PreFetch-Pass</code>, <code>X-PreFetch-Miss</code> or <code>X-PostFetch</code> headers exist, and if so we append the relevant details to the <code>X-VCL-Route</code> header. Finally leaving us with appending the <em>current</em> state (i.e. we&rsquo;re in <code>vcl_deliver</code>) to the header.</p>
 
 <p>Right, OK so now let&rsquo;s go back and revisit <code>vcl_error</code>&hellip;</p>

@@ -315,6 +315,8 @@ This point about `vcl_error` is _very_ important, we'll skip that discussion for
 
 Next in `vcl_deliver`, once we have reset the `X-VCL-Route` header on the `req` object, we look at `fastly_info.state` which is Fastly's own internal system for tracking the current state of Varnish. We first look to see if we've had a 'hit-for-pass' (see the [next section](#5) for details on that), and if so we append the relevant information to the header. Next we check we had a hit from an earlier cache lookup, again, if we have then we append the relevant information.
 
+> If you want more information on `fastly_info.state` see [this community comment](https://community.fastly.com/t/useful-variables-to-log/303/3).
+
 After that we check if the `X-PreFetch-Pass`, `X-PreFetch-Miss` or `X-PostFetch` headers exist, and if so we append the relevant details to the `X-VCL-Route` header. Finally leaving us with appending the _current_ state (i.e. we're in `vcl_deliver`) to the header.
 
 Right, OK so now let's go back and revisit `vcl_error`...
