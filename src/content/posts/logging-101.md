@@ -39,7 +39,11 @@ It can also, depending on the tools you use to analyse your log data (e.g. exter
 <div id="2"></div>
 ## Levels
 
-Here are common log levels and their application...
+When recording log data, there are various 'levels' you can utilise that indicate different [severities](https://en.wikipedia.org/wiki/Syslog#Severity_level).
+
+Below are some common log levels and a short description that should help indicate when you should use that particular level...
+
+> Note: I saw these descriptions in a tweet a long time ago, and saved them off, and then months later when I've come to write this post I have since lost the link to the original tweet. If someone knows what it is, could you ping me on twitter and I'll get the author credited appropriately.
 
 ### Fatal
 
