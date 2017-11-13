@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Use real datasets Identify collateral damage Stub services if necessary Distribute your traffic Automate for reproducible runs Consider disabling authentication Don&rsquo;t immediately scale dependencies Send traffic from different geographical regions Decide if your tool should support reusing connections Start testing a single instance, before moving onto clusters Verify load using multiple strategies Reset your environment between test runs Document the results Tools  
+Introduction This post should serve as a guideline for running load tests.'>
+
+<meta property='og:title' content='Load Testing Guidelines ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Use real datasets Identify collateral damage Stub services if necessary Distribute your traffic Automate for reproducible runs Consider disabling authentication Don&rsquo;t immediately scale dependencies Send traffic from different geographical regions Decide if your tool should support reusing connections Start testing a single instance, before moving onto clusters Verify load using multiple strategies Reset your environment between test runs Document the results Tools  
+Introduction This post should serve as a guideline for running load tests.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/load-testing-guidelines/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='load-testing'><meta property='article:tag' content='performance'><meta property='article:published_time' content='2017-11-13T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2017-11-13T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Load Testing Guidelines ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/load-testing-guidelines/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Load Testing Guidelines</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2017-11-13T13:00:00&#43;01:00'>2017-11-13</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    5 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Use real datasets</a></li>
+<li><a href="#3">Identify collateral damage</a></li>
+<li><a href="#4">Stub services if necessary</a></li>
+<li><a href="#5">Distribute your traffic</a></li>
+<li><a href="#6">Automate for reproducible runs</a></li>
+<li><a href="#7">Consider disabling authentication</a></li>
+<li><a href="#8">Don&rsquo;t immediately scale dependencies</a></li>
+<li><a href="#9">Send traffic from different geographical regions</a></li>
+<li><a href="#10">Decide if your tool should support reusing connections</a></li>
+<li><a href="#11">Start testing a single instance, before moving onto clusters</a></li>
+<li><a href="#12">Verify load using multiple strategies</a></li>
+<li><a href="#13">Reset your environment between test runs</a></li>
+<li><a href="#14">Document the results</a></li>
+<li><a href="#15">Tools</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This post should serve as a guideline for running load tests.</p>
+
+<p>It is designed to be a concise list of notes and tips.</p>
+
+<p>For a list of load testing tools, including their reviews and benchmark results, I refer you to the &ldquo;<a href="#15">Tools</a>&rdquo; section at the end.</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="use-real-datasets">Use real datasets</h2>
+
+<p>Parse your access logs for real user requests, then replay those requests within your load test. Also be mindful of different time periods for more accurate distribution of transactions. Look for realistic worst case situations (there may be more than one).</p>
+
+<p><div id="3"></div></p>
+
+<h2 id="identify-collateral-damage">Identify collateral damage</h2>
+
+<p>What users or upstreams will be affected by this additional load?</p>
+
+<p>Are there any vulnerable dependencies that should be: notified of the load test or protected from it? † (<a href="#4">see next section</a>)</p>
+
+<blockquote>
+<p>† not all services are completely isolated. Consider what happens when your services is using an external API service. If the API is doing its job right it should start rate limiting you (or denies you access for exceeding your thresholds). But that still doesn&rsquo;t necessarily mean you have to be a bad web citizen and start hammering their service (on a side note: you should probably be considering caching).</p>
+</blockquote>
+
+<p><div id="4"></div></p>
+
+<h2 id="stub-services-if-necessary">Stub services if necessary</h2>
+
+<p>Rather than hit a real upstream, try creating a mock version. The benefit of doing this is that you can your mock service to allow for controlling the latency and/or throughput restraints (thus mimicking different failure scenarios and seeing how your service behaves under different conditions).</p>
+
+<p><div id="5"></div></p>
+
+<h2 id="distribute-your-traffic">Distribute your traffic</h2>
+
+<p>When your service response is fairly big, it’s easy to hit a network capacity limit, so if you’re seeing that your service doesn’t scale with addition of new instances, this may be the root cause. To help avoid this, use <a href="https://github.com/tsenart/vegeta#usage-distributed-attacks">distributed testing</a> (here&rsquo;s an example <a href="https://gist.github.com/Integralist/e4b4e53dd09745b645e10e89fc133f63">wrapper</a> to simplify the process).</p>
+
+<p><div id="6"></div></p>
+
+<h2 id="automate-for-reproducible-runs">Automate for reproducible runs</h2>
+
+<p>Write simple scripts that let you coordinate a fresh load test run. Such as configuring mock services and defining specific strategies (e.g. running a &lsquo;<a href="https://en.wikipedia.org/wiki/Soak_testing">soak</a>&rsquo; test vs. a shorter duration load test that mimicks a slow ramp-up in traffic pattern vs a load test that mimicks a &lsquo;thundering herd&rsquo; approach).</p>
+
+<p><div id="7"></div></p>
+
+<h2 id="consider-disabling-authentication">Consider disabling authentication</h2>
+
+<p>It can be hard to include auth tokens/keys in load testing tools, and as such it is often easier to use a network secured backend and a custom code branch that either allows for auth bypass or has no authentication.</p>
+
+<blockquote>
+<p>Note: although being able to load test with authentication is important as it could highlight important problem points in your architecture design.</p>
+</blockquote>
+
+<p><div id="8"></div></p>
+
+<h2 id="don-t-immediately-scale-dependencies">Don&rsquo;t immediately scale dependencies</h2>
+
+<p>If you have a dependency such as redis (or another type of data store), then leave it configured to the size it currently is. If you have a stage environment, it can be tempting to configure that stage resource to be identical to your production environment. But it would be better to first verify if that resource is even a problem point by analysing the results of an initial load test with all resources configured normally for that environment.</p>
+
+<p>Once you&rsquo;ve run your load test, if you find you&rsquo;re having no issues, then sure you <em>could</em> consider increasing/scaling up the resource in question. But ultimately if it wasn&rsquo;t a problem before, then it is unlikely to be an issue once it has even more compute/memory/network/etc.</p>
+
+<p><div id="9"></div></p>
+
+<h2 id="send-traffic-from-different-geographical-regions">Send traffic from different geographical regions</h2>
+
+<p>It can be beneficial to set-up load testing instances in multiple <a href="http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html">regions and availability zones</a>. This is ideal for a highly dynamic application expected to be globally utilized, as it means you can accurately simulate traffic with different latency expectations. Although, if you have a simple/static application, maybe the use of <a href="https://www.fastly.com/">CDN edge caching</a> is enough to mitigate concern.</p>
+
+<p><div id="10"></div></p>
+
+<h2 id="decide-if-your-tool-should-support-reusing-connections">Decide if your tool should support reusing connections</h2>
+
+<p>A tool such as <a href="https://github.com/JoeDog/siege">Siege</a> doesn’t support reusing existing http connections. This can be interesting as far as identifying how your system behaves under those conditions. But reusing existing connections is mostly preferred so that throughput can be properly verified. Tools such as <a href="https://github.com/tsenart/vegeta">Vegeta</a> and <a href="https://github.com/wg/wrk">Wrk</a> support connection reuse and have better performance/features.</p>
+
+<p><div id="11"></div></p>
+
+<h2 id="start-testing-a-single-instance-before-moving-onto-clusters">Start testing a single instance, before moving onto clusters</h2>
+
+<p>We should ideally identify the threshold of a single instance before moving onto testing a cluster of instances. This is so that we can make appropriate tweaks to our application(s) based on the initial load testing results and should then help improve the initial cluster results as well.</p>
+
+<p><div id="12"></div></p>
+
+<h2 id="verify-load-using-multiple-strategies">Verify load using multiple strategies</h2>
+
+<p>There are multiple types of load testing strategies: constant, ramp-up, soak test (and more). Research and identify which is the most appropriate for your service under test. It may be that you’ll want to execute multiple strategies.</p>
+
+<p><div id="13"></div></p>
+
+<h2 id="reset-your-environment-between-test-runs">Reset your environment between test runs</h2>
+
+<p>Ensure your system is back to &lsquo;normal&rsquo; (that means different things to different services) before starting another load test. Otherwise your test results will be skewed by the system being in a &lsquo;hot&rsquo; state and could also mean putting your upstream services under <a href="https://en.wikipedia.org/wiki/Denial-of-service_attack">DoS</a> like scenarios.</p>
+
+<p><div id="14"></div></p>
+
+<h2 id="document-the-results">Document the results</h2>
+
+<p>It is beneficial for all (i.e. your team and others) to be able to review the load test results. Ensure each test is documented in a consistent, known and obvious location. For example, store them in a <code>/docs/load-tests</code> folder inside your service code base and include any key fixes (e.g. changes made that resolved a problem in your service performance).</p>
+
+<p><div id="15"></div></p>
+
+<h2 id="tools">Tools</h2>
+
+<p>There are various load/stress testing tools available.</p>
+
+<p>The following, for me, are the top three open-source choices:</p>
+
+<ul>
+<li><a href="https://www.joedog.org/siege-home/">Siege</a></li>
+<li><a href="https://github.com/tsenart/vegeta">Vegeta</a></li>
+<li><a href="https://github.com/wg/wrk">Wrk</a></li>
+</ul>
+
+<p>For a review of these tools (and many more open-source options), please read:</p>
+
+<ul>
+<li><a href="http://blog.loadimpact.com/open-source-load-testing-tool-review">Load Testing Tools Review</a></li>
+<li><a href="http://blog.loadimpact.com/open-source-load-testing-tool-benchmarks">Load Testing Tools Benchmarks</a></li>
+</ul>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/development'>development</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/load-testing'>load-testing</a>, <a class='tag' href='/tags/performance'>performance</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/logging-101/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Logging 101</a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+

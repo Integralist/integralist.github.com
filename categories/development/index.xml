@@ -6,10 +6,20 @@
     <description>Recent content in Development on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Sun, 12 Nov 2017 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 13 Nov 2017 13:00:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/categories/development/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Load Testing Guidelines</title>
+      <link>http://www.integralist.co.uk/posts/load-testing-guidelines/</link>
+      <pubDate>Mon, 13 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/load-testing-guidelines/</guid>
+      <description>Introduction Use real datasets Identify collateral damage Stub services if necessary Distribute your traffic Automate for reproducible runs Consider disabling authentication Don&amp;rsquo;t immediately scale dependencies Send traffic from different geographical regions Decide if your tool should support reusing connections Start testing a single instance, before moving onto clusters Verify load using multiple strategies Reset your environment between test runs Document the results Tools  
+Introduction This post should serve as a guideline for running load tests.</description>
+    </item>
     
     <item>
       <title>Logging 101</title>

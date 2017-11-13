@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Performance on integralist</title>
-    <link>http://www.integralist.co.uk/tags/performance/</link>
-    <description>Recent content in Performance on integralist</description>
+    <title>Load-testing on integralist</title>
+    <link>http://www.integralist.co.uk/tags/load-testing/</link>
+    <description>Recent content in Load-testing on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
     <lastBuildDate>Mon, 13 Nov 2017 13:00:00 +0100</lastBuildDate>
     
-	<atom:link href="http://www.integralist.co.uk/tags/performance/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://www.integralist.co.uk/tags/load-testing/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -19,17 +19,6 @@
       <guid>http://www.integralist.co.uk/posts/load-testing-guidelines/</guid>
       <description>Introduction Use real datasets Identify collateral damage Stub services if necessary Distribute your traffic Automate for reproducible runs Consider disabling authentication Don&amp;rsquo;t immediately scale dependencies Send traffic from different geographical regions Decide if your tool should support reusing connections Start testing a single instance, before moving onto clusters Verify load using multiple strategies Reset your environment between test runs Document the results Tools  
 Introduction This post should serve as a guideline for running load tests.</description>
-    </item>
-    
-    <item>
-      <title>HTTP/2</title>
-      <link>http://www.integralist.co.uk/posts/http2/</link>
-      <pubDate>Tue, 20 Oct 2015 13:00:00 +0100</pubDate>
-      
-      <guid>http://www.integralist.co.uk/posts/http2/</guid>
-      <description>Introduction Persistent Connections Multiplexing Compression Prioritization SSL/TLS Server Push Implementations  Nginx Go  References  
-Introduction This is a super quick post for demonstrating how to utilise the new HTTP/2 protocol. If you&amp;rsquo;re unfamiliar with it, then let me spend a brief few moments discussing some of the highlights:
- Single, persistent connection Multiplexing Header compression Prioritization Encryption Server Push  If none of these features make sense, then allow me to clarify further&amp;hellip;</description>
     </item>
     
   </channel>
