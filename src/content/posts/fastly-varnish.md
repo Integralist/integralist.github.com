@@ -466,7 +466,13 @@ set beresp.stale_if_error = <N>s;
 - `stale_while_revalidate`: when cache ttl expires, we'll serve stale for 60s while we acquire fresh content
 - `stale_if_error`: if we have an error, we'll serve stale for 1hr while we acquire fresh content
 
-> You can find more details on Fastly's implementation [here](https://docs.fastly.com/guides/performance-tuning/serving-stale-content) as well as a blog post announcing this feature [here](https://www.fastly.com/blog/stale-while-revalidate-stale-if-error-available-today/).
+If these settings aren't configured in VCL, then you'll need to provide them as part of the `Surrogate-Control` header:
+
+```vcl
+"Surrogate-Control": "max-age=123, stale-while-revalidate=172800, stale-if-error=172800"
+```
+
+> You can find more details on Fastly's implementation [here](https://docs.fastly.com/guides/performance-tuning/serving-stale-content) as well as a blog post announcing this feature [here](https://www.fastly.com/blog/stale-while-revalidate-stale-if-error-available-today/). If you want details on Varnish 4.0's implementation of serving stale, see [this post](https://info.varnish-software.com/blog/grace-varnish-4-stale-while-revalidate-semantics-varnish).
 
 ### Different actions for different states
 

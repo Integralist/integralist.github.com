@@ -594,6 +594,14 @@ This generates an image that looks like the following (notice how the bigger the
 
 > Note: you can also output as a PDF with `-pdf`.
 
+### Web UI
+
+Finally, there is a interactive web ui coming for pprof in the near future (as of November 2017).
+
+See [this post](https://rakyll.org/pprof-ui/) for more details.
+
+But in short you can get the updated pprof tool from GitHub and then execute it with the new flag `-http` (e.g. `-http=:8080`).
+
 <div id="7"></div>
 ## Trace
 
