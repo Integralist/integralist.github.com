@@ -463,10 +463,10 @@ set beresp.stale_if_error = <N>s;
 
 > Where `<N>` is the amount of time in seconds you want to keep the object for after its ttl has expired.
 
-- `stale_while_revalidate`: when cache ttl expires, we'll serve stale for 60s while we acquire fresh content
-- `stale_if_error`: if we have an error, we'll serve stale for 1hr while we acquire fresh content
+- `stale_while_revalidate`: when cache ttl expires, we'll serve stale for N seconds while we acquire fresh content.
+- `stale_if_error`: if we have an error, we'll serve stale for N seconds while we acquire fresh content.
 
-If these settings aren't configured in VCL, then you'll need to provide them as part of the `Surrogate-Control` header:
+If these settings aren't configured in VCL, then you'll need to provide them as part of Fastly's `Surrogate-Control` header (see [here](https://docs.fastly.com/guides/tutorials/cache-control-tutorial#surrogate-control) for the details):
 
 ```vcl
 "Surrogate-Control": "max-age=123, stale-while-revalidate=172800, stale-if-error=172800"

@@ -764,11 +764,11 @@ set beresp.stale_if_error = &lt;N&gt;s;
 </blockquote>
 
 <ul>
-<li><code>stale_while_revalidate</code>: when cache ttl expires, we&rsquo;ll serve stale for 60s while we acquire fresh content</li>
-<li><code>stale_if_error</code>: if we have an error, we&rsquo;ll serve stale for 1hr while we acquire fresh content</li>
+<li><code>stale_while_revalidate</code>: when cache ttl expires, we&rsquo;ll serve stale for N seconds while we acquire fresh content.</li>
+<li><code>stale_if_error</code>: if we have an error, we&rsquo;ll serve stale for N seconds while we acquire fresh content.</li>
 </ul>
 
-<p>If these settings aren&rsquo;t configured in VCL, then you&rsquo;ll need to provide them as part of the <code>Surrogate-Control</code> header:</p>
+<p>If these settings aren&rsquo;t configured in VCL, then you&rsquo;ll need to provide them as part of Fastly&rsquo;s <code>Surrogate-Control</code> header (see <a href="https://docs.fastly.com/guides/tutorials/cache-control-tutorial#surrogate-control">here</a> for the details):</p>
 
 <pre><code class="language-vcl">&quot;Surrogate-Control&quot;: &quot;max-age=123, stale-while-revalidate=172800, stale-if-error=172800&quot;
 </code></pre>
