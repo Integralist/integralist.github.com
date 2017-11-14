@@ -768,13 +768,23 @@ set beresp.stale_if_error = &lt;N&gt;s;
 <li><code>stale_if_error</code>: if we have an error, we&rsquo;ll serve stale for N seconds while we acquire fresh content.</li>
 </ul>
 
+<p>Even more specifically, <code>stale_while_revalidate</code> causes Varnish to serve stale after a cache MISS, while it asynchronously fetches a newer version of the content from origin. This takes precedence over <code>stale_if_error</code>.</p>
+
 <p>If these settings aren&rsquo;t configured in VCL, then you&rsquo;ll need to provide them as part of Fastly&rsquo;s <code>Surrogate-Control</code> header (see <a href="https://docs.fastly.com/guides/tutorials/cache-control-tutorial#surrogate-control">here</a> for the details):</p>
 
 <pre><code class="language-vcl">&quot;Surrogate-Control&quot;: &quot;max-age=123, stale-while-revalidate=172800, stale-if-error=172800&quot;
 </code></pre>
 
+<p>The use of <code>beresp.stale_if_error</code> is effectively the same as Varnish&rsquo;s <code>beresp.grace</code>. But be careful if your VCL already utilises Varnish&rsquo;s original <code>grace</code> feature, because it will override any Fastly behaviour that is using the <code>stale_if_error</code>.</p>
+
 <blockquote>
 <p>You can find more details on Fastly&rsquo;s implementation <a href="https://docs.fastly.com/guides/performance-tuning/serving-stale-content">here</a> as well as a blog post announcing this feature <a href="https://www.fastly.com/blog/stale-while-revalidate-stale-if-error-available-today/">here</a>. If you want details on Varnish 4.0&rsquo;s implementation of serving stale, see <a href="https://info.varnish-software.com/blog/grace-varnish-4-stale-while-revalidate-semantics-varnish">this post</a>.</p>
+</blockquote>
+
+<p>You might find that you&rsquo;re not serving stale even though you would expect to be. This can be caused by a lack of <a href="https://docs.fastly.com/guides/performance-tuning/shielding">shielding</a> (an additional Fastly feature that&rsquo;s designed to improve your hit ratio) as you can only serve a stale cached object if the request ended up being routed through the POP that has the content cached (which is more difficult without shielding enabled).</p>
+
+<blockquote>
+<p>Another reason would be to use &ldquo;<a href="https://docs.fastly.com/guides/purging/soft-purges">soft purging</a>&rdquo; rather than hard purges.</p>
 </blockquote>
 
 <h3 id="different-actions-for-different-states">Different actions for different states</h3>

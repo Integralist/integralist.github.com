@@ -466,13 +466,21 @@ set beresp.stale_if_error = <N>s;
 - `stale_while_revalidate`: when cache ttl expires, we'll serve stale for N seconds while we acquire fresh content.
 - `stale_if_error`: if we have an error, we'll serve stale for N seconds while we acquire fresh content.
 
+Even more specifically, `stale_while_revalidate` causes Varnish to serve stale after a cache MISS, while it asynchronously fetches a newer version of the content from origin. This takes precedence over `stale_if_error`.
+
 If these settings aren't configured in VCL, then you'll need to provide them as part of Fastly's `Surrogate-Control` header (see [here](https://docs.fastly.com/guides/tutorials/cache-control-tutorial#surrogate-control) for the details):
 
 ```vcl
 "Surrogate-Control": "max-age=123, stale-while-revalidate=172800, stale-if-error=172800"
 ```
 
+The use of `beresp.stale_if_error` is effectively the same as Varnish's `beresp.grace`. But be careful if your VCL already utilises Varnish's original `grace` feature, because it will override any Fastly behaviour that is using the `stale_if_error`.
+
 > You can find more details on Fastly's implementation [here](https://docs.fastly.com/guides/performance-tuning/serving-stale-content) as well as a blog post announcing this feature [here](https://www.fastly.com/blog/stale-while-revalidate-stale-if-error-available-today/). If you want details on Varnish 4.0's implementation of serving stale, see [this post](https://info.varnish-software.com/blog/grace-varnish-4-stale-while-revalidate-semantics-varnish).
+
+You might find that you're not serving stale even though you would expect to be. This can be caused by a lack of [shielding](https://docs.fastly.com/guides/performance-tuning/shielding) (an additional Fastly feature that's designed to improve your hit ratio) as you can only serve a stale cached object if the request ended up being routed through the POP that has the content cached (which is more difficult without shielding enabled). 
+
+> Another reason would be to use "[soft purging](https://docs.fastly.com/guides/purging/soft-purges)" rather than hard purges.
 
 ### Different actions for different states
 
