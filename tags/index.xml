@@ -273,6 +273,15 @@
     </item>
     
     <item>
+      <title>Instrumentation</title>
+      <link>http://www.integralist.co.uk/tags/instrumentation/</link>
+      <pubDate>Wed, 15 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/instrumentation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Javascript</title>
       <link>http://www.integralist.co.uk/tags/javascript/</link>
       <pubDate>Sat, 26 Apr 2014 13:00:00 +0100</pubDate>
@@ -365,7 +374,7 @@
     <item>
       <title>Monitoring</title>
       <link>http://www.integralist.co.uk/tags/monitoring/</link>
-      <pubDate>Thu, 03 Mar 2016 13:00:00 +0100</pubDate>
+      <pubDate>Wed, 15 Nov 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/monitoring/</guid>
       <description></description>
@@ -395,6 +404,15 @@
       <pubDate>Tue, 20 Oct 2015 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/nginx/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Observability</title>
+      <link>http://www.integralist.co.uk/tags/observability/</link>
+      <pubDate>Wed, 15 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/observability/</guid>
       <description></description>
     </item>
     

@@ -4,11 +4,16 @@
   
   <url>
     <loc>http://www.integralist.co.uk/</loc>
-    <lastmod>2017-11-13T13:00:00+01:00</lastmod>
+    <lastmod>2017-11-15T13:00:00+01:00</lastmod>
   </url>
   
   <url>
     <loc>http://www.integralist.co.uk/about/</loc>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/posts/observability-monitoring-instrumentation/</loc>
+    <lastmod>2017-11-15T13:00:00+01:00</lastmod>
   </url>
   
   <url>
@@ -361,7 +366,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/development/</loc>
-    <lastmod>2017-11-13T13:00:00+01:00</lastmod>
+    <lastmod>2017-11-15T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -427,7 +432,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/guide/</loc>
-    <lastmod>2017-11-13T13:00:00+01:00</lastmod>
+    <lastmod>2017-11-15T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -452,6 +457,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/https/</loc>
     <lastmod>2015-10-03T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/instrumentation/</loc>
+    <lastmod>2017-11-15T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -517,7 +528,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/monitoring/</loc>
-    <lastmod>2016-03-03T13:00:00+01:00</lastmod>
+    <lastmod>2017-11-15T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -536,6 +547,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/nginx/</loc>
     <lastmod>2015-10-20T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/observability/</loc>
+    <lastmod>2017-11-15T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -600,7 +617,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/posts/</loc>
-    <lastmod>2017-11-13T13:00:00+01:00</lastmod>
+    <lastmod>2017-11-15T13:00:00+01:00</lastmod>
     <priority>0</priority>
   </url>
   
