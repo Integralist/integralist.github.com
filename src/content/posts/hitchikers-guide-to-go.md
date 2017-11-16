@@ -3153,3 +3153,7 @@ func (this Stuff) UnmarshalJSON(b []byte) error {
 	return nil
 }
 ```
+
+This means you can also leverage custom type checking:
+
+See: [leveraging interfaces in golang](http://blog.tamizhvendan.in/blog/2017/06/24/leveraging-interfaces-in-golang-part-1/)
