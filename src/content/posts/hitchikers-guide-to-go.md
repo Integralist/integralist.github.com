@@ -52,6 +52,7 @@ draft: false
 - [Shell Commands](#41)
 - [New Instance Idiom](#42)
 - [JSON Connection Draining](#43)
+- [Writing your own Marshal/Unmarshal functions](#44)
 
 <div id="1"></div>
 ## Introduction
@@ -3078,3 +3079,77 @@ defer func() {
 ```
 
 > Note: [https://github.com/google/go-github/pull/317](https://github.com/google/go-github/pull/317)
+
+<div id="44"></div>
+## Writing your own Marshal/Unmarshal functions
+
+```
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"strconv"
+)
+
+func main() {
+	a := make(Stuff)
+	a[1] = "asdf"
+	a[-1] = "qwer"
+	fmt.Println("Initial:     ", a)
+
+	stuff, _ := json.Marshal(a)
+	fmt.Println("Serialized:  ", string(stuff))
+
+	b := make(Stuff)
+	_ = json.Unmarshal(stuff, &b)
+	fmt.Println("Deserialized:", b)
+}
+
+type Stuff map[int]string
+
+// MarshalJSON works the same as the underlying json.Marshal would
+func (this Stuff) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString("{")
+	length := len(this)
+	count := 0
+	for key, value := range this {
+		jsonValue, err := json.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+		buffer.WriteString(fmt.Sprintf("\"%d\":%s", key, string(jsonValue)))
+		count++
+		if count < length {
+			buffer.WriteString(",")
+		}
+	}
+	buffer.WriteString("}")
+	return buffer.Bytes(), nil
+
+  // for example you could totally change the behaviour...
+  /*
+	buffer := bytes.NewBufferString("{")
+	buffer.WriteString("}")
+	return buffer.Bytes(), nil
+	*/
+}
+
+// UnmarshalJSON works the same as the underlying json.Unmarshal would
+func (this Stuff) UnmarshalJSON(b []byte) error {
+	var stuff map[string]string
+	err := json.Unmarshal(b, &stuff)
+	if err != nil {
+		return err
+	}
+	for key, value := range stuff {
+		numericKey, err := strconv.Atoi(key)
+		if err != nil {
+			return err
+		}
+		this[numericKey] = value
+	}
+	return nil
+}
+```

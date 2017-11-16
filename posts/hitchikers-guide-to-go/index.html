@@ -4,10 +4,10 @@
 <head>
   <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta name='description' content='Introduction Private Repo Access Build and Compilation Dependency Information Dependency Management Documentation Testing Logging Godo Import Race Conditions New vs Make Custom Types Function Types Enumerator IOTA Struct: Var vs Type Embedded Structs Reference vs Value See all methods on &lt;Type&gt; Convert Struct into JSON Pretty Printing JSON String Convert Struct into YAML Sorting Structs Read Users Input HTTP Middleware Sessions HTTPS TLS Request HTTP GET Web Page Custom HTTP Request Methods Pointers Type Assertion Line Counting Reading File in Chunks Time Starting and Stopping things with Channels Channel Pipelines Templating Error handling Socket Programming Comparing Maps Zip File Contents Shell Commands New Instance Idiom JSON Connection Draining'>
+<meta name='description' content='Introduction Private Repo Access Build and Compilation Dependency Information Dependency Management Documentation Testing Logging Godo Import Race Conditions New vs Make Custom Types Function Types Enumerator IOTA Struct: Var vs Type Embedded Structs Reference vs Value See all methods on &lt;Type&gt; Convert Struct into JSON Pretty Printing JSON String Convert Struct into YAML Sorting Structs Read Users Input HTTP Middleware Sessions HTTPS TLS Request HTTP GET Web Page Custom HTTP Request Methods Pointers Type Assertion Line Counting Reading File in Chunks Time Starting and Stopping things with Channels Channel Pipelines Templating Error handling Socket Programming Comparing Maps Zip File Contents Shell Commands New Instance Idiom JSON Connection Draining Writing your own Marshal/Unmarshal functions'>
 
 <meta property='og:title' content='Hitchikers Guide to Go ⋆ Mark McDonnell'>
-<meta property='og:description' content='Introduction Private Repo Access Build and Compilation Dependency Information Dependency Management Documentation Testing Logging Godo Import Race Conditions New vs Make Custom Types Function Types Enumerator IOTA Struct: Var vs Type Embedded Structs Reference vs Value See all methods on &lt;Type&gt; Convert Struct into JSON Pretty Printing JSON String Convert Struct into YAML Sorting Structs Read Users Input HTTP Middleware Sessions HTTPS TLS Request HTTP GET Web Page Custom HTTP Request Methods Pointers Type Assertion Line Counting Reading File in Chunks Time Starting and Stopping things with Channels Channel Pipelines Templating Error handling Socket Programming Comparing Maps Zip File Contents Shell Commands New Instance Idiom JSON Connection Draining'>
+<meta property='og:description' content='Introduction Private Repo Access Build and Compilation Dependency Information Dependency Management Documentation Testing Logging Godo Import Race Conditions New vs Make Custom Types Function Types Enumerator IOTA Struct: Var vs Type Embedded Structs Reference vs Value See all methods on &lt;Type&gt; Convert Struct into JSON Pretty Printing JSON String Convert Struct into YAML Sorting Structs Read Users Input HTTP Middleware Sessions HTTPS TLS Request HTTP GET Web Page Custom HTTP Request Methods Pointers Type Assertion Line Counting Reading File in Chunks Time Starting and Stopping things with Channels Channel Pipelines Templating Error handling Socket Programming Comparing Maps Zip File Contents Shell Commands New Instance Idiom JSON Connection Draining Writing your own Marshal/Unmarshal functions'>
 <meta property='og:url' content='http://www.integralist.co.uk/posts/hitchikers-guide-to-go/'>
 <meta property='og:site_name' content='integralist'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='go'><meta property='article:published_time' content='2016-12-02T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2016-12-02T13:00:00&#43;01:00'/>
@@ -178,6 +178,7 @@ ga('send', 'pageview');
 <li><a href="#41">Shell Commands</a></li>
 <li><a href="#42">New Instance Idiom</a></li>
 <li><a href="#43">JSON Connection Draining</a></li>
+<li><a href="#44">Writing your own Marshal/Unmarshal functions</a></li>
 </ul>
 
 <p><div id="1"></div></p>
@@ -3190,6 +3191,80 @@ func main() {
 <blockquote>
 <p>Note: <a href="https://github.com/google/go-github/pull/317">https://github.com/google/go-github/pull/317</a></p>
 </blockquote>
+
+<p><div id="44"></div></p>
+
+<h2 id="writing-your-own-marshal-unmarshal-functions">Writing your own Marshal/Unmarshal functions</h2>
+
+<pre><code>package main
+
+import (
+	&quot;bytes&quot;
+	&quot;encoding/json&quot;
+	&quot;fmt&quot;
+	&quot;strconv&quot;
+)
+
+func main() {
+	a := make(Stuff)
+	a[1] = &quot;asdf&quot;
+	a[-1] = &quot;qwer&quot;
+	fmt.Println(&quot;Initial:     &quot;, a)
+
+	stuff, _ := json.Marshal(a)
+	fmt.Println(&quot;Serialized:  &quot;, string(stuff))
+
+	b := make(Stuff)
+	_ = json.Unmarshal(stuff, &amp;b)
+	fmt.Println(&quot;Deserialized:&quot;, b)
+}
+
+type Stuff map[int]string
+
+// MarshalJSON works the same as the underlying json.Marshal would
+func (this Stuff) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString(&quot;{&quot;)
+	length := len(this)
+	count := 0
+	for key, value := range this {
+		jsonValue, err := json.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+		buffer.WriteString(fmt.Sprintf(&quot;\&quot;%d\&quot;:%s&quot;, key, string(jsonValue)))
+		count++
+		if count &lt; length {
+			buffer.WriteString(&quot;,&quot;)
+		}
+	}
+	buffer.WriteString(&quot;}&quot;)
+	return buffer.Bytes(), nil
+
+  // for example you could totally change the behaviour...
+  /*
+	buffer := bytes.NewBufferString(&quot;{&quot;)
+	buffer.WriteString(&quot;}&quot;)
+	return buffer.Bytes(), nil
+	*/
+}
+
+// UnmarshalJSON works the same as the underlying json.Unmarshal would
+func (this Stuff) UnmarshalJSON(b []byte) error {
+	var stuff map[string]string
+	err := json.Unmarshal(b, &amp;stuff)
+	if err != nil {
+		return err
+	}
+	for key, value := range stuff {
+		numericKey, err := strconv.Atoi(key)
+		if err != nil {
+			return err
+		}
+		this[numericKey] = value
+	}
+	return nil
+}
+</code></pre>
 
 </div>
 
