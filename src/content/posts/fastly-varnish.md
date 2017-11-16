@@ -22,7 +22,8 @@ draft: false
 - [Persisting State](#4.2)
 - [Hit for Pass](#5)
 - [Serving Stale](#6)
-- [Conclusion](#7)
+- [Logging](#7)
+- [Conclusion](#8)
 
 <div id="1"></div>
 ## Introduction
@@ -517,6 +518,61 @@ This means we end up processing the request again, but this time when we make a 
 In this scenario we don't find a stale object in either `vcl_fetch` or `vcl_deliver` and so we end up serving the 5xx content that we got from origin to the client. Although you may want to attempt to restart the request and use a custom header (e.g. `set req.http.X-Serve-500-Page = "true"`) in order to indicate to `vcl_recv` that you want to short-circuit the request cycle and serve a custom error page instead.
 
 <div id="7"></div>
+## Logging
+
+With Fastly, to set-up logging you'll need to use their UI, as this means they can configure the relevant integration with your log aggregation provider. But what people don't realise is that by default Fastly will generate a subroutine called `vcl_log`.
+
+Now, if you don't specify a "log format", then the generated subroutine will look like this:
+
+```
+sub vcl_log {
+#--FASTLY LOG START
+  # default response conditions
+  log {"syslog <service_id> <service_name> :: "} ;
+#--FASTLY LOG END
+}
+```
+
+If you _do_ provide a log format value, then it could look something like the following:
+
+```
+sub vcl_log {
+#--FASTLY LOG START
+  # default response conditions
+  log {"syslog <service_id> <service_name> :: "} req.http.Fastly-Client-IP " [" strftime({"%Y-%m-%d %H:%M:%S"}, time.start) "." time.start.msec_frac {"] ""} cstr_escape(req.request) " " cstr_escape(req.url) " " cstr_escape(req.proto) {"" "} resp.status " " resp.body_bytes_written " " tls.client.protocol " " fastly_info.state " " req.http.user-agent;
+#--FASTLY LOG END
+}
+```
+
+The `vcl_log` subroutine executes _after_ `vcl_deliver`. So it's the _very last_ routine to be executed before Varnish completes the request (so this is even after it has delivered the response to the client). The reason this subroutine exists is because logging inside of `vcl_deliver` (which is how Fastly _used_ to work - i.e. they would auto-generate the log call inside of `vcl_deliver`) they wouldn't have certain response variables available, such as determining how long it took to send the first byte of the response to the client.
+
+What confused me about the logging set-up was the fact that I didn't realise I was looking at things too much from an 'engineering' perspective. By that I mean, not all of the UI features Fastly provides exist just for my benefit :-) 
+
+So what I was confusedly thinking was: "why is Fastly generating a single log call in `vcl_log`, is there a technical reason for that or a limitation with Varnish?" and it ended up simply just being that some Fastly users don't want to write their own VCL (or don't know anything about writing code) and so they are quite happy with knowing that the UI will trigger a single log call at the end of each request cycle.
+
+Where (as a programmer) I was expecting to add log calls all over the place! But I never realised a `vcl_log` was being auto-generated for me by Fastly. Meaning... I never realised that an extra log call (after all the log calls I was manually adding to my custom VCL) was being executed.
+
+So when I eventually stumbled across a Fastly documentation page talking about "duplicate logs", I started digging deeper into why that might be ...and that's where I discovered `vcl_log` was a thing.
+
+Now, the documentation then goes on to mention using the UI to create a custom 'condition' to prevent Fastly's auto-generated log from being executed. This intrigued me. I was thinking "what is this magical 'condition feature' they have?". Well, turns out that I was again thinking too much like an engineer and not enough like a normal Joe Bloggs user who knows nothing about programming, as this 'feature' just generates a standard conditional 'if statement' code block around the auto-generated log call, like so:
+
+```
+sub vcl_log {
+#--FASTLY LOG START
+  # default response conditions
+  # Response Condition: generate-a-log Prio: 10
+  if( !req.url ) {
+    log {"syslog <service_id> <service_name> :: "} ;
+  }
+#--FASTLY LOG END
+}
+```
+
+As you can probably tell, this recommended condition will never match and so the log call isn't executed.
+
+Mystery solved.
+
+<div id="8"></div>
 ## Conclusion
 
 So there we have it, a quick run down of how some important aspects of Varnish and VCL work (and specifically for Fastly's implementation).
