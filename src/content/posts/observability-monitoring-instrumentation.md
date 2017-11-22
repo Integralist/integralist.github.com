@@ -5,9 +5,9 @@ categories:
   - "development"
   - "guide"
 tags:
-  - "observability"
-  - "monitoring"
   - "instrumentation"
+  - "monitoring"
+  - "observability"
 draft: false
 ---
 

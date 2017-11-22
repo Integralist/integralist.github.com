@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Does it work? What metrics should we focus on? Frequency and Aggregation Data Collection Methods Frontend Monitoring Logging or Metrics? What else to check for? Conclusion  
+Introduction I&rsquo;ve just finished reading Practical Monitoring &ldquo;Effective Strategies for the Real World&rdquo; by Mike Julian. It&rsquo;s a great book and highly recommended.
+I&rsquo;d like to share my thoughts on monitoring, based on both my past experience on the subject and also some interesting details found in Practical Monitoring.'>
+
+<meta property='og:title' content='Practical Monitoring ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Does it work? What metrics should we focus on? Frequency and Aggregation Data Collection Methods Frontend Monitoring Logging or Metrics? What else to check for? Conclusion  
+Introduction I&rsquo;ve just finished reading Practical Monitoring &ldquo;Effective Strategies for the Real World&rdquo; by Mike Julian. It&rsquo;s a great book and highly recommended.
+I&rsquo;d like to share my thoughts on monitoring, based on both my past experience on the subject and also some interesting details found in Practical Monitoring.'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/practical-monitoring/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='instrumentation'><meta property='article:tag' content='monitoring'><meta property='article:tag' content='observability'><meta property='article:published_time' content='2017-11-22T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2017-11-22T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Practical Monitoring ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/practical-monitoring/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+    <li>
+      <a href='http://www.integralist.co.uk/resume' 
+        
+      >Resume</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Practical Monitoring</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2017-11-22T13:00:00&#43;01:00'>2017-11-22</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    11 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Does it work?</a></li>
+<li><a href="#3">What metrics should we focus on?</a></li>
+<li><a href="#4">Frequency and Aggregation</a></li>
+<li><a href="#5">Data Collection Methods</a></li>
+<li><a href="#6">Frontend Monitoring</a></li>
+<li><a href="#7">Logging or Metrics?</a></li>
+<li><a href="#8">What else to check for?</a></li>
+<li><a href="#9">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>I&rsquo;ve just finished reading <a href="http://shop.oreilly.com/product/0636920050773.do">Practical Monitoring</a> &ldquo;Effective Strategies for the Real World&rdquo; by Mike Julian. It&rsquo;s a great book and highly recommended.</p>
+
+<p>I&rsquo;d like to share my thoughts on monitoring, based on both my past experience on the subject and also some interesting details found in Practical Monitoring.</p>
+
+<p>If you&rsquo;re new to monitoring then just be aware that this post isn&rsquo;t necessarily the &ldquo;correct&rdquo; way to do things. It&rsquo;s merely a combination of Mike Julian&rsquo;s experience, and my own, mangled together into a somewhat coherent reference post. With that in mind, take what bits interest you and feel free to leave the rest.</p>
+
+<blockquote>
+<p>Note: for a brief differentiation between terminology, see my earlier post: <a href="http://www.integralist.co.uk/posts/observability-monitoring-instrumentation/">Observability, Monitoring, Instrumentation</a>.</p>
+</blockquote>
+
+<p><div id="2"></div></p>
+
+<h2 id="does-it-work">Does it work?</h2>
+
+<p>While reading Practical Monitoring, the first thing I took note of was the following line&hellip;</p>
+
+<blockquote>
+<p>What does it mean for our service to be considered &ldquo;working&rdquo;?</p>
+</blockquote>
+
+<p>I found this interesting because I&rsquo;ve also been thinking about the same thing recently. I&rsquo;ve found myself in situations where alarms (for systems I don&rsquo;t necessarily own) are firing and I&rsquo;m trying to understand what the alarm really <em>means</em>. In most cases the alarm is firing on something not entirely useful and which doesn&rsquo;t &lsquo;clearly&rsquo; indicate the problem.</p>
+
+<p>For example, if the alarm is firing because of high-level reasons like &ldquo;the response status code wasn&rsquo;t a 200 OK&rdquo; or &ldquo;the request latency was under N seconds&rdquo;, then these things (although useful and are alarms we should include in our monitoring) don&rsquo;t actually help you to understand <em>what</em> went wrong (i.e. the cause); they just indicate a symptom. That can be a cause for concern because at 3am on a Sunday morning you need to know what happened so you can quickly resolve the issue. Not now have to spend time debugging the issue.</p>
+
+<p>I&rsquo;ve not found the answer to this problem yet, although I believe providing more contextual information in the alarm should help. But I&rsquo;m at least more aware of this as a problem area and is something I&rsquo;m now pro-actively thinking about improving in our own systems.</p>
+
+<p><div id="3"></div></p>
+
+<h2 id="what-metrics-should-we-focus-on">What metrics should we focus on?</h2>
+
+<p>A lot of the time you&rsquo;ll find alarms are configured to monitor OS level metrics like CPU or memory consumption. These are great for diagnostics and performance analysis, as they help to highlight the underlying system behaviour. But you should probably not be using these stats for alarming as their values can have relative meaning in different situations (I&rsquo;ll come back to this).</p>
+
+<p>We should probably focus instead our monitorings on the outer layer of the overall system architecture: what does the end user experience? How can we identify if the problems we&rsquo;re seeing are bubbling up to the user and causing <em>real</em> detrimental effects on our business and the trust associated with our product.</p>
+
+<p>Instead of looking at the memory usage and seeing it has raised beyond some arbitrarily selected threshold value that you&rsquo;ve picked simply based off past usage, instead, try monitoring 5xx status code errors and slow latency times. These not only tell you something is wrong, but also that the problem is affecting your users (and that is the most critical of errors and is something you should wake up and fix <em>immediately</em>).</p>
+
+<blockquote>
+<p>Note: although, as mentioned earlier - this still doesn&rsquo;t tell us <em>what</em> went wrong. That&rsquo;s a problem that requires extra contextual information.</p>
+</blockquote>
+
+<p>Also consider using percentage based monitoring rather than static thresholds. For example, a static threshold might look like &ldquo;Free disk space is &lt; 10%&rdquo; (which in itself is relative to the system, because 10% of 1 terabyte isn&rsquo;t the same thing as 10% of 1 gigabyte), whereas a more useful percentage monitor would look like &ldquo;Disk usage has <em>grown</em> by 50%&rdquo; (that indicates much more than the static threshold).</p>
+
+<p>A key comment made in the book was&hellip;</p>
+
+<blockquote>
+<p>Go as deep and wide with your instrumentation as you want, but always be asking yourself, &ldquo;How will these metrics show me the user impact?&rdquo;</p>
+</blockquote>
+
+<p>Once you have those items covered, you can start moving further inwards to other layers beyond that. The deeper you go, the more specific your alarms become, and the less useful they become at identifying trends and patterns.</p>
+
+<p>Importantly, static thresholds have a habit of raising false alarms (spikes in data that cross our thresholds). This happens so frequently, and is such a problem that some tools offer &ldquo;flapping detection&rdquo; to help prevent these <em>deviations</em>.</p>
+
+<p>Ultimately, monitoring doesn&rsquo;t fix anything. If you find yourself spending more and more time on investigating alarms, you should really start investing time towards <em>fixing</em> the things raised by these service alarms and thus making the service much more resilient in future.</p>
+
+<blockquote>
+<p>Note: after each critical alarm fired, you should schedule time in your next team/sprint planning session to discuss steps to mitigate the issue in future (there is a whole area of discussion known as &ldquo;<a href="https://en.wikipedia.org/wiki/Postmortem_documentation">post-mortem</a>&rdquo;).</p>
+</blockquote>
+
+<p><div id="4"></div></p>
+
+<h2 id="frequency-and-aggregation">Frequency and Aggregation</h2>
+
+<p>The more data you have, the more things you can do with that data. So it&rsquo;s suggested that you should be collecting metrics at 60 seconds intervals (more frequent, if you have a high-traffic service).</p>
+
+<p>When dealing with a TSDB (<a href="https://en.wikipedia.org/wiki/Time_series_database">Time Series Database</a>) you&rsquo;ll find that, after a period of time, it will start to aggregate multiple datapoints into a single datapoint. This is also known as its &ldquo;roll up&rdquo; method.</p>
+
+<blockquote>
+<p>Note: TSDB&rsquo;s are made up of key/value pairs. The key is the timestamp and the value is the metric value at that point in time.</p>
+</blockquote>
+
+<p><div id="5"></div></p>
+
+<h2 id="data-collection-methods">Data Collection Methods</h2>
+
+<p>There are fundamentally two methods for data collection:</p>
+
+<ol>
+<li>Push: <em>send</em> metrics to an analysis tool.</li>
+<li>Pull: configure a health check endpoint, that a centralised tool pulls data from.</li>
+</ol>
+
+<blockquote>
+<p>Note: when defining a health endpoint, you should consider A.) locking access behind an <a href="https://en.wikipedia.org/wiki/Access_control_list">ACL</a> and B.) then adding more contextual information to allow humans (not just machines) to better understand the state of the system. Such as, are we able to connect to the Database? Just be mindful of the overhead these health endpoints can subsequently cause on your system dependencies.</p>
+</blockquote>
+
+<p>You&rsquo;ll find with a lot of analysis tools (<a href="https://www.datadoghq.com/">Datadog</a> being an example), that there are various metric &lsquo;types&rsquo; you can collect data as. Two common ones are:</p>
+
+<ol>
+<li>Counter: ever increasing value</li>
+<li>Gauge: point-in-time value</li>
+</ol>
+
+<p>A counter can be reset to zero, but otherwise its value simply increases. This is useful for things like &ldquo;number of visitors&rdquo;. Where as a gauge allows your analysis tool to take these multiple datapoints and to plot them out onto a graph.</p>
+
+<blockquote>
+<p>Note: depending on your analysis tool, it might store a counter as a data type that can then be mapped to a graph.</p>
+</blockquote>
+
+<p><div id="6"></div></p>
+
+<h2 id="frontend-monitoring">Frontend Monitoring</h2>
+
+<p>There are two main approaches to frontend monitoring:</p>
+
+<ol>
+<li>Real User Monitoring (RUM).</li>
+<li>Synthetic.</li>
+</ol>
+
+<p>The difference between them has to do with the type of traffic that is triggering the data collection. For example, with RUM the requests being processed are from <em>real</em> users, whereas with &lsquo;synthetic&rsquo; the requests are fake (i.e. generated by your own software) and this then causes data to be collected for analysis (allowing you to identify the availability and performance of your system).</p>
+
+<p><div id="7"></div></p>
+
+<h2 id="logging-or-metrics">Logging or Metrics?</h2>
+
+<p>In the beginning I thought logs were inexpensive and could be collected en masse no problem. I was wrong about that. Logging is expensive (in the real-world cost sense) and so you should be prudent with what you log.</p>
+
+<p>Now being prudent with logs isn&rsquo;t only beneficial for the practical storage/analysis costs, but it can also help with the &lsquo;noise to signal&rsquo; ratio (where too many logs makes it difficult to sift through).</p>
+
+<p>My approach nowadays is to have logs only indicate errors (utilise <a href="http://www.integralist.co.uk/posts/logging-101/">log levels</a> to help you). That way if I see something in the logs, it means there are problems remaining to be fixed. If I see nothing in my logs (except some application bootup information), then I know all is well.</p>
+
+<blockquote>
+<p>Note: that approach might not work for everyone, but I&rsquo;ve found it to be useful.</p>
+</blockquote>
+
+<p>Practical Monitoring recommends identifying the types of questions you would ask about your service when something does go wrong. Those questions you typically ask should drive the decision on what information you should log.</p>
+
+<p>With all that said, what about collecting data as metrics instead of being recorded as a log? When does it make sense to use one over the other?</p>
+
+<p>In order to help individual teams identify whether they should collect data as a metric or as a log, Practical Monitoring recommends asking the following questions:</p>
+
+<ol>
+<li>is it easier for your team to think about metrics or logs?</li>
+<li>is it more effective for the thing in question to be a log entry or metric?</li>
+</ol>
+
+<p>For number 1. I&rsquo;ve found most teams prefer metrics as there&rsquo;s more things we can do with that data once stored into our data analysis tools (such as <a href="https://www.datadoghq.com/">Datadog</a>). For number 2. what constitutes &ldquo;effective&rdquo; will be team specific. For myself it&rsquo;s a mixture of real-world costs and ease of consumption.</p>
+
+<p>So typically I&rsquo;ll collect an error or exception as a log <em>and</em> as a metric. The metric allows me to monitor a rise in that particular error (as I&rsquo;m not sitting around staring at dashboards of log files all day) and so when an alarm does fire I&rsquo;ll be able to jump over to the logs and get the additional context I need.</p>
+
+<blockquote>
+<p>Note: again, that approach might not sit or work well for you and your team. <a href="https://dictionary.cambridge.org/dictionary/english/ymmv">YMMV</a>.</p>
+</blockquote>
+
+<p>For mostly everything else I&rsquo;ll collect the data as a metric so I can create useful dashboards of information. Any other logs I record will have their visibility controlled by log levels and typically are &lsquo;enabled&rsquo; while running the application locally in &lsquo;development&rsquo; mode (or similarly when run on a stage environment).</p>
+
+<p><div id="8"></div></p>
+
+<h2 id="what-else-to-check-for">What else to check for?</h2>
+
+<p>Just to quickly finish up, here are some other &lsquo;grab bag&rsquo; of notes I made whilst reading Practical Monitoring.</p>
+
+<p>When dealing with memory consumption issues, you should keep an eye out for the &ldquo;OOMKiller&rdquo;. In most Linux systems when the amount of memory used by a process exceeds its threshold, then it will be killed. What determines if a container should be killed is a process that runs directly on the host referred to as the <a href="https://en.wikipedia.org/wiki/Out_of_memory#Out_of_memory_management">OOMKiller</a>.</p>
+
+<p>So you should look out for instances of the OOMKiller in your syslog by grepping (or using whatever filtering tools are available with your log aggregation system) for the phrase &ldquo;killed process&rdquo;. You should also look at setting an alert in your log management system for any occurrences.</p>
+
+<p>For services that receive requests from clients (such as web servers or API endpoints), you should definitely monitor &ldquo;requests per second&rdquo; (RPS) as these are clear indicators of the performance and available throughput of your service.</p>
+
+<p>If your system utilises message queues (such as <a href="http://nsq.io/">NSQ</a>), then two key items to monitor are:</p>
+
+<ol>
+<li>Queue length: total number of messages waiting to be processed.</li>
+<li>Consumption rate: rate of messages being consumed by subscribers.</li>
+</ol>
+
+<p>You want to be sure your queue length doesn&rsquo;t become too long and that the consumption rate stays consistent (and high), because it otherwise means there&rsquo;s an issue with the upstream services (e.g. they&rsquo;re unable to pull and process messages quickly enough).</p>
+
+<blockquote>
+<p>Note: I&rsquo;ll have a post written soon about &lsquo;best practices&rsquo; for building queue based systems.</p>
+</blockquote>
+
+<p>When dealing with a caching layer, the key items to monitor are:</p>
+
+<ol>
+<li>Number of evicted items</li>
+<li>Hit/Miss Ratio</li>
+</ol>
+
+<p>For example, if you notice a lot of evicted items, then it could be an indicator that your cache is too small. Whereas if you notice a higher number of MISS than HIT being reported, then this is indicating a possible problem with your caching algorithm or cache protection in general (you need to review what constitutes a cache hit and why downstream content might not being cached - are they sending back the wrong response headers or have they been configured incorrectly).</p>
+
+<p>Finally, remember to add appropriate context to monitors/alarms. When the person on-call has no idea of what your service does, it can be very useful to include useful contextual information to help them understand what has gone wrong as well as where they can go next to debug the issue and know how to resolve it.</p>
+
+<p><div id="9"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>So there you have it, a quick run down of some important monitoring learnings. If you&rsquo;ve struggled to follow along with this post, then I strongly recommend you go buy <a href="http://shop.oreilly.com/product/0636920050773.do">Practical Monitoring</a> as it was a very enjoyable read.</p>
+
+<p>Another interesting/useful resource was <a href="https://www.datadoghq.com/blog/timeseries-metric-graphs-101/">this post</a> by Datadog on the various types of graphs they support, and when it&rsquo;s most appropriate to use them.</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/development'>development</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/instrumentation'>instrumentation</a>, <a class='tag' href='/tags/monitoring'>monitoring</a>, <a class='tag' href='/tags/observability'>observability</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/observability-monitoring-instrumentation/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Observability Monitoring Instrumentation</a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+
+</body>
+
+</html>
+
