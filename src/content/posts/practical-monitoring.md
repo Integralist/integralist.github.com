@@ -75,7 +75,7 @@ Ultimately, monitoring doesn't fix anything. If you find yourself spending more 
 
 The more data you have, the more things you can do with that data. So it's suggested that you should be collecting metrics at 60 seconds intervals (more frequent, if you have a high-traffic service).
 
-When dealing with a TSDB ([Time Series Database](https://en.wikipedia.org/wiki/Time_series_database)) you'll find that, after a period of time, it will start to aggregate multiple datapoints into a single datapoint. This is also known as its "roll up" method.
+When dealing with a TSDB ([Time Series Database](https://en.wikipedia.org/wiki/Time_series_database)) you'll find that, after a period of time, it will start to aggregate multiple datapoints into a single datapoint. This is also known as its "roll up" method. The problem with rolling up of data is that it _smooths_ out your datapoints. So you go from a spikey looking graph that shows every possible false positive, to a graph that covers up those spikes. On the plus side, rolling up data like this means you get to see the data at a higher level and so patterns of use start to emerge. You've got to find that balance.
 
 > Note: TSDB's are made up of key/value pairs. The key is the timestamp and the value is the metric value at that point in time.
 

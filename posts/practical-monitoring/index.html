@@ -218,7 +218,7 @@ ga('send', 'pageview');
 
 <p>The more data you have, the more things you can do with that data. So it&rsquo;s suggested that you should be collecting metrics at 60 seconds intervals (more frequent, if you have a high-traffic service).</p>
 
-<p>When dealing with a TSDB (<a href="https://en.wikipedia.org/wiki/Time_series_database">Time Series Database</a>) you&rsquo;ll find that, after a period of time, it will start to aggregate multiple datapoints into a single datapoint. This is also known as its &ldquo;roll up&rdquo; method.</p>
+<p>When dealing with a TSDB (<a href="https://en.wikipedia.org/wiki/Time_series_database">Time Series Database</a>) you&rsquo;ll find that, after a period of time, it will start to aggregate multiple datapoints into a single datapoint. This is also known as its &ldquo;roll up&rdquo; method. The problem with rolling up of data is that it <em>smooths</em> out your datapoints. So you go from a spikey looking graph that shows every possible false positive, to a graph that covers up those spikes. On the plus side, rolling up data like this means you get to see the data at a higher level and so patterns of use start to emerge. You&rsquo;ve got to find that balance.</p>
 
 <blockquote>
 <p>Note: TSDB&rsquo;s are made up of key/value pairs. The key is the timestamp and the value is the metric value at that point in time.</p>
