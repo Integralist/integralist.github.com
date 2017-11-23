@@ -44,9 +44,9 @@ preserveTaxonomyNames = true
   name = "Posts"
   url = "/posts"
 
-[[menu.main]]
-  name = "Resume"
-  url = "http://www.integralist.co.uk/resume"
+# [[menu.main]]
+#   name = "Resume"
+#   url = "http://www.integralist.co.uk/resume"
 
 # Language Configuration
 defaultContentLanguage = "en"

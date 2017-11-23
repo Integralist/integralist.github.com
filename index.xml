@@ -24,6 +24,18 @@
     </item>
     
     <item>
+      <title>Resume</title>
+      <link>http://www.integralist.co.uk/resume/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/resume/</guid>
+      <description>Hello, my name is Mark and I work @BuzzFeed as a Senior Software Engineer (formerly Principal Engineer @BBCNews).
+I&amp;rsquo;m also a published author with Apress and LeanPub:
+Apress  Pro Vim Tmux Taster Quick Clojure: Effective Functional Programming  LeanPub  Python for Programmers Programming in Clojure  Connect You can find me online at the following locations:
+ integralist.co.uk github.com/integralist twitter.com/integralist keybase.io/integralist linkedin.com/mark-mcdonnell  History BuzzFeed (June 2016 - present) The journey has just begun&amp;hellip;</description>
+    </item>
+    
+    <item>
       <title>Practical Monitoring</title>
       <link>http://www.integralist.co.uk/posts/practical-monitoring/</link>
       <pubDate>Wed, 22 Nov 2017 13:00:00 +0100</pubDate>

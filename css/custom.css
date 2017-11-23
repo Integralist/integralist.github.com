@@ -1,3 +1,12 @@
+h2 {
+  border-bottom: 1px solid #666;
+}
+
+h3 {
+  color: #666;
+  font-size: 1.2em;
+}
+
 .title, body, button, h1, h2, h3, h4, h5, h6, input, select, textarea {
   font-family: Georgia, serif;
 }
