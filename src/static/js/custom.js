@@ -33,10 +33,10 @@ function themeSwitch(e) {
 
     if (document.body.classList.contains("night")) {
       e.target.innerText = "Day Mode";
-      document.cookie = "theme=night;domain=localhost;path=/";
+      document.cookie = "theme=night;domain=.integralist.co.uk;path=/";
     } else {
       e.target.innerText = "Night Mode";
-      document.cookie = "theme=day;domain=localhost;path=/";
+      document.cookie = "theme=day;domain=.integralist.co.uk;path=/";
     }
   }
 }
