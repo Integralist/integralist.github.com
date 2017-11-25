@@ -12,6 +12,7 @@ draft: false
 ---
 
 - [Introduction](#1)
+- [Types of Monitoring](#1.1)
 - [Does it work?](#2)
 - [What metrics should we focus on?](#3)
 - [Frequency and Aggregation](#4)
@@ -31,6 +32,17 @@ I'd like to share my thoughts on monitoring, based on both my past experience on
 If you're new to monitoring then just be aware that this post isn't necessarily the "correct" way to do things. It's merely a combination of Mike Julian's experience, and my own, mangled together into a somewhat coherent reference post. With that in mind, take what bits interest you and feel free to leave the rest.
 
 > Note: for a brief differentiation between terminology, see my earlier post: [Observability, Monitoring, Instrumentation](http://www.integralist.co.uk/posts/observability-monitoring-instrumentation/).
+
+<div id="1.1"></div>
+## Types of Monitoring
+
+Below is a short summary of the various types of monitoring:
+
+- **Server monitoring**: monitor the health of your servers and ensure they stay operating efficiently.
+- **Configuration change monitoring**: monitor your system configuration to identify if and when changes to your infrastructure impact your application.
+- **Application performance monitoring**: look inside your application and services to make sure they are operating as expected (also known as APM tooling).
+- **Synthetic testing**: real time interactions to verify how your application is functioning from the perspective of your users (hopefully to catch errors before _they_ do).
+- **Alerting**: notify the service owners when problems occur so they can resolve them, minimizing the impact to your customers.
 
 <div id="2"></div>
 ## Does it work?

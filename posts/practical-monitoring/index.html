@@ -4,12 +4,12 @@
 <head>
   <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta name='description' content='Introduction Does it work? What metrics should we focus on? Frequency and Aggregation Data Collection Methods Frontend Monitoring Logging or Metrics? What else to check for? Conclusion  
+<meta name='description' content='Introduction Types of Monitoring Does it work? What metrics should we focus on? Frequency and Aggregation Data Collection Methods Frontend Monitoring Logging or Metrics? What else to check for? Conclusion  
 Introduction I&rsquo;ve just finished reading Practical Monitoring &ldquo;Effective Strategies for the Real World&rdquo; by Mike Julian. It&rsquo;s a great book and highly recommended.
 I&rsquo;d like to share my thoughts on monitoring, based on both my past experience on the subject and also some interesting details found in Practical Monitoring.'>
 
 <meta property='og:title' content='Practical Monitoring ⋆ Mark McDonnell'>
-<meta property='og:description' content='Introduction Does it work? What metrics should we focus on? Frequency and Aggregation Data Collection Methods Frontend Monitoring Logging or Metrics? What else to check for? Conclusion  
+<meta property='og:description' content='Introduction Types of Monitoring Does it work? What metrics should we focus on? Frequency and Aggregation Data Collection Methods Frontend Monitoring Logging or Metrics? What else to check for? Conclusion  
 Introduction I&rsquo;ve just finished reading Practical Monitoring &ldquo;Effective Strategies for the Real World&rdquo; by Mike Julian. It&rsquo;s a great book and highly recommended.
 I&rsquo;d like to share my thoughts on monitoring, based on both my past experience on the subject and also some interesting details found in Practical Monitoring.'>
 <meta property='og:url' content='http://www.integralist.co.uk/posts/practical-monitoring/'>
@@ -140,6 +140,7 @@ ga('send', 'pageview');
 
 <ul>
 <li><a href="#1">Introduction</a></li>
+<li><a href="#1.1">Types of Monitoring</a></li>
 <li><a href="#2">Does it work?</a></li>
 <li><a href="#3">What metrics should we focus on?</a></li>
 <li><a href="#4">Frequency and Aggregation</a></li>
@@ -163,6 +164,20 @@ ga('send', 'pageview');
 <blockquote>
 <p>Note: for a brief differentiation between terminology, see my earlier post: <a href="http://www.integralist.co.uk/posts/observability-monitoring-instrumentation/">Observability, Monitoring, Instrumentation</a>.</p>
 </blockquote>
+
+<p><div id="1.1"></div></p>
+
+<h2 id="types-of-monitoring">Types of Monitoring</h2>
+
+<p>Below is a short summary of the various types of monitoring:</p>
+
+<ul>
+<li><strong>Server monitoring</strong>: monitor the health of your servers and ensure they stay operating efficiently.</li>
+<li><strong>Configuration change monitoring</strong>: monitor your system configuration to identify if and when changes to your infrastructure impact your application.</li>
+<li><strong>Application performance monitoring</strong>: look inside your application and services to make sure they are operating as expected (also known as APM tooling).</li>
+<li><strong>Synthetic testing</strong>: real time interactions to verify how your application is functioning from the perspective of your users (hopefully to catch errors before <em>they</em> do).</li>
+<li><strong>Alerting</strong>: notify the service owners when problems occur so they can resolve them, minimizing the impact to your customers.</li>
+</ul>
 
 <p><div id="2"></div></p>
 

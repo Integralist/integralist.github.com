@@ -130,7 +130,7 @@ I progressed upwards through the organisation, moving from initially being a cli
   - [Presentation Slides](https://speakerdeck.com/integralist/bbc-news-responsive-images)
 - Member of the [BBC's GEL Responsive Working Group](http://www.bbc.co.uk/gel)
 - Integrated new BBC UX framework
-- Published BBC News blog post regarding [Imager.js](/post/58244240772/imager-js)
+- Published BBC News blog post regarding [Imager.js](http://responsivenews.co.uk/post/58244240772/imagerjs)
 - Rewrote and open-sourced the BBC News [responsive image technique](https://github.com/BBC-News/Imager.js/)
 - Developed open-source [PhantomJS CLI](https://github.com/Integralist/Squirrel) tool for automating the generation of Application Cache manifests
 - Developed open-source [Sass image extension](https://github.com/Integralist/Sass-Base64-Extension) in Ruby
@@ -175,7 +175,7 @@ I don't profess mastery, but I'm adept with most of the below, and I have an apt
 
 - [BBC Talks: Slides](https://slides.com/markmcdonnell/)
 
-- Imager.js Presentation:  
+- [Imager.js Presentation](https://speakerdeck.com/integralist/bbc-news-responsive-images):  
 Talk I gave at the Mozilla offices in Paris (which included speakers from: Google, Apple, Microsoft, Adobe, Opera, W3C and Akamai).
 
 ## Published

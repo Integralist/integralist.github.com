@@ -41,7 +41,7 @@ Apress  Pro Vim Tmux Taster Quick Clojure: Effective Functional Programming  Lea
       <pubDate>Wed, 22 Nov 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/posts/practical-monitoring/</guid>
-      <description>Introduction Does it work? What metrics should we focus on? Frequency and Aggregation Data Collection Methods Frontend Monitoring Logging or Metrics? What else to check for? Conclusion  
+      <description>Introduction Types of Monitoring Does it work? What metrics should we focus on? Frequency and Aggregation Data Collection Methods Frontend Monitoring Logging or Metrics? What else to check for? Conclusion  
 Introduction I&amp;rsquo;ve just finished reading Practical Monitoring &amp;ldquo;Effective Strategies for the Real World&amp;rdquo; by Mike Julian. It&amp;rsquo;s a great book and highly recommended.
 I&amp;rsquo;d like to share my thoughts on monitoring, based on both my past experience on the subject and also some interesting details found in Practical Monitoring.</description>
     </item>
