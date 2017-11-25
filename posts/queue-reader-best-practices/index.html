@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Control Log Noise Ephemeral Channels? Fail quickly Verify your message handling logic Be wary of global variables Instrument timers around your primary message handler Pynsq doesn’t support coroutines Prevent messages backing up in the queue Avoid API libraries auto-retrying expensive operations Place blocking IO operations into a thread pool Rate limit yourself Disable yourself Drop or Requeue?  Introduction This post should serve as a guide for best practices when dealing with services that consume messages from queues and process those messages (we refer to them as QRs or &lsquo;Queue Readers&rsquo;).'>
+
+<meta property='og:title' content='Queue Reader Best Practices ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Control Log Noise Ephemeral Channels? Fail quickly Verify your message handling logic Be wary of global variables Instrument timers around your primary message handler Pynsq doesn’t support coroutines Prevent messages backing up in the queue Avoid API libraries auto-retrying expensive operations Place blocking IO operations into a thread pool Rate limit yourself Disable yourself Drop or Requeue?  Introduction This post should serve as a guide for best practices when dealing with services that consume messages from queues and process those messages (we refer to them as QRs or &lsquo;Queue Readers&rsquo;).'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/queue-reader-best-practices/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='nsq'><meta property='article:tag' content='performance'><meta property='article:tag' content='python'><meta property='article:tag' content='queues'><meta property='article:published_time' content='2017-11-26T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2017-11-26T13:00:00&#43;01:00'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Queue Reader Best Practices ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/queue-reader-best-practices/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/resume/' 
+        
+      >Resume</a>
+    </li>
+    
+    <li>
+      <a href='#theme' 
+        
+      >Night Mode</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Queue Reader Best Practices</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2017-11-26T13:00:00&#43;01:00'>2017-11-26</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    9 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#0">Introduction</a></li>
+<li><a href="#1">Control Log Noise</a></li>
+<li><a href="#2">Ephemeral Channels?</a></li>
+<li><a href="#3">Fail quickly</a></li>
+<li><a href="#4">Verify your message handling logic</a></li>
+<li><a href="#5">Be wary of global variables</a></li>
+<li><a href="#6">Instrument timers around your primary message handler</a></li>
+<li><a href="#7">Pynsq doesn’t support coroutines</a></li>
+<li><a href="#8">Prevent messages backing up in the queue</a></li>
+<li><a href="#9">Avoid API libraries auto-retrying expensive operations</a></li>
+<li><a href="#10">Place blocking IO operations into a thread pool</a></li>
+<li><a href="#11">Rate limit yourself</a></li>
+<li><a href="#12">Disable yourself</a></li>
+<li><a href="#13">Drop or Requeue?</a></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This post should serve as a guide for best practices when dealing with services that consume messages from queues and process those messages (we refer to them as QRs or &lsquo;Queue Readers&rsquo;). The best practices detailed below are from the perspective of both general programming idioms as well as useful performance patterns.</p>
+
+<p>We also are focusing primarily on QRs that use the <a href="http://nsq.io/">NSQ data pipeline</a> and specifically for services written in Python (although I imagine most of the items discussed could translate well enough to your queue mechanism of choice).</p>
+
+<p>As with all &lsquo;best practice&rsquo; guidelines, they are just that &hellip;<em>guidelines</em>. Not everything listed here will be applicable for your needs. So remember to start by verifying your own application&rsquo;s requirements and specific use cases.</p>
+
+<h2 id="control-log-noise">Control Log Noise</h2>
+
+<p>In production you should aim to only log information that is useful for identifying errors. Remember the adage &ldquo;no news is good news&rdquo;. You can then utilise <a href="https://docs.python.org/3/library/logging.html#logging-levels">log levels</a> to control when logs are actually sent to your log aggregation service.</p>
+
+<blockquote>
+<p>Note: see my earlier posts on <a href="/posts/logging-101/">Logging 101</a> and <a href="/posts/practical-monitoring/">Practical Monitoring</a> for more details.</p>
+</blockquote>
+
+<p>For example, the default log level is WARNING. Meaning <code>log.debug()</code> and <code>log.info()</code> calls will not be visible in your log aggregation service. But you can configure your application so that when it is run locally to switch to the DEBUG level so you can review everything your application is doing, while leaving the application in production to only make log calls for warnings and errors.</p>
+
+<p>You can also utilise <a href="https://structlog.readthedocs.io/en/stable/">structure logging</a> as this will allow you to easily grep/filter logs.</p>
+
+<h2 id="ephemeral-channels">Ephemeral Channels?</h2>
+
+<p>Imagine your server instance needs to be restarted, or its <a href="http://nsq.io/components/nsqd.html">nsqd daemon</a> (which receives, queues, and delivers messages to clients) is unexpectedly terminated, or maybe the nsqd exceeds the allocated <code>mem-queue-size</code> (which determines the number of messages that should be kept in memory).</p>
+
+<p>Normally this would mean messages in the queue would be lost. If you’re OK with that scenario and its outcome, then you should append <code>#ephemeral</code> to your channels&hellip;</p>
+
+<pre><code>nsq_channel: 'qr_name_goes_here#ephemeral'
+</code></pre>
+
+<p>Otherwise, the <a href="http://nsq.io/overview/design.html">default behaviour for NSQ queues</a> is to persist messages on disk. Which you choose will depend on your application and how critical you feel the messages are.</p>
+
+<h2 id="fail-quickly">Fail quickly</h2>
+
+<p>When processing a high throughput of messages it&rsquo;s beneficial to identify <em>invalid</em> messages quickly, then mark them as &ldquo;processed&rdquo; so you can exit your handler as quickly as possible and so not cause undue processing stress on your application and/or upstream service(s).</p>
+
+<p>You should wrap <em>potentially</em> problematic code in a try/except (e.g. a function that makes HTTP requests can have multiple types of exceptions raised). Doing this means you can isolate that specific call and handle the failing scenarios appropriately.</p>
+
+<h2 id="verify-your-message-handling-logic">Verify your message handling logic</h2>
+
+<p>You should understand the complete request flow of your message handling function(s) and be sure you are correctly dropping and/or re-queuing messages at the appropriate places within your application code. It’s very easy to not re-queue (or drop messages) by mistake.</p>
+
+<p>When processing messages synchronously you typically just return <code>True</code> (message was processed) or <code>False</code> (requeue this message) from your handler. But in order to process messages asynchronously you need to call <code>nsq_msg.enable_async()</code> and then you’ll need to make sure you explicitly return either <code>nsq_msg.finish()</code> or <code>nsq_msg.requeue()</code>.</p>
+
+<h2 id="be-wary-of-global-variables">Be wary of global variables</h2>
+
+<p>Most of the time global variables can be more performant as you&rsquo;re reusing a pointer to some data, but there are some cases where a long-living (and large) global object (such as a <a href="http://boto3.readthedocs.io/en/latest/">boto S3 connection</a>) might end up leaking memory. This is something that should be measured and verified using the appropriate Python profiling tools first though.</p>
+
+<h2 id="instrument-timers-around-your-primary-message-handler">Instrument timers around your primary message handler</h2>
+
+<p>It&rsquo;s important to be able to identify anomalies in the performance of your message handlers. By using a decorator to time the function you can set up appropriate dashboards and alarms.</p>
+
+<pre><code>from your_metrics_abstraction import metrics
+
+@metrics.timed(&quot;message_handler.time&quot;)
+async def message_handler(nsq_msg):
+    ...
+</code></pre>
+
+<h2 id="pynsq-doesn-t-support-coroutines">Pynsq doesn’t support coroutines</h2>
+
+<p>The <a href="https://github.com/nsqio/pynsq/issues/186">pynsq library only supports a ‘callback’ form of asynchronous message processing</a>. Meaning if you were to define a message handler using a decorator like <code>@gen.coroutine</code> or a native <code>async</code> syntax (either one will convert the function into a coroutine) it will end up breaking the QR application by exiting the handler immediately.</p>
+
+<p>See the <a href="#8">next section</a> for an example code snippet that works around this issue by utilising Tornado&rsquo;s ioloop directly to schedule the handler’s asynchronous execution.</p>
+
+<h2 id="prevent-messages-backing-up-in-the-queue">Prevent messages backing up in the queue</h2>
+
+<p>Messages can build up and cause alarms to fire if they are not pulled from the queue and successfully processed by your application in a timely fashion. You can help resolve this by either configuring the <a href="http://pynsq.readthedocs.io/en/latest/reader.html">nsq.Reader#max_in_flight</a> attribute and/or processing your messages asynchronously.</p>
+
+<pre><code>from tornado import ioloop
+
+async def coro_handler(msg):
+    # ... do stuff
+    return msg.finish()
+
+def handler(msg):
+    msg.enable_async()
+    ioloop.IOLoop.current().add_callback(coro_handler, msg)
+</code></pre>
+
+<p>You can also look to tweak the <a href="http://pynsq.readthedocs.io/en/latest/reader.html">nsq.Reader#max_tries</a> attribute, which defines the number of times a message can be requeued before it is permanently dropped (this prevents cyclic errors).</p>
+
+<p>There is also the <a href="http://pynsq.readthedocs.io/en/latest/message.html#nsq.Message.touch">nsq.Message#touch</a> method which lets you indicate to the NSQ daemon that you need more time to process the message and thus postpone (for a little while at least) the message processing from timing out and being automatically re-queued (depending on the setting of the <code>max_tries</code> attribute).</p>
+
+<h2 id="avoid-api-libraries-auto-retrying-expensive-operations">Avoid API libraries auto-retrying expensive operations</h2>
+
+<p>Some API libraries, such as <a href="http://boto3.readthedocs.io/en/latest/">boto</a>, allow you to configure it so that operations are retried N number of times before finally failing. This can be helpful to ensure a temporary network blip or error doesn&rsquo;t cause a message to be unnecessarily dropped or requeued. But this can also bring a performance overhead if the operation in question is very slow. Review the API calls you are making and evaluate how expensive they are. In some cases you might prefer to configure &ldquo;retries&rdquo; off and have NSQ handle these temporary errors (i.e. by re-queuing messages).</p>
+
+<p>Below is an example of how to configure boto to not retry operations:</p>
+
+<pre><code>s3_resource = session.resource(&quot;s3&quot;, config=Config(
+    connect_timeout=2, 
+    read_timeout=2,
+    retries={'max_attempts': 0}
+  )
+)
+</code></pre>
+
+<blockquote>
+<p>Note: as per the example above, it’s worth tweaking the connection/read timeouts as well. For example we noticed that calls for <code>.xml</code> files from S3 were really slow and so in that service we had to increase the <code>read_connection</code> by a significant amount (but not too much; you don’t want the client to sit hanging for a long period of time, so it requires some fine tuning to get it right).</p>
+</blockquote>
+
+<h2 id="place-blocking-io-operations-into-a-thread-pool">Place blocking IO operations into a thread pool</h2>
+
+<p>Some libraries do not provide asynchronous support (such as <a href="https://redis-py.readthedocs.io/en/latest/">Python&rsquo;s redis library</a>). So if your message handler is asynchronous, and you’re also executing a potentially long running <em>blocking</em> operation (such as an S3 object GET), then this will end up causing your application to block the ioloop and prevent concurrently handling multiple messages.</p>
+
+<pre><code>from app.threadpool import run_on_executor
+
+async def message_handler():
+    result = await run_on_executor(fn, arg1, arg2, ...)
+</code></pre>
+
+<p>Then the <code>app.threadpool</code> referenced in the above snippet would look something like:</p>
+
+<pre><code>from tornado import gen
+from concurrent.futures import ThreadPoolExecutor
+
+from bf_rig import settings
+
+
+THREAD_POOL = ThreadPoolExecutor(settings.get('pool_max_workers'))  # 10
+
+
+@gen.coroutine
+def run_on_executor(*args, **kwargs):
+    result = yield THREAD_POOL.submit(*args, **kwargs)
+    raise gen.Return(result)
+</code></pre>
+
+<p>The above example needs to use a Tornado decorator as <code>ThreadPoolExecutor</code> doesn&rsquo;t work with native coroutines. It would require the use of <code>asyncio.wrap_future</code> which isn&rsquo;t much better than just using Tornado&rsquo;s own decorator.</p>
+
+<blockquote>
+<p>Note: the <code>ThreadPoolExecutor</code> will only help you deal with IO bound tasks that need to be handled asynchronously (and whose library doesn&rsquo;t support natively). If the task to be executed is actually CPU bound then you&rsquo;ll want to utilise a <a href="https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor"><code>ProcessPoolExecutor</code></a> instead.</p>
+</blockquote>
+
+<h2 id="rate-limit-yourself">Rate limit yourself</h2>
+
+<p>In a service where there&rsquo;s a potential for lots of duplicate messages it can be useful to implement some simple rate limiting logic. In one of our QR services we use Redis to track duplicate requests and then execute some basic rate limiting logic in order to prevent overwhelming any upstream services that would otherwise be called.</p>
+
+<blockquote>
+<p>Note: be aware that the rate limit you set can cause unwanted side-effects. For example, if you start to requeue messages during a rate limit period, you may start to see that messages aren&rsquo;t being processed quickly enough and so the queue depth will begin to increase (i.e. the queue will start to backup and fill up) and this might cause monitors (e.g. systems like Datadog/Nagios) to trigger.</p>
+</blockquote>
+
+<h2 id="disable-yourself">Disable yourself</h2>
+
+<p>Consider your upstream services and identify if there&rsquo;s ever a point where your service needs to stop making requests to it. Most services will be sat behind an API Gateway so they&rsquo;ll likely <em>enforce</em> rate limiting on <em>you</em>. But that might not always be the case.</p>
+
+<p>One example of this is a QR service which makes requests to a separate rendering service for HTML content to be backed up into AWS S3. There are periods where this rendering service will dynamically purge its cache (both its internal application cache, and also the outer CDN cache layer). In order to prevent the QR service from overloading the rendering service during this period where it&rsquo;s vulnerable(†), we automatically disable the QR service (we use a shared redis cluster to identify the switch in a key value; so we change it from disabled to enabled).</p>
+
+<blockquote>
+<p>† due to it having no cache! none of these services we have are vulnerable in the security sense, as they&rsquo;re internal access only within a VPC</p>
+</blockquote>
+
+<p>The below example demonstrates an implementation used in one of our QR services, which was to use a Python decorator:</p>
+
+<pre><code>from app.foo import toggle
+
+@toggle('status')
+def _message_handler(nsq_msg, *args, **kwargs):
+    nsq_msg.enable_async()
+    ioloop.IOLoop.current().add_callback(message_handler, nsq_msg)
+</code></pre>
+
+<p>The <code>app.foo</code> code then looked something like the following:</p>
+
+<pre><code>def toggle_qr(status_key: str) -&gt; Callable:
+    &quot;&quot;&quot;
+    When status_key is set to 'stopped' in redis, 
+    this decorator will finish the nsq message and return immediately, 
+    otherwise it will proceed with event handling.
+
+    Arguments:
+        status: name of the status key in redis.
+    Returns:
+        Wrapped message handler.
+    &quot;&quot;&quot;
+    def deco(function):
+        @wraps(function)
+        def wrapper(nsq_msg: Message, *args, **kwargs):
+            assert 'redis' in kwargs, 'redis parameter is required'
+            redis = kwargs['redis']
+            try:
+                status = redis.get(status_key)
+            except Exception as e:
+                status = None
+            if status == b'stopped':
+                nsq_msg.finish()
+                return
+            return function(nsq_msg, *args, **kwargs)
+        return wrapper
+    return deco
+</code></pre>
+
+<h2 id="drop-or-requeue">Drop or Requeue?</h2>
+
+<p>Consider the previous section about disabling a QR service in times where it might be necessary to protect an upstream (e.g. where rate limiting yourself maybe doesn&rsquo;t make sense, or being rate limited by the upstream isn&rsquo;t possible), you might then need to make a decision about what you do with the messages that are building up in the message queue.</p>
+
+<p>Those messages will eventually reach a threshold and in some cases it might make more sense to not requeue messages while the QR service is in &lsquo;disable&rsquo; mode, but instead just drop them completely. The answer, and your approach, will depend on the message source itself: are they messages that you can afford to drop? are they generated fairly regularly?</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/development'>development</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/nsq'>nsq</a>, <a class='tag' href='/tags/performance'>performance</a>, <a class='tag' href='/tags/python'>python</a>, <a class='tag' href='/tags/queues'>queues</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/practical-monitoring/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Practical Monitoring</a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+    <script src='/js/custom.js'></script>
+  
+
+</body>
+
+</html>
+

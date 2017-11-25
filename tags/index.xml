@@ -408,6 +408,15 @@
     </item>
     
     <item>
+      <title>Nsq</title>
+      <link>http://www.integralist.co.uk/tags/nsq/</link>
+      <pubDate>Sun, 26 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/nsq/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Observability</title>
       <link>http://www.integralist.co.uk/tags/observability/</link>
       <pubDate>Wed, 22 Nov 2017 13:00:00 +0100</pubDate>
@@ -464,7 +473,7 @@
     <item>
       <title>Performance</title>
       <link>http://www.integralist.co.uk/tags/performance/</link>
-      <pubDate>Mon, 13 Nov 2017 13:00:00 +0100</pubDate>
+      <pubDate>Sun, 26 Nov 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/performance/</guid>
       <description></description>
@@ -491,7 +500,7 @@
     <item>
       <title>Python</title>
       <link>http://www.integralist.co.uk/tags/python/</link>
-      <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
+      <pubDate>Sun, 26 Nov 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/python/</guid>
       <description></description>
@@ -503,6 +512,15 @@
       <pubDate>Fri, 27 May 2016 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/quality/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Queues</title>
+      <link>http://www.integralist.co.uk/tags/queues/</link>
+      <pubDate>Sun, 26 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/queues/</guid>
       <description></description>
     </item>
     

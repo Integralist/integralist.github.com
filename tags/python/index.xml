@@ -6,10 +6,19 @@
     <description>Recent content in Python on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Tue, 31 Oct 2017 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 26 Nov 2017 13:00:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Queue Reader Best Practices</title>
+      <link>http://www.integralist.co.uk/posts/queue-reader-best-practices/</link>
+      <pubDate>Sun, 26 Nov 2017 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/queue-reader-best-practices/</guid>
+      <description>Introduction Control Log Noise Ephemeral Channels? Fail quickly Verify your message handling logic Be wary of global variables Instrument timers around your primary message handler Pynsq doesn’t support coroutines Prevent messages backing up in the queue Avoid API libraries auto-retrying expensive operations Place blocking IO operations into a thread pool Rate limit yourself Disable yourself Drop or Requeue?  Introduction This post should serve as a guide for best practices when dealing with services that consume messages from queues and process those messages (we refer to them as QRs or &amp;lsquo;Queue Readers&amp;rsquo;).</description>
+    </item>
     
     <item>
       <title>Profiling Python</title>
