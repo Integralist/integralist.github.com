@@ -1,5 +1,5 @@
 ---
-title: "Observability Monitoring Instrumentation"
+title: "Observability, Monitoring, Instrumentation"
 date: 2017-11-15T13:00:00+01:00
 categories:
   - "development"
