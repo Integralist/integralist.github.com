@@ -17,7 +17,7 @@ preserveTaxonomyNames = true
   copyrightStartYear = "2017"
   # hideEntryNavigation = false
   customCSS = ["css/custom.css"]
-  # customJS = ["js/custom.js"]
+  customJS = ["js/custom.js"]
   # hideSocialMenu = false
   showReadTime = true
 
@@ -44,9 +44,9 @@ preserveTaxonomyNames = true
   name = "Posts"
   url = "/posts"
 
-# [[menu.main]]
-#   name = "Resume"
-#   url = "http://www.integralist.co.uk/resume"
+[[menu.main]]
+  name = "Night Mode"
+  url = "#theme"
 
 # Language Configuration
 defaultContentLanguage = "en"
