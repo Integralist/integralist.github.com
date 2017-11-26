@@ -197,7 +197,7 @@ ga('send', 'pageview');
 
 <p>I found this interesting because I&rsquo;ve also been thinking about the same thing recently. I&rsquo;ve found myself in situations where alarms (for systems I don&rsquo;t necessarily own) are firing and I&rsquo;m trying to understand what the alarm really <em>means</em>. In most cases the alarm is firing on something not entirely useful and which doesn&rsquo;t &lsquo;clearly&rsquo; indicate the problem.</p>
 
-<p>For example, if the alarm is firing because of high-level reasons like &ldquo;the response status code wasn&rsquo;t a 200 OK&rdquo; or &ldquo;the request latency was under N seconds&rdquo;, then these things (although useful and are alarms we should include in our monitoring) don&rsquo;t actually help you to understand <em>what</em> went wrong (i.e. the cause); they just indicate a symptom. That can be a cause for concern because at 3am on a Sunday morning you need to know what happened so you can quickly resolve the issue. Not now have to spend time debugging the issue.</p>
+<p>For example, if the alarm is firing because of high-level reasons like &ldquo;the response status code wasn&rsquo;t a 200 OK&rdquo; or &ldquo;the request latency was over N seconds&rdquo;, then these things (although useful and are alarms we should include in our monitoring) don&rsquo;t actually help you to understand <em>what</em> went wrong (i.e. the cause); they just indicate a symptom. That can be a cause for concern because at 3am on a Sunday morning you need to know what happened so you can quickly resolve the issue. Not now have to spend time debugging the issue.</p>
 
 <p>I&rsquo;ve not found the answer to this problem yet, although I believe providing more contextual information in the alarm should help. But I&rsquo;m at least more aware of this as a problem area and is something I&rsquo;m now pro-actively thinking about improving in our own systems.</p>
 
@@ -425,7 +425,7 @@ ga('send', 'pageview');
         <span class='screen-reader'>Previous post: </span>Observability, Monitoring, Instrumentation</a>
     </div><div class='next-entry'>
       <a href='http://www.integralist.co.uk/posts/queue-reader-best-practices/'>
-        <span class='screen-reader'>Next post: </span>Queue Reader Best Practices<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+        <span class='screen-reader'>Next post: </span>NSQ Queue Reader Best Practices<span aria-hidden='true'>Next <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
   
   <line x1="4" y1="12" x2="20" y2="12"/>
   <polyline points="14 6 20 12 14 18"/>

@@ -179,6 +179,8 @@ I don't profess mastery, but I'm adept with most of the below, and I have an apt
 - Tmux
 - Trello
 - Vagrant
+- Varnish
+- VCL
 - Vim
 
 ## Talks

@@ -4,17 +4,19 @@
 <head>
   <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta name='description' content='Introduction Control Log Noise Ephemeral Channels? Fail quickly Verify your message handling logic Be wary of global variables Instrument timers around your primary message handler Pynsq doesn’t support coroutines Prevent messages backing up in the queue Avoid API libraries auto-retrying expensive operations Place blocking IO operations into a thread pool Rate limit yourself Disable yourself Drop or Requeue?  Introduction This post should serve as a guide for best practices when dealing with services that consume messages from queues and process those messages (we refer to them as QRs or &lsquo;Queue Readers&rsquo;).'>
+<meta name='description' content='Introduction Ephemeral Channels? Fail quickly Verify your message handling logic Be wary of global variables Instrument timers around your primary message handler Pynsq doesn’t support coroutines Prevent messages backing up in the queue Avoid API libraries auto-retrying expensive operations Place blocking IO operations into a thread pool Rate limit yourself Disable yourself Drop or Requeue?  
+Introduction This post should serve as a guide for best practices when dealing with services that consume messages from queues and process those messages (we refer to them as QRs or &lsquo;Queue Readers&rsquo;).'>
 
-<meta property='og:title' content='Queue Reader Best Practices ⋆ Mark McDonnell'>
-<meta property='og:description' content='Introduction Control Log Noise Ephemeral Channels? Fail quickly Verify your message handling logic Be wary of global variables Instrument timers around your primary message handler Pynsq doesn’t support coroutines Prevent messages backing up in the queue Avoid API libraries auto-retrying expensive operations Place blocking IO operations into a thread pool Rate limit yourself Disable yourself Drop or Requeue?  Introduction This post should serve as a guide for best practices when dealing with services that consume messages from queues and process those messages (we refer to them as QRs or &lsquo;Queue Readers&rsquo;).'>
+<meta property='og:title' content='NSQ Queue Reader Best Practices ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Ephemeral Channels? Fail quickly Verify your message handling logic Be wary of global variables Instrument timers around your primary message handler Pynsq doesn’t support coroutines Prevent messages backing up in the queue Avoid API libraries auto-retrying expensive operations Place blocking IO operations into a thread pool Rate limit yourself Disable yourself Drop or Requeue?  
+Introduction This post should serve as a guide for best practices when dealing with services that consume messages from queues and process those messages (we refer to them as QRs or &lsquo;Queue Readers&rsquo;).'>
 <meta property='og:url' content='http://www.integralist.co.uk/posts/queue-reader-best-practices/'>
 <meta property='og:site_name' content='integralist'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='nsq'><meta property='article:tag' content='performance'><meta property='article:tag' content='python'><meta property='article:tag' content='queues'><meta property='article:published_time' content='2017-11-26T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2017-11-26T13:00:00&#43;01:00'/>
 
 <meta name="generator" content="Hugo 0.26" />
 
-  <title>Queue Reader Best Practices ⋆ Mark McDonnell</title>
+  <title>NSQ Queue Reader Best Practices ⋆ Mark McDonnell</title>
   <link rel='canonical' href='http://www.integralist.co.uk/posts/queue-reader-best-practices/'>
   
   <link rel='icon' href='/favicon.ico'>
@@ -89,7 +91,7 @@ ga('send', 'pageview');
   <article lang='en' class='entry'>
     <header class='entry-header'>
   <div class='entry-info'>
-    <h1 class='entry-title title'>Queue Reader Best Practices</h1>
+    <h1 class='entry-title title'>NSQ Queue Reader Best Practices</h1>
     
   </div>
   
@@ -141,8 +143,7 @@ ga('send', 'pageview');
   
 
 <ul>
-<li><a href="#0">Introduction</a></li>
-<li><a href="#1">Control Log Noise</a></li>
+<li><a href="#1">Introduction</a></li>
 <li><a href="#2">Ephemeral Channels?</a></li>
 <li><a href="#3">Fail quickly</a></li>
 <li><a href="#4">Verify your message handling logic</a></li>
@@ -157,6 +158,8 @@ ga('send', 'pageview');
 <li><a href="#13">Drop or Requeue?</a></li>
 </ul>
 
+<p><div id="1"></div></p>
+
 <h2 id="introduction">Introduction</h2>
 
 <p>This post should serve as a guide for best practices when dealing with services that consume messages from queues and process those messages (we refer to them as QRs or &lsquo;Queue Readers&rsquo;). The best practices detailed below are from the perspective of both general programming idioms as well as useful performance patterns.</p>
@@ -165,17 +168,7 @@ ga('send', 'pageview');
 
 <p>As with all &lsquo;best practice&rsquo; guidelines, they are just that &hellip;<em>guidelines</em>. Not everything listed here will be applicable for your needs. So remember to start by verifying your own application&rsquo;s requirements and specific use cases.</p>
 
-<h2 id="control-log-noise">Control Log Noise</h2>
-
-<p>In production you should aim to only log information that is useful for identifying errors. Remember the adage &ldquo;no news is good news&rdquo;. You can then utilise <a href="https://docs.python.org/3/library/logging.html#logging-levels">log levels</a> to control when logs are actually sent to your log aggregation service.</p>
-
-<blockquote>
-<p>Note: see my earlier posts on <a href="/posts/logging-101/">Logging 101</a> and <a href="/posts/practical-monitoring/">Practical Monitoring</a> for more details.</p>
-</blockquote>
-
-<p>For example, the default log level is WARNING. Meaning <code>log.debug()</code> and <code>log.info()</code> calls will not be visible in your log aggregation service. But you can configure your application so that when it is run locally to switch to the DEBUG level so you can review everything your application is doing, while leaving the application in production to only make log calls for warnings and errors.</p>
-
-<p>You can also utilise <a href="https://structlog.readthedocs.io/en/stable/">structure logging</a> as this will allow you to easily grep/filter logs.</p>
+<p><div id="2"></div></p>
 
 <h2 id="ephemeral-channels">Ephemeral Channels?</h2>
 
@@ -188,11 +181,15 @@ ga('send', 'pageview');
 
 <p>Otherwise, the <a href="http://nsq.io/overview/design.html">default behaviour for NSQ queues</a> is to persist messages on disk. Which you choose will depend on your application and how critical you feel the messages are.</p>
 
+<p><div id="3"></div></p>
+
 <h2 id="fail-quickly">Fail quickly</h2>
 
 <p>When processing a high throughput of messages it&rsquo;s beneficial to identify <em>invalid</em> messages quickly, then mark them as &ldquo;processed&rdquo; so you can exit your handler as quickly as possible and so not cause undue processing stress on your application and/or upstream service(s).</p>
 
 <p>You should wrap <em>potentially</em> problematic code in a try/except (e.g. a function that makes HTTP requests can have multiple types of exceptions raised). Doing this means you can isolate that specific call and handle the failing scenarios appropriately.</p>
+
+<p><div id="4"></div></p>
 
 <h2 id="verify-your-message-handling-logic">Verify your message handling logic</h2>
 
@@ -200,9 +197,13 @@ ga('send', 'pageview');
 
 <p>When processing messages synchronously you typically just return <code>True</code> (message was processed) or <code>False</code> (requeue this message) from your handler. But in order to process messages asynchronously you need to call <code>nsq_msg.enable_async()</code> and then you’ll need to make sure you explicitly return either <code>nsq_msg.finish()</code> or <code>nsq_msg.requeue()</code>.</p>
 
+<p><div id="5"></div></p>
+
 <h2 id="be-wary-of-global-variables">Be wary of global variables</h2>
 
 <p>Most of the time global variables can be more performant as you&rsquo;re reusing a pointer to some data, but there are some cases where a long-living (and large) global object (such as a <a href="http://boto3.readthedocs.io/en/latest/">boto S3 connection</a>) might end up leaking memory. This is something that should be measured and verified using the appropriate Python profiling tools first though.</p>
+
+<p><div id="6"></div></p>
 
 <h2 id="instrument-timers-around-your-primary-message-handler">Instrument timers around your primary message handler</h2>
 
@@ -215,11 +216,15 @@ async def message_handler(nsq_msg):
     ...
 </code></pre>
 
+<p><div id="7"></div></p>
+
 <h2 id="pynsq-doesn-t-support-coroutines">Pynsq doesn’t support coroutines</h2>
 
 <p>The <a href="https://github.com/nsqio/pynsq/issues/186">pynsq library only supports a ‘callback’ form of asynchronous message processing</a>. Meaning if you were to define a message handler using a decorator like <code>@gen.coroutine</code> or a native <code>async</code> syntax (either one will convert the function into a coroutine) it will end up breaking the QR application by exiting the handler immediately.</p>
 
 <p>See the <a href="#8">next section</a> for an example code snippet that works around this issue by utilising Tornado&rsquo;s ioloop directly to schedule the handler’s asynchronous execution.</p>
+
+<p><div id="8"></div></p>
 
 <h2 id="prevent-messages-backing-up-in-the-queue">Prevent messages backing up in the queue</h2>
 
@@ -240,6 +245,8 @@ def handler(msg):
 
 <p>There is also the <a href="http://pynsq.readthedocs.io/en/latest/message.html#nsq.Message.touch">nsq.Message#touch</a> method which lets you indicate to the NSQ daemon that you need more time to process the message and thus postpone (for a little while at least) the message processing from timing out and being automatically re-queued (depending on the setting of the <code>max_tries</code> attribute).</p>
 
+<p><div id="9"></div></p>
+
 <h2 id="avoid-api-libraries-auto-retrying-expensive-operations">Avoid API libraries auto-retrying expensive operations</h2>
 
 <p>Some API libraries, such as <a href="http://boto3.readthedocs.io/en/latest/">boto</a>, allow you to configure it so that operations are retried N number of times before finally failing. This can be helpful to ensure a temporary network blip or error doesn&rsquo;t cause a message to be unnecessarily dropped or requeued. But this can also bring a performance overhead if the operation in question is very slow. Review the API calls you are making and evaluate how expensive they are. In some cases you might prefer to configure &ldquo;retries&rdquo; off and have NSQ handle these temporary errors (i.e. by re-queuing messages).</p>
@@ -257,6 +264,8 @@ def handler(msg):
 <blockquote>
 <p>Note: as per the example above, it’s worth tweaking the connection/read timeouts as well. For example we noticed that calls for <code>.xml</code> files from S3 were really slow and so in that service we had to increase the <code>read_connection</code> by a significant amount (but not too much; you don’t want the client to sit hanging for a long period of time, so it requires some fine tuning to get it right).</p>
 </blockquote>
+
+<p><div id="10"></div></p>
 
 <h2 id="place-blocking-io-operations-into-a-thread-pool">Place blocking IO operations into a thread pool</h2>
 
@@ -291,6 +300,8 @@ def run_on_executor(*args, **kwargs):
 <p>Note: the <code>ThreadPoolExecutor</code> will only help you deal with IO bound tasks that need to be handled asynchronously (and whose library doesn&rsquo;t support natively). If the task to be executed is actually CPU bound then you&rsquo;ll want to utilise a <a href="https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor"><code>ProcessPoolExecutor</code></a> instead.</p>
 </blockquote>
 
+<p><div id="11"></div></p>
+
 <h2 id="rate-limit-yourself">Rate limit yourself</h2>
 
 <p>In a service where there&rsquo;s a potential for lots of duplicate messages it can be useful to implement some simple rate limiting logic. In one of our QR services we use Redis to track duplicate requests and then execute some basic rate limiting logic in order to prevent overwhelming any upstream services that would otherwise be called.</p>
@@ -298,6 +309,8 @@ def run_on_executor(*args, **kwargs):
 <blockquote>
 <p>Note: be aware that the rate limit you set can cause unwanted side-effects. For example, if you start to requeue messages during a rate limit period, you may start to see that messages aren&rsquo;t being processed quickly enough and so the queue depth will begin to increase (i.e. the queue will start to backup and fill up) and this might cause monitors (e.g. systems like Datadog/Nagios) to trigger.</p>
 </blockquote>
+
+<p><div id="12"></div></p>
 
 <h2 id="disable-yourself">Disable yourself</h2>
 
@@ -348,6 +361,8 @@ def _message_handler(nsq_msg, *args, **kwargs):
         return wrapper
     return deco
 </code></pre>
+
+<p><div id="13"></div></p>
 
 <h2 id="drop-or-requeue">Drop or Requeue?</h2>
 
