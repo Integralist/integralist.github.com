@@ -794,6 +794,8 @@ set beresp.stale_if_error = &lt;N&gt;s;
 <p>Another reason would be to use &ldquo;<a href="https://docs.fastly.com/guides/purging/soft-purges">soft purging</a>&rdquo; rather than hard purges.</p>
 </blockquote>
 
+<p>Lastly, there&rsquo;s one quirk of Fastly&rsquo;s caching implementation you might need to know about: if you specify a <code>max-age</code> of less than 61 minutes, then your content will only be persisted into memory (and there are many situations where a cached object in memory can be removed). To make sure the object is persisted (i.e. cached) on disk and thus available for a longer period of time for serving stale, you must set a <code>max-age</code> above 61 minutes.</p>
+
 <h3 id="different-actions-for-different-states">Different actions for different states</h3>
 
 <p>So if we find a stale object, we need to deliver it to the user. But the action you take (as far as Fastly&rsquo;s implementation of Varnish is concerned) depends on which state Varnish currently is in (<code>vcl_fetch</code> or <code>vcl_deliver</code>).</p>

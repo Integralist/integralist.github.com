@@ -483,6 +483,8 @@ You might find that you're not serving stale even though you would expect to be.
 
 > Another reason would be to use "[soft purging](https://docs.fastly.com/guides/purging/soft-purges)" rather than hard purges.
 
+Lastly, there's one quirk of Fastly's caching implementation you might need to know about: if you specify a `max-age` of less than 61 minutes, then your content will only be persisted into memory (and there are many situations where a cached object in memory can be removed). To make sure the object is persisted (i.e. cached) on disk and thus available for a longer period of time for serving stale, you must set a `max-age` above 61 minutes.
+
 ### Different actions for different states
 
 So if we find a stale object, we need to deliver it to the user. But the action you take (as far as Fastly's implementation of Varnish is concerned) depends on which state Varnish currently is in (`vcl_fetch` or `vcl_deliver`). 
