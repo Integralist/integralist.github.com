@@ -582,3 +582,5 @@ So there we have it, a quick run down of how some important aspects of Varnish a
 One thing I want to mention is that I am personally a HUGE fan of Fastly and the tools they provide. They are an amazing company and their software has helped BuzzFeed (and many other large organisations) to scale massively with ease.
 
 I would also highly recommend watching this talk by Rogier Mulhuijzen (Senior Varnish Engineer - who currently works for Fastly) on "Advanced VCL": [vimeo.com/226067901](https://vimeo.com/226067901). It goes into great detail about some complex aspects of VCL and Varnish and really does a great job of elucidating them.
+
+Lastly, there was [a recent article from an engineer working at the Financial Times](https://medium.com/@samparkinson_/making-a-request-to-the-financial-times-b2119a2f422d), detailing the complete request flow from DNS to Delivery. It's very interesting and covers a lot of information about Fastly. Highly recommended reading.
