@@ -6,30 +6,20 @@
     <description>Recent content in Monitoring on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Wed, 22 Nov 2017 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 15 Nov 2017 13:00:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/tags/monitoring/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Practical Monitoring</title>
-      <link>http://www.integralist.co.uk/posts/practical-monitoring/</link>
-      <pubDate>Wed, 22 Nov 2017 13:00:00 +0100</pubDate>
-      
-      <guid>http://www.integralist.co.uk/posts/practical-monitoring/</guid>
-      <description>Introduction Types of Monitoring Does it work? What metrics should we focus on? Frequency and Aggregation Data Collection Methods Frontend Monitoring Logging or Metrics? What else to check for? Conclusion  
-Introduction I&amp;rsquo;ve just finished reading Practical Monitoring &amp;ldquo;Effective Strategies for the Real World&amp;rdquo; by Mike Julian. It&amp;rsquo;s a great book and highly recommended.
-I&amp;rsquo;d like to share my thoughts on monitoring, based on both my past experience on the subject and also some interesting details found in Practical Monitoring.</description>
-    </item>
-    
-    <item>
-      <title>Observability, Monitoring, Instrumentation</title>
-      <link>http://www.integralist.co.uk/posts/observability-monitoring-instrumentation/</link>
+      <title>Observability and Monitoring Best Practices</title>
+      <link>http://www.integralist.co.uk/posts/monitoring-best-practices/</link>
       <pubDate>Wed, 15 Nov 2017 13:00:00 +0100</pubDate>
       
-      <guid>http://www.integralist.co.uk/posts/observability-monitoring-instrumentation/</guid>
-      <description>In software engineering, there is a lot of confusion caused by the discussion around what exactly is meant by the word &amp;ldquo;observability&amp;rdquo; and how it relates to other words, such as &amp;ldquo;monitoring&amp;rdquo; and &amp;ldquo;instrumentation&amp;rdquo;.
-We&amp;rsquo;re going to take a quick look at the definitions of these words and see if we can understand them without having to read through a 10,000 word essay on the finer details of the topic. This isn&amp;rsquo;t that blog post.</description>
+      <guid>http://www.integralist.co.uk/posts/monitoring-best-practices/</guid>
+      <description>This post aims to discuss key monitoring discussion points and to summarise the relevant best practices when instrumenting application performance monitoring.
+Below are some of the areas we&amp;rsquo;ll be focusing in on&amp;hellip;
+ Terminology. Understand the different types of monitoring.  Data collection methods. Frontend monitoring.  Focus on user impact. Favour organic changes over static thresholds. Send critical and noncritical alarms to different channels. Give context. Think about data aggregation.</description>
     </item>
     
     <item>
