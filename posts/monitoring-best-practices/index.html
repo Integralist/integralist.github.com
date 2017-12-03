@@ -133,7 +133,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    11 mins read
+    12 mins read
   </span>
   
 </div>
@@ -282,7 +282,22 @@ notify the service owners when problems occur so they can resolve them, minimizi
 <p>Go as deep and wide with your instrumentation as you want, but always be asking yourself, &ldquo;<u><strong>How will these metrics show me the user impact?</strong></u>&ldquo;</p>
 </blockquote>
 
-<p>You should begin by creating monitors for things that have a direct impact on your users.</p>
+<p>Or put another way: &ldquo;Who is your <em>customer</em>&rdquo;?</p>
+
+<p>Depending on the services you build, your customers might be people who pay money to use your service, or they might be other engineers within your organisation who are consuming an API you&rsquo;ve developed. Either way, your customer is the most important thing to you and your service. You need to keep them happy.</p>
+
+<p>For most users, whether they be a non-technical paying customer or an engineer, they will have certain criteria that will make them happy. You could imagine the sorts of questions they&rsquo;ll ask to be something like&hellip;</p>
+
+<ol>
+<li><strong>I want the service to work as expected</strong><br />
+i.e. you should monitor whatever is determined to be a &lsquo;success rate&rsquo; for your service.</li>
+<li><strong>I want the service to be fast</strong><br />
+i.e. you should monitor the service latency.</li>
+<li><strong>I want to use &lsquo;this much&rsquo; of the service</strong><br />
+i.e. you should monitor things like &lsquo;requests per second&rsquo; - do you have <a href="https://en.wikipedia.org/wiki/Service-level_agreement">SLA</a>&rsquo;s defined?</li>
+</ol>
+
+<p>In essence you should start by creating monitors for things that have a <em>direct impact</em> on your users.</p>
 
 <p>For example, measuring OS level metrics such as CPU and memory consumption is great for diagnostics &amp; performance analysis, as they help to highlight the underlying system behaviour.</p>
 

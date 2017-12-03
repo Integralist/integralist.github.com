@@ -118,7 +118,20 @@ Below is a quote from Mike Julian (author of [Practical Monitoring](http://shop.
 
 > Go as deep and wide with your instrumentation as you want, but always be asking yourself, "<u>**How will these metrics show me the user impact?**</u>"
 
-You should begin by creating monitors for things that have a direct impact on your users. 
+Or put another way: "Who is your _customer_"?
+
+Depending on the services you build, your customers might be people who pay money to use your service, or they might be other engineers within your organisation who are consuming an API you've developed. Either way, your customer is the most important thing to you and your service. You need to keep them happy.
+
+For most users, whether they be a non-technical paying customer or an engineer, they will have certain criteria that will make them happy. You could imagine the sorts of questions they'll ask to be something like...
+
+1. **I want the service to work as expected**  
+  i.e. you should monitor whatever is determined to be a 'success rate' for your service.
+2. **I want the service to be fast**  
+  i.e. you should monitor the service latency.
+3. **I want to use 'this much' of the service**  
+  i.e. you should monitor things like 'requests per second' - do you have [SLA](https://en.wikipedia.org/wiki/Service-level_agreement)'s defined?
+
+In essence you should start by creating monitors for things that have a _direct impact_ on your users. 
 
 For example, measuring OS level metrics such as CPU and memory consumption is great for diagnostics & performance analysis, as they help to highlight the underlying system behaviour. 
 

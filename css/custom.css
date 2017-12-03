@@ -34,7 +34,8 @@ h6 > code,
 li > code,
 a > code,
 p > code,
-blockquote strong{
+blockquote strong,
+li strong {
   color: #c31900;
 }
 
@@ -87,6 +88,7 @@ body.night, .night button, .night input, .night select, .night textarea,
 .night h6 > code,
 .night li > code,
 .night a > code,
-.night p > code {
+.night p > code,
+.night li strong {
   color: #ff6ed0;
 }
