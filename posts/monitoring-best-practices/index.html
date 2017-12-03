@@ -6,12 +6,12 @@
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta name='description' content='This post aims to discuss key monitoring discussion points and to summarise the relevant best practices when instrumenting application performance monitoring.
 Below are some of the areas we&rsquo;ll be focusing in on&hellip;
- Terminology. Understand the different types of monitoring.  Data collection methods. Frontend monitoring.  Focus on user impact. Favour organic changes over static thresholds. Send critical and noncritical alarms to different channels. Give context. Think about data aggregation.'>
+ Terminology. Understand the different types of monitoring.  Data collection methods. Frontend monitoring.  Make it useful, then actionable. Focus on user impact. Favour organic changes over static thresholds. Send critical and noncritical alarms to different channels.'>
 
 <meta property='og:title' content='Observability and Monitoring Best Practices ⋆ Mark McDonnell'>
 <meta property='og:description' content='This post aims to discuss key monitoring discussion points and to summarise the relevant best practices when instrumenting application performance monitoring.
 Below are some of the areas we&rsquo;ll be focusing in on&hellip;
- Terminology. Understand the different types of monitoring.  Data collection methods. Frontend monitoring.  Focus on user impact. Favour organic changes over static thresholds. Send critical and noncritical alarms to different channels. Give context. Think about data aggregation.'>
+ Terminology. Understand the different types of monitoring.  Data collection methods. Frontend monitoring.  Make it useful, then actionable. Focus on user impact. Favour organic changes over static thresholds. Send critical and noncritical alarms to different channels.'>
 <meta property='og:url' content='http://www.integralist.co.uk/posts/monitoring-best-practices/'>
 <meta property='og:site_name' content='integralist'>
 <meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='instrumentation'><meta property='article:tag' content='monitoring'><meta property='article:tag' content='observability'><meta property='article:published_time' content='2017-11-15T13:00:00&#43;01:00'/><meta property='article:modified_time' content='2017-11-15T13:00:00&#43;01:00'/>
@@ -133,7 +133,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    10 mins read
+    11 mins read
   </span>
   
 </div>
@@ -156,12 +156,14 @@ ga('send', 'pageview');
 <li><a href="#3">Data collection methods</a>.</li>
 <li><a href="#4">Frontend monitoring</a>.</li>
 </ul></li>
-<li><a href="#5">Focus on user impact</a>.</li>
+<li><a href="#5">Make it useful, then actionable</a>.</li>
+<li><a href="#5.1">Focus on user impact</a>.</li>
 <li><a href="#6">Favour organic changes over static thresholds</a>.</li>
 <li><a href="#7">Send critical and noncritical alarms to different channels</a>.</li>
 <li><a href="#8">Give context</a>.</li>
 <li><a href="#9">Think about data aggregation</a>.</li>
 <li><a href="#10">Know your graphs</a>.</li>
+<li><a href="#10.1">Map your graphs</a></li>
 <li><a href="#11">Choosing between a metric or log</a>.</li>
 <li><a href="#12">Reference material</a>.</li>
 </ul>
@@ -258,7 +260,7 @@ notify the service owners when problems occur so they can resolve them, minimizi
 
 <p><div id="5"></div></p>
 
-<h2 id="focus-on-user-impact">Focus on user impact</h2>
+<h2 id="make-it-useful-then-actionable">Make it useful, then actionable</h2>
 
 <p>Let&rsquo;s start with a quote from Charity Majors (author of <a href="http://shop.oreilly.com/product/0636920039761.do">Database Reliability Engineering</a> and CEO of <a href="http://honeycomb.io/">honeycomb.io</a>).</p>
 
@@ -266,9 +268,13 @@ notify the service owners when problems occur so they can resolve them, minimizi
 <p><u><strong>Don&rsquo;t attempt to &ldquo;monitor everything&rdquo;</strong></u>. You can&rsquo;t. Engineers often waste so much time doing this that they lose track of the critical path, <u><strong>and their important alerts drown in fluff and cruft</strong></u>.</p>
 </blockquote>
 
-<p>When a monitor triggers an alarm, it should first and foremost be &ldquo;actionable&rdquo;. There should be something you can do to resolve the alarm and also be a set of steps (post-resolution) to prevent that alarm from triggering again.</p>
+<p>When a monitor triggers an alarm, it should first and foremost be &ldquo;useful&rdquo;. Secondly, it should be &ldquo;actionable&rdquo;. There should be something you can do to resolve the alarm and also be a set of steps (post-resolution) to prevent that alarm from triggering again.</p>
 
 <p>If the alarm isn&rsquo;t <em>actionable</em>, then it just becomes noise.</p>
+
+<p><div id="5.1"></div></p>
+
+<h2 id="focus-on-user-impact">Focus on user impact</h2>
 
 <p>Below is a quote from Mike Julian (author of <a href="http://shop.oreilly.com/product/0636920050773.do">Practical Monitoring</a> and <a href="https://weekly.monitoring.love">Monitoring Weekly</a>)</p>
 
@@ -388,6 +394,18 @@ Please refer to the monitoring for more details:
 <li><a href="https://www.datadoghq.com/blog/summary-graphs-metric-graphs-101/">Summary graphs</a>.</li>
 </ul>
 
+<p><div id="10.1"></div></p>
+
+<h2 id="map-your-graphs">Map your graphs</h2>
+
+<p>It can be useful to order your graphs (within a dashboard/timeboard) <em>chronologically</em>. For example, CDN -&gt; LB -&gt; Service. This can help you mentally model the request flow through your system, such that you know the request starts by hitting your CDN layer, it&rsquo;s then routed inside of your infrastructure and hits a load balancer, finally that load balancer distributes the request to a specific service node.</p>
+
+<p>It can equally be useful to collate multiple services (and their graphs) within a single overarching dashboard, because when there is a problem in the system you can follow the request flow from start to finish and see where a bottleneck (or anomaly) somewhere else in the chain is causing a side effect elsewhere in the chain.</p>
+
+<p>An alternative approach is to have a dashboard that focuses on the key metrics for a service&rsquo;s performance, and underneath that they&rsquo;ll have graphs that monitor their dependencies. So when an engineer gets a call because of an issue that seems to be with their service, they&rsquo;ll check the dashboard and might see there&rsquo;s an issue upstream of them with one of their dependencies.</p>
+
+<p>Some companies even take that approach a step further and formalize this process and subsequently define a standardized structure for dashboards (i.e. all dashboards are structurally the same). The benefit of that approach is that people on-call can start at the beginning of a request and then follow the dashboards like a thread until they reach a service that is the root cause of the problem being reported.</p>
+
 <p><div id="11"></div></p>
 
 <h2 id="choosing-between-a-metric-or-log">Choosing between a metric or log</h2>
@@ -433,7 +451,6 @@ Please refer to the monitoring for more details:
 <ul>
 <li>Timeboards allow for tracking data points across multiple graphs at once.</li>
 </ul></li>
-<li>Graphs should be ordered chronologically (e.g. CDN -&gt; ELB -&gt; Service etc).</li>
 <li>Let people know where the dashboards are, Slack pinned, Runbooks etc</li>
 <li>For latency use <a href="https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule">95th percentile (standard deviation)</a>, not just the &lsquo;mean average&rsquo;.
 

@@ -19,7 +19,7 @@
       <guid>http://www.integralist.co.uk/posts/monitoring-best-practices/</guid>
       <description>This post aims to discuss key monitoring discussion points and to summarise the relevant best practices when instrumenting application performance monitoring.
 Below are some of the areas we&amp;rsquo;ll be focusing in on&amp;hellip;
- Terminology. Understand the different types of monitoring.  Data collection methods. Frontend monitoring.  Focus on user impact. Favour organic changes over static thresholds. Send critical and noncritical alarms to different channels. Give context. Think about data aggregation.</description>
+ Terminology. Understand the different types of monitoring.  Data collection methods. Frontend monitoring.  Make it useful, then actionable. Focus on user impact. Favour organic changes over static thresholds. Send critical and noncritical alarms to different channels.</description>
     </item>
     
     <item>

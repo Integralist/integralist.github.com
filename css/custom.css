@@ -33,7 +33,8 @@ h5 > code,
 h6 > code,
 li > code,
 a > code,
-p > code {
+p > code,
+blockquote strong{
   color: #c31900;
 }
 
@@ -76,6 +77,16 @@ body.night, .night button, .night input, .night select, .night textarea,
   color: #ccc;
 }
 
-.night td > code, .night h1 > code, .night h2 > code, .night h3 > code, .night h4 > code, .night h5 > code, .night h6 > code, .night li > code, .night a > code, .night p > code {
-  color: #e449b2;
+.night blockquote strong,
+.night td > code,
+.night h1 > code,
+.night h2 > code,
+.night h3 > code,
+.night h4 > code,
+.night h5 > code,
+.night h6 > code,
+.night li > code,
+.night a > code,
+.night p > code {
+  color: #ff6ed0;
 }

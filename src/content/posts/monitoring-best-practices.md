@@ -19,12 +19,14 @@ Below are some of the areas we'll be focusing in on...
 - [Understand the different types of monitoring](#2).
   - [Data collection methods](#3).
   - [Frontend monitoring](#4).
-- [Focus on user impact](#5).
+- [Make it useful, then actionable](#5).
+- [Focus on user impact](#5.1).
 - [Favour organic changes over static thresholds](#6).
 - [Send critical and noncritical alarms to different channels](#7).
 - [Give context](#8).
 - [Think about data aggregation](#9).
 - [Know your graphs](#10).
+- [Map your graphs](#10.1)
 - [Choosing between a metric or log](#11).
 - [Reference material](#12).
 
@@ -99,15 +101,18 @@ The difference between them has to do with the _type_ of traffic that is trigger
 Synthetic monitoring causes data to be collected for analysis, thus allowing you to identify the availability and performance of your system by constructing very specific test cases.
 
 <div id="5"></div>
-## Focus on user impact
+## Make it useful, then actionable
 
 Let's start with a quote from Charity Majors (author of [Database Reliability Engineering](http://shop.oreilly.com/product/0636920039761.do) and CEO of [honeycomb.io](http://honeycomb.io/)).
 
 > <u>**Don't attempt to "monitor everything"**</u>. You can't. Engineers often waste so much time doing this that they lose track of the critical path, <u>**and their important alerts drown in fluff and cruft**</u>.
 
-When a monitor triggers an alarm, it should first and foremost be "actionable". There should be something you can do to resolve the alarm and also be a set of steps (post-resolution) to prevent that alarm from triggering again.
+When a monitor triggers an alarm, it should first and foremost be "useful". Secondly, it should be "actionable". There should be something you can do to resolve the alarm and also be a set of steps (post-resolution) to prevent that alarm from triggering again.
 
 If the alarm isn't _actionable_, then it just becomes noise.
+
+<div id="5.1"></div>
+## Focus on user impact
 
 Below is a quote from Mike Julian (author of [Practical Monitoring](http://shop.oreilly.com/product/0636920050773.do) and [Monitoring Weekly](https://weekly.monitoring.love))
 
@@ -210,6 +215,17 @@ We won't repeat the details here, but suffice to say, each graph in Datadog has 
 - [Timeseries graphs](https://www.datadoghq.com/blog/timeseries-metric-graphs-101/).
 - [Summary graphs](https://www.datadoghq.com/blog/summary-graphs-metric-graphs-101/).
 
+<div id="10.1"></div>
+## Map your graphs
+
+It can be useful to order your graphs (within a dashboard/timeboard) _chronologically_. For example, CDN -> LB -> Service. This can help you mentally model the request flow through your system, such that you know the request starts by hitting your CDN layer, it's then routed inside of your infrastructure and hits a load balancer, finally that load balancer distributes the request to a specific service node.
+
+It can equally be useful to collate multiple services (and their graphs) within a single overarching dashboard, because when there is a problem in the system you can follow the request flow from start to finish and see where a bottleneck (or anomaly) somewhere else in the chain is causing a side effect elsewhere in the chain.
+
+An alternative approach is to have a dashboard that focuses on the key metrics for a service's performance, and underneath that they'll have graphs that monitor their dependencies. So when an engineer gets a call because of an issue that seems to be with their service, they'll check the dashboard and might see there's an issue upstream of them with one of their dependencies.
+
+Some companies even take that approach a step further and formalize this process and subsequently define a standardized structure for dashboards (i.e. all dashboards are structurally the same). The benefit of that approach is that people on-call can start at the beginning of a request and then follow the dashboards like a thread until they reach a service that is the root cause of the problem being reported.
+
 <div id="11"></div>
 ## Choosing between a metric or log
 
@@ -237,7 +253,6 @@ We can't answer these questions for you, but we have generally found the followi
 - [Datadog events](https://docs.datadoghq.com/api/#events-post), are useful for capturing additional info (e.g. exception message).
 - 99% of the time you want a [Timeboard, _not_ a Screenboard](https://help.datadoghq.com/hc/en-us/articles/204580349-What-is-the-difference-between-a-ScreenBoard-and-a-TimeBoard-).
   - Timeboards allow for tracking data points across multiple graphs at once.
-- Graphs should be ordered chronologically (e.g. CDN -> ELB -> Service etc).
 - Let people know where the dashboards are, Slack pinned, Runbooks etc
 - For latency use [95th percentile (standard deviation)](https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule), not just the 'mean average'.
   - Because the mean can miss important slow requests.
