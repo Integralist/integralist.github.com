@@ -235,8 +235,7 @@ I'm a print published and self-published author; I'm also a tech reviewer and am
 
 The following links are to some of my more 'popular' articles. My main focus when writing is to take a complicated or confusing topic and attempt to distil it, in order for the subject to be more easily understood.
 
-- [Practical Monitoring](/posts/practical-monitoring/) (2017)
-- [Observability, Monitoring, Instrumentation](/posts/observability-monitoring-instrumentation/) (2017)
+- [Observability and Monitoring Best Practices](/posts/monitoring-best-practices/) (2017)
 - [Logging 101](/posts/logging-101/) (2017)
 - [Fastly Varnish](/posts/fastly-varnish/) (2017)
 - [Profiling Go](/posts/profiling-go/) (2017)
