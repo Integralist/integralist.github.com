@@ -429,6 +429,8 @@ and <code>R</code> is &ldquo;Read&rdquo;<br />
 and <code>W</code> is &ldquo;Write&rdquo;</p>
 </blockquote>
 
+<p>It&rsquo;s important to realise that the above matrix is based on Varnish and not Fastly&rsquo;s version of Varnish. But there&rsquo;s only one difference between them, which is the response object <code>resp</code> isn&rsquo;t available within <code>vcl_error</code> when using Fastly.</p>
+
 <p>When you&rsquo;re dealing with <code>vcl_recv</code> you pretty much only ever interact with the <code>req</code> object. You generally will want to manipulate the incoming request <em>before</em> doing anything else.</p>
 
 <blockquote>

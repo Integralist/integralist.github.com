@@ -84,7 +84,8 @@ So this could be things like a successful database connection was opened. But a 
 There are also various metric _types_ you can collect data as. Two common ones are:
 
 - **Counter**: an ever increasing value.
-- **Gauge**: a point-in-time value.
+- **Gauge**: a point-in-time value (can arbitrarily go up and down).
+- **Histogram**: samples observations and counts them in configurable buckets.
 
 For more information, see these Datadog articles: [Metric Types](https://docs.datadoghq.com/metrictypes/) and [DogStatsD](https://docs.datadoghq.com/guides/dogstatsd/).
 

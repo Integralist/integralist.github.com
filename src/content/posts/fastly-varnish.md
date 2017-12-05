@@ -154,6 +154,8 @@ Here's a quick key for the various states:
 > and `R` is "Read"  
 > and `W` is "Write"
 
+It's important to realise that the above matrix is based on Varnish and not Fastly's version of Varnish. But there's only one difference between them, which is the response object `resp` isn't available within `vcl_error` when using Fastly.
+
 When you're dealing with `vcl_recv` you pretty much only ever interact with the `req` object. You generally will want to manipulate the incoming request _before_ doing anything else.
 
 > Note: the only other reason for setting data on the `req` object is when you want to keep track of things (because, as we can see from the above table matrix, the `req` object is available to R/W from _all_ available states).
