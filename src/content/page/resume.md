@@ -70,6 +70,7 @@ I progressed upwards through the organisation, moving from initially being a cli
 
 ### 2017
 
+- Took lead on documenting and improving the state of our monitoring by way of implementing best practices ([see my article for details](/posts/monitoring-best-practices/)) as well as improving the quality (and consistency) of our operational runbooks ([see an example template](https://docs.google.com/document/d/1eaT9KMam5zq7lT-5OVz9T91RJQUx-qx2q6WnKSvxC_U/edit?usp=sharing)).
 - Core member of the BuzzFeed "Better-Docs" Working Group. We aim to improve documentation and its discoverability for BuzzFeed Tech. We primarily intend to do this through the standardization of doc formats, the creation and maintenance of doc tooling, and continuing education of ourselves and the BF Tech community about documentation.
 - Tech Lead for the Site Infra 'Resilience' team. This includes designing a disaster recovery strategy by the name of "Plan Z" with handling of multiple failure scenarios and failovers across many service providers.
 - For the 2017 Hack Week I built an operations Slackbot tool in Go called OpsBot. It would dynamically create standardized incident channels and would automatically invite relevant users to the incident channel (using an emoji 'message reaction' convention). It also allowed searching for runbooks via the Google Drive API. Future updates will include creating a post-mortem Google Doc and inviting all users inside the incident channel to view the newly created doc.
