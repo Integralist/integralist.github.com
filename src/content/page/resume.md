@@ -70,6 +70,7 @@ I progressed upwards through the organisation, moving from initially being a cli
 
 ### 2017
 
+- Created basic [README validator](https://gist.github.com/Integralist/03279be86a356119b1f820da6ebb8740#file-2-python-3-4-compatible-version-for-rig-vm-mono-repo-result-csv-options-py) as part of our Better Docs initiative and in preparation for our Doc Day event.
 - Took lead on documenting and improving the state of our monitoring by way of implementing best practices ([see my article for details](/posts/monitoring-best-practices/)) as well as improving the quality (and consistency) of our operational runbooks ([see an example template](https://docs.google.com/document/d/1eaT9KMam5zq7lT-5OVz9T91RJQUx-qx2q6WnKSvxC_U/edit?usp=sharing)).
 - Core member of the BuzzFeed "Better-Docs" Working Group. We aim to improve documentation and its discoverability for BuzzFeed Tech. We primarily intend to do this through the standardization of doc formats, the creation and maintenance of doc tooling, and continuing education of ourselves and the BF Tech community about documentation.
 - Tech Lead for the Site Infra 'Resilience' team. This includes designing a disaster recovery strategy by the name of "Plan Z" with handling of multiple failure scenarios and failovers across many service providers.
