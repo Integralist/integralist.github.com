@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Stats on integralist</title>
+    <link>http://www.integralist.co.uk/tags/stats/</link>
+    <description>Recent content in Stats on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Tue, 19 Dec 2017 09:32:54 +0000</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/stats/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Statistics and Graphs: The Basics</title>
+      <link>http://www.integralist.co.uk/posts/statistic-basics/</link>
+      <pubDate>Tue, 19 Dec 2017 09:32:54 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/statistic-basics/</guid>
+      <description>Introduction Information vs Data Watch out for misleading data Frequency Pie Chart Bar Chart  Stacked Split  Histograms  Differences? Calculating dimensions Frequency Density?  Line Graphs  
+Introduction I started learning about statistics because I found myself doing a lot of operational monitoring (i.e. making systems more observable, instrumenting individual services, and monitoring that data via custom built dashboards).
+Although, for the most part, everything worked as expected and I generally understood the data I was seeing visualised, I wanted to be sure I wasn&amp;rsquo;t missing any important information (or worse, mis-representing the data).</description>
+    </item>
+    
+  </channel>
+</rss>

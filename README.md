@@ -10,4 +10,5 @@
 - `cd ../ && ./build.sh` (to compile files to be pushed to GitHub)
 
  > Note: images should be placed into `src/static/images`  
- > When _building_ the static site, those will be copied into `public/images`
+ > When _building_ the static site, those will be copied into `public/images`  
+ > Similarly, custom CSS/JS should go inside `src/static/css` and `src/static/js`

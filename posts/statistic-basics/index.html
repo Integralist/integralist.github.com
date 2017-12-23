@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Information vs Data Watch out for misleading data Frequency Pie Chart Bar Chart  Stacked Split  Histograms  Differences? Calculating dimensions Frequency Density?  Line Graphs  
+Introduction I started learning about statistics because I found myself doing a lot of operational monitoring (i.e. making systems more observable, instrumenting individual services, and monitoring that data via custom built dashboards).
+Although, for the most part, everything worked as expected and I generally understood the data I was seeing visualised, I wanted to be sure I wasn&rsquo;t missing any important information (or worse, mis-representing the data).'>
+
+<meta property='og:title' content='Statistics and Graphs: The Basics ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Information vs Data Watch out for misleading data Frequency Pie Chart Bar Chart  Stacked Split  Histograms  Differences? Calculating dimensions Frequency Density?  Line Graphs  
+Introduction I started learning about statistics because I found myself doing a lot of operational monitoring (i.e. making systems more observable, instrumenting individual services, and monitoring that data via custom built dashboards).
+Although, for the most part, everything worked as expected and I generally understood the data I was seeing visualised, I wanted to be sure I wasn&rsquo;t missing any important information (or worse, mis-representing the data).'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/statistic-basics/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='graphs'><meta property='article:tag' content='monitoring'><meta property='article:tag' content='performance'><meta property='article:tag' content='statistics'><meta property='article:tag' content='stats'><meta property='article:published_time' content='2017-12-19T09:32:54Z'/><meta property='article:modified_time' content='2017-12-19T09:32:54Z'/>
+
+<meta name="generator" content="Hugo 0.26" />
+
+  <title>Statistics and Graphs: The Basics ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/statistic-basics/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/resume/' 
+        
+      >Resume</a>
+    </li>
+    
+    <li>
+      <a href='#theme' 
+        
+      >Night Mode</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Statistics and Graphs: The Basics</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2017-12-19T09:32:54Z'>2017-12-19</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    15 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Information vs Data</a></li>
+<li><a href="#3">Watch out for misleading data</a></li>
+<li><a href="#4">Frequency</a></li>
+<li><a href="#5">Pie Chart</a></li>
+<li><a href="#6">Bar Chart</a>
+
+<ul>
+<li><a href="#6.1">Stacked</a></li>
+<li><a href="#6.2">Split</a></li>
+</ul></li>
+<li><a href="#7">Histograms</a>
+
+<ul>
+<li><a href="#7.1">Differences?</a></li>
+<li><a href="#7.2">Calculating dimensions</a></li>
+<li><a href="#7.3">Frequency Density?</a></li>
+</ul></li>
+<li><a href="#8">Line Graphs</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>I started learning about statistics because I found myself doing a lot of operational monitoring (i.e. making systems more observable, instrumenting individual services, and monitoring that data via custom built dashboards).</p>
+
+<p>Although, for the most part, everything worked as expected and I generally understood the data I was seeing visualised, I wanted to be sure I wasn&rsquo;t missing any important information (or worse, mis-representing the data).</p>
+
+<p>This began my journey into learning about statistics (as a complete beginner). I picked up a book on the subject and started taking notes. This blog post is the result of what I have learnt so far, and its motivation is to explain some of the basic concepts behind utilising statistics to represent data. This post is aimed at beginners, as I myself am very much a beginner in this space.</p>
+
+<p>So let&rsquo;s begin by defining what &lsquo;statistics&rsquo; means&hellip;</p>
+
+<blockquote>
+<p><strong>Statistics</strong> is a branch of mathematics dealing with the collection, analysis, interpretation, presentation, and organization of data &ndash; <a href="https://en.wikipedia.org/wiki/Statistics">Wikipedia</a></p>
+</blockquote>
+
+<p><div id="2"></div></p>
+
+<h2 id="information-vs-data">Information vs Data</h2>
+
+<p>If you&rsquo;re like me, you may well have confused the words &ldquo;data&rdquo; and &ldquo;information&rdquo; as being the same thing. But there are actually important differences that should be understood:</p>
+
+<ul>
+<li><strong>Data</strong>: is the <em>raw</em> facts/figures.</li>
+<li><strong>Information</strong>: data that has extra context/meaning applied.</li>
+</ul>
+
+<p>For example, raw data might look like:</p>
+
+<pre><code>[3, 5, 7]
+</code></pre>
+
+<p>Where as <em>information</em> would be the taking of that raw data and giving it extra context. So, in this example, those three data points could represent the age of three children.</p>
+
+<blockquote>
+<p>Note: data is either &ldquo;numerical&rdquo; (dealing with numbers), &ldquo;quantitative&rdquo; (describing quantities) or &ldquo;categorical&rdquo; (data is split into categories that describe qualities or characteristics - also referred to as &ldquo;qualitative&rdquo;).</p>
+</blockquote>
+
+<p><div id="3"></div></p>
+
+<h2 id="watch-out-for-misleading-data">Watch out for misleading data</h2>
+
+<p>The following example is very contrived and silly, but it does illustrate the point about being aware of how data can be manipulated to represent what you want it to.</p>
+
+<p>Here are two graphs, both have the same datapoints, but the first graph is misleading the viewer, while the second graph is more accurate. Take a look and see why that might be?</p>
+
+<canvas id="misleadingProfitsLine"></canvas>
+
+<canvas id="profitsLine"></canvas>
+
+<p>At a quick glance (or if you just didn&rsquo;t know any better), you would see the first graph and think the company has some incredible profit growth. But the second graph doesn&rsquo;t look as impressive?</p>
+
+<p>This is because the first graph is zoomed in from the starting point <code>2.0</code> where as the first graph is zoomed out at the correct level so you can see the data in a more accurate and representative form.</p>
+
+<blockquote>
+<p>See also my comment below about the pie chart. It&rsquo;s a mis-representation, not of the data but of the truth. Some charts mis-represent data (like shown above), where others set a specific &lsquo;scene&rsquo; (either accidentally or on purpose) by the mere ommission of data.</p>
+</blockquote>
+
+<p><div id="4"></div></p>
+
+<h2 id="frequency">Frequency</h2>
+
+<p>When dealing with statistical data, the first thing you typically learn about is data &ldquo;frequency&rdquo;. Let&rsquo;s start with a definition&hellip;</p>
+
+<blockquote>
+<p>In statistics the frequency (or absolute frequency) of an event is the number of times the event occurred in an experiment or study. &ndash; <a href="https://en.wikipedia.org/wiki/Frequency_(statistics)">Wikipedia</a></p>
+</blockquote>
+
+<p>The frequency of a piece of data can be visualised in many ways depending on the chart you wish to use. Some charts are better suited for representing certain types of data than others, so let&rsquo;s take a look at some different chart types to see how they work.</p>
+
+<p><div id="5"></div></p>
+
+<h2 id="pie-chart">Pie Chart</h2>
+
+<p>A graph, such as a pie chart, will split your data up into distinct &lsquo;groups&rsquo; and then it&rsquo;ll calculate the relative percentage of each group to ensure the total adds up to 100%.</p>
+
+<p>Below is an example pie graph that uses the data <code>[150,200,50]</code>, which could represent (just for example) usage of certain programming languages within an organisation. The pie chart is generated based off the percentage representation of the underlying data.</p>
+
+<blockquote>
+<p>For example:<br />
+Start by finding the total (sum all the data)<br />
+Then calculate 1% of the total<br />
+Finally, calculate each group&rsquo;s percentage</p>
+
+<p><strong>Total</strong>: 150+200+50 = 400<br />
+<strong>1 Percent</strong>: <sup>400</sup>&frasl;<sub>100</sub> = 4</p>
+
+<p><strong>Python</strong> group = 50%<br />
+<small>i.e. <code>(400/100) * 50 = 200</code></small></p>
+
+<p><strong>Go</strong> group = 37.5%<br />
+<small>i.e. <code>(400/100) * 37.5 = 150</code></small></p>
+
+<p><strong>Bash</strong> group = 12.5%<br />
+<small>i.e. <code>(400/100) * 12.5 = 50</code></small></p>
+
+<p><strong>50%</strong> + <strong>37.5%</strong> + <strong>12.5%</strong> = 100%</p>
+</blockquote>
+
+<canvas id="simplePie"></canvas>
+
+<p>This type of graph is useful for understanding &lsquo;at a glance&rsquo; the relative difference between groups of data, but becomes less useful when the data is close together as each &lsquo;slice&rsquo; becomes effectively the same size.</p>
+
+<p>As with all charts, there are problems with how you <em>interpret</em> the graph.</p>
+
+<p>Pie charts display the information in relative percentages, but if they don&rsquo;t show (or include somewhere near the graph) the <em>frequency</em> for each group within the pie chart, then the graph can become misleading. This is because without the frequency you can&rsquo;t identify or confirm the <em>consistency</em> of the data reported (e.g. lack of user engagement within any particular group).</p>
+
+<p>In our example (when hovering or clicking on the chart) you&rsquo;ll see that we display the <em>frequency</em> data and not the relative percentage (e.g. we show the value as 200 and not 50%). This is fine, because the most important part of this graph is the data&rsquo;s frequency, and besides, the pie chart itself is visually representing the frequency data in percentages (so although you don&rsquo;t see <code>Go: 37.5%</code>, it doesn&rsquo;t matter, as you can visually gauge the relative percentage easily enough).</p>
+
+<p>If we didn&rsquo;t include the data frequency we can&rsquo;t tell if we have an equal number of responses from users. This may or may not indicate whether it&rsquo;s fair to compare user satisfaction in this way (as it might not be truly representative).</p>
+
+<p>So you have to be careful with data to make sure it&rsquo;s as inclusive as possible or that you&rsquo;re explicit about what you&rsquo;re focusing on or how the data might be lacking.</p>
+
+<p>For the problem of data groups that are close together as a percentage, you might find a more suitable option would be the bar chart&hellip;</p>
+
+<p><div id="6"></div></p>
+
+<h2 id="bar-chart">Bar Chart</h2>
+
+<p>If you wanted to see the &lsquo;programming language&rsquo; data in a format that is more suitable for subtle differences, then one option would be a bar chart.</p>
+
+<p>When dealing with a horizontal bar chart (directly below), the frequency groups are placed along the y axis, while with a vertical bar chart (example below that) they&rsquo;re placed along the x axis.</p>
+
+<canvas id="simpleBar"></canvas>
+
+<canvas id="simpleBarVert"></canvas>
+
+<p>One thing to notice about a bar chart is that the <em>width</em> of the bar is the same (doesn&rsquo;t matter if it&rsquo;s a horizontal or vertical variation). It&rsquo;s the <em>length</em> of each bar that&rsquo;s important.</p>
+
+<p>The length represents the frequency of the group&rsquo;s data. This can trip people up, as they might mistake a bar chart for a &lsquo;histogram&rsquo;, where the width of the bar <em>does</em> change in relation to the frequency (we&rsquo;ll come back to histograms later).</p>
+
+<p><div id="6.1"></div></p>
+
+<h3 id="stacked">Stacked</h3>
+
+<p>Now imagine you wanted to visualise data that represented how much people liked or disliked specific programming languages (this is different to the previous data which was the general usage of programming languages).</p>
+
+<p>To represent this multifaceted data you could use a specific type of bar chart known as a &lsquo;stacked&rsquo; bar chart (see below). This type of graph is useful because it represents both the frequency <em>and</em> the relative percentage of the various data types.</p>
+
+<blockquote>
+<p>Note: stacked bar charts are also known as &lsquo;segmented&rsquo;.</p>
+</blockquote>
+
+<canvas id="stackedBar"></canvas>
+
+<p>It&rsquo;s less likely for this chart to be mis-represented because the <em>length</em> of each bar is based on the data frequency.</p>
+
+<p>You can see for the groups &ldquo;Go&rdquo; and &ldquo;Bash&rdquo; we&rsquo;ve had a consistent number of reports (300 in total), and so when the values are visualised as a percentage the length of the bars are the same.</p>
+
+<p>Where as the &ldquo;Python&rdquo; group has less data frequency compared to the other groups (only 250 in total, where the other groups were 300), and so although it correctly represents that data as a percentage (60% were &ldquo;like&rdquo; vs 40% &ldquo;dislike&rdquo;) it&rsquo;s still not as representative as a whole in comparison to the other data groups we have. Ideally each group would have consistent frequencies.</p>
+
+<p><div id="6.2"></div></p>
+
+<h3 id="split">Split</h3>
+
+<p>Another type of bar chart is called &lsquo;split-category&rsquo; and is useful for <em>comparing frequencies</em> (unlike the stacked/segmented bar chart which compares frequency but represents them visually in percentages).</p>
+
+<canvas id="splitBar"></canvas>
+
+<p><div id="7"></div></p>
+
+<h2 id="histograms">Histograms</h2>
+
+<p>I&rsquo;ve yet to find a charting library that let&rsquo;s me create an actual histogram in the strict definition (most libraries seem to call standard bar charts &lsquo;histograms&rsquo;?), which makes it hard for me to visually demonstrate them, unless I hand draw a chart (which is what I&rsquo;ve had to resort to below).</p>
+
+<p><div id="7.1"></div></p>
+
+<h3 id="differences">Differences?</h3>
+
+<p>Based on what I&rsquo;ve read, there are some key differences between histograms and standard bar charts. These are:</p>
+
+<ol>
+<li>The &lsquo;area&rsquo; (width <em>and</em> height) of each bar is proportional to its frequency.</li>
+<li>There should be no gaps between each bar.</li>
+</ol>
+
+<p>The reason for histogram bar sizes being proportional (unlike a traditional bar chart †) is because histograms are usually best suited to dealing with <strong><em>grouped numerical data</em></strong>.</p>
+
+<blockquote>
+<p>† remember: with a traditional bar chart, each bar width is the same and only the bar &lsquo;length&rsquo; is relevant (as it&rsquo;s determined by the frequency).</p>
+</blockquote>
+
+<p><div id="7.2"></div></p>
+
+<h3 id="calculating-dimensions">Calculating dimensions</h3>
+
+<p>When constructing a histogram, you&rsquo;ll place the groups on the x axis and make the width of each bar the same as the range it covers; while placing the frequencies for each group on the y axis and make the length of the bar match the frequency value for that group.</p>
+
+<p>Doing this is fine, as long as the groups have a consistent range (i.e. they all have the same interval size, like: <code>0-5,5-10,10-15</code> and whose range/interval distance are all five).</p>
+
+<p>But in some datasets a single group can cover a much wider range than the other groups. For example, consider a dataset for gaming hours played by a group of 17 users:</p>
+
+<pre><code>Hours, Frequency
+0-1,   5
+1-20,  2
+20-22, 10
+</code></pre>
+
+<p>Here &lsquo;hours&rsquo; is the grouped numerical data. As explained above, we would put the frequency on the y axis and the grouped data along the x axis (see below for an example graph).</p>
+
+<p><img src="../../images/disproportionate_historgram.png"></p>
+
+<blockquote>
+<p>Note: we can see our first bar &ldquo;0-1&rdquo; spreads only one interval and &ldquo;20-22&rdquo; spreads only two intervals, where as the middle bar &ldquo;1-20&rdquo; spreads over nineteen intervals!</p>
+</blockquote>
+
+<p>The problem with the above graph is that the height of the middle bar is wrong as we&rsquo;ve set it to be as high as the frequency value itself (and the third bar is incorrect too!), which normally would be fine if the interval range were the same across all groups, but in this case it isn&rsquo;t the correct approach due to each group covering a different range from each other.</p>
+
+<p>In using this data, the <code>1-20</code> group&rsquo;s <em>area</em> could mistakenly look disproportionately large (the <code>20-22</code> group also has a different range so that would be a problem as well).</p>
+
+<p>So to solve the problem of disproportionate sizes (when dealing with multi-range groups), we have to make sure that <em>both</em> the width and height (or &lsquo;area&rsquo;) of the group is proportional.</p>
+
+<p>To fix the bar area size problem we need a different calculation for determining the &lsquo;height&rsquo; of each bar (also known as the frequency density):</p>
+
+<pre><code>frequency / range = frequency density
+</code></pre>
+
+<p>For example, the range for <code>1-20</code> is 19 and its frequency is 2:</p>
+
+<pre><code>2 / 19 = 0.10
+</code></pre>
+
+<p>Meaning the height of the bar (its frequency density) for <code>1-20</code> should be set to <code>0.10</code> and not to the frequency value itself (which was <code>2</code>).</p>
+
+<p>You would then apply this calculation to the height of each group/bar (see below). You&rsquo;ll see we also needed to change the height of the <code>20-22</code> group based on this new area calculation (<code>10 / 2 = 5</code>).</p>
+
+<p><img src="../../images/disproportionate_historgram_area_fixed.png"></p>
+
+<blockquote>
+<p>Note: I appreciate the difference between the original height of 2 vs 0.10 (and 10 vs 5), using this contrived example, isn&rsquo;t exactly ground breakingly different, but that&rsquo;s the general idea behind calculating histogram areas for groups that have inconsistent ranges.</p>
+</blockquote>
+
+<p>The overall area (or shape) for each bar represents the actual frequency, and can be calculated like so:</p>
+
+<pre><code>frequency = range × frequency density
+</code></pre>
+
+<p>Example: the group <code>20-22</code> had a range of 2 and a frequency density of 5.</p>
+
+<p>If we were to look at the graph by itself, which only shows the proportional area relative to the other groups (i.e. it only shows the frequency density and the range) we could reverse engineer/calculate the actual <em>frequency value</em> with the abstract calculation above (<code>2 * 5 = 10</code>).</p>
+
+<p><div id="7.3"></div></p>
+
+<h3 id="frequency-density">Frequency Density?</h3>
+
+<p>As alluded to earlier, the height of each bar indicates the frequency density, which itself is best explained via an analogy:</p>
+
+<p>Imagine you have a tall glass and you pour a set amount of liquid into it that fills the glass to approximately <sup>3</sup>&frasl;<sub>4</sub>. If you now pour that liquid into a much wider glass, the liquid amount hasn&rsquo;t changed but the height has changed. It&rsquo;ll be at a lower level as the liquid has spread out more across the available glass space.</p>
+
+<p>The frequency density is <em>related</em> to frequency but is focused more around its &lsquo;concentration&rsquo;.</p>
+
+<p>If we wanted to calculate the <em>total frequency</em> for the entire dataset then we would use the following calculation: <code>group range x group frequency density</code> for each group (which gives us the frequency for each group) and then we sum each of the frequencies together.</p>
+
+<blockquote>
+<p>Note: this is as far as I got with histograms, as I felt I had learnt enough to be dangerous in a conversation. There may well be nuances, pros/cons and other aspects to histograms I&rsquo;ve not fully understood. I&rsquo;d welcome anyone who knows more to educate me on this :-)</p>
+</blockquote>
+
+<p><div id="8"></div></p>
+
+<h2 id="line-graphs">Line Graphs</h2>
+
+<p>We&rsquo;ve already seen a couple of example line graphs at the start of this post. These types of graphs are best for identifying trends in your data and are most useful when applied across numerical data (such as time, which again helps with overarching trending patterns).</p>
+
+<blockquote>
+<p>Note: compare this to bar charts, which are generally better for comparing values or categories.</p>
+</blockquote>
+
+<p>There are various types of line graphs, one is known as an &ldquo;accumulative frequency graph&rdquo; which we can demonstrate using the earlier grouped dataset of hours played online. If we were to take the hours data, we could graph a specific subset view of that data.</p>
+
+<p>For example, we can visualise the number of people who played for a specific number of hours. So we could say: &ldquo;how many users were playing online for up to five hours?&rdquo;.</p>
+
+<p>The way we do this is by adding up all the previous groups frequencies, which determines the upper limit for each group. So for example, using our previous data:</p>
+
+<pre><code>Hours, Frequency
+0-1,   5
+1-20,  2
+20-22, 10
+</code></pre>
+
+<p>We can calculate the cumulative frequency like so:</p>
+
+<pre><code>0-1:   upper limit = 1  (total/cumulative frequency: 5)
+1-20:  upper limit = 20 (total/cumulative frequency: 5+2=7)
+20-22: upper limit = 22 (total/cumulative frequency: 5+2+10=17)
+</code></pre>
+
+<p>Resulting in the following cumulative frequencies:</p>
+
+<pre><code>0-1:   5
+1-20:  7
+20-22: 17
+</code></pre>
+
+<p>We can now plot these onto a line graph by placing the cumulative frequencies onto the y axis and the groups across the x axis. Then mark onto the graph the upper limits against the relevant cumulative frequency and finally join up the dots:</p>
+
+<canvas id="simpleLine"></canvas>
+
+<blockquote>
+<p>In the above example graph, if we asked &ldquo;how many people were playing for up to 21 hours?&rdquo; the answer would be approximately 11 people.</p>
+</blockquote>
+
+<script src="../../js/Chart.bundle.min.js"></script>
+<script>
+var chartColors = {
+    red: 'rgb(255, 99, 132)',
+    orange: 'rgb(255, 159, 64)',
+    yellow: 'rgb(255, 205, 86)',
+    green: 'rgb(75, 192, 192)',
+    blue: 'rgb(54, 162, 235)',
+    purple: 'rgb(153, 102, 255)',
+    grey: 'rgb(201, 203, 207)'
+};
+
+function alpharize(rgb) {
+  // Usage: alpharize(chartColors.red)
+  var result = /\((\d{2,3}), (\d{2,3}), (\d{2,3})/i.exec(rgb);
+  var colors = {}
+  if (result) {
+    colors['r'] = parseInt(result[1], 16);
+    colors['g'] = parseInt(result[2], 16);
+    colors['b'] = parseInt(result[3], 16);
+    return 'rgba(' + colors['r'] + ', ' + colors['g'] + ', ' + colors['b'] + ', 0.5)';
+  };
+  
+  return 'rgba(201, 203, 207, 0.5)'; // grey
+}
+
+var ctxLine = document.getElementById("misleadingProfitsLine").getContext("2d");
+var myLineChart = new Chart(ctxLine, {
+  "type":"line",
+  "data":{
+    "labels":["January","February","March","April","May","June"],
+    "datasets":[{
+        "label":"Misleading Company Profits",
+        "data":[2,2.1,2.2,2.1,2.3,2.4],
+        "fill":false,
+        "borderColor": chartColors.red,
+        "lineTension":0.1
+    }]
+  },
+  "options":{responsive: true}
+});
+
+var ctxLine = document.getElementById("profitsLine").getContext("2d");
+var myLineChart = new Chart(ctxLine, {
+  "type":"line",
+  "data":{
+    "labels":["January","February","March","April","May","June"],
+    "datasets":[{
+        "label":"Accurate Company Profits",
+        "data":[2,2.1,2.2,2.1,2.3,2.4],
+        "fill":false,
+        "borderColor": chartColors.blue,
+    }, {label: "",data: [0]}]
+  },
+  "options":{responsive: true}
+});
+
+var ctxLine = document.getElementById("simplePie").getContext("2d");
+var myLineChart = new Chart(ctxLine, {
+  "type":"pie",
+  "data":{
+    "labels":["Go", "Python", "Bash"],
+    "datasets":[{
+        "label":"Workload by Programming Language",
+        "data":[150,200,50],
+        "backgroundColor": [chartColors.red, chartColors.yellow, chartColors.green],
+    }]
+  },
+  "options":{responsive: true}
+});
+
+var ctxBar = document.getElementById("simpleBar").getContext("2d");
+var myBarChart = new Chart(ctxBar, {
+    type: "horizontalBar",
+    data: {
+        labels: ["Go", "Python", "Bash"],
+        datasets: [{
+            label: "Programming Languages",
+            backgroundColor: chartColors.red,
+            borderColor: chartColors.red,
+            borderWidth: 1,
+            data: [150,200,50]
+        }]
+    },
+    options: {
+      elements: {
+          rectangle: {
+              borderWidth: 2,
+          }
+      },
+      responsive: true,
+      title: {
+          display: true,
+          text: ""
+      }
+    }
+});
+
+var ctxBar = document.getElementById("simpleBarVert").getContext("2d");
+var myBarChart = new Chart(ctxBar, {
+    type: "bar",
+    data: {
+        labels: ["Go", "Python", "Bash"],
+        datasets: [{
+            label: "Programming Languages",
+            backgroundColor: chartColors.red,
+            borderColor: chartColors.red,
+            borderWidth: 1,
+            data: [150,200,50]
+        }]
+    },
+    options: {
+      elements: {
+          rectangle: {
+              borderWidth: 2,
+          }
+      },
+      responsive: true,
+      title: {
+          display: true,
+          text: ""
+      }
+    }
+});
+
+var ctxBar = document.getElementById("stackedBar").getContext("2d");
+var myBarChart = new Chart(ctxBar, {
+    type: "horizontalBar",
+    data: {
+        labels: ["Go", "Python", "Bash"],
+        datasets: [{
+            label: "Like",
+            backgroundColor: chartColors.green,
+            borderColor: chartColors.green,
+            borderWidth: 1,
+            data: [290,150,50]
+        },{
+            label: "Dislike",
+            backgroundColor: chartColors.red,
+            borderColor: chartColors.red,
+            borderWidth: 1,
+            data: [10,100,250]
+        }]
+    },
+    options: {
+      elements: {
+          rectangle: {
+              borderWidth: 2,
+          }
+      },
+      responsive: true,
+      title: {
+          display: true,
+          text: ""
+      },
+      scales: {
+        xAxes: [{
+            stacked: true
+        }],
+        yAxes: [{
+            stacked: true
+        }]
+      }
+    }
+});
+
+var ctxBar = document.getElementById("splitBar").getContext("2d");
+var myBarChart = new Chart(ctxBar, {
+    type: "bar",
+    data: {
+        labels: ["Go", "Python", "Bash"],
+        datasets: [{
+            label: "Like",
+            stack: "Stack 1",
+            backgroundColor: chartColors.green,
+            borderColor: chartColors.green,
+            borderWidth: 1,
+            data: [290,150,50]
+        },{
+            label: "Dislike",
+            stack: "Stack 2",
+            backgroundColor: chartColors.red,
+            borderColor: chartColors.red,
+            borderWidth: 1,
+            data: [10,100,250]
+        }]
+    },
+    options: {
+      elements: {
+          rectangle: {
+              borderWidth: 2,
+          }
+      },
+      responsive: true,
+      title: {
+          display: true,
+          text: ""
+      }
+    }
+});
+
+var ctxLine = document.getElementById("simpleLine").getContext("2d");
+var myLineChart = new Chart(ctxLine, {
+  "type":"line",
+  "data":{
+  "labels":["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+            "21", "22"],
+    "datasets":[{
+        "label":"Cumulative Frequencies of Hours Played",
+        "data":[null,5,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,7,null,17],
+        "fill":false,
+        "borderColor": chartColors.red,
+        "lineTension":0.1
+    }]
+  },
+  "options":{
+    spanGaps: true,
+    responsive: true,
+    scales: {
+      xAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: "Hours"
+        }
+      }],
+      yAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: "Cumulative Frequencies"
+        }
+      }]
+    }
+  }
+});
+</script>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/graphs'>graphs</a>, <a class='tag' href='/tags/monitoring'>monitoring</a>, <a class='tag' href='/tags/performance'>performance</a>, <a class='tag' href='/tags/statistics'>statistics</a>, <a class='tag' href='/tags/stats'>stats</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/queue-reader-best-practices/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>NSQ Queue Reader Best Practices</a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+  
+  &copy; 2017 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+    <script src='/js/custom.js'></script>
+  
+
+</body>
+
+</html>
+
