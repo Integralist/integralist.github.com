@@ -105,7 +105,7 @@ Scaling a system to accommodate more users isn't a free lunch; doing so can caus
 
 Typically the first thing developers do (before considering more extreme architectural changes) is to try running their code in parallel (or support more concurrent operations). There is nothing necessarily wrong with that, unless your code isn't "[thread safe](http://en.wikipedia.org/wiki/Thread_safety)". Fixing the issue of thread safety isn't always straight forward and if you're new to the concept of multi-threaded code then you'll likely hit a few stumbling blocks as you slowly start to understand the problem space.
 
-If you're interested in understanding thread safety (and the different concurrency abstractions) in more detail then I recommend you take a read of the following article "[Thread Safe Concurrency](http://www.integralist.co.uk/posts/concurrency.html)".
+If you're interested in understanding thread safety (and the different concurrency abstractions) in more detail then I recommend you take a read of the following article "[Thread Safe Concurrency](http://www.integralist.co.uk/posts/thread-safe-concurrency/)".
 
 Along side the process of trying to speed up code by multi-threading, you'll nearly always want to have your application scale automatically based upon the current needs of the system. If you're application is running on an infrastructure that is designed to scale "horizontally" (e.g. it dynamically creates new server instances running your application) then you will quickly start to introduce the problem of data consistency.
 
@@ -149,7 +149,7 @@ Instead the process should be more decoupled, like so (see below diagram): user 
 
 In the mean time, a separate service is polling the queue for messages (5). The service will read the message (which can include the location of the source image in S3) and then retrieves the relevant image from S3 (6) so it can resize the image (7) and replace the image in S3 with the resized version (8), or whatever needs to happen at that point.
 
-![Better Architecture](../../better-architecture.png)
+![Better Architecture](../../images/better-architecture.png)
 
 So this design might not be perfect, but what's better about this architecture is that we've decoupled the various parts of the overall system that previously would've made scaling the application much harder. We're now in a position to scale up the back-end service (the service that polls the queue and resizes the images) separately from the front-end system which handles the user upload.
 
@@ -445,7 +445,7 @@ You'll also find the Clojure programming language (which isn't a strict FP langu
 
 The reason for a discussion around using OOP vs FP is because there are different pros and cons to both styles of development when it comes to high traffic, distributed and concurrent software systems. Although we're primarily an OOP based organization and through good code design have not suffered any ill-effect from using OOP; some members of the team (myself included) have since been exposed to the greater simplicity and reduction of bugs that inherently occurs when utilizing FP and languages that natively support immutability.
 
-Immutability is the key to avoiding complex mutexes and semaphores when writing multi-threaded code. To find out more on the subject please take a read of ["Thread Safe Concurrency"](http://www.integralist.co.uk/posts/concurrency.html).
+Immutability is the key to avoiding complex mutexes and semaphores when writing multi-threaded code. To find out more on the subject please take a read of ["Thread Safe Concurrency"](http://www.integralist.co.uk/posts/thread-safe-concurrency/).
 
 One last point I'd like to cover is the (ab)use of the MVC _pattern_.
 

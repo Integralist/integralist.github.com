@@ -244,7 +244,7 @@ ga('send', 'pageview');
 
 <p>Typically the first thing developers do (before considering more extreme architectural changes) is to try running their code in parallel (or support more concurrent operations). There is nothing necessarily wrong with that, unless your code isn&rsquo;t &ldquo;<a href="http://en.wikipedia.org/wiki/Thread_safety">thread safe</a>&rdquo;. Fixing the issue of thread safety isn&rsquo;t always straight forward and if you&rsquo;re new to the concept of multi-threaded code then you&rsquo;ll likely hit a few stumbling blocks as you slowly start to understand the problem space.</p>
 
-<p>If you&rsquo;re interested in understanding thread safety (and the different concurrency abstractions) in more detail then I recommend you take a read of the following article &ldquo;<a href="http://www.integralist.co.uk/posts/concurrency.html">Thread Safe Concurrency</a>&rdquo;.</p>
+<p>If you&rsquo;re interested in understanding thread safety (and the different concurrency abstractions) in more detail then I recommend you take a read of the following article &ldquo;<a href="http://www.integralist.co.uk/posts/thread-safe-concurrency/">Thread Safe Concurrency</a>&rdquo;.</p>
 
 <p>Along side the process of trying to speed up code by multi-threading, you&rsquo;ll nearly always want to have your application scale automatically based upon the current needs of the system. If you&rsquo;re application is running on an infrastructure that is designed to scale &ldquo;horizontally&rdquo; (e.g. it dynamically creates new server instances running your application) then you will quickly start to introduce the problem of data consistency.</p>
 
@@ -294,7 +294,7 @@ ga('send', 'pageview');
 
 <p>In the mean time, a separate service is polling the queue for messages (5). The service will read the message (which can include the location of the source image in S3) and then retrieves the relevant image from S3 (6) so it can resize the image (7) and replace the image in S3 with the resized version (8), or whatever needs to happen at that point.</p>
 
-<p><img src="../../better-architecture.png" alt="Better Architecture" /></p>
+<p><img src="../../images/better-architecture.png" alt="Better Architecture" /></p>
 
 <p>So this design might not be perfect, but what&rsquo;s better about this architecture is that we&rsquo;ve decoupled the various parts of the overall system that previously would&rsquo;ve made scaling the application much harder. We&rsquo;re now in a position to scale up the back-end service (the service that polls the queue and resizes the images) separately from the front-end system which handles the user upload.</p>
 
@@ -639,7 +639,7 @@ dependencies:
 
 <p>The reason for a discussion around using OOP vs FP is because there are different pros and cons to both styles of development when it comes to high traffic, distributed and concurrent software systems. Although we&rsquo;re primarily an OOP based organization and through good code design have not suffered any ill-effect from using OOP; some members of the team (myself included) have since been exposed to the greater simplicity and reduction of bugs that inherently occurs when utilizing FP and languages that natively support immutability.</p>
 
-<p>Immutability is the key to avoiding complex mutexes and semaphores when writing multi-threaded code. To find out more on the subject please take a read of <a href="http://www.integralist.co.uk/posts/concurrency.html">&ldquo;Thread Safe Concurrency&rdquo;</a>.</p>
+<p>Immutability is the key to avoiding complex mutexes and semaphores when writing multi-threaded code. To find out more on the subject please take a read of <a href="http://www.integralist.co.uk/posts/thread-safe-concurrency/">&ldquo;Thread Safe Concurrency&rdquo;</a>.</p>
 
 <p>One last point I&rsquo;d like to cover is the (ab)use of the MVC <em>pattern</em>.</p>
 
