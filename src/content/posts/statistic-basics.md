@@ -26,6 +26,12 @@ draft: false
   - [Calculating dimensions](#7.2)
   - [Frequency Density?](#7.3)
 - [Line Graphs](#8)
+- [Averages](#9)
+- [Which average to use?](#10)
+- [Ranges](#11)
+- [Percentiles](#12)
+- [Variance](#13)
+- [Conclusion](#14)
 
 <div id="1"></div>
 ## Introduction
@@ -34,7 +40,11 @@ I started learning about statistics because I found myself doing a lot of operat
 
 Although, for the most part, everything worked as expected and I generally understood the data I was seeing visualised, I wanted to be sure I wasn't missing any important information (or worse, mis-representing the data).
 
-This began my journey into learning about statistics (as a complete beginner). I picked up a book on the subject and started taking notes. This blog post is the result of what I have learnt so far, and its motivation is to explain some of the basic concepts behind utilising statistics to represent data. This post is aimed at beginners, as I myself am very much a beginner in this space. 
+This began my journey into learning about statistics (as a complete beginner). I picked up a book on the subject and started taking notes. 
+
+> Note: I highly recommend reading [Head First Statistics](http://shop.oreilly.com/product/9780596527587.do) which is where the majority of this information has stemmed. There you'll find a lot more detail and better break downs of the ideas.
+
+This blog post is the result of what I have learnt so far, and its motivation is to explain some of the basic concepts behind utilising statistics to represent data. This post is aimed at beginners, as I myself am very much a beginner in this space. 
 
 So let's begin by defining what 'statistics' means...
 
@@ -295,6 +305,374 @@ We can now plot these onto a line graph by placing the cumulative frequencies on
 
 > In the above example graph, if we asked "how many people were playing for up to 21 hours?" the answer would be approximately 11 people.
 
+<div id="9"></div>
+## Averages
+
+When looking at data and graphs, people are generally interested in 'averages' because they help us better gauge what/where the majority is. But there are actually three different types of 'average', and each one has a different purpose:
+
+- mean average
+- median average
+- mode average
+
+### Mean
+
+The 'mean' average is the average that most people think about. To calculate the mean you would sum every number in your dataset and then divide the result by the number of elements in the dataset. For example:
+
+```
+dataset = [2,5,9]
+sum = 16 (2 + 5 + 9)
+mean = 3 (16 / 3)
+```
+
+> Note: the mean average can be expressed mathematically by `Σx/n`. When broken down it means `Σx` (pronounced "sigma x") which is a quick way of saying "add together the values of all the x's" without having to say what the values are. This also can be expressed with the Greek symbol `μ`.
+
+When dealing with datasets that have frequencies we need to ensure the frequencies are included as part of the calculation. For example, consider the following data:
+
+```
+Age:       19, 20, 21
+Frequency: 1,  3,  1
+```
+
+What the frequencies indicate is that 19 and 21 only appear once, where as 20 appears three times. So when summing the values (`Σx`) this _doesn't_ mean `19+20+21`, instead it means `19+20+20+20+21`.
+
+Similarly, when dividing by the number of items in the dataset (the `n` in `Σx/n`) it means dividing by 5 (`1+3+1`) and not taking the number of frequencies literally, so _not_ dividing by 3 (`1,3,1`).
+
+Resulting in a calculation that gives us the mean average as `20`:
+
+```
+(19+20+20+20+21) / (1+3+1) = 20
+```
+
+or
+
+```
+100 / 5 = 20
+```
+
+> Note: this type of mean average (i.e. one applied to data that has frequencies associated with it) can be expressed mathematically with `Σfx/Σf` and equates to "multiply each number by its frequency, then add the results together" (`Σfx`), then "divide the result by the sum of frequencies" (`Σf`).
+
+There's an issue with using the mean average, and that's **outliers**.
+
+Consider the following dataset:
+
+```
+Age:       19, 20, 21, 145, 147
+Frequency: 3,  6,  3,  1,   1
+```
+
+If we wanted to calculate the average age (using `Σfx/Σf`), that would look like the following:
+
+```
+((3×19) + (6×20) + (3×21) + 145 + 147) / (3+6+3+1+1) = 38
+```
+
+This is telling us the average age is 38. That number doesn't actually _exist_ in the dataset!?
+
+What has happened is that the outliers (the large numbers at the end of the dataset: `145, 147`) have _pulled_ the mean higher, meaning the data is "skewed". Data can be skewed to the left (the mean is pulled lower) or it can be skewed to the right (the mean is pulled higher - as in the case of our example above).
+
+> Note: we say skewed "left" or "right" because when sorting the data in ascending order you would see the outliers are either mainly to the left or the right (depending on the data).
+
+If we were to look at this on a line histogram graph we would notice this 'pulling' of the mean:
+
+<canvas id="meanOutliers"></canvas>
+
+> Note: in the above graph you can see the longer 'tail' that indicates the outliers.
+
+How can we deal with outliers? Well, this is where the median can help...
+
+### Median
+
+The median gives us the _exact middle_ of our data.
+
+To calculate this you would take all the numbers (inc. their frequencies) sort them, and then select whatever is the middle number. Let's see this using the following dataset:
+
+```
+Age:       19, 20, 21, 145
+Frequency: 3,  6,  3,  1
+```
+
+Let's include the frequencies and sort the numbers in ascending order:
+
+```
+19, 19, 19, 20, 20, 20, 20, 20, 20, 21, 21, 21, 145
+```
+
+There's 13 numbers in total (i.e. sum the frequencies `Σf` like so: `3+6+3+1`).
+
+So to find the exact middle we just divide the number by 2 (which gives us 6.5) and then round it (so it becomes 7). Meaning the seventh number in the dataset is the exact middle: `20`.
+
+> Note: alternatively it can be abstracted to `(n+1)/2`
+
+But what happens with a dataset with an _even_ set of numbers? Well, in that case you need to take the mean of the two middle numbers (i.e. sum them and divide the result by 2). Consider the following example:
+
+```
+19, 19, 20, 20, 20, 21, 22, 23, 145, 147
+```
+
+There are 10 numbers so if we divide by 2 we'll get 5. If you count five items inwards from either the start or the end of the dataset, you'll find you land on two different numbers (in this case 20 and 21). 
+
+So in this scenario you sum 20 and 21 (`20+21 = 41`) and divide the result by two (`41/2 = 20.5`). Meaning the median of the above dataset is `20.5`.
+
+> Note: what you'll typically find is that if the data is _symmetrical_ then the mean and the median will result in the same value.
+
+But what happens if a dataset has multiple clusters of values, so for example the dataset includes values that are at both low and high ends? 
+
+Consider a baby swimming group; this would include very young ages (i.e. the babies) and older ages (i.e. the parents) and so you might find the mean and median both result in an average age for that dataset as being mid-teens (which _traditionally_ wouldn't necessarily be correct - depending on the social/cultural environment). Also the results can vary significantly if there are more babies or parents joining the class.
+
+The solution to this problem is to return the most popular value (the one with the highest frequency). This is where the "mode" average can help...
+
+### Mode
+
+The mode is the third and final type of average, and it aims to return the value with the highest frequency. Which means the value that it gives as the result **MUST** exist within the dataset (unlike the mean which could result in a value that _doesn't_ exist).
+
+> Note: if there are multiple frequencies with the same value, then the dataset is considered "bimodal". Meaning there are multiple modes for the dataset.
+
+The mode average is the only average that works not just on numerical data but categorical data. When you’re dealing with categorical data, the mode is the most frequently occurring category. 
+
+Here are the steps for calculating the mode:
+
+1. Identify all the distinct categories (or values) in your dataset.
+2. Document the frequency for each categoy (or value).
+3. Select the values with the highest frequency to find the mode.
+
+The mode is considered most useful when dealing with data that has a small number of modes, or when the data is categorical instead of numerical (remember: neither the mean nor the median can be used with categorical data). But if there are lots of modes identified, then the mode average can end up being _less_ useful over other averages.
+
+Let's see some example data and identify the mode average in each:
+
+```
+Values:    1, 2, 3
+Frequency: 3, 7, 4
+```
+
+The mode for the above dataset is `2` (as it is the value that has the highest frequency).
+
+```
+Categories: Red, Yellow, Green
+Frequency:  20,   7,      4
+```
+
+The mode for the above dataset is the "Red" category (as it is the category has the highest frequency).
+
+```
+Values:    1, 2, 3
+Frequency: 3, 7, 7
+```
+
+The above dataset actually contains multiple modes (i.e. multiple modes with the same frequency which happens to be the highest in the set). The modes being `2` and `3` (whose frequency is `7`).
+
+<div id="10"></div>
+## Which average to use?
+
+Imagine we have staff, managers and a CEO and they're all determining how pay rises should be calculated when based on the average salary. Below is a suggestion as to which average each one of them might suggest using and why:
+
+- **Staff**: median  
+  staff prefer the median average as it helps reduce the effect of the CEO's salary as an outlier.  
+
+- **Managers**: mean  
+  the large CEO salary is an outlier, thus resulting in the mean being skewed to the right - so this is the preferred average of the managers as it brings a much larger pay rise!  
+
+- **CEO**: mode  
+  considering there are many more staff than managers (or CEOs), the CEO prefers the mode because it results in the staff salary being the basis of a pay rise - resulting in paying out a lot less than is fair.  
+
+> Note: the median is the most 'fair' when calculating a pay rise in this example scenario.
+
+<div id="11"></div>
+## Ranges
+
+Averages help identify the center of our data (and via various perspectives as we've already seen: mean, median and mode). But this isn't useful when it comes to understanding how the data itself varies.
+
+Ranges help explain how data is _distributed_ and informs you of how far apart your highest and lowest values are. In other words, the range is a way of measuring how _spread_ out a set of values are (almost like we're measuring the width of the dataset).
+
+To calculate the range of a dataset you require the "upper bound" and the "lower bound". The upper bound is the highest value and similarly the lower bound is the lowest value. The range calculation is as follows:
+
+```
+upper bound - lower bound = range
+```
+
+But you can be in a situation where two separate datasets have different distribution of data and yet they have the same 'range' value. This is because the range only indicates the _width_ of the data and not how it's dispersed inbetween the higher/lower bounds.
+
+> Note: the range value is very sensitive to outliers and so it can be misleading if used to identify data distribution.
+
+Consider this example dataset:
+
+```
+1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5
+```
+
+On a bar chart this data could be mapped like so (where the frequencies are set on the y axis and the numerical values are set on the x axis):
+
+<canvas id="range"></canvas>
+
+The range for the above data would be 4 (`5 - 1`).
+
+Now append an outlier value:
+
+```
+1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 10
+```
+
+<canvas id="rangeOutlier"></canvas>
+
+The range for the above data would now become 9 (`10 - 1`) even though there are no new values inbetween. The outlier has distorted the range.
+
+### Quartiles
+
+In order to avoid outliers we should focus on the central tendency of the data. In order to do that we need to split our data into quarters. The first and last quarters (which typically contain outliers) can subsequently be discarded, allowing us to focus on the central quarters.
+
+Given the earlier data (which included an outlier on the far right):
+
+```
+1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 10
+```
+
+This would be split into quarters like so:
+
+```
+[1, 1, 1, 2, 2,]
+[2, 2, 3, 3, 3,]
+[3, 3, 4, 4, 4,]
+[4, 5, 5, 5, 10]
+```
+
+The location within the data where splits have been inserted are known as "quartiles":
+
+```
+[...] quartile [...] quartile [...] quartile [...]
+```
+
+The lowest quartile is called the "lower quartile" or Q1, while the highest quartile is called the "upper quartile" or Q3. The middle quartile is called the "median" or Q2 (effectively splitting the data in half).
+
+Here are those splits but using the relevant names applied (Q1, Q2 and Q3):
+
+```
+[...] Q1 [...] Q2 [...] Q3 [...]
+```
+
+The range of the values in the two median quarters (inbetween Q1-Q3) are referred to as the "[interquartile range](https://en.wikipedia.org/wiki/Interquartile_range)", and provides a way to measure how values are dispersed while being less sensitive to the outliers that would have been found in the lower/upper quartiles. 
+
+### Locating the lower/higher quartiles
+
+Consider the following sorted data:
+
+```
+4, 7, 1, 0, 3, 8, 9, 2, 5, 10, 6
+```
+
+> Note: there are 11 values in the above data
+
+The calculation for finding the lower quartile is as follows:
+
+```
+N / 4 = round(result)
+```
+
+So this would be `11 / 4`, which gives us the result of `2.75` that we then round up to `3`. Meaning the lower quartile is the third value in the dataset, so that would be the value `1`.
+
+The calculation for finding the higher quartile is as follows:
+
+```
+lower quartile x (N / 4) = round(result)
+```
+
+So this would be `3 x 2.75`, which gives us the result of `8.25` that we then round up to `9`. Meaning the higher quartile is the ninth value in the dataset, so that would be the value `5`.
+
+Meaning the interquartile range can be found in-between the lower/upper quartile positions, thus giving us the central 50% of the data to focus on.
+
+<div id="12"></div>
+## Percentiles
+
+When dealing with quartiles (see above), you're splitting your data into quarters. When dealing with percentiles, you're splitting your data into percentages. Each percentage is a percentile. For example, the 20th percentile is the value that is found 20% into your data.
+
+> Note: quartiles are a type of percentile. For example, the lower quartile is the 25th percentile. Where as the upper quarter is the 75th percentile. The median (or Q2) is the 50th percentile.
+
+Percentiles are generally used as a means for identifing values for a specific percentage of your users. For example, if your dataset reported performance numbers, then you could look at the value at the 95th percentile of the data and say "95% of our users are seeing this measure of performance". Which is more relevant than looking at the average (i.e. mean/median/mode) of that performance data.
+
+Another typical example given for understanding the purpose of percentiles is to imagine you scored 50 in a test, and the value in the test results dataset at the 90th percentile was 50, then this would mean you had scored the same as (or beat the score of) 90% of your class who took the test.
+
+### Calculating Percentiles
+
+In order to calculate percentiles of a dataset you first need to sort the data in ascending order. Once this is done you need to identify `N` which is the number of values you have in your dataset. From there you can do the following calculation (where `K` is the percentile you want the value for):
+
+```
+K x (N / 100)
+```
+
+If the result is not an integer, then round it up and that will give you the position of your percentile. Otherwise if it _is_ an integer, then the value can be found in-between the integer position and the next position along so take the average of the two numbers at those positions to find the percentile value.
+
+For example, if you have 125 numbers in a dataset and you wished to see the 10th percentile for those values, then the calculation would be:
+
+```
+10 x (125 / 100) = round_up(12.5) -> 13
+```
+
+So the 10th percentile would be the value at position 13 in your dataset.
+
+<div id="13"></div>
+## Variance
+
+Measuring the 'spread' of data isn't always as useful as being able to measure the consistency of that spread, in that if our data represented player scores in a game, then we might want to identify how consistent (or reliable) a player was. Did they perform better and more reliably than another player?
+
+The way to measure this is by looking at the mean and then looking at the distance of other values from the mean. This will give us the "variation" we're looking for. The closer values are to the mean, the more consistent they are.
+
+So going back to the idea of a dataset that reports game player performance. Imagine we have two players (A and B). Both have a mean value that is the same, but player A has a closer spread of values than player B. This means player A is more consistent with their scoring.
+
+The approach for measuring the spread of data that we will look at is called the "variance" and it specifically measures, not from the 'mean', but the 'mean squared'. 
+
+The reason for deciding to measure the spread of values from the 'mean squared' is because maths (read [Head First Statistics](http://shop.oreilly.com/product/9780596527587.do) for the gory details). To be a little more specific, it's because if we don't calculate things from the mean squared it means we'll always get an incorrect value of zero.
+
+The variance calculation is: 
+
+```
+Σ(μ-x)²/n
+```
+
+That might look a little hairy, but most of these symbols we've already seen.
+
+- `μ`: this is the dataset mean (which was shorthand for `Σx/n`).
+- `Σx/n`: where `Σ` is the sum of each dataset item value `n` divided by the number of items in the dataset.
+- `Σ(μ-x)²`: we square the result of `μ-x` and sum `Σ` all the resulting values.
+    
+For example, imagine we have the following data:
+
+```
+1, 2, 9
+```
+
+The mean for this data is `4`. The distance between `1` and `4` is `3`, between `2` and `4` is `2`, between `9` and `4` is `-5`.
+
+If you're confused about why the distance between `9` and the mean is `-5` and not `5` (as in, counting from nine back to the mean `8,7,6,5,4` looks like a distance of five), then read on...
+
+You need to realise when measuring the distance to the mean that you're counting either negative or positive from zero. So `9` is where you start (which is effectively zero) and in this case the mean is lower than `9` (the mean value is `4`) so we have to count backwards into negative numbers. 
+
+For example: counting `8,7,6,5,4` is `5` numbers away from `9`, but as we're treating this as negative distance from zero the value is `-5`. Where as when calculating the distance from either `1` or `2` to the mean, the mean (`4`) is ahead of it and so you count positive not negative.
+
+OK so we now have the distances `3, 2, -5` from here we need to square these numbers and then add them up (we have to square the numbers otherwise the sum result would be zero). Finally, we divide by `N` (the number of items in the dataset). 
+
+This ultimately gives us the "variance" of `12.67`. 
+
+> Note: here's a shorter calculation for the variance `Σx²/n - μ²`
+
+The reason the variance is useful is because it has provided the measure of distance from the mean based on every value in the dataset. The downside to this approach is that you've calculated the variance from the mean _squared_ of the dataset and not just the mean. To solve _that_ concern you then need to calculate the square root of the variance (also referred to as the standard deviation).
+
+### Standard Deviation
+
+If we calculate the standard deviation of the variance value `12.67` we'll find the result is `3.56` and so that value is the actual distance most values are away from the mean. You would then compare that to the standard deviation of another player's results to see which player ultimately performed better overall.
+
+> Note: standard deviation has its own Greek symbol `σ` (referred to as the lowercase Sigma). Remember to calculate `σ` you start by calculating the variance, and then take the square root.
+
+Some other real-world examples would be a company that manufactures machine parts. For them, they want the standard deviation for their data to be small so they can be sure all the parts they build are the same size. Where as if you were inspecting wages across a large organisation you would likely find that the standard deviation naturally becomes quite large.
+
+Standard deviation is also measured in the same units as your data. So if your dataset values are, for example, centimeters and the standard deviation is `1`, this means that the values are typically 1 centimeter away from the mean.
+
+<div id="14"></div>
+## Conclusion
+
+So there we have it, a run through of some statistic basics. We've covered a few different graph types (pie, bar, histograms, line) and explained what averages are and how they're calculated in different scenarios. We've also looked at how data is distributed and how you might measure that to identify whether some results are more consistent than others.
+
+Statistics is such a large topic area, and as far as I can tell, this is really only scratching the surface. To be honest I'm not sure how much further I myself will go with my learning. I feel I now have enough understanding to help me get by in my work and know enough to be dangerous in conversation. Otherwise if there's anything I discover is missing in future, I'll be sure to return and update this post accordingly.
+
+Thanks for reading. Hopefully there was something useful in here for you.
+
 <script src="../../js/Chart.bundle.min.js"></script>
 <script>
 var chartColors = {
@@ -529,5 +907,83 @@ var myLineChart = new Chart(ctxLine, {
       }]
     }
   }
+});
+
+var ctxLine = document.getElementById("meanOutliers").getContext("2d");
+var myLineChart = new Chart(ctxLine, {
+  "type":"line",
+  "data":{
+  "labels":[19, 20, 21, 145, 147],
+    "datasets":[{
+        "label":"Ages for a group of people",
+        "data":[3, 6, 3, 1, 1],
+        "fill":false,
+        "borderColor": chartColors.red,
+        "lineTension":0.1
+    }]
+  },
+  "options":{
+    responsive: true,
+    scales: {
+      xAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: "Ages"
+        }
+      }],
+      yAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: "Frequencies"
+        }
+      }]
+    }
+  }
+});
+
+var ctxBar = document.getElementById("range").getContext("2d");
+var myBarChart = new Chart(ctxBar, {
+    type: "bar",
+    data: {
+        labels: [0, 1, 2, 3, 4, 5, 6],
+        datasets: [{
+            label: "Example of a symmetrical/balanced range",
+            backgroundColor: chartColors.red,
+            borderColor: chartColors.red,
+            borderWidth: 1,
+            data: [0, 3, 4, 5, 4, 3, 0]
+        }]
+    },
+    options: {
+      elements: {
+          rectangle: {
+              borderWidth: 2,
+          }
+      },
+      responsive: true
+    }
+});
+
+var ctxBar = document.getElementById("rangeOutlier").getContext("2d");
+var myBarChart = new Chart(ctxBar, {
+    type: "bar",
+    data: {
+        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        datasets: [{
+            label: "Example of an unbalanced range",
+            backgroundColor: chartColors.red,
+            borderColor: chartColors.red,
+            borderWidth: 1,
+            data: [0, 3, 4, 5, 4, 3, 0, 0, 0, 0, 1]
+        }]
+    },
+    options: {
+      elements: {
+          rectangle: {
+              borderWidth: 2,
+          }
+      },
+      responsive: true
+    }
 });
 </script>
