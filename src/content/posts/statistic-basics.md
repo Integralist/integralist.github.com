@@ -15,12 +15,12 @@ draft: false
 
 - [Introduction](#1)
 - [Information vs Data](#2)
-- [Watch out for misleading data](#3)
-- [Frequency](#4)
+- [Frequency](#3)
+- [Watch out for misleading data](#4)
 - [Pie Chart](#5)
 - [Bar Chart](#6)
-  - [Stacked](#6.1)
-  - [Split](#6.2)
+  - [Stacked Bars](#6.1)
+  - [Split Bars](#6.2)
 - [Histograms](#7)
   - [Differences?](#7.1)
   - [Calculating dimensions](#7.2)
@@ -50,6 +50,8 @@ So let's begin by defining what 'statistics' means...
 
 > **Statistics** is a branch of mathematics dealing with the collection, analysis, interpretation, presentation, and organization of data -- [Wikipedia](https://en.wikipedia.org/wiki/Statistics)
 
+OK, that seems reasonable enough. Statistics is an 'umbrella' term that encapsulates the complete pipeline of how data is acquired, analysed and visualised. So what _is_ data and what does it look like? Let's move onto the next section where we can begin to clarify and understand it a bit more...
+
 <div id="2"></div>
 ## Information vs Data
 
@@ -64,16 +66,56 @@ For example, raw data might look like:
 [3, 5, 7]
 ```
 
-Where as _information_ would be the taking of that raw data and giving it extra context. So, in this example, those three data points could represent the age of three children.
+Where as _information_ would be the taking of that raw data and giving it extra context. So, in this example, those three data points could represent the age of three children. In a classic CSV (comma separated values) format (which is used for storing 'tabular' data), it might be represented like so:
+
+```
+Age
+3,
+5,
+7
+```
 
 > Note: data is either "numerical" (dealing with numbers), "quantitative" (describing quantities) or "categorical" (data is split into categories that describe qualities or characteristics - also referred to as "qualitative").
 
 <div id="3"></div>
+## Frequency
+
+When dealing with statistical data, the first thing you typically learn about is data "frequency". Let's start with a definition...
+
+> In statistics the frequency (or absolute frequency) of an event is the number of times the event occurred in an experiment or study. -- [Wikipedia](https://en.wikipedia.org/wiki/Frequency_(statistics))
+
+Consider the following data:
+
+```
+3,5,5,5,7,7,2
+```
+
+The first number `3` and the last number `2` both have a frequency of one, in that they only appear once throughout the entire dataset. Where as the number `5` has a frequency of three and the number `7` has a frequency of two for similar reasons (i.e. `5` appears three times and `7` appears twice).
+
+Another way to represent this data is by defining a separate column for the frequency (which allows you to more clearly see the unique numbers that are present in the dataset):
+
+```
+Age, Frequency
+3,   1
+5,   3
+7,   2
+2,   1
+```
+
+> Note: strictly speaking you might want to refer to the above snippet as **information** rather than **data** simply because the raw data now has 'context' added to it which clarifies what the numbers mean.
+
+The data/information can be visualised in many ways depending on the graph type you wish to use. Some graphs are better suited for representing certain types of data than others. 
+
+We'll take a look at some different graph types to see how they work, but first let's take a moment to consider how data can trick us...
+
+<div id="4"></div>
 ## Watch out for misleading data
 
 The following example is very contrived and silly, but it does illustrate the point about being aware of how data can be manipulated to represent what you want it to.
 
-Here are two graphs, both have the same datapoints, but the first graph is misleading the viewer, while the second graph is more accurate. Take a look and see why that might be?
+Below are two 'line' graphs. We'll talk about this type of graph in more detail later, but effectively we create two axis and then plot our data onto the graph and draw a line between the dots.
+
+Now both graphs use the same datapoints, but the first graph is misleading the viewer, while the second graph is more accurate. Take a look and see why that might be?
 
 <canvas id="misleadingProfitsLine"></canvas>
 
@@ -83,31 +125,29 @@ At a quick glance (or if you just didn't know any better), you would see the fir
 
 This is because the first graph is zoomed in from the starting point `2.0` where as the first graph is zoomed out at the correct level so you can see the data in a more accurate and representative form.
 
-> See also my comment below about the pie chart. It's a mis-representation, not of the data but of the truth. Some charts mis-represent data (like shown above), where others set a specific 'scene' (either accidentally or on purpose) by the mere ommission of data.
-
-<div id="4"></div>
-## Frequency
-
-When dealing with statistical data, the first thing you typically learn about is data "frequency". Let's start with a definition...
-
-> In statistics the frequency (or absolute frequency) of an event is the number of times the event occurred in an experiment or study. -- [Wikipedia](https://en.wikipedia.org/wiki/Frequency_(statistics))
-
-The frequency of a piece of data can be visualised in many ways depending on the chart you wish to use. Some charts are better suited for representing certain types of data than others, so let's take a look at some different chart types to see how they work.
+> See also my comment in the next section about [pie charts](#5). You'll notice there that the data can be mis-represented if not all the information is made available to the user. 
+>
+> So the data isn't lying, it's just the view the user has of the data isn't accurately portrayed due to purposeful data ommission (this is a trick newspapers and academic papers use to represent a point of view they wish to push).
 
 <div id="5"></div>
 ## Pie Chart
 
-A graph, such as a pie chart, will split your data up into distinct 'groups' and then it'll calculate the relative percentage of each group to ensure the total adds up to 100%. 
+A graph, such as a pie chart, will split your data up into distinct 'groups'. These groups are represented as relative percentages of the total group, meaning the total area adds up to 100%. 
 
 Below is an example pie graph that uses the data `[150,200,50]`, which could represent (just for example) usage of certain programming languages within an organisation. The pie chart is generated based off the percentage representation of the underlying data.
 
-> For example:  
-> Start by finding the total (sum all the data)  
-> Then calculate 1% of the total  
-> Finally, calculate each group's percentage
+<canvas id="simplePie"></canvas>
+
+> Here is how the graph data is calculated:
+>
+> Start by finding the total (i.e. sum all the data)  
+> Then calculate 1% of that total  
+> Finally, calculate each group's individual percentage
 >
 > **Total**: 150+200+50 = 400  
 > **1 Percent**: 400/100 = 4
+>
+> Now we know the total is 400 and 1% of that is 4 we can calculate each group's individual percentage...
 >
 > **Python** group = 50%  
 > <small>i.e. `(400/100) * 50 = 200`</small>
@@ -118,43 +158,67 @@ Below is an example pie graph that uses the data `[150,200,50]`, which could rep
 > **Bash** group = 12.5%  
 > <small>i.e. `(400/100) * 12.5 = 50`</small>
 > 
+> We'll know if we've calculated things correctly, if the sum of the group percentages results in 100%
+>
 > **50%** + **37.5%** + **12.5%** = 100%
 
-<canvas id="simplePie"></canvas>
+Pie charts are useful for understanding 'at a glance' the relative difference between groups of data. But they become less useful when the data is close together, as each 'slice' becomes effectively the same size.
 
-This type of graph is useful for understanding 'at a glance' the relative difference between groups of data, but becomes less useful when the data is close together as each 'slice' becomes effectively the same size.
+### Misleading?
 
-As with all charts, there are problems with how you _interpret_ the graph.
+As mentioned in the previous section, all graphs can be presented in such a way as to mislead you and make you think that the reality is different to what it really is. Pie charts are no exception.
 
-Pie charts display the information in relative percentages, but if they don't show (or include somewhere near the graph) the _frequency_ for each group within the pie chart, then the graph can become misleading. This is because without the frequency you can't identify or confirm the _consistency_ of the data reported (e.g. lack of user engagement within any particular group).
+Pie charts visually 'display' their information in relative percentages, but if they don't also show (or include somewhere near the graph) the _frequency_ for each group within the pie chart, then the graph could be misleading.
 
-In our example (when hovering or clicking on the chart) you'll see that we display the _frequency_ data and not the relative percentage (e.g. we show the value as 200 and not 50%). This is fine, because the most important part of this graph is the data's frequency, and besides, the pie chart itself is visually representing the frequency data in percentages (so although you don't see `Go: 37.5%`, it doesn't matter, as you can visually gauge the relative percentage easily enough). 
+The reason it can be misleading is because without the frequency you can't identify whether the data being presented is _consistent_. This may or may not indicate whether it's fair to compare the data in this way (as it might not be truly representative).
 
-If we didn't include the data frequency we can't tell if we have an equal number of responses from users. This may or may not indicate whether it's fair to compare user satisfaction in this way (as it might not be truly representative).
+Whether that is the case or not depends on the type of data being presented. In our case it's not really an issue for two reasons:
+
+1. We include the _frequency_ data in our pie chart.
+  * hover over or click on the chart to view frequency.
+2. Our data is simple enough to not be mis-represented.
 
 So you have to be careful with data to make sure it's as inclusive as possible or that you're explicit about what you're focusing on or how the data might be lacking.
 
-For the problem of data groups that are close together as a percentage, you might find a more suitable option would be the bar chart...
+Earlier we mentioned a problem of data groups percentages being too close together resulting in a graph that was hard to distinguish subtle differences. In those scenarios you might find a more suitable option would be the bar chart...
 
 <div id="6"></div>
 ## Bar Chart
 
 If you wanted to see the 'programming language' data in a format that is more suitable for subtle differences, then one option would be a bar chart. 
 
-When dealing with a horizontal bar chart (directly below), the frequency groups are placed along the y axis, while with a vertical bar chart (example below that) they're placed along the x axis.
+Let's view the dataset we have:
+
+```
+Language, Frequency
+Go,       150
+Python,   200
+Bash,     50
+```
+
+When dealing with a horizontal bar chart (directly below), the individual data groups (in this case: the programming languages) are placed along the y axis, while with a vertical bar chart (example below that) they're placed along the x axis.
 
 <canvas id="simpleBar"></canvas>
 
 <canvas id="simpleBarVert"></canvas>
 
-One thing to notice about a bar chart is that the _width_ of the bar is the same (doesn't matter if it's a horizontal or vertical variation). It's the _length_ of each bar that's important. 
+One thing to notice about a bar chart is that the _width_ of the bar is the same (doesn't matter if it's a horizontal or vertical variation, their widths stay consistent). It's the _length_ of each bar that's actually important. 
 
-The length represents the frequency of the group's data. This can trip people up, as they might mistake a bar chart for a 'histogram', where the width of the bar _does_ change in relation to the frequency (we'll come back to histograms later).
+This is because the length represents the frequency of the group's data. This can trip people up, as they might mistake a bar chart for a 'histogram', where the width of the bar _does_ change in relation to the frequency (don't worry, we'll come back to histograms later).
 
 <div id="6.1"></div>
-### Stacked
+### Stacked Bars
 
 Now imagine you wanted to visualise data that represented how much people liked or disliked specific programming languages (this is different to the previous data which was the general usage of programming languages). 
+
+The dataset might look something like the following:
+
+```
+Language, Like, Dislike
+Go,       290,  10
+Python,   150,  100
+Bash,     50,   250
+```
 
 To represent this multifaceted data you could use a specific type of bar chart known as a 'stacked' bar chart (see below). This type of graph is useful because it represents both the frequency _and_ the relative percentage of the various data types.
 
@@ -169,7 +233,7 @@ You can see for the groups "Go" and "Bash" we've had a consistent number of repo
 Where as the "Python" group has less data frequency compared to the other groups (only 250 in total, where the other groups were 300), and so although it correctly represents that data as a percentage (60% were "like" vs 40% "dislike") it's still not as representative as a whole in comparison to the other data groups we have. Ideally each group would have consistent frequencies.
 
 <div id="6.2"></div>
-### Split
+### Split Bars
 
 Another type of bar chart is called 'split-category' and is useful for _comparing frequencies_ (unlike the stacked/segmented bar chart which compares frequency but represents them visually in percentages).
 
@@ -199,6 +263,8 @@ When constructing a histogram, you'll place the groups on the x axis and make th
 
 Doing this is fine, as long as the groups have a consistent range (i.e. they all have the same interval size, like: `0-5,5-10,10-15` and whose range/interval distance are all five). 
 
+### Inconsistent Ranges
+
 But in some datasets a single group can cover a much wider range than the other groups. For example, consider a dataset for gaming hours played by a group of 17 users:
 
 ```
@@ -220,6 +286,8 @@ In using this data, the `1-20` group's _area_ could mistakenly look disproportio
 
 So to solve the problem of disproportionate sizes (when dealing with multi-range groups), we have to make sure that _both_ the width and height (or 'area') of the group is proportional. 
 
+### How to fix the proportions?
+
 To fix the bar area size problem we need a different calculation for determining the 'height' of each bar (also known as the frequency density):
 
 ```
@@ -238,9 +306,9 @@ You would then apply this calculation to the height of each group/bar (see below
 
 <img src="../../images/disproportionate_historgram_area_fixed.png">
 
-> Note: I appreciate the difference between the original height of 2 vs 0.10 (and 10 vs 5), using this contrived example, isn't exactly ground breakingly different, but that's the general idea behind calculating histogram areas for groups that have inconsistent ranges.
+> Note: I appreciate the difference between the original height of 2 vs the correct height of 0.10 (for the range `1-20`) and 10 vs 5 (for the range `20-22`), when using this contrived example, isn't exactly ground breakingly different; but this is just to help you understand the general idea behind calculating histogram areas for groups that have inconsistent ranges.
 
-The overall area (or shape) for each bar represents the actual frequency, and can be calculated like so:
+We can now see the overall area (or shape) for each bar represents the actual frequency, and can be calculated like so:
 
 ```
 frequency = range × frequency density
@@ -266,7 +334,9 @@ If we wanted to calculate the _total frequency_ for the entire dataset then we w
 <div id="8"></div>
 ## Line Graphs
 
-We've already seen a couple of example line graphs at the start of this post. These types of graphs are best for identifying trends in your data and are most useful when applied across numerical data (such as time, which again helps with overarching trending patterns).
+We've already seen a couple of example line graphs at the start of this post. To create a line graph you require two axis (x and y) and the data to be mapped onto different points across these axis' which allow us to plot a line between the dots we mark.
+
+These types of graphs are best for identifying _trends_ in your data and are most useful when applied across numerical data (such as time, which again helps with overarching trending patterns).
 
 > Note: compare this to bar charts, which are generally better for comparing values or categories.
 
