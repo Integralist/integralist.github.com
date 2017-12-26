@@ -747,7 +747,7 @@ The answer is that you'll want to rotate your encryption key pair on a regular b
 
 Also the company you work for might want to control your encryption key so that once you leave the organisation they can decrypt stuff you've worked on previously. But if they have your key then you'd need to create a new one for your personal interactions and means you couldn't build up a secure and well established identity outside of the company. 
 
-In all these cases, it can be easier to just have a separate 'signing' key pair that lasts for a long time. This ultimately becomes your _identify_ that people trust. You then have separate keys for encrypting and you can digitally sign the encrypted content. 
+In all these cases, it can be easier to just have a separate 'signing' key pair that lasts for a long time. This ultimately becomes your _identity_ that people trust. You then have separate keys for encrypting and you can digitally sign the encrypted content. 
 
 Interestingly by default GPG creates a signing key and an encryption key. You can see this by running the following command:
 
