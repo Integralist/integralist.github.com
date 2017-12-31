@@ -620,6 +620,10 @@ Here are those splits but using the relevant names applied (Q1, Q2 and Q3):
 
 The range of the values in the two median quarters (inbetween Q1-Q3) are referred to as the "[interquartile range](https://en.wikipedia.org/wiki/Interquartile_range)", and provides a way to measure how values are dispersed while being less sensitive to the outliers that would have been found in the lower/upper quartiles. 
 
+Below is a (very) rough outline of where the quartiles would be found using our example dataset (each quartile is highlighted in blue). We can see that the interquartile range (the section inside of the outer blue lines) chops off the outlier that is pulling (skewing) the data to the right:
+
+<canvas id="quartile"></canvas>
+
 ### Locating the lower/higher quartiles
 
 Consider the following sorted data:
@@ -1075,5 +1079,46 @@ var myBarChart = new Chart(ctxBar, {
       },
       responsive: true
     }
+});
+
+var ctxQuartile = document.getElementById("quartile").getContext("2d");
+var myQuartileChart = new Chart(ctxQuartile, {
+  "type":"line",
+  "data":{
+    labels:[1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 7, 8, 9, 10, 11],
+    datasets:[{
+        // y axis data - the frequencies
+        label: "Example of distribution with quartile markers",
+        data:[3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 0, 0, 0, 0, 1],
+        fill:false,
+        borderColor: chartColors.red,
+        lineTension:0.1
+    },{
+      label: "",
+      data:[6] // added for some breathing space
+    }]
+  },
+  "options":{
+    responsive: true,
+    scales: {
+      xAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: "Data Values"
+        },
+        gridLines: {
+          color: [null, null, null, null, null, "blue", null, null, null, null, "blue", null, null, null, null, "blue"],
+          lineWidth: 5,
+          borderDash: [1]
+        }
+      }],
+      yAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: "Frequencies"
+        }
+      }]
+    }
+  }
 });
 </script>
