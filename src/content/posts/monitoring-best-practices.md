@@ -149,7 +149,11 @@ Static thresholds such as "the number of errors reported has exceeded N" have a 
 
 This happens so frequently that most monitoring tools/services (such as nagios) offer "flapping detection" to help prevent these deviations.
 
-To help with this services such as [Datadog](https://www.datadoghq.com/) offer "[anomaly detection](https://docs.datadoghq.com/guides/anomalies/)", which detects when a metric is behaving differently than it has in the past, taking into account trends, seasonal day-of-week and time-of-day patterns. This can be more useful for organically identifying issues, as it allows for buffer zones around your static thresholds.
+To help with this services such as [Datadog](https://www.datadoghq.com/) offer a feature called "[recovery thresholds](https://www.datadoghq.com/blog/introducing-recovery-thresholds/)" which helps to quieten monitor state changes so you can be confident when a monitor switches back to OK state that it has in fact definitely resolved itself. 
+
+The way it works is like so: you give Datadog a threshold value that must be met to consider the monitor “back to normal”. Once the monitor state switches to ALARM it will now never flip-flop between OK and ALARM. It will only ever go back to OK if the set recovery threshold goes below the specified value.
+
+They also offer "[anomaly detection](https://docs.datadoghq.com/guides/anomalies/)", which detects when a metric is behaving differently than it has in the past, taking into account trends, seasonal day-of-week and time-of-day patterns. This can be more useful for organically identifying issues, as it allows for buffer zones around your static thresholds.
 
 Datadog also offers "[outlier monitoring](https://docs.datadoghq.com/guides/outliers/)" which detects when a specific member of a group (e.g., hosts, availability zones, partitions) is behaving unusually compared to the rest. They are useful for noticing when a given group, which should behave uniformly, isn't doing so.
 

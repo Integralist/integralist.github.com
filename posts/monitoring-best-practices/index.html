@@ -316,7 +316,11 @@ i.e. you should monitor things like &lsquo;requests per second&rsquo; - do you h
 
 <p>This happens so frequently that most monitoring tools/services (such as nagios) offer &ldquo;flapping detection&rdquo; to help prevent these deviations.</p>
 
-<p>To help with this services such as <a href="https://www.datadoghq.com/">Datadog</a> offer &ldquo;<a href="https://docs.datadoghq.com/guides/anomalies/">anomaly detection</a>&rdquo;, which detects when a metric is behaving differently than it has in the past, taking into account trends, seasonal day-of-week and time-of-day patterns. This can be more useful for organically identifying issues, as it allows for buffer zones around your static thresholds.</p>
+<p>To help with this services such as <a href="https://www.datadoghq.com/">Datadog</a> offer a feature called &ldquo;<a href="https://www.datadoghq.com/blog/introducing-recovery-thresholds/">recovery thresholds</a>&rdquo; which helps to quieten monitor state changes so you can be confident when a monitor switches back to OK state that it has in fact definitely resolved itself.</p>
+
+<p>The way it works is like so: you give Datadog a threshold value that must be met to consider the monitor “back to normal”. Once the monitor state switches to ALARM it will now never flip-flop between OK and ALARM. It will only ever go back to OK if the set recovery threshold goes below the specified value.</p>
+
+<p>They also offer &ldquo;<a href="https://docs.datadoghq.com/guides/anomalies/">anomaly detection</a>&rdquo;, which detects when a metric is behaving differently than it has in the past, taking into account trends, seasonal day-of-week and time-of-day patterns. This can be more useful for organically identifying issues, as it allows for buffer zones around your static thresholds.</p>
 
 <p>Datadog also offers &ldquo;<a href="https://docs.datadoghq.com/guides/outliers/">outlier monitoring</a>&rdquo; which detects when a specific member of a group (e.g., hosts, availability zones, partitions) is behaving unusually compared to the rest. They are useful for noticing when a given group, which should behave uniformly, isn&rsquo;t doing so.</p>
 
