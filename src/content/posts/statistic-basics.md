@@ -394,7 +394,7 @@ sum = 16 (2 + 5 + 9)
 mean = 3 (16 / 3)
 ```
 
-> Note: the mean average can be expressed mathematically by `Σx/n`. When broken down it means `Σx` (pronounced "sigma x") which is a quick way of saying "add together the values of all the x's" without having to say what the values are. This also can be expressed with the Greek symbol `μ`.
+> Note: the mean average can be expressed mathematically by `Σx/n`. When broken down `Σx` (pronounced "sigma x") is a quick way of saying "add together the values of all the x's" without having to say what the values are. This also can be expressed with the Greek symbol `μ`.
 
 When dealing with datasets that have frequencies we need to ensure the frequencies are included as part of the calculation. For example, consider the following data:
 
@@ -699,8 +699,12 @@ The variance calculation is:
 That might look a little hairy, but most of these symbols we've already seen.
 
 - `μ`: this is the dataset mean (which was shorthand for `Σx/n`).
-- `Σx/n`: where `Σ` is the sum of each dataset item value `n` divided by the number of items in the dataset.
-- `Σ(μ-x)²`: we square the result of `μ-x` and sum `Σ` all the resulting values.
+  - `Σ` represents the sum of a dataset's values.
+  - `x` is the value for a particular dataset item.
+  - `n` is the number of items in the dataset.
+  - `Σx` thus means: sum all values in the dataset.
+  - `Σx/n` thus means: divide the total sum of numbers in the dataset by the number of items in the dataset.
+- `Σ(μ-x)²` thus means: we square the result of `μ-x` and sum `Σ` all the resulting values.
     
 For example, imagine we have the following data:
 
@@ -708,25 +712,41 @@ For example, imagine we have the following data:
 1, 2, 9
 ```
 
-The mean for this data is `4`. The distance between `1` and `4` is `3`, between `2` and `4` is `2`, between `9` and `4` is `-5`.
+The mean average for this data is `4`. The distance between `1` and `4` is `3` (e.g. `4` is three numbers away from `1`: so count from `1` three numbers away and you'll reach `4` like so, `2, 3, 4`). The distance between `2` and `4` is `2`, and the distance between `9` and `4` is `-5`. 
 
-If you're confused about why the distance between `9` and the mean is `-5` and not `5` (as in, counting from nine back to the mean `8,7,6,5,4` looks like a distance of five), then read on...
+Hence the resulting distances we get from the mean are: `3, 2, -5`. There's more to do, but first let's clarify the negative/postive aspect of these numbers (i.e. if you're confused about why the distance between `9` and the mean is `-5` and not `5`, then read on)...
 
-You need to realise when measuring the distance to the mean that you're counting either negative or positive from zero. So `9` is where you start (which is effectively zero) and in this case the mean is lower than `9` (the mean value is `4`) so we have to count backwards into negative numbers. 
+You need to realise when measuring the distance to the mean that you're actually counting either negative or positive in direction (this becomes clearer where you look at numbers visually):
 
-For example: counting `8,7,6,5,4` is `5` numbers away from `9`, but as we're treating this as negative distance from zero the value is `-5`. Where as when calculating the distance from either `1` or `2` to the mean, the mean (`4`) is ahead of it and so you count positive not negative.
+```
+1, 2, 3, [4], 5, 6, 7, 8, 9
+```
 
-OK so we now have the distances `3, 2, -5` from here we need to square these numbers and then add them up (we have to square the numbers otherwise the sum result would be zero). Finally, we divide by `N` (the number of items in the dataset). 
+> Note: I've put a square bracket around the number `4` to indicate that it's the mean average.
+
+If we look at the number `1` and count the distance to `4`, we're effectively counting _forward_ (i.e. positive) towards `4` (similarly with the number `2`). But with `9` we have to count _backwards_ (i.e. negative) towards `4`.
+
+For example: counting `8,7,6,5,4` shows that `9` is five numbers away from `4`. But as we're treating this as a negative distance, the value is `-5`. Where as when calculating the distance from either `1` or `2` to the mean, the mean (`4`) is ahead of it and so you count positive not negative.
+
+OK so we now have the distances `3, 2, -5`, from here we need to square these numbers and then add them up (we have to square the numbers otherwise the sum result would be zero). 
+
+Finally, we divide by `N` (the number of items in the dataset). 
 
 This ultimately gives us the "variance" of `12.67`. 
 
 > Note: here's a shorter calculation for the variance `Σx²/n - μ²`
 
-The reason the variance is useful is because it has provided the measure of distance from the mean based on every value in the dataset. The downside to this approach is that you've calculated the variance from the mean _squared_ of the dataset and not just the mean. To solve _that_ concern you then need to calculate the square root of the variance (also referred to as the standard deviation).
+The reason the variance is useful is because it has provided the measure of distance from the mean based on every value in the dataset. The downside to this approach is that you've calculated the variance from the mean _squared_ of the dataset and not just the mean. 
+
+In order to have a more relative variance number (i.e. our variance result is based on the mean squared, but in practice we'll be dealing mainly with a normal mean value, and not a _sqaured_ mean value) we'll want to use something called "standard deviation"...
 
 ### Standard Deviation
 
-If we calculate the standard deviation of the variance value `12.67` we'll find the result is `3.56` and so that value is the actual distance most values are away from the mean. You would then compare that to the standard deviation of another player's results to see which player ultimately performed better overall.
+All standard deviation means is: take the variance result and find the square root.
+
+If we calculate the standard deviation of the variance value `12.67` we'll find the result is `3.56` and so that value is the _actual_ distance most values are away from the mean. 
+
+You would then compare this standard devication to a standard deviation of another player's results to see which player ultimately performed better overall (i.e. if the standard deviation for player A was smaller than player B, then player A is a more consistent player).
 
 > Note: standard deviation has its own Greek symbol `σ` (referred to as the lowercase Sigma). Remember to calculate `σ` you start by calculating the variance, and then take the square root.
 

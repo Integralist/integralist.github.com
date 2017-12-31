@@ -131,7 +131,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    34 mins read
+    35 mins read
   </span>
   
 </div>
@@ -571,7 +571,7 @@ mean = 3 (16 / 3)
 </code></pre>
 
 <blockquote>
-<p>Note: the mean average can be expressed mathematically by <code>Σx/n</code>. When broken down it means <code>Σx</code> (pronounced &ldquo;sigma x&rdquo;) which is a quick way of saying &ldquo;add together the values of all the x&rsquo;s&rdquo; without having to say what the values are. This also can be expressed with the Greek symbol <code>μ</code>.</p>
+<p>Note: the mean average can be expressed mathematically by <code>Σx/n</code>. When broken down <code>Σx</code> (pronounced &ldquo;sigma x&rdquo;) is a quick way of saying &ldquo;add together the values of all the x&rsquo;s&rdquo; without having to say what the values are. This also can be expressed with the Greek symbol <code>μ</code>.</p>
 </blockquote>
 
 <p>When dealing with datasets that have frequencies we need to ensure the frequencies are included as part of the calculation. For example, consider the following data:</p>
@@ -881,9 +881,16 @@ considering there are many more staff than managers (or CEOs), the CEO prefers t
 <p>That might look a little hairy, but most of these symbols we&rsquo;ve already seen.</p>
 
 <ul>
-<li><code>μ</code>: this is the dataset mean (which was shorthand for <code>Σx/n</code>).</li>
-<li><code>Σx/n</code>: where <code>Σ</code> is the sum of each dataset item value <code>n</code> divided by the number of items in the dataset.</li>
-<li><code>Σ(μ-x)²</code>: we square the result of <code>μ-x</code> and sum <code>Σ</code> all the resulting values.
+<li><code>μ</code>: this is the dataset mean (which was shorthand for <code>Σx/n</code>).
+
+<ul>
+<li><code>Σ</code> represents the sum of a dataset&rsquo;s values.</li>
+<li><code>x</code> is the value for a particular dataset item.</li>
+<li><code>n</code> is the number of items in the dataset.</li>
+<li><code>Σx</code> thus means: sum all values in the dataset.</li>
+<li><code>Σx/n</code> thus means: divide the total sum of numbers in the dataset by the number of items in the dataset.</li>
+</ul></li>
+<li><code>Σ(μ-x)²</code> thus means: we square the result of <code>μ-x</code> and sum <code>Σ</code> all the resulting values.
 <br /></li>
 </ul>
 
@@ -892,15 +899,26 @@ considering there are many more staff than managers (or CEOs), the CEO prefers t
 <pre><code>1, 2, 9
 </code></pre>
 
-<p>The mean for this data is <code>4</code>. The distance between <code>1</code> and <code>4</code> is <code>3</code>, between <code>2</code> and <code>4</code> is <code>2</code>, between <code>9</code> and <code>4</code> is <code>-5</code>.</p>
+<p>The mean average for this data is <code>4</code>. The distance between <code>1</code> and <code>4</code> is <code>3</code> (e.g. <code>4</code> is three numbers away from <code>1</code>: so count from <code>1</code> three numbers away and you&rsquo;ll reach <code>4</code> like so, <code>2, 3, 4</code>). The distance between <code>2</code> and <code>4</code> is <code>2</code>, and the distance between <code>9</code> and <code>4</code> is <code>-5</code>.</p>
 
-<p>If you&rsquo;re confused about why the distance between <code>9</code> and the mean is <code>-5</code> and not <code>5</code> (as in, counting from nine back to the mean <code>8,7,6,5,4</code> looks like a distance of five), then read on&hellip;</p>
+<p>Hence the resulting distances we get from the mean are: <code>3, 2, -5</code>. There&rsquo;s more to do, but first let&rsquo;s clarify the negative/postive aspect of these numbers (i.e. if you&rsquo;re confused about why the distance between <code>9</code> and the mean is <code>-5</code> and not <code>5</code>, then read on)&hellip;</p>
 
-<p>You need to realise when measuring the distance to the mean that you&rsquo;re counting either negative or positive from zero. So <code>9</code> is where you start (which is effectively zero) and in this case the mean is lower than <code>9</code> (the mean value is <code>4</code>) so we have to count backwards into negative numbers.</p>
+<p>You need to realise when measuring the distance to the mean that you&rsquo;re actually counting either negative or positive in direction (this becomes clearer where you look at numbers visually):</p>
 
-<p>For example: counting <code>8,7,6,5,4</code> is <code>5</code> numbers away from <code>9</code>, but as we&rsquo;re treating this as negative distance from zero the value is <code>-5</code>. Where as when calculating the distance from either <code>1</code> or <code>2</code> to the mean, the mean (<code>4</code>) is ahead of it and so you count positive not negative.</p>
+<pre><code>1, 2, 3, [4], 5, 6, 7, 8, 9
+</code></pre>
 
-<p>OK so we now have the distances <code>3, 2, -5</code> from here we need to square these numbers and then add them up (we have to square the numbers otherwise the sum result would be zero). Finally, we divide by <code>N</code> (the number of items in the dataset).</p>
+<blockquote>
+<p>Note: I&rsquo;ve put a square bracket around the number <code>4</code> to indicate that it&rsquo;s the mean average.</p>
+</blockquote>
+
+<p>If we look at the number <code>1</code> and count the distance to <code>4</code>, we&rsquo;re effectively counting <em>forward</em> (i.e. positive) towards <code>4</code> (similarly with the number <code>2</code>). But with <code>9</code> we have to count <em>backwards</em> (i.e. negative) towards <code>4</code>.</p>
+
+<p>For example: counting <code>8,7,6,5,4</code> shows that <code>9</code> is five numbers away from <code>4</code>. But as we&rsquo;re treating this as a negative distance, the value is <code>-5</code>. Where as when calculating the distance from either <code>1</code> or <code>2</code> to the mean, the mean (<code>4</code>) is ahead of it and so you count positive not negative.</p>
+
+<p>OK so we now have the distances <code>3, 2, -5</code>, from here we need to square these numbers and then add them up (we have to square the numbers otherwise the sum result would be zero).</p>
+
+<p>Finally, we divide by <code>N</code> (the number of items in the dataset).</p>
 
 <p>This ultimately gives us the &ldquo;variance&rdquo; of <code>12.67</code>.</p>
 
@@ -908,11 +926,17 @@ considering there are many more staff than managers (or CEOs), the CEO prefers t
 <p>Note: here&rsquo;s a shorter calculation for the variance <code>Σx²/n - μ²</code></p>
 </blockquote>
 
-<p>The reason the variance is useful is because it has provided the measure of distance from the mean based on every value in the dataset. The downside to this approach is that you&rsquo;ve calculated the variance from the mean <em>squared</em> of the dataset and not just the mean. To solve <em>that</em> concern you then need to calculate the square root of the variance (also referred to as the standard deviation).</p>
+<p>The reason the variance is useful is because it has provided the measure of distance from the mean based on every value in the dataset. The downside to this approach is that you&rsquo;ve calculated the variance from the mean <em>squared</em> of the dataset and not just the mean.</p>
+
+<p>In order to have a more relative variance number (i.e. our variance result is based on the mean squared, but in practice we&rsquo;ll be dealing mainly with a normal mean value, and not a <em>sqaured</em> mean value) we&rsquo;ll want to use something called &ldquo;standard deviation&rdquo;&hellip;</p>
 
 <h3 id="standard-deviation">Standard Deviation</h3>
 
-<p>If we calculate the standard deviation of the variance value <code>12.67</code> we&rsquo;ll find the result is <code>3.56</code> and so that value is the actual distance most values are away from the mean. You would then compare that to the standard deviation of another player&rsquo;s results to see which player ultimately performed better overall.</p>
+<p>All standard deviation means is: take the variance result and find the square root.</p>
+
+<p>If we calculate the standard deviation of the variance value <code>12.67</code> we&rsquo;ll find the result is <code>3.56</code> and so that value is the <em>actual</em> distance most values are away from the mean.</p>
+
+<p>You would then compare this standard devication to a standard deviation of another player&rsquo;s results to see which player ultimately performed better overall (i.e. if the standard deviation for player A was smaller than player B, then player A is a more consistent player).</p>
 
 <blockquote>
 <p>Note: standard deviation has its own Greek symbol <code>σ</code> (referred to as the lowercase Sigma). Remember to calculate <code>σ</code> you start by calculating the variance, and then take the square root.</p>

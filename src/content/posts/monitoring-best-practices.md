@@ -233,6 +233,12 @@ We won't repeat the details here, but suffice to say, each graph in Datadog has 
 - [Timeseries graphs](https://www.datadoghq.com/blog/timeseries-metric-graphs-101/).
 - [Summary graphs](https://www.datadoghq.com/blog/summary-graphs-metric-graphs-101/).
 
+### UPDATE
+
+I've since written a blog post about stastistics (aimed at beginners) and so by understanding the basics of statistics you'll be able to understand more clearly what certain graphs represent and how.
+
+You can read the post here: [Statistics and Graphs: The Basics](/posts/statistic-basics/)
+
 <div id="10.1"></div>
 ## Map your graphs
 
@@ -260,7 +266,7 @@ We can't answer these questions for you, but we have generally found the followi
   - The metric helps with monitoring and triggering alarms.
 - Log _only_ errors/exceptions.
   - "No news is good news".
-  - Control other log calls using [log levels](http://www.integralist.co.uk/posts/logging-101/) (so they can be enabled when necessary).
+  - Control other log calls using [log levels](/posts/logging-101/) (so they can be enabled when necessary).
 - Include unique identifiers with your logs
   - This helps to quickly figure out what the log is possibly associated with when looking from a centralized distributed log system which contains many logs aggregated from many distinct services.
 - Mostly everything else we'll record as a metric so we can monitor pattern changes.
