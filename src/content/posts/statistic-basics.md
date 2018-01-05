@@ -692,7 +692,7 @@ So going back to the idea of a dataset that reports game player performance. Ima
 
 The approach for measuring the spread of data that we will look at is called the "variance" and it specifically measures, not from the 'mean', but the 'mean squared'. 
 
-The reason for deciding to measure the spread of values from the 'mean squared' is because maths (read [Head First Statistics](http://shop.oreilly.com/product/9780596527587.do) for the gory details). To be a little more specific, it's because if we don't calculate things from the mean squared it means we'll always get an incorrect value of zero.
+The reason for deciding to measure the spread of values from the 'mean squared' is because maths (read [Head First Statistics](http://shop.oreilly.com/product/9780596527587.do) for the gory details). To be a little more specific, it's because if we don't calculate things from the mean squared it can result in an incorrect value such as zero.
 
 The variance calculation is: 
 
@@ -742,7 +742,7 @@ This ultimately gives us the "variance" of `12.67`.
 
 The reason the variance is useful is because it has provided the measure of distance from the mean based on every value in the dataset. The downside to this approach is that you've calculated the variance from the mean _squared_ of the dataset and not just the mean. 
 
-In order to have a more relative variance number (i.e. our variance result is based on the mean squared, but in practice we'll be dealing mainly with a normal mean value, and not a _sqaured_ mean value) we'll want to use something called "standard deviation"...
+In order to have a more relative variance number (i.e. our variance result is based on the mean squared, but in practice we'll be dealing mainly with a normal mean value, and not a _squared_ mean value) we'll want to use something called "standard deviation"...
 
 ### Standard Deviation
 
