@@ -133,7 +133,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    12 mins read
+    13 mins read
   </span>
   
 </div>
@@ -348,6 +348,17 @@ i.e. you should monitor things like &lsquo;requests per second&rsquo; - do you h
 <blockquote>
 <p>In the chaotic future we&rsquo;re all hurtling toward, you need the discipline to <u><strong>have radically fewer paging alerts - not more</strong></u>.</p>
 </blockquote>
+
+<p>You should also consider sending a monitor&rsquo;s &ldquo;warning&rdquo; state to a different channel for similar reasons. You can define different channels in Datadog using the following template code:</p>
+
+<pre><code>{{#is_alert}}
+@slack-my-channel-for-serious-alarms
+{{/is_alert}}
+
+{{#is_warning}}
+@slack-my-channel-for-just-warnings-to-keep-an-eye-on
+{{/is_warning}}
+</code></pre>
 
 <p><div id="8"></div></p>
 

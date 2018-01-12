@@ -175,6 +175,18 @@ To quote (again) Charity Majors...
 
 > In the chaotic future we're all hurtling toward, you need the discipline to <u>**have radically fewer paging alerts - not more**</u>.
 
+You should also consider sending a monitor's "warning" state to a different channel for similar reasons. You can define different channels in Datadog using the following template code:
+
+```
+{{#is_alert}}
+@slack-my-channel-for-serious-alarms
+{{/is_alert}}
+
+{{#is_warning}}
+@slack-my-channel-for-just-warnings-to-keep-an-eye-on
+{{/is_warning}}
+```
+
 <div id="8"></div>
 ## Give context
 
