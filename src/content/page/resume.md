@@ -68,6 +68,10 @@ I progressed upwards through the organisation, moving from initially being a cli
 
 ## Key Achievements
 
+### 2018
+
+- Selected to be part of a new infrastructure team tasked with designing a new 'authentication and authorization' service layer(s).
+
 ### 2017
 
 - Created basic [README validator](https://gist.github.com/Integralist/03279be86a356119b1f820da6ebb8740#file-2-python-3-4-compatible-version-for-rig-vm-mono-repo-result-csv-options-py) as part of our Better Docs initiative and in preparation for our Doc Day event.
