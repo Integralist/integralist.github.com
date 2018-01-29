@@ -16,7 +16,7 @@ This post is aimed at explaining the difference between a system call (provided 
 
 I have no formal Computer Science (CS) background, I started programming in 1999 and only from 2016 am I starting to learn the C programming language in order to help give me a deeper knowledge of how *nix systems work and other core CS concepts. 
 
-> See my previous post called '[Bits and Bytes)](/posts/bits-and-bytes-explained/)' to see where these learnings are taking me.
+> See my previous post called '[Bits and Bytes)](/posts/bits-and-bytes/)' to see where these learnings are taking me.
 
 ## What's the issue?
 
