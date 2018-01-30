@@ -18,6 +18,7 @@ draft: false
 - [Shell Builtins](#4)
 - [Executables](#5)
 - [Documentation](#6)
+- [Explicit Requests](#6.1)
 - [Locating programs](#7)
 - [Hashed Types](#8)
 - [List of all builtins vs executables](#9)
@@ -170,6 +171,9 @@ type: type [-afptP] name [name ...]
     Exit Status:
     Returns success if all of the NAMEs are found; fails if any are not found.
 ```
+
+<div id="6.1"></div>
+## Explicit Requests
 
 When we used the `type` command earlier on the `exit` command it returned a single response (`exit is a shell builtin`).
 
