@@ -241,7 +241,7 @@ I'm a print published and self-published author; I'm also a tech reviewer and am
 
 The following links are to some of my more 'popular' articles. My main focus when writing is to take a complicated or confusing topic and attempt to distil it, in order for the subject to be more easily understood.
 
-- [Computers 101: terminals, kernals and shells](/posts/terminal-shell/) (2018)
+- [Computers 101: terminals, kernels and shells](/posts/terminal-shell/) (2018)
 - [Statistics and Graphs: The Basics](/posts/statistic-basics/) (2017)
 - [Observability and Monitoring Best Practices](/posts/monitoring-best-practices/) (2017)
 - [Logging 101](/posts/logging-101/) (2017)

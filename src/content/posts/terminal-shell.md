@@ -1,5 +1,5 @@
 ---
-title: "Computers 101: terminals, kernals and shells"
+title: "Computers 101: terminals, kernels and shells"
 date: 2018-01-30T09:29:10Z
 categories:
   - "code"
@@ -39,13 +39,13 @@ If don't want to use a GUI (graphical user interface) to interact with your comp
 <div id="2"></div>
 ## Kernal
 
-A computer has a kernal.
+A computer has a kernel.
 
-The kernal is responsible for managing the computer's system.
+The kernel is responsible for managing the computer's system.
 
-The kernal has no user interface.
+The kernel has no user interface.
 
-To interact with the kernal you use an intermediary program.
+To interact with the kernel you use an intermediary program.
 
 A program is an executable binary.
 
