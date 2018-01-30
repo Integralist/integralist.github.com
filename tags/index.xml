@@ -57,6 +57,15 @@
     </item>
     
     <item>
+      <title>Builtins</title>
+      <link>http://www.integralist.co.uk/tags/builtins/</link>
+      <pubDate>Tue, 30 Jan 2018 09:29:10 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/builtins/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Bytes</title>
       <link>http://www.integralist.co.uk/tags/bytes/</link>
       <pubDate>Wed, 16 Nov 2016 13:00:00 +0100</pubDate>
@@ -179,6 +188,15 @@
       <pubDate>Wed, 29 Mar 2017 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/docker/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Executables</title>
+      <link>http://www.integralist.co.uk/tags/executables/</link>
+      <pubDate>Tue, 30 Jan 2018 09:29:10 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/executables/</guid>
       <description></description>
     </item>
     
@@ -608,7 +626,7 @@
     <item>
       <title>Shell</title>
       <link>http://www.integralist.co.uk/tags/shell/</link>
-      <pubDate>Fri, 25 Nov 2016 13:00:00 +0000</pubDate>
+      <pubDate>Tue, 30 Jan 2018 09:29:10 +0000</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/shell/</guid>
       <description></description>
@@ -662,7 +680,7 @@
     <item>
       <title>Terminal</title>
       <link>http://www.integralist.co.uk/tags/terminal/</link>
-      <pubDate>Wed, 19 Oct 2016 13:00:00 +0100</pubDate>
+      <pubDate>Tue, 30 Jan 2018 09:29:10 +0000</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/terminal/</guid>
       <description></description>

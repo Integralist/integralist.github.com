@@ -4,7 +4,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/</loc>
-    <lastmod>2017-12-19T09:32:54+00:00</lastmod>
+    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
   </url>
   
   <url>
@@ -13,6 +13,11 @@
   
   <url>
     <loc>http://www.integralist.co.uk/resume/</loc>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/posts/terminal-shell/</loc>
+    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
   </url>
   
   <url>
@@ -289,6 +294,12 @@
   </url>
   
   <url>
+    <loc>http://www.integralist.co.uk/tags/builtins/</loc>
+    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://www.integralist.co.uk/tags/bytes/</loc>
     <lastmod>2016-11-16T13:00:00+01:00</lastmod>
     <priority>0</priority>
@@ -350,7 +361,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/code/</loc>
-    <lastmod>2017-12-19T09:32:54+00:00</lastmod>
+    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -393,6 +404,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/docker/</loc>
     <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/executables/</loc>
+    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -452,7 +469,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/guide/</loc>
-    <lastmod>2017-12-19T09:32:54+00:00</lastmod>
+    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -647,7 +664,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/posts/</loc>
-    <lastmod>2017-12-19T09:32:54+00:00</lastmod>
+    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -747,7 +764,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/shell/</loc>
-    <lastmod>2016-11-25T13:00:00+00:00</lastmod>
+    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -789,7 +806,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/terminal/</loc>
-    <lastmod>2016-10-19T13:00:00+01:00</lastmod>
+    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
     <priority>0</priority>
   </url>
   

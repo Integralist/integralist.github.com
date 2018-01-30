@@ -6,10 +6,24 @@
     <description>Recent content in Guide on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Tue, 19 Dec 2017 09:32:54 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 30 Jan 2018 09:29:10 +0000</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/categories/guide/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Computers 101: terminals, kernals and shells</title>
+      <link>http://www.integralist.co.uk/posts/terminal-shell/</link>
+      <pubDate>Tue, 30 Jan 2018 09:29:10 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/terminal-shell/</guid>
+      <description>Terminal Kernal Shell Shell Builtins Executables Documentation Locating programs Hashed Types List of all builtins vs executables  
+Terminal A terminal is an input/output device.
+Traditionally terminals would have been a real hardware device that you used to interact with a computer.
+In modern computing we have electronic terminals.
+Also known as a &amp;lsquo;terminal emulator&amp;rsquo;.
+If don&amp;rsquo;t want to use a GUI (graphical user interface) to interact with your computer, you can use a terminal emulator.</description>
+    </item>
     
     <item>
       <title>Statistics and Graphs: The Basics</title>

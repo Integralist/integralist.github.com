@@ -6,7 +6,7 @@
     <description>Recent content in Home on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Tue, 19 Dec 2017 09:32:54 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 30 Jan 2018 09:29:10 +0000</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/index.xml" rel="self" type="application/rss+xml" />
     
@@ -32,6 +32,20 @@
       <description>Hello! Connect History Key Achievements Tools, Languages and Tech Talks Published Popular articles Open-Source Summary  Hello! Hello, my name is Mark and I work @BuzzFeed as a Senior Software Engineer (formerly Principal Engineer @BBCNews).
 I&amp;rsquo;m also a published author with Apress and LeanPub:
 Apress  Pro Vim Tmux Taster Quick Clojure: Effective Functional Programming  LeanPub  Python for Programmers Programming in Clojure  Connect You can find me online at the following locations:</description>
+    </item>
+    
+    <item>
+      <title>Computers 101: terminals, kernals and shells</title>
+      <link>http://www.integralist.co.uk/posts/terminal-shell/</link>
+      <pubDate>Tue, 30 Jan 2018 09:29:10 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/terminal-shell/</guid>
+      <description>Terminal Kernal Shell Shell Builtins Executables Documentation Locating programs Hashed Types List of all builtins vs executables  
+Terminal A terminal is an input/output device.
+Traditionally terminals would have been a real hardware device that you used to interact with a computer.
+In modern computing we have electronic terminals.
+Also known as a &amp;lsquo;terminal emulator&amp;rsquo;.
+If don&amp;rsquo;t want to use a GUI (graphical user interface) to interact with your computer, you can use a terminal emulator.</description>
     </item>
     
     <item>
