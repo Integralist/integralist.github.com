@@ -74,6 +74,12 @@ A 'builtin' function is one that is provided by the shell.
 
 If a command is provided and the shell has no corresponding builtin, it will lookup the command via a separate list of available _external_ 'executables'.
 
+A builtin command can affect the internal state of the shell. 
+
+This is why a command such as `cd` _must_ be part of the shell (i.e. a builtin), because an external program can't change the current directory of the shell. 
+
+Other commands, like `echo`, might be (and are in this case) built into the shell for the sake of performance (it's quicker to call the builtin `echo` than it is to load and manage the external executable `echo`).
+
 <div id="5"></div>
 ## Executables
 
@@ -388,6 +394,8 @@ enable unalias
 enable unset
 enable wait
 ```
+
+> Note: an online reference can be found [here](https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html#Bash-Builtins)
 
 To list out all available executables is a little more tricky.
 

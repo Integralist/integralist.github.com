@@ -222,6 +222,12 @@ ga('send', 'pageview');
 
 <p>If a command is provided and the shell has no corresponding builtin, it will lookup the command via a separate list of available <em>external</em> &lsquo;executables&rsquo;.</p>
 
+<p>A builtin command can affect the internal state of the shell.</p>
+
+<p>This is why a command such as <code>cd</code> <em>must</em> be part of the shell (i.e. a builtin), because an external program can&rsquo;t change the current directory of the shell.</p>
+
+<p>Other commands, like <code>echo</code>, might be (and are in this case) built into the shell for the sake of performance (it&rsquo;s quicker to call the builtin <code>echo</code> than it is to load and manage the external executable <code>echo</code>).</p>
+
 <p><div id="5"></div></p>
 
 <h2 id="executables">Executables</h2>
@@ -527,6 +533,10 @@ enable unalias
 enable unset
 enable wait
 </code></pre>
+
+<blockquote>
+<p>Note: an online reference can be found <a href="https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html#Bash-Builtins">here</a></p>
+</blockquote>
 
 <p>To list out all available executables is a little more tricky.</p>
 
