@@ -13,7 +13,7 @@ draft: false
 ---
 
 - [Terminal](#1)
-- [Kernal](#2)
+- [Kernel](#2)
 - [Shell](#3)
 - [Shell Builtins](#4)
 - [Executables](#5)
@@ -37,7 +37,7 @@ Also known as a 'terminal emulator'.
 If don't want to use a GUI (graphical user interface) to interact with your computer, you can use a terminal emulator.
 
 <div id="2"></div>
-## Kernal
+## Kernel
 
 A computer has a kernel.
 
