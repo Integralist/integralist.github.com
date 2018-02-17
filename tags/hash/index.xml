@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hash on integralist</title>
+    <link>http://www.integralist.co.uk/tags/hash/</link>
+    <description>Recent content in Hash on integralist</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Fri, 16 Feb 2018 08:33:40 +0000</lastBuildDate>
+    
+	<atom:link href="http://www.integralist.co.uk/tags/hash/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Hashing, Encryption and Encoding</title>
+      <link>http://www.integralist.co.uk/posts/hashing-and-encryption/</link>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/hashing-and-encryption/</guid>
+      <description>Introduction I&amp;rsquo;ve written previously (and in-depth) on the subject of security basics, using tools such as GPG, OpenSSH, OpenSSL, and Keybase. But this time I wanted to focus in on the differences between encryption and hashing, whilst also providing a slightly more concise reference point for those already familiar with these concepts.
+Before we get started, let&amp;rsquo;s see what we&amp;rsquo;ll be covering:
+ Terminology Hashing vs Encryption MAC vs HMAC Base64 Encoding Random Password Generation Hash Functions  shasum hashlib cksum  OpenSSH OpenSSL  Generating a key pair Encrypting and Decrypting Randomness  GPG  Generating a key pair Automate Asymmetrical Encryption and Decryption Symmetrical Encryption and Decryption Signing keys Signing encrypted files  Keybase</description>
+    </item>
+    
+  </channel>
+</rss>

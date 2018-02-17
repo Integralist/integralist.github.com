@@ -23,7 +23,7 @@
     <item>
       <title>Bash</title>
       <link>http://www.integralist.co.uk/tags/bash/</link>
-      <pubDate>Tue, 31 Oct 2017 13:00:00 +0100</pubDate>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/bash/</guid>
       <description></description>
@@ -192,6 +192,24 @@
     </item>
     
     <item>
+      <title>Encoding</title>
+      <link>http://www.integralist.co.uk/tags/encoding/</link>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/encoding/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Encryption</title>
+      <link>http://www.integralist.co.uk/tags/encryption/</link>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/encryption/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Executables</title>
       <link>http://www.integralist.co.uk/tags/executables/</link>
       <pubDate>Tue, 30 Jan 2018 09:29:10 +0000</pubDate>
@@ -248,7 +266,7 @@
     <item>
       <title>Gpg</title>
       <link>http://www.integralist.co.uk/tags/gpg/</link>
-      <pubDate>Sat, 10 Dec 2016 13:00:00 +0100</pubDate>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/gpg/</guid>
       <description></description>
@@ -287,6 +305,15 @@
       <pubDate>Tue, 20 Oct 2015 13:00:00 +0100</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/http2/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Hash</title>
+      <link>http://www.integralist.co.uk/tags/hash/</link>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/tags/hash/</guid>
       <description></description>
     </item>
     
@@ -338,7 +365,7 @@
     <item>
       <title>Keybase</title>
       <link>http://www.integralist.co.uk/tags/keybase/</link>
-      <pubDate>Tue, 25 Aug 2015 13:00:00 +0100</pubDate>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/keybase/</guid>
       <description></description>
@@ -347,7 +374,7 @@
     <item>
       <title>Keys</title>
       <link>http://www.integralist.co.uk/tags/keys/</link>
-      <pubDate>Sat, 03 Oct 2015 13:00:00 +0100</pubDate>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/keys/</guid>
       <description></description>
@@ -464,7 +491,7 @@
     <item>
       <title>Openssh</title>
       <link>http://www.integralist.co.uk/tags/openssh/</link>
-      <pubDate>Tue, 25 Aug 2015 13:00:00 +0100</pubDate>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/openssh/</guid>
       <description></description>
@@ -473,7 +500,7 @@
     <item>
       <title>Openssl</title>
       <link>http://www.integralist.co.uk/tags/openssl/</link>
-      <pubDate>Sat, 03 Oct 2015 13:00:00 +0100</pubDate>
+      <pubDate>Fri, 16 Feb 2018 08:33:40 +0000</pubDate>
       
       <guid>http://www.integralist.co.uk/tags/openssl/</guid>
       <description></description>

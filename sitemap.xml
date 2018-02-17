@@ -4,7 +4,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/</loc>
-    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
   </url>
   
   <url>
@@ -13,6 +13,11 @@
   
   <url>
     <loc>http://www.integralist.co.uk/resume/</loc>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/posts/hashing-and-encryption/</loc>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
   </url>
   
   <url>
@@ -271,7 +276,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/bash/</loc>
-    <lastmod>2017-10-31T13:00:00+01:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -361,7 +366,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/code/</loc>
-    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -404,6 +409,18 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/docker/</loc>
     <lastmod>2017-03-29T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/encoding/</loc>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/encryption/</loc>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -451,7 +468,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/gpg/</loc>
-    <lastmod>2016-12-10T13:00:00+01:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -469,7 +486,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/guide/</loc>
-    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -488,6 +505,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/http2/</loc>
     <lastmod>2015-10-20T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/hash/</loc>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -523,13 +546,13 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/keybase/</loc>
-    <lastmod>2015-08-25T13:00:00+01:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://www.integralist.co.uk/tags/keys/</loc>
-    <lastmod>2015-10-03T13:00:00+01:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -611,13 +634,13 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/openssh/</loc>
-    <lastmod>2015-08-25T13:00:00+01:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://www.integralist.co.uk/tags/openssl/</loc>
-    <lastmod>2015-10-03T13:00:00+01:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -664,7 +687,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/posts/</loc>
-    <lastmod>2018-01-30T09:29:10+00:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -758,7 +781,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/security/</loc>
-    <lastmod>2016-12-10T13:00:00+01:00</lastmod>
+    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
     <priority>0</priority>
   </url>
   
