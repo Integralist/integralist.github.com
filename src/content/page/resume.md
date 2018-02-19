@@ -70,6 +70,7 @@ I progressed upwards through the organisation, moving from initially being a cli
 
 ### 2018
 
+- Designed and implemented a Python package that acts as a Tornado web handler decorator for acquiring/caching/revalidating an asymmetrical public key (provided by an authentication server we built in Go). This key is then used once we have acquired a signed JWT object so we may verify the integrity is intact. It's purpose was to make engineers time assigning authentication to their services much simpler and less time consuming, and provide a consistent experience across the platform.
 - Selected to be part of a new infrastructure team tasked with designing a new 'authentication and authorization' service layer(s).
 
 ### 2017
@@ -248,6 +249,7 @@ I'm a print published and self-published author; I'm also a tech reviewer and am
 
 The following links are to some of my more 'popular' articles. My main focus when writing is to take a complicated or confusing topic and attempt to distil it, in order for the subject to be more easily understood.
 
+- [Hashing, Encryption and Encoding](/posts/hashing-and-encryption/) (2018)
 - [Computers 101: terminals, kernels and shells](/posts/terminal-shell/) (2018)
 - [Statistics and Graphs: The Basics](/posts/statistic-basics/) (2017)
 - [Observability and Monitoring Best Practices](/posts/monitoring-best-practices/) (2017)
