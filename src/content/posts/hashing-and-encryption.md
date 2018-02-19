@@ -137,6 +137,14 @@ Which outputs:
 RNsU/klsS8SvXo5uNoPl23rP+lVYl89LK0NFq6rxrOM=
 ```
 
+You don't have to use an abstraction around the command obviously, you can just use:
+
+```
+cat plaintext.txt | openssl dgst -sha512 -binary | base64
+```
+
+> Note: `base64` could be replaced with openssl's base64 encoding command: `openssl enc -base64 -A`
+
 <div id="4"></div>
 ## Random Password Generation
 
@@ -157,7 +165,7 @@ Now when you execute `psw` you'll get output that looks something like the follo
 <div id="5"></div>
 ## Hash Functions
 
-There are many different ways of accessing a hash function, two options we'll look at will be using the executable `shasum` (provided by macOS) and the `hashlib` package provided the [Python](https://www.python.org/) programming language.
+There are many different ways of accessing a hash function, two options we'll look at will be using the executable `shasum` (provided by macOS) and the `hashlib` package provided by the [Python](https://www.python.org/) programming language.
 
 ### shasum
 
@@ -308,7 +316,7 @@ Salted__MJin¨MàÍ£?è,random¡:~randomW!5µõ
 
 You can also use someone's public key to encrypt data with (i.e. asymmetrical encryption) by utilising the `openssl rsautl` command, which stands for "RSA Utility" and is commonly used to sign, verify, encrypt and decrypt data using the RSA algorithm. 
 
-In the following example we have a file `plaintext.txt` we encrypt using a public key and then it will only be possible to decrypt the encoded `secret.enc` file if you have the corresponding private key:
+In the following example we have a file `plaintext.txt` we encrypt using a public key. It will now only be possible to decrypt the `secret.enc` file if you have the corresponding private key:
 
 ```
 # encrypting
@@ -379,8 +387,8 @@ $ gpg --gen-key --batch batch_file
 
 gpg: Generating a basic OpenPGP key
 gpg: key 4BCAEAAD199B5FE8 marked as ultimately trusted
-gpg: directory '/Users/markmcdonnell/.gnupg/openpgp-revocs.d' created
-gpg: revocation certificate stored as '/Users/markmcdonnell/.gnupg/openpgp-revocs.d/CFE96536285D83C990567BF64BCAEAAD199B5FE8.rev'
+gpg: directory '/Users/Integralist/.gnupg/openpgp-revocs.d' created
+gpg: revocation certificate stored as '/Users/Integralist/.gnupg/openpgp-revocs.d/CFE96536285D83C990567BF64BCAEAAD199B5FE8.rev'
 gpg: done
 ```
 
@@ -469,7 +477,7 @@ gpg --symmetric --cipher-algo AES256 plaintext.txt
 
 If you want to explicitly trust a public key you have imported, you can 'sign' it. You do this using the `--sign-key` flag. Doing this can also be beneficial for the owner of that public key (Bob), because if a friend of yours (Alice) trusts _you_ and they see you've signed Bob's public key, then Alice is more likely to trust Bob as well.
 
-In order for Bob to benefit from this 'web of trust' you need to send him back his public key which you signed. They would need to import that version of their public key back into their gpg keyring so that they can publish it online for others to see _you_ trust him.
+In order for Bob to benefit from this 'web of trust' you need to send him back his public key which you signed. Bob would need to import that version of his public key back into his gpg keyring, so that he can then republish it online for others to see the _you_ trust him.
 
 The following example demonstrates how you would export Bob's public key, which you previously imported and signed:
 
@@ -481,10 +489,26 @@ gpg --export --armor bob@example.org
 
 ### Signing encrypted files
 
-It can be useful to sign a file that you encrypt so that the person who will decrypt the file can verify it was you who sent it to them and that the integrity of the file is intact. You do this by using the `--sign` flag:
+It can be useful to sign a file that you encrypt, so that the person who will decrypt the file can verify it was you who sent it to them, and also check that the integrity of the file is still intact. 
+
+You do this by using the `--sign` flag:
 
 ```
 gpg --local-user Bob --encrypt --recipient Alice --sign plaintext.txt
+```
+
+> Note: I'm using `--local-user` because I have many different key pairs setup for testing.
+
+This will generate a `plaintext.txt.gpg` encrypted file.
+
+The recipient (Alice), can either decrypt the file using Bob's public key and this will both decrypt and verify the signature, or Alice could just use the `--verify` flag if she didn't want to decrypt the file.
+
+```
+$ gpg --verify plaintext.txt.gpg
+
+gpg: Signature made Mon Feb 19 10:16:38 2018 GMT
+gpg:                using RSA key F2G91BE243E405E5B64B08A1CB5EBDB2561C861B
+gpg: Good signature from "Bob <bob@example.com>" [ultimate]
 ```
 
 <div id="9"></div>

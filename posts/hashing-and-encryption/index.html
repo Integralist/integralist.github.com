@@ -133,7 +133,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    12 mins read
+    13 mins read
   </span>
   
 </div>
@@ -288,6 +288,15 @@ Remember, it <em>encodes</em> data, not <em>encrypt</em> it.</p>
 <pre><code>RNsU/klsS8SvXo5uNoPl23rP+lVYl89LK0NFq6rxrOM=
 </code></pre>
 
+<p>You don&rsquo;t have to use an abstraction around the command obviously, you can just use:</p>
+
+<pre><code>cat plaintext.txt | openssl dgst -sha512 -binary | base64
+</code></pre>
+
+<blockquote>
+<p>Note: <code>base64</code> could be replaced with openssl&rsquo;s base64 encoding command: <code>openssl enc -base64 -A</code></p>
+</blockquote>
+
 <p><div id="4"></div></p>
 
 <h2 id="random-password-generation">Random Password Generation</h2>
@@ -308,7 +317,7 @@ Remember, it <em>encodes</em> data, not <em>encrypt</em> it.</p>
 
 <h2 id="hash-functions">Hash Functions</h2>
 
-<p>There are many different ways of accessing a hash function, two options we&rsquo;ll look at will be using the executable <code>shasum</code> (provided by macOS) and the <code>hashlib</code> package provided the <a href="https://www.python.org/">Python</a> programming language.</p>
+<p>There are many different ways of accessing a hash function, two options we&rsquo;ll look at will be using the executable <code>shasum</code> (provided by macOS) and the <code>hashlib</code> package provided by the <a href="https://www.python.org/">Python</a> programming language.</p>
 
 <h3 id="shasum">shasum</h3>
 
@@ -457,7 +466,7 @@ U2FsdGVkX19/L0WtkvCNlpMiQnvD1SWGM19lm4m6xK4=
 
 <p>You can also use someone&rsquo;s public key to encrypt data with (i.e. asymmetrical encryption) by utilising the <code>openssl rsautl</code> command, which stands for &ldquo;RSA Utility&rdquo; and is commonly used to sign, verify, encrypt and decrypt data using the RSA algorithm.</p>
 
-<p>In the following example we have a file <code>plaintext.txt</code> we encrypt using a public key and then it will only be possible to decrypt the encoded <code>secret.enc</code> file if you have the corresponding private key:</p>
+<p>In the following example we have a file <code>plaintext.txt</code> we encrypt using a public key. It will now only be possible to decrypt the <code>secret.enc</code> file if you have the corresponding private key:</p>
 
 <pre><code># encrypting
 openssl rsautl -encrypt -pubin -inkey public_key.pem -in plaintext.txt -out secret.enc
@@ -526,8 +535,8 @@ EOF
 
 gpg: Generating a basic OpenPGP key
 gpg: key 4BCAEAAD199B5FE8 marked as ultimately trusted
-gpg: directory '/Users/markmcdonnell/.gnupg/openpgp-revocs.d' created
-gpg: revocation certificate stored as '/Users/markmcdonnell/.gnupg/openpgp-revocs.d/CFE96536285D83C990567BF64BCAEAAD199B5FE8.rev'
+gpg: directory '/Users/Integralist/.gnupg/openpgp-revocs.d' created
+gpg: revocation certificate stored as '/Users/Integralist/.gnupg/openpgp-revocs.d/CFE96536285D83C990567BF64BCAEAAD199B5FE8.rev'
 gpg: done
 </code></pre>
 
@@ -607,7 +616,7 @@ sub   rsa2048 2018-02-17 [E]
 
 <p>If you want to explicitly trust a public key you have imported, you can &lsquo;sign&rsquo; it. You do this using the <code>--sign-key</code> flag. Doing this can also be beneficial for the owner of that public key (Bob), because if a friend of yours (Alice) trusts <em>you</em> and they see you&rsquo;ve signed Bob&rsquo;s public key, then Alice is more likely to trust Bob as well.</p>
 
-<p>In order for Bob to benefit from this &lsquo;web of trust&rsquo; you need to send him back his public key which you signed. They would need to import that version of their public key back into their gpg keyring so that they can publish it online for others to see <em>you</em> trust him.</p>
+<p>In order for Bob to benefit from this &lsquo;web of trust&rsquo; you need to send him back his public key which you signed. Bob would need to import that version of his public key back into his gpg keyring, so that he can then republish it online for others to see the <em>you</em> trust him.</p>
 
 <p>The following example demonstrates how you would export Bob&rsquo;s public key, which you previously imported and signed:</p>
 
@@ -620,9 +629,26 @@ sub   rsa2048 2018-02-17 [E]
 
 <h3 id="signing-encrypted-files">Signing encrypted files</h3>
 
-<p>It can be useful to sign a file that you encrypt so that the person who will decrypt the file can verify it was you who sent it to them and that the integrity of the file is intact. You do this by using the <code>--sign</code> flag:</p>
+<p>It can be useful to sign a file that you encrypt, so that the person who will decrypt the file can verify it was you who sent it to them, and also check that the integrity of the file is still intact.</p>
+
+<p>You do this by using the <code>--sign</code> flag:</p>
 
 <pre><code>gpg --local-user Bob --encrypt --recipient Alice --sign plaintext.txt
+</code></pre>
+
+<blockquote>
+<p>Note: I&rsquo;m using <code>--local-user</code> because I have many different key pairs setup for testing.</p>
+</blockquote>
+
+<p>This will generate a <code>plaintext.txt.gpg</code> encrypted file.</p>
+
+<p>The recipient (Alice), can either decrypt the file using Bob&rsquo;s public key and this will both decrypt and verify the signature, or Alice could just use the <code>--verify</code> flag if she didn&rsquo;t want to decrypt the file.</p>
+
+<pre><code>$ gpg --verify plaintext.txt.gpg
+
+gpg: Signature made Mon Feb 19 10:16:38 2018 GMT
+gpg:                using RSA key F2G91BE243E405E5B64B08A1CB5EBDB2561C861B
+gpg: Good signature from &quot;Bob &lt;bob@example.com&gt;&quot; [ultimate]
 </code></pre>
 
 <p><div id="9"></div></p>
