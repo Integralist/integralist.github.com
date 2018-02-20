@@ -443,6 +443,8 @@ echo foobar | openssl aes-256-cbc -out message.enc
 openssl aes-256-cbc -in message.enc -d
 </code></pre>
 
+<h4 id="encoding">Encoding</h4>
+
 <p>You can also generate Base64 output of the encrypted data, by using the <code>-a</code> flag like so:</p>
 
 <pre><code>$ echo foobar | openssl aes-256-cbc -a
@@ -454,17 +456,25 @@ U2FsdGVkX19/L0WtkvCNlpMiQnvD1SWGM19lm4m6xK4=
 <p>Note: see <code>man enc</code> for details</p>
 </blockquote>
 
+<h4 id="salts">Salts</h4>
+
 <p>It&rsquo;s also worth mentioning that the default behaviour for OpenSSL is to use a &lsquo;salt&rsquo; when using encrypting the message. A salt is random data appended to your already hashed message and then that is hashed itself. In pseudo-code it would look like this:</p>
 
 <pre><code>$pwd = hash(hash($password) + salt)
 </code></pre>
 
-<p>You can see this by trying to read an encrypted file (<code>cat message.enc</code>):</p>
+<p>You would then store the value of <code>$pwd</code> in your database along with the salt itself.</p>
+
+<p>The security doesn&rsquo;t come from obfuscating the salt, but more that a rainbow table attack can&rsquo;t now automatically loop/check its collection of hashed passwords. An attacker would need to incorporate your (per-user) unique salt value into their check against a predetermined list of hashes, and they also wouldn&rsquo;t know if the salt was prefixed or suffixed to the password itself. Making it computationally very expensive and time consuming to attempt.</p>
+
+<p>You can also see that a salt is used by trying to read an encrypted file (<code>cat message.enc</code>):</p>
 
 <pre><code>Salted__MJin¨MàÍ£?è,random¡:~randomW!5µõ
 </code></pre>
 
-<p>You can also use someone&rsquo;s public key to encrypt data with (i.e. asymmetrical encryption) by utilising the <code>openssl rsautl</code> command, which stands for &ldquo;RSA Utility&rdquo; and is commonly used to sign, verify, encrypt and decrypt data using the RSA algorithm.</p>
+<h4 id="asymmetrical-encryption">Asymmetrical Encryption</h4>
+
+<p>If you need to you can use a public key to encrypt data with (i.e. asymmetrical encryption) by utilising the <code>openssl rsautl</code> command, which stands for &ldquo;RSA Utility&rdquo; and is commonly used to sign, verify, encrypt and decrypt data using the RSA algorithm.</p>
 
 <p>In the following example we have a file <code>plaintext.txt</code> we encrypt using a public key. It will now only be possible to decrypt the <code>secret.enc</code> file if you have the corresponding private key:</p>
 

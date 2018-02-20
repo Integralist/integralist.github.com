@@ -292,6 +292,8 @@ echo foobar | openssl aes-256-cbc -out message.enc
 openssl aes-256-cbc -in message.enc -d
 ```
 
+#### Encoding
+
 You can also generate Base64 output of the encrypted data, by using the `-a` flag like so:
 
 ```
@@ -302,19 +304,27 @@ U2FsdGVkX19/L0WtkvCNlpMiQnvD1SWGM19lm4m6xK4=
 
 > Note: see `man enc` for details
 
+#### Salts
+
 It's also worth mentioning that the default behaviour for OpenSSL is to use a 'salt' when using encrypting the message. A salt is random data appended to your already hashed message and then that is hashed itself. In pseudo-code it would look like this:
 
 ```
 $pwd = hash(hash($password) + salt)
 ```
 
-You can see this by trying to read an encrypted file (`cat message.enc`):
+You would then store the value of `$pwd` in your database along with the salt itself. 
+
+The security doesn't come from obfuscating the salt, but more that a rainbow table attack can't now automatically loop/check its collection of hashed passwords. An attacker would need to incorporate your (per-user) unique salt value into their check against a predetermined list of hashes, and they also wouldn't know if the salt was prefixed or suffixed to the password itself. Making it computationally very expensive and time consuming to attempt.
+
+You can also see that a salt is used by trying to read an encrypted file (`cat message.enc`):
 
 ```
 Salted__MJin¨MàÍ£?è,random¡:~randomW!5µõ
 ```
 
-You can also use someone's public key to encrypt data with (i.e. asymmetrical encryption) by utilising the `openssl rsautl` command, which stands for "RSA Utility" and is commonly used to sign, verify, encrypt and decrypt data using the RSA algorithm. 
+#### Asymmetrical Encryption
+
+If you need to you can use a public key to encrypt data with (i.e. asymmetrical encryption) by utilising the `openssl rsautl` command, which stands for "RSA Utility" and is commonly used to sign, verify, encrypt and decrypt data using the RSA algorithm. 
 
 In the following example we have a file `plaintext.txt` we encrypt using a public key. It will now only be possible to decrypt the `secret.enc` file if you have the corresponding private key:
 
