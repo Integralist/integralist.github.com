@@ -8,7 +8,7 @@ weight: -170
 
 <img src="../images/profile.jpg">
 
-Hello, my name is Mark and I work @[BuzzFeed](https://www.buzzfeed.com/) as a Senior Software Engineer (formerly Principal Engineer @[BBCNews](http://www.bbc.co.uk/news)).
+Hello, my name is Mark and I work @[BuzzFeed](https://www.buzzfeed.com/) as a Staff Software Engineer (formerly Principal Engineer @[BBCNews](http://www.bbc.co.uk/news)).
 
 > [keybase.io/integralist](https://keybase.io/integralist)
 

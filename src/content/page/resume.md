@@ -1,6 +1,6 @@
 ---
 title: Resume
-description: Senior Software Engineer @BuzzFeed
+description: Staff Software Engineer @BuzzFeed
 comments: false
 menu: main
 weight: -170
@@ -21,7 +21,7 @@ weight: -170
 
 ## Hello!
 
-Hello, my name is Mark and I work @[BuzzFeed](https://www.buzzfeed.com/) as a Senior Software Engineer (formerly Principal Engineer @[BBCNews](http://www.bbc.co.uk/news)).
+Hello, my name is Mark and I work @[BuzzFeed](https://www.buzzfeed.com/) as a Staff Software Engineer (formerly Principal Engineer @[BBCNews](http://www.bbc.co.uk/news)).
 
 I'm also a published author with Apress and LeanPub:
 
@@ -72,6 +72,7 @@ I progressed upwards through the organisation, moving from initially being a cli
 
 - Designed and implemented a Python package that acts as a Tornado web handler decorator for acquiring/caching/revalidating an asymmetrical public key (provided by an authentication server we built in Go). This key is then used once we have acquired a signed JWT object so we may verify the integrity is intact. It's purpose was to make engineers time assigning authentication to their services much simpler and less time consuming, and provide a consistent experience across the platform.
 - Selected to be part of a new infrastructure team tasked with designing a new 'authentication and authorization' service layer(s).
+- Promoted to Staff Software Engineer in January.
 
 ### 2017
 
