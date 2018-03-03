@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Introduction Example Python Origin Code Example Golang Proxy Code Demonstration Explanation Conclusion  
+Introduction I was struggling to find a good (or just simple) reverse proxy solution written in Go, so I decided to take what I had learnt from a work colleague of mine and put together a simple example for others to build upon if they needed a quick reference point.
+In this example I have an origin server written in Python (for no other reason than to have a clearer distinction between the proxy and the origin) and which supports the endpoints /, /foo and /bar/* (where the wildcard glob means we support multiple variants of that, such as /bar/baz).'>
+
+<meta property='og:title' content='Golang Reverse Proxy ⋆ Mark McDonnell'>
+<meta property='og:description' content='Introduction Example Python Origin Code Example Golang Proxy Code Demonstration Explanation Conclusion  
+Introduction I was struggling to find a good (or just simple) reverse proxy solution written in Go, so I decided to take what I had learnt from a work colleague of mine and put together a simple example for others to build upon if they needed a quick reference point.
+In this example I have an origin server written in Python (for no other reason than to have a clearer distinction between the proxy and the origin) and which supports the endpoints /, /foo and /bar/* (where the wildcard glob means we support multiple variants of that, such as /bar/baz).'>
+<meta property='og:url' content='http://www.integralist.co.uk/posts/golang-reverse-proxy/'>
+<meta property='og:site_name' content='integralist'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts'><meta property='article:tag' content='go'><meta property='article:tag' content='golang'><meta property='article:tag' content='proxy'><meta property='article:published_time' content='2018-03-03T17:08:13Z'/><meta property='article:modified_time' content='2018-03-03T17:08:13Z'/>
+
+<meta name="generator" content="Hugo 0.36" />
+
+  <title>Golang Reverse Proxy ⋆ Mark McDonnell</title>
+  <link rel='canonical' href='http://www.integralist.co.uk/posts/golang-reverse-proxy/'>
+  
+  <link rel='icon' href='/favicon.ico'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700&subset=latin'>
+<link rel='stylesheet' href='/css/main.d02777fd.css'>
+
+  <link rel='stylesheet' href='/css/custom.css'>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-33159515-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+</head>
+
+
+<body class='page'>
+  <div class='site'>
+    <header id='header' class='header-container'>
+      <div class='site-header'>
+        <nav id='navmenu' aria-label='Main Menu'>
+  <ul class='main-menu'>
+    
+    <li>
+      <a href='/' 
+        
+      >Home</a>
+    </li>
+    
+    <li>
+      <a href='/about/' 
+        
+      >About</a>
+    </li>
+    
+    <li>
+      <a href='/resume/' 
+        
+      >Resume</a>
+    </li>
+    
+    <li>
+      <a href='#theme' 
+        
+      >Night Mode</a>
+    </li>
+    
+    <li>
+      <a href='/posts' 
+        
+      >Posts</a>
+    </li>
+    
+  </ul>
+</nav>
+
+        <div class='site-info'>
+          
+          <p class='site-title title'>integralist</p>
+          
+          <p class='site-description'>Polyglot. Author. Human.</p>
+        </div>
+      </div>
+    </header>
+
+
+<main class='main'>
+  <article lang='en' class='entry'>
+    <header class='entry-header'>
+  <div class='entry-info'>
+    <h1 class='entry-title title'>Golang Reverse Proxy</h1>
+    
+  </div>
+  
+<div class='meta'>
+  <span class='posted-on'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+  <line x1="16" y1="2" x2="16" y2="6"/>
+  <line x1="8" y1="2" x2="8" y2="6"/>
+  <line x1="3" y1="10" x2="21" y2="10"/>
+  
+</svg>
+
+    <span class='screen-reader'>Posted on </span>
+    <time class='date' datetime='2018-03-03T17:08:13Z'>2018-03-03</time>
+  </span>
+  
+  <span class='byline'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M21,21V20c0-2.76-4-5-9-5s-9,2.24-9,5v1"/>
+  <path d="M16,6.37A4,4,0,1,1,12.63,3,4,4,0,0,1,16,6.37Z"/>
+  
+</svg>
+
+    <span class='screen-reader'> by </span>
+    Mark McDonnell
+  </span>
+  
+  
+  <span class='reading-time'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <circle cx="12" cy="12" r="10"/>
+  <polyline points="12 6 12 12 15 15"/> 
+  
+</svg>
+
+    5 mins read
+  </span>
+  
+</div>
+
+
+</header>
+
+    <div class='entry-content'>
+  
+
+<ul>
+<li><a href="#1">Introduction</a></li>
+<li><a href="#2">Example Python Origin Code</a></li>
+<li><a href="#3">Example Golang Proxy Code</a></li>
+<li><a href="#4">Demonstration</a></li>
+<li><a href="#5">Explanation</a></li>
+<li><a href="#6">Conclusion</a></li>
+</ul>
+
+<p><div id="1"></div></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>I was struggling to find a good (or just simple) reverse proxy solution written in <a href="https://golang.org/">Go</a>, so I decided to take what I had learnt from a work colleague of mine and put together a simple example for others to build upon if they needed a quick reference point.</p>
+
+<p>In this example I have an origin server written in Python (for no other reason than to have a clearer distinction between the proxy and the origin) and which supports the endpoints <code>/</code>, <code>/foo</code> and <code>/bar/*</code> (where the wildcard glob means we support multiple variants of that, such as <code>/bar/baz</code>).</p>
+
+<p>Each origin handler will print the http request headers, followed by sending a response body that correlates to the handler name (so for example, the <code>FooHandler</code> class will respond with <code>FOO!</code>, while the <code>BarHandler</code> class will response with <code>BAR!</code>).</p>
+
+<p><div id="2"></div></p>
+
+<h2 id="example-python-origin-code">Example Python Origin Code</h2>
+
+<p>Here is our Python code using the <a href="http://www.tornadoweb.org/">Tornado</a> web framework.</p>
+
+<pre><code>import tornado.ioloop
+import tornado.web
+
+
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        print(&quot;MAIN HEADERS:\n\n&quot;, self.request.headers)
+        self.write(&quot;MAIN!&quot;)
+
+
+class FooHandler(tornado.web.RequestHandler):
+    def get(self):
+        print(&quot;FOO HEADERS:\n\n&quot;, self.request.headers)
+        self.write(&quot;FOO!&quot;)
+
+
+class BarHandler(tornado.web.RequestHandler):
+    def get(self):
+        print(&quot;BAR HEADERS:\n\n&quot;, self.request.headers)
+        self.write(&quot;BAR!&quot;)
+
+
+def make_app():
+    return tornado.web.Application([
+        (r&quot;/&quot;, MainHandler),
+        (r&quot;/foo&quot;, FooHandler),
+        (r&quot;/bar.*&quot;, BarHandler),
+    ])
+
+
+if __name__ == &quot;__main__&quot;:
+    app = make_app()
+    app.listen(9000)
+    tornado.ioloop.IOLoop.current().start()
+</code></pre>
+
+<p><div id="3"></div></p>
+
+<h2 id="example-golang-proxy-code">Example Golang Proxy Code</h2>
+
+<p>Here is our Go code using the standard library for the reverse proxy logic, and a few external packages such as <a href="https://github.com/julienschmidt/httprouter">httprouter</a> and <a href="https://github.com/Sirupsen/logrus">logrus</a> for routing and logging respectively.</p>
+
+<pre><code>package main
+
+import (
+	&quot;net/http&quot;
+	&quot;net/http/httputil&quot;
+	&quot;net/url&quot;
+	&quot;os&quot;
+	&quot;strings&quot;
+
+	&quot;github.com/Sirupsen/logrus&quot;
+	&quot;github.com/julienschmidt/httprouter&quot;
+)
+
+func singleJoiningSlash(a, b string) string {
+	aslash := strings.HasSuffix(a, &quot;/&quot;)
+	bslash := strings.HasPrefix(b, &quot;/&quot;)
+	switch {
+	case aslash &amp;&amp; bslash:
+		return a + b[1:]
+	case !aslash &amp;&amp; !bslash:
+		return a + &quot;/&quot; + b
+	}
+	return a + b
+}
+
+func main() {
+	logrus.SetFormatter(&amp;logrus.TextFormatter{})
+	logrus.SetOutput(os.Stdout)
+	logrus.SetLevel(logrus.InfoLevel)
+	logger := logrus.WithFields(logrus.Fields{
+		&quot;service&quot;: &quot;go-reverse-proxy&quot;,
+	})
+
+	router := httprouter.New()
+	origin, _ := url.Parse(&quot;http://localhost:9000/&quot;)
+	path := &quot;/*catchall&quot;
+
+	reverseProxy := httputil.NewSingleHostReverseProxy(origin)
+
+	reverseProxy.Director = func(req *http.Request) {
+		req.Header.Add(&quot;X-Forwarded-Host&quot;, req.Host)
+		req.Header.Add(&quot;X-Origin-Host&quot;, origin.Host)
+		req.URL.Scheme = origin.Scheme
+		req.URL.Host = origin.Host
+
+		wildcardIndex := strings.IndexAny(path, &quot;*&quot;)
+		proxyPath := singleJoiningSlash(origin.Path, req.URL.Path[wildcardIndex:])
+		if strings.HasSuffix(proxyPath, &quot;/&quot;) &amp;&amp; len(proxyPath) &gt; 1 {
+			proxyPath = proxyPath[:len(proxyPath)-1]
+		}
+		req.URL.Path = proxyPath
+	}
+
+	router.Handle(&quot;GET&quot;, path, func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		reverseProxy.ServeHTTP(w, r)
+	})
+
+	logger.Fatal(http.ListenAndServe(&quot;:9001&quot;, router))
+}
+</code></pre>
+
+<p><div id="4"></div></p>
+
+<h2 id="demonstration">Demonstration</h2>
+
+<p>In order to run this example you should follow these instructions:</p>
+
+<ol>
+<li>run the tornado application (e.g. <code>python tornado-origin.py</code>)</li>
+<li>run the go application (e.g. <code>go run main.go</code>)</li>
+<li>make http requests (shown below)</li>
+</ol>
+
+<pre><code>curl -v http://localhost:9001/
+curl -v http://localhost:9001/foo
+curl -v http://localhost:9001/foo/
+curl -v http://localhost:9001/bar/baz
+</code></pre>
+
+<p>You should see output from the Python server that looks something like this:</p>
+
+<pre><code>FOO HEADERS:
+
+Host: localhost:9001
+User-Agent: curl/7.54.0
+Accept: */*
+X-Forwarded-Host: localhost:9001
+X-Origin-Host: localhost:9000
+</code></pre>
+
+<p><div id="5"></div></p>
+
+<h2 id="explanation">Explanation</h2>
+
+<p>OK, so let&rsquo;s step through the <code>main</code> function to see what&rsquo;s going on.</p>
+
+<p>First we set up our basic logging configuration:</p>
+
+<pre><code>logrus.SetFormatter(&amp;logrus.TextFormatter{})
+logrus.SetOutput(os.Stdout)
+logrus.SetLevel(logrus.InfoLevel)
+logger := logrus.WithFields(logrus.Fields{
+  &quot;service&quot;: &quot;go-reverse-proxy&quot;,
+})
+</code></pre>
+
+<p>Next we create a new httprouter instance, we define the origin host (<code>http://localhost:9000/</code>) and the &lsquo;pattern&rsquo; we want httprouter to look out for (<code>/*catchall</code>, which is a special syntax that represents a catchall wildcard/glob):</p>
+
+<pre><code>router := httprouter.New()
+origin, _ := url.Parse(&quot;http://localhost:9000/&quot;)
+path := &quot;/*catchall&quot;
+</code></pre>
+
+<p>Next we create a new reverse proxy instance, passing it the origin host (<code>http://localhost:9000/</code>):</p>
+
+<pre><code>reverseProxy := httputil.NewSingleHostReverseProxy(origin)
+</code></pre>
+
+<p>Followed by configuring the &lsquo;director&rsquo; for the reverse proxy. The director is simply a function that modifies the received incoming request, while the response from the origin is copied back to the original client.</p>
+
+<p>In this example, we attach a few common proxy related headers to the incoming request and then modify its Scheme/Host to reflect the origin we wish to proxy it onto.</p>
+
+<p>Next, we change the request path to the origin. What we do is ensure the path we request from the origin is whatever the base origin path is + the requested path (i.e. not just directing the request to the root/entrypoint of the origin).</p>
+
+<p>In our example, our origin&rsquo;s path is just <code>/</code> where as the client will be requesting things like <code>/foo</code> and <code>/bar/baz</code>, so these would be appended to the origin&rsquo;s defined <code>/</code>. But we also make sure that when joining the origin&rsquo;s path with the incoming request path, that we avoid double slashes in the middle.</p>
+
+<p>Lastly, we ensure that any trailing slash is removed as well:</p>
+
+<pre><code>reverseProxy.Director = func(req *http.Request) {
+  req.Header.Add(&quot;X-Forwarded-Host&quot;, req.Host)
+  req.Header.Add(&quot;X-Origin-Host&quot;, origin.Host)
+  req.URL.Scheme = origin.Scheme
+  req.URL.Host = origin.Host
+
+  wildcardIndex := strings.IndexAny(path, &quot;*&quot;)
+  proxyPath := singleJoiningSlash(origin.Path, req.URL.Path[wildcardIndex:])
+  if strings.HasSuffix(proxyPath, &quot;/&quot;) &amp;&amp; len(proxyPath) &gt; 1 {
+    proxyPath = proxyPath[:len(proxyPath)-1]
+  }
+  req.URL.Path = proxyPath
+}
+</code></pre>
+
+<p>Finally, we setup the handler for the <code>/*catchall</code> httprouter path. In this case we don&rsquo;t do anything other than call the reverse proxy&rsquo;s <code>ServeHTTP</code> method and pass it the original <code>ResponseWriter</code> and http <code>Request</code>. We then kick start the httprouter using <code>ListenAndServe</code>:</p>
+
+<pre><code>router.Handle(&quot;GET&quot;, path, func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+  reverseProxy.ServeHTTP(w, r)
+})
+
+logger.Fatal(http.ListenAndServe(&quot;:9001&quot;, router))
+</code></pre>
+
+<p><div id="6"></div></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s all there is to it.</p>
+
+<p>You could also wrap the function passed to <code>router.Handle</code> in a middleware function so that you&rsquo;re able to do extra processing. A common example of this is to authenticate the incoming request <em>before</em> it is proxied to the origin (meaning you can reject the request if necessary).</p>
+
+</div>
+
+    
+<footer class='entry-footer'>
+  
+    
+      
+      
+
+<div class='categories'>
+  <span class='category-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Categories: </span><a class='category' href='/categories/code'>code</a>, <a class='category' href='/categories/guide'>guide</a></div>
+
+    
+  
+    
+      
+      
+
+<div class='tags'>
+  <span class='tag-icon'>
+    <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z"/>
+  <line x1="7" y1="7" x2="7" y2="7"/>
+  
+</svg>
+
+  </span>
+  <span class='screen-reader'>Tags: </span><a class='tag' href='/tags/go'>go</a>, <a class='tag' href='/tags/golang'>golang</a>, <a class='tag' href='/tags/proxy'>proxy</a></div>
+
+    
+  
+</footer>
+
+
+  </article>
+
+  
+    
+<nav class='entry-nav'>
+  <div class='entry-nav-links'><div class='prev-entry'>
+      <a href='http://www.integralist.co.uk/posts/hashing-and-encryption/'>
+        <span aria-hidden='true'><svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <line x1="20" y1="12" x2="4" y2="12"/>
+  <polyline points="10 18 4 12 10 6"/>
+  
+</svg>
+ Previous</span>
+        <span class='screen-reader'>Previous post: </span>Hashing, Encryption and Encoding</a>
+    </div></div>
+</nav>
+
+
+  
+
+  
+    <div class='comments-container'>
+  
+</div>
+
+  
+</main>
+
+    <footer id='footer' class='footer-container'>
+      <div class='footer'>
+        <div class='social'>
+  <nav aria-label='Social Menu'>
+    <ul class='social-menu'><li>
+        <a href='https://github.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Github account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://instagram.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Instagram account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+  <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+  
+</svg>
+
+        </a>
+      </li><li>
+        <a href='https://twitter.com/integralist' target='_blank' rel='noopener'>
+          <span class='screen-reader'>Open Twitter account in new tab</span>
+          <svg class='icon' viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+  
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+  
+</svg>
+
+        </a>
+      </li></ul>
+  </nav>
+</div>
+
+        <div class='copyright'>
+          <p>
+    
+      
+    
+  
+  &copy; 2017-2018 integralist</p>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src='/js/main.af838dd5.js'></script>
+  
+    <script src='/js/custom.js'></script>
+  
+
+</body>
+
+</html>
+

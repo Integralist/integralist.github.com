@@ -4,7 +4,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/</loc>
-    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
+    <lastmod>2018-03-03T17:08:13+00:00</lastmod>
   </url>
   
   <url>
@@ -13,6 +13,11 @@
   
   <url>
     <loc>http://www.integralist.co.uk/resume/</loc>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/posts/golang-reverse-proxy/</loc>
+    <lastmod>2018-03-03T17:08:13+00:00</lastmod>
   </url>
   
   <url>
@@ -366,7 +371,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/code/</loc>
-    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
+    <lastmod>2018-03-03T17:08:13+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -462,7 +467,13 @@
   
   <url>
     <loc>http://www.integralist.co.uk/tags/go/</loc>
-    <lastmod>2017-10-31T13:00:00+01:00</lastmod>
+    <lastmod>2018-03-03T17:08:13+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/golang/</loc>
+    <lastmod>2018-03-03T17:08:13+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -486,7 +497,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/categories/guide/</loc>
-    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
+    <lastmod>2018-03-03T17:08:13+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -687,7 +698,7 @@
   
   <url>
     <loc>http://www.integralist.co.uk/posts/</loc>
-    <lastmod>2018-02-16T08:33:40+00:00</lastmod>
+    <lastmod>2018-03-03T17:08:13+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -710,6 +721,12 @@
   <url>
     <loc>http://www.integralist.co.uk/tags/profiling/</loc>
     <lastmod>2017-10-31T13:00:00+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.integralist.co.uk/tags/proxy/</loc>
+    <lastmod>2018-03-03T17:08:13+00:00</lastmod>
     <priority>0</priority>
   </url>
   

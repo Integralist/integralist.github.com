@@ -6,10 +6,21 @@
     <description>Recent content in Guide on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Fri, 16 Feb 2018 08:33:40 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 03 Mar 2018 17:08:13 +0000</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/categories/guide/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang Reverse Proxy</title>
+      <link>http://www.integralist.co.uk/posts/golang-reverse-proxy/</link>
+      <pubDate>Sat, 03 Mar 2018 17:08:13 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/golang-reverse-proxy/</guid>
+      <description>Introduction Example Python Origin Code Example Golang Proxy Code Demonstration Explanation Conclusion  
+Introduction I was struggling to find a good (or just simple) reverse proxy solution written in Go, so I decided to take what I had learnt from a work colleague of mine and put together a simple example for others to build upon if they needed a quick reference point.
+In this example I have an origin server written in Python (for no other reason than to have a clearer distinction between the proxy and the origin) and which supports the endpoints /, /foo and /bar/* (where the wildcard glob means we support multiple variants of that, such as /bar/baz).</description>
+    </item>
     
     <item>
       <title>Hashing, Encryption and Encoding</title>

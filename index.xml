@@ -6,7 +6,7 @@
     <description>Recent content in Home on integralist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Fri, 16 Feb 2018 08:33:40 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 03 Mar 2018 17:08:13 +0000</lastBuildDate>
     
 	<atom:link href="http://www.integralist.co.uk/index.xml" rel="self" type="application/rss+xml" />
     
@@ -32,6 +32,17 @@
       <description>Hello! Connect History Key Achievements Tools, Languages and Tech Talks Published Popular articles Open-Source Summary  Hello! Hello, my name is Mark and I work @BuzzFeed as a Staff Software Engineer (formerly Principal Engineer @BBCNews).
 I&amp;rsquo;m also a published author with Apress and LeanPub:
 Apress  Pro Vim Tmux Taster Quick Clojure: Effective Functional Programming  LeanPub  Python for Programmers Programming in Clojure  Connect You can find me online at the following locations:</description>
+    </item>
+    
+    <item>
+      <title>Golang Reverse Proxy</title>
+      <link>http://www.integralist.co.uk/posts/golang-reverse-proxy/</link>
+      <pubDate>Sat, 03 Mar 2018 17:08:13 +0000</pubDate>
+      
+      <guid>http://www.integralist.co.uk/posts/golang-reverse-proxy/</guid>
+      <description>Introduction Example Python Origin Code Example Golang Proxy Code Demonstration Explanation Conclusion  
+Introduction I was struggling to find a good (or just simple) reverse proxy solution written in Go, so I decided to take what I had learnt from a work colleague of mine and put together a simple example for others to build upon if they needed a quick reference point.
+In this example I have an origin server written in Python (for no other reason than to have a clearer distinction between the proxy and the origin) and which supports the endpoints /, /foo and /bar/* (where the wildcard glob means we support multiple variants of that, such as /bar/baz).</description>
     </item>
     
     <item>
