@@ -133,7 +133,7 @@ ga('send', 'pageview');
   
 </svg>
 
-    13 mins read
+    14 mins read
   </span>
   
 </div>
@@ -211,6 +211,9 @@ the message transported has not been tampered with or altered.</p></li>
 
 <li><p><strong>confidentiality</strong>:<br />
 the communication between trusted parties is confidential.</p></li>
+
+<li><p><strong>authenticity</strong>:<br />
+the communication is with who you expect it to be (not a man-in-the-middle).</p></li>
 </ul>
 
 <p><div id="2"></div></p>
@@ -227,7 +230,7 @@ the communication between trusted parties is confidential.</p></li>
 <p>Often cryptographic primitives need to be combined. For example, <a href="/posts/security-basics/#public-key-cryptography">public-key cryptography</a> uses RSA (a slow, but very secure algorithm) for <em>communicating</em> securely, while internally using AES (a faster, but less secure algorithm †) for <em>encrypting</em> data with a shared key, while using a hash function for generating a message digest to ensure both parties can verify the <em>integrity</em> of the payload sent/received.</p>
 
 <blockquote>
-<p>† less secure in the sense that you have to share a secret key with the person you wish to communicate with.</p>
+<p>† less secure in the sense that you have to share a secret key with the person you wish to communicate with, but that&rsquo;s what public-key cryptography helps to secure.</p>
 </blockquote>
 
 <h3 id="why-use-a-hash-function">Why use a hash function?</h3>
@@ -251,7 +254,11 @@ Remember, it <em>encodes</em> data, not <em>encrypt</em> it.</p>
 
 <h2 id="mac-vs-hmac">MAC vs HMAC</h2>
 
-<p>A &lsquo;MAC&rsquo; (Message Authentication Code) uses symmetrical cryptography with an encryption algorithm (such as AES) to verify the integrity of a message, where as a &lsquo;HMAC&rsquo; will use a hash function (such as SHA256) internally instead of an encryption algorithm.</p>
+<p>A &lsquo;MAC&rsquo; (Message Authentication Code) uses symmetrical cryptography with an encryption algorithm (such as AES †) to verify the integrity of a message, where as a &lsquo;HMAC&rsquo; will use a hash function (such as SHA256) internally instead of an encryption algorithm.</p>
+
+<blockquote>
+<p>† encryption algorithms: AES (Advanced Encryption Standard), Blowfish, DES (Data Encryption Standard), Triple DES, Serpent, and Twofish.</p>
+</blockquote>
 
 <p>Below is an example HMAC written in <a href="https://www.gnu.org/software/bash/">Bash</a> and using the <a href="https://www.openssl.org/">OpenSSL</a> command-line tool.</p>
 
@@ -405,6 +412,17 @@ print(message.hexdigest())
 <blockquote>
 <p>Note: for a full list of commands see: <code>openssl -h</code> and <code>openssl &lt;command&gt; -h</code>.</p>
 </blockquote>
+
+<h3 id="key-exchanges">Key Exchanges</h3>
+
+<p>There are two popular key exchange algorithms:</p>
+
+<ol>
+<li>RSA</li>
+<li>Diffie-Hellman</li>
+</ol>
+
+<p>For the specific details of each I recommend you read <a href="https://technet.microsoft.com/en-us/library/cc962035.aspx">this post on the differences</a>. In short RSA uses the person&rsquo;s public key to encrypt the secret, while Diffie-Hellman uses a mathematical function to ensure only those two people communicating can calculate the secret based on the information that&rsquo;s publicly available.</p>
 
 <h3 id="generating-a-key-pair">Generating a key pair</h3>
 
@@ -640,6 +658,10 @@ sub   rsa2048 2018-02-17 [E]
 <h3 id="signing-encrypted-files">Signing encrypted files</h3>
 
 <p>It can be useful to sign a file that you encrypt, so that the person who will decrypt the file can verify it was you who sent it to them, and also check that the integrity of the file is still intact.</p>
+
+<blockquote>
+<p>Note: this provides a combination of <em>authenticity</em> and <em>integrity</em> (as defined within the <a href="#1">terminology section</a>)</p>
+</blockquote>
 
 <p>You do this by using the <code>--sign</code> flag:</p>
 

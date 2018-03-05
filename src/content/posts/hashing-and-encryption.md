@@ -67,6 +67,8 @@ OK, so using the correct terminology is essential and helps us to be explicit an
   the message transported has not been tampered with or altered.
 * **confidentiality**:  
   the communication between trusted parties is confidential.
+* **authenticity**:  
+  the communication is with who you expect it to be (not a man-in-the-middle).
 
 <div id="2"></div>
 ## Hashing vs Encryption
@@ -78,7 +80,7 @@ In essence:
 
 Often cryptographic primitives need to be combined. For example, [public-key cryptography](/posts/security-basics/#public-key-cryptography) uses RSA (a slow, but very secure algorithm) for _communicating_ securely, while internally using AES (a faster, but less secure algorithm †) for _encrypting_ data with a shared key, while using a hash function for generating a message digest to ensure both parties can verify the _integrity_ of the payload sent/received.
 
-> † less secure in the sense that you have to share a secret key with the person you wish to communicate with.
+> † less secure in the sense that you have to share a secret key with the person you wish to communicate with, but that's what public-key cryptography helps to secure.
 
 ### Why use a hash function?
 
@@ -97,7 +99,9 @@ How it works: Base64 encoding takes three bytes, each consisting of eight bits, 
 <div id="2.1"></div>
 ## MAC vs HMAC
 
-A 'MAC' (Message Authentication Code) uses symmetrical cryptography with an encryption algorithm (such as AES) to verify the integrity of a message, where as a 'HMAC' will use a hash function (such as SHA256) internally instead of an encryption algorithm.
+A 'MAC' (Message Authentication Code) uses symmetrical cryptography with an encryption algorithm (such as AES †) to verify the integrity of a message, where as a 'HMAC' will use a hash function (such as SHA256) internally instead of an encryption algorithm.
+
+> † encryption algorithms: AES (Advanced Encryption Standard), Blowfish, DES (Data Encryption Standard), Triple DES, Serpent, and Twofish.
 
 Below is an example HMAC written in [Bash](https://www.gnu.org/software/bash/) and using the [OpenSSL](https://www.openssl.org/) command-line tool.
 
@@ -253,6 +257,15 @@ alias sshagent='eval "$(ssh-agent -s)" && ssh-add -K ~/.ssh/github_rsa'
 OpenSSL is designed to provide a method for securing web based communication (think HTTPS/TLS/SSL).
 
 > Note: for a full list of commands see: `openssl -h` and `openssl <command> -h`.
+
+### Key Exchanges
+
+There are two popular key exchange algorithms:
+
+1. RSA
+2. Diffie-Hellman
+
+For the specific details of each I recommend you read [this post on the differences](https://technet.microsoft.com/en-us/library/cc962035.aspx). In short RSA uses the person's public key to encrypt the secret, while Diffie-Hellman uses a mathematical function to ensure only those two people communicating can calculate the secret based on the information that's publicly available.
 
 ### Generating a key pair
 
@@ -500,6 +513,8 @@ gpg --export --armor bob@example.org
 ### Signing encrypted files
 
 It can be useful to sign a file that you encrypt, so that the person who will decrypt the file can verify it was you who sent it to them, and also check that the integrity of the file is still intact. 
+
+> Note: this provides a combination of _authenticity_ and _integrity_ (as defined within the [terminology section](#1))
 
 You do this by using the `--sign` flag:
 
