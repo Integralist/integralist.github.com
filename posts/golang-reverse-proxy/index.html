@@ -209,7 +209,44 @@ if __name__ == &quot;__main__&quot;:
 
 <h2 id="example-golang-proxy-code">Example Golang Proxy Code</h2>
 
-<p>Here is our Go code using the standard library for the reverse proxy logic, and a few external packages such as <a href="https://github.com/julienschmidt/httprouter">httprouter</a> and <a href="https://github.com/Sirupsen/logrus">logrus</a> for routing and logging respectively.</p>
+<p>There are two versions of the code, a simple version and a more advanced version that aims to handle more specific use cases.</p>
+
+<p>The simple version uses just the Go standard library, where as the advanced version uses the standard library as well as a few a few external packages such as <a href="https://github.com/julienschmidt/httprouter">httprouter</a> and <a href="https://github.com/Sirupsen/logrus">logrus</a> for routing and logging respectively.</p>
+
+<p>One difference between them that&rsquo;s worth mentioning is that in the simple version we use the <code>httputil.ReverseProxy</code> http handler directly, where as in the advanced version we use <code>httputil.NewSingleHostReverseProxy</code> to construct this for us. The advanced version also tries to normalise the paths by stripping trailing slashes and joining them up with the base path (if there was one, although ironically I don&rsquo;t define one in the advanced example).</p>
+
+<h3 id="simple">Simple</h3>
+
+<pre><code>package main
+
+import (
+	&quot;log&quot;
+	&quot;net/http&quot;
+	&quot;net/http/httputil&quot;
+	&quot;net/url&quot;
+)
+
+func main() {
+	origin, _ := url.Parse(&quot;http://localhost:9000/&quot;)
+
+	director := func(req *http.Request) {
+		req.Header.Add(&quot;X-Forwarded-Host&quot;, req.Host)
+		req.Header.Add(&quot;X-Origin-Host&quot;, origin.Host)
+		req.URL.Scheme = &quot;http&quot;
+		req.URL.Host = origin.Host
+	}
+
+	proxy := &amp;httputil.ReverseProxy{Director: director}
+
+	http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+		proxy.ServeHTTP(w, r)
+	})
+
+	log.Fatal(http.ListenAndServe(&quot;:9001&quot;, nil))
+}
+</code></pre>
+
+<h3 id="advanced">Advanced</h3>
 
 <pre><code>package main
 

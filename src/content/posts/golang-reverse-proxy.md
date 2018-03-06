@@ -72,7 +72,45 @@ if __name__ == "__main__":
 <div id="3"></div>
 ## Example Golang Proxy Code
 
-Here is our Go code using the standard library for the reverse proxy logic, and a few external packages such as [httprouter](https://github.com/julienschmidt/httprouter) and [logrus](https://github.com/Sirupsen/logrus) for routing and logging respectively.
+There are two versions of the code, a simple version and a more advanced version that aims to handle more specific use cases.
+
+The simple version uses just the Go standard library, where as the advanced version uses the standard library as well as a few a few external packages such as [httprouter](https://github.com/julienschmidt/httprouter) and [logrus](https://github.com/Sirupsen/logrus) for routing and logging respectively.
+
+One difference between them that's worth mentioning is that in the simple version we use the `httputil.ReverseProxy` http handler directly, where as in the advanced version we use `httputil.NewSingleHostReverseProxy` to construct this for us. The advanced version also tries to normalise the paths by stripping trailing slashes and joining them up with the base path (if there was one, although ironically I don't define one in the advanced example).
+
+### Simple
+
+```
+package main
+
+import (
+	"log"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+)
+
+func main() {
+	origin, _ := url.Parse("http://localhost:9000/")
+
+	director := func(req *http.Request) {
+		req.Header.Add("X-Forwarded-Host", req.Host)
+		req.Header.Add("X-Origin-Host", origin.Host)
+		req.URL.Scheme = "http"
+		req.URL.Host = origin.Host
+	}
+
+	proxy := &httputil.ReverseProxy{Director: director}
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		proxy.ServeHTTP(w, r)
+	})
+
+	log.Fatal(http.ListenAndServe(":9001", nil))
+}
+```
+
+### Advanced
 
 ```
 package main
