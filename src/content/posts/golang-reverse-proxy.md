@@ -205,7 +205,9 @@ X-Origin-Host: localhost:9000
 <div id="5"></div>
 ## Explanation
 
-OK, so let's step through the `main` function to see what's going on.
+OK, so let's step through the `main` function of the advanced example code to see what's going on.
+
+> The concepts are core reverse proxy code is effectively the same between the advanced and simple versions.
 
 First we set up our basic logging configuration:
 
