@@ -121,6 +121,12 @@ windows   386      -- 32 bit Windows
 windows   amd64    -- 64 bit Windows
 ```
 
+You can get a full list with:
+
+```
+go tool dist list
+```
+
 ### Gox
 
 Gox is an alternative build tool.
