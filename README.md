@@ -18,6 +18,11 @@ classicwwf.com.		14400	IN	A	185.199.111.153
 classicwwf.com.		14400	IN	A	185.199.109.153
 ```
 
+## Development
+
+- `make build`: compile templates
+- `make run`: run local server
+
 <!-- markdownlint-enable MD010 -->
 
 [1]: https://integralist.github.io/
