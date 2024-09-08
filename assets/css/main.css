@@ -2192,6 +2192,10 @@ button,
   #footer .copyright a {
     color: inherit; }
 
+#footer .small {
+  font-size: 0.5em;
+}
+
 /* Menu */
 #menu ul {
   -moz-user-select: none;
