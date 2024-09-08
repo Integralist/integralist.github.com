@@ -1,4 +1,4 @@
-SERVER_CMD = go run local.go
+SERVER_CMD = go run build.go && go run local.go
 WATCH_CMD = fswatch -o -e ".*" -i "\\.html$$" -i "\\.tpl$$" -i "\\.css$$" -r ./images . | xargs -n1 -I{} sh -c 'kill $$SERVER_PID; $(SERVER_CMD) & SERVER_PID=$$!; sleep 1; open http://localhost:8080'
 
 # Default target
