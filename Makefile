@@ -15,4 +15,8 @@ run:
 	@echo "Watching for changes..."
 	$(WATCH_CMD)
 
+.PHONY: build
+build:
+	go run build.go
+
 .PHONY: clean test
