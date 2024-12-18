@@ -1,14 +1,16 @@
-# integralist.co.uk
+# Classic WWF
 
-The `integralist.co.uk` website is statically generated using [Go][1] and
-hosted by [Netlify][2].
+The `classicwwf.com` website is statically generated using [Go][1] and
+hosted by GitHub.
+
+- [integralist.github.io][2]
+- [classicwwf.com][3]
 
 Running the target `make build` will:
 
 - Loop over all top-level directories (skipping `cmd`, `assets` etc).
 - Convert every `.md` into a `index.html`.
-- Pushes the date for every `.md` (extracted from the filename) into a queue.
-- A separate process pulls from the queue and builds a HTML list.
+- The date in the Markdown filename is used as the publish date.
 
 > \[!NOTE\]
 > The folder name will become the URL slug.
@@ -17,9 +19,9 @@ Running the target `make build` will:
 
 Most pages on the website are "article" pages writing about some topic.
 
-Some are general pages (e.g. "resume") and so they won't have a date prefixed to
-the filename. In these cases we render the page as HTML and when linking to the
-page in the side nav we'll group them under a section called "Pages".
+Some are general pages and so they won't have a date prefixed to the filename.
+In these cases we render the page as HTML and when linking to the page in the
+side nav we'll group them under a section called "Pages".
 
 ## Writing Markdown
 
@@ -42,42 +44,33 @@ SOMETHING HERE TO IGNORE
 
 ## DNS
 
-- Hostname: www
-- Type: CNAME
-- Value: dreamy-wing-b0b998.netlify.com.
-
-______________________________________________________________________
-
-- Hostname: @
-- Type: A
-- Value: 104.198.14.52
-
-______________________________________________________________________
-
-- Hostname: www
-- Type: A
-- Value: 104.198.14.52
-
-______________________________________________________________________
-
 ```shell
-$ dig www.integralist.co.uk
+$ dig www.classicwwf.com
+
+; <<>> DiG 9.10.6 <<>> www.classicwwf.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 17961
+;; flags: qr rd ra; QUERY: 1, ANSWER: 5, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;www.classicwwf.com.		IN	A
 
 ;; ANSWER SECTION:
-www.integralist.co.uk.  14399   IN      CNAME   dreamy-wing-b0b998.netlify.com.
-dreamy-wing-b0b998.netlify.com. 19 IN   A       54.229.14.125
+www.classicwwf.com.	14400	IN	CNAME	classicwwf.com.
+classicwwf.com.		14400	IN	A	185.199.111.153
+classicwwf.com.		14400	IN	A	185.199.110.153
+classicwwf.com.		14400	IN	A	185.199.108.153
+classicwwf.com.		14400	IN	A	185.199.109.153
 
-$ dig integralist.co.uk
-
-;; ANSWER SECTION:
-integralist.co.uk.      14224   IN      A       104.198.14.52
-
-$ dig A integralist.co.uk @ns.123-reg.co.uk. +short
-104.198.14.52
-
-$ dig A integralist.co.uk @8.8.8.8 +short
-104.198.14.52
+;; Query time: 63 msec
+;; SERVER: 1.0.0.1#53(1.0.0.1)
+;; WHEN: Wed Dec 18 13:05:05 GMT 2024
+;; MSG SIZE  rcvd: 125
 ```
 
 [1]: https://go.dev/
-[2]: https://www.netlify.com/
+[2]: https://integralist.github.io/
+[3]: https://classicwwf.com/
