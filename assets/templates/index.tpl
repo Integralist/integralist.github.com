@@ -19,33 +19,28 @@
         <div class="inner">
           <!-- Header -->
           <header id="header">
-            <!--<a href="index.html" class="logo"><strong>Integralist</strong></a>-->
+            <a href="index.html" class="logo"><strong>Classic WWF</strong></a>
             <ul class="icons">
               <!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
-              <!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+              <li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>
             </ul>
           </header>
           <!-- Banner -->
           <section id="banner">
             <div class="content">
-              <header>
-                <h1>Integralist</h1>
-                <p>Compassionate Listener. Polyglot. Author. Husband. Father. He/Him.</p>
+							<header>
+                <h1>Welcome to Classic WWF</h1>
+                <p>Step back into the glory days of wrestling and relive the epic battles that defined a generation.</p>
               </header>
-							<p>Hello, my name is Mark and I work at <a href="https://fastly.com/" target="_blank">Fastly</a> as a Staff Software Engineer.
-							<p><b>Previously:</b></p>
-							<ul>
-								<li>Staff Software Engineer at BuzzFeed</li>
-								<li>Principal Software Engineer at BBC</li>
-								<li>Principal Software Engineer at StormCreative</li>
-							</ul>
+              <p>Larger-than-life characters, fierce rivalries, and unforgettable moments ruled the ring during the golden era of wrestling. From electrifying entrances to bone-crushing finishing moves, every match was a spectacle that left crowds on the edge of their seats. It was a time when the lines between hero and villain were drawn, and fans passionately followed every twist and turn in the ring.</p>
+              <p>Whether you were cheering for the fan-favorites or rooting for the most notorious heels, this era defined a generation and shaped the future of sports entertainment. Relive the history, stories, and legends that made classic wrestling truly iconic.</p>
               <!--<ul class="actions">-->
               <!--  <li><a href="#" class="button big">Learn More</a></li>-->
               <!--</ul>-->
             </div>
-            <!--<span class="image object">-->
-            <!--  <img src="images/hulk.jpg" alt="" />-->
-            <!--</span>-->
+            <span class="image object">
+              <img src="./assets/images/hulk.jpg" alt="" />
+            </span>
           </section>
           <!-- Section -->
           <section>
@@ -53,32 +48,32 @@
               <h2>Who?</h2>
             </header>
             <div class="features">
-              <article>
+						<article>
                 <span class="icon fa-user"></span>
                 <div class="content">
-                  <h3>Hard Worker</h3>
-                  <p>I bring dedication and focus to everything I do. I believe in rolling up my sleeves, going the extra mile, and delivering results that count. For me, hard work isn't just a habit—it's a mindset.</p>
+                  <h3>Iconic Characters</h3>
+                  <p>The 80s gave us some of wrestling's most memorable personalities, from Hulk Hogan to "Macho Man" Randy Savage, who captivated fans with their larger-than-life personas.</p>
                 </div>
               </article>
               <article>
                 <span class="icon solid fa-book-open"></span>
                 <div class="content">
-                  <h3>Avid Learner</h3>
-                  <p>Curiosity fuels my journey. I'm passionate about expanding my horizons, mastering new skills, and staying ahead of the curve. Whether it's exploring cutting-edge ideas or honing tried-and-true techniques.</p>
+                  <h3>Legendary Storylines</h3>
+                  <p>The rivalries and feuds of the 80s were intense and emotional, creating unforgettable narratives that kept fans hooked from match to match.</p>
                 </div>
               </article>
               <article>
                 <span class="icon solid fa-star"></span>
                 <div class="content">
-                  <h3>Star Performer</h3>
-                  <p>When it comes to excelling, I don't settle for anything less than my best. I thrive in challenges, embrace opportunities, and consistently aim to exceed expectations.</p>
+                  <h3>Cultural Impact</h3>
+                  <p>Wrestling became a mainstream phenomenon in the 80s, with superstars crossing into movies, TV, and pop culture, making the sport bigger than ever.</p>
                 </div>
               </article>
               <article>
                 <span class="icon solid fa-users"></span>
                 <div class="content">
-                  <h3>Family Man</h3>
-                  <p>My family is my foundation. They inspire me to work hard and stay grounded. Whether it's sharing laughter, creating memories, or supporting one another, I treasure the moments that truly matter.</p>
+                  <h3>Classic Tag Teams</h3>
+                  <p>The 80s showcased some of the greatest tag teams in wrestling history, with dynamic duos like The Road Warriors and The Hart Foundation redefining teamwork and strategy in the ring.</p>
                 </div>
               </article>
             </div>

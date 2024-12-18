@@ -1,4 +1,4 @@
-module github.com/integralist/integralist.co.uk
+module github.com/integralist/integralist.github.com
 
 go 1.23.4
 
