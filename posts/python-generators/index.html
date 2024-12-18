@@ -1,0 +1,966 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#python-101-iterators-generators-coroutines">Python 101: iterators, generators, coroutines</a>
+<ul>
+<li><a href="#summary">Summary</a></li>
+
+<li><a href="#iterators">Iterators</a>
+<ul>
+<li><a href="#why-use-iterators">Why use Iterators?</a></li>
+
+<li><a href="#iterator-implementation">Iterator Implementation</a></li>
+
+<li><a href="#iterator-example">Iterator Example</a></li>
+</ul></li>
+
+<li><a href="#generators">Generators</a>
+<ul>
+<li><a href="#why-use-generators">Why use Generators?</a></li>
+
+<li><a href="#generator-implementation">Generator Implementation</a></li>
+
+<li><a href="#generator-example">Generator Example</a></li>
+
+<li><a href="#generator-expressions">Generator Expressions</a></li>
+
+<li><a href="#nested-generators-i-e-yield-from">Nested Generators (i.e. <code>yield from</code>)</a></li>
+</ul></li>
+
+<li><a href="#coroutines">Coroutines</a>
+<ul>
+<li><a href="#why-use-coroutines">Why use Coroutines?</a></li>
+
+<li><a href="#coroutines-implementation">Coroutines Implementation</a></li>
+
+<li><a href="#coroutines-example">Coroutines Example</a></li>
+
+<li><a href="#asyncio-generator-based-coroutines">Asyncio: generator based coroutines</a></li>
+
+<li><a href="#asyncio-new-async-coroutines">Asyncio: new async coroutines</a></li>
+
+<li><a href="#types-of-coroutines">Types of Coroutines</a></li>
+
+<li><a href="#miscellaneous">Miscellaneous</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="python-101-iterators-generators-coroutines">Python 101: iterators, generators, coroutines</h1>
+
+<p>In this post I&rsquo;m going to be talking about what a generator is and how it compares to a coroutine, but to understand these two concepts (generators and coroutines) we&rsquo;ll need to take a step back and understand the underlying concept of an Iterator.</p>
+
+<p>Each section leads onto the next, so it&rsquo;s best to read this post in the order the sections are defined. Unless you&rsquo;re already familiar with earlier segments and prefer to jump ahead.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>The summary of everything we&rsquo;ll be discussing below is this:</p>
+
+<ul>
+<li>Iterators let you iterate over your own custom object.</li>
+<li>Generators are built upon Iterators (they reduce boilerplate).</li>
+<li>Generator Expressions are even more concise Generators †</li>
+<li>Coroutines <em>are</em> Generators, but their <code>yield</code> accepts values.</li>
+<li>Coroutines can pause and resume execution (great for concurrency).</li>
+</ul>
+
+<blockquote>
+<p>† think <a href="https://gist.github.com/e5310d1082b0ff8307e39b71a6f9bae5" target="_blank">comprehensions</a>.</p>
+</blockquote>
+
+<h2 id="iterators">Iterators</h2>
+
+<p>According to the official <a href="https://docs.python.org/3.7/glossary.html#term-iterator" target="_blank">Python glossary</a>, an &lsquo;iterator&rsquo; is&hellip;</p>
+
+<blockquote>
+<p>An object representing a stream of data.</p>
+</blockquote>
+
+<h3 id="why-use-iterators">Why use Iterators?</h3>
+
+<p>An interator is useful because it enables any custom object to be iterated over using the standard Python <code>for-in</code> syntax. This is ultimately how the internal list and dictionary types work, and how they allow <code>for-in</code> to iterate over them.</p>
+
+<p>More importantly, an iterator (as we&rsquo;ll discover) is very memory efficient and means there is only ever one element being handled at once. Thus you could have an iterator object that provides an infinite sequence of elements and you&rsquo;ll never find your program exhausting its memory allocation.</p>
+
+<h3 id="iterator-implementation">Iterator Implementation</h3>
+
+<p>An iterator is (typically) an object that implements both the <code>__iter__</code> and <code>__next__</code> &lsquo;dunder&rsquo; methods, although the <code>__next__</code> method doesn&rsquo;t <em>have</em> to be defined as part of the same object as where <code>__iter__</code> is defined. Let me clarify&hellip;</p>
+
+<p>An &lsquo;iterator&rsquo; is really just a container of some data. This &lsquo;container&rsquo; must have an <code>__iter__</code> method which, according to the <a href="https://docs.python.org/3.7/library/stdtypes.html#iterator.__iter__" target="_blank">protocol documentation</a>, should return an iterator object (i.e. something that has the <code>__next__</code> method). It&rsquo;s the <code>__next__</code> method that moves forward through the relevant collection of data.</p>
+
+<p>So you could design a single class that contains both the <code>__iter__</code> and <code>__next__</code> methods (like I demonstrate below), or you might want to have the <code>__next__</code> method defined as part of a separate class (it&rsquo;s up to you and whatever you feel works best for your project).</p>
+
+<blockquote>
+<p>Note: the Python docs for <a href="https://docs.python.org/3.7/library/collections.abc.html#collections.abc.Iterator" target="_blank"><code>collections.abc</code></a> highlight the other &lsquo;protocols&rsquo; that Python has and the various methods they require (see an <a href="/posts/design-python/#interfaces-protocols-and-abstract-methods">earlier post of mine</a> that discusses protocols + abstract classes in detail). If you&rsquo;re unfamiliar with &lsquo;dunder&rsquo; methods, then I&rsquo;ll refer you to an excellent post: <a href="https://rszalski.github.io/magicmethods/" target="_blank">a guide to magic methods</a>.</p>
+</blockquote>
+
+<p>By implementing these two methods it enables Python to iterate over a &lsquo;collection&rsquo;. It doesn&rsquo;t matter what the collection is, as long as the iterator object defines the behaviour that lets Python know how to iterate over it.</p>
+
+<h3 id="iterator-example">Iterator Example</h3>
+
+<p>Below is a contrived example that shows how to create such an object. In this example we pass in a list of strings to a class constructor and the class implements the relevant methods that allow <code>for-in</code> to iterate over that collection of data:</p>
+
+<pre><code>class Foo:
+    def __init__(self, collection):
+        self.collection = collection
+        self.index = 0
+
+    def __iter__(self):
+        &quot;&quot;&quot;
+        we return self so the 'iterator object' 
+        is the Foo class instance itself,
+        
+        but we could have returned a new instance 
+        of a completely different class, so long as
+        that other class had __next__ defined on it.
+        &quot;&quot;&quot;
+        return self
+
+    def __next__(self):
+        &quot;&quot;&quot;
+        this method is handling state and informing
+        the container of the iterator where we are
+        currently pointing to within our data collection.
+        &quot;&quot;&quot;
+        if self.index &gt; len(self.collection)-1:
+            raise StopIteration
+
+        value = self.collection[self.index]
+        self.index += 1
+
+        return value
+
+# we are now able to loop over our custom Foo class!
+for element in Foo([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]):
+    print(element)
+</code></pre>
+
+<blockquote>
+<p>Note: raising the <code>StopIteration</code> exception is a requirement for implementing an iterator correctly.</p>
+</blockquote>
+
+<p>With this example implementation, we can also iterate over our <code>Foo</code> class <em>manually</em>, using the <code>iter</code> and <code>next</code> functions, like so:</p>
+
+<pre><code>foo = Foo([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;])
+iterator = iter(foo)
+
+next(iterator)  # 'a'
+next(iterator)  # 'b'
+next(iterator)  # 'c'
+</code></pre>
+
+<blockquote>
+<p>Note: <code>iter(foo)</code> is the same as <code>foo.__iter__()</code>, while <code>next(iterator)</code> is the same as <code>iterator.__next__()</code> &ndash; so these functions are basic syntactic sugar provided by the standard library that helps make our code look nicer.</p>
+</blockquote>
+
+<p>This type of iterator is referred to as a &lsquo;class-based iterator&rsquo; and isn&rsquo;t the only way to implement an <em>iterable</em> object. <a href="#generators">Generators</a> and <a href="#generator-expressions">Generator Expressions</a> (see the following sections) are other ways of iterating over an object in a memory efficient way.</p>
+
+<p>We can also <em>realize</em> the full collection by using the <code>list</code> function, like so:</p>
+
+<pre><code>iterator = Foo([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;])
+list(iterator)  # [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+</code></pre>
+
+<blockquote>
+<p>Note: be careful doing this, because if the iterator is yielding an unbounded number of elements, then this will exhaust your application&rsquo;s memory!</p>
+</blockquote>
+
+<h2 id="generators">Generators</h2>
+
+<p>According to the official <a href="https://docs.python.org/3.7/library/stdtypes.html#generator-types" target="_blank">Python documentation</a>, a &lsquo;generator&rsquo; provides&hellip;</p>
+
+<blockquote>
+<p>A convenient way to implement the iterator protocol. If a container object&rsquo;s <code>__iter__()</code> method is implemented as a generator, it will automatically return an iterator object.</p>
+</blockquote>
+
+<h3 id="why-use-generators">Why use Generators?</h3>
+
+<p>They offer nice syntax sugar around creating a simple Iterator, but also help reduce the boilerplate code necessary to make something iterable.</p>
+
+<p>A Generator can help reduce the code boilerplate associated with a &lsquo;class-based&rsquo; iterator because they&rsquo;re designed to handle the &lsquo;state management&rsquo; logic you would otherwise have to write yourself.</p>
+
+<h3 id="generator-implementation">Generator Implementation</h3>
+
+<p>A Generator is a function that returns a &lsquo;generator iterator&rsquo;, so it acts similar to how <code>__iter__</code> works (remember it returns an iterator).</p>
+
+<p>In fact a Generator is a subclass of an Iterator. The generator function itself should utilize a <code>yield</code> statement to return control back to the caller of the generator function.</p>
+
+<p>The caller can then advance the generator iterator by using either the <code>for-in</code> statement or <code>next</code> function (as we saw earlier with the &lsquo;class-based&rsquo; Iterator examples), which again highlights how generators are indeed a subclass of an Iterator.</p>
+
+<p>When a generator &lsquo;yields&rsquo; it actually pauses the function at that point in time and returns a value. Calling <code>next</code> (or as part of a <code>for-in</code>) will move the function forward, where it will either complete the generator function or stop at the next <code>yield</code> declaration within the generator function.</p>
+
+<h3 id="generator-example">Generator Example</h3>
+
+<p>The following example prints <code>a</code>, then <code>b</code>, finally <code>c</code>:</p>
+
+<pre><code>def generator():
+  yield &quot;a&quot;
+  yield &quot;b&quot;
+  yield &quot;c&quot;
+
+for v in generator():
+     print(v)
+</code></pre>
+
+<p>If we used the <code>next()</code> function instead then we would do something like the following:</p>
+
+<pre><code>gen = generator()
+next(gen)  # a
+next(gen)  # b
+next(gen)  # c
+next(gen)  # raises StopIteration
+</code></pre>
+
+<p>Notice that this has greatly reduced our code boilerplate compared to the custom &lsquo;class-based&rsquo; Iterator we created earlier, as there is no need to define the <code>__iter__</code> nor <code>__next__</code> methods on a class instance (nor manage any state ourselves). We simple call <code>yield</code>!</p>
+
+<p>If our use case is simple enough, then Generators are the way to go. Otherwise we might need a custom &lsquo;class-based&rsquo; Iterator if we have very specific logic we need to execute.</p>
+
+<p>Remember, Iterators (and by extension Generators) are very memory efficient and thus we could have a generator that yields an unbounded number of elements like so:</p>
+
+<pre><code>def unbounded_generator():
+    while True:
+        yield &quot;some value&quot;
+
+gen = unbounded_generator()
+
+next(gen)  # some value
+next(gen)  # some value
+next(gen)  # some value
+next(gen)  # some value
+next(gen)  # ...
+</code></pre>
+
+<p>So, as mentioned earlier, be careful when using <code>list()</code> over a generator function (see below example), as that will realize the entire collection and could exhaust your application memory.</p>
+
+<pre><code>def generator():
+  yield &quot;a&quot;
+  yield &quot;b&quot;
+  yield &quot;c&quot;
+
+gen = generator()
+list(gen)  # [a, b, c]
+</code></pre>
+
+<h3 id="generator-expressions">Generator Expressions</h3>
+
+<p>According to the official <a href="https://www.python.org/dev/peps/pep-0289/" target="_blank">PEP 289 document</a> for generator expressions&hellip;</p>
+
+<blockquote>
+<p>Generator expressions are a high-performance, memory–efficient generalization of list comprehensions and generators.</p>
+</blockquote>
+
+<p>In essence they are a way of creating a generator using a syntax very similar to <a href="https://gist.github.com/e5310d1082b0ff8307e39b71a6f9bae5" target="_blank">list comprehensions</a>.</p>
+
+<p>Below is an example of a generator function that will print <code>&quot;foo&quot;</code> five times:</p>
+
+<pre><code>def generator(limit):
+    for i in range(limit):
+        yield &quot;foo&quot;
+
+for v in generator(5):
+    print(v)
+</code></pre>
+
+<p>Now here is is the same thing as a generator expression:</p>
+
+<pre><code>for v in (&quot;foo&quot; for i in range(5)):
+    print(v)
+</code></pre>
+
+<p>The syntax for a generator expression is also very similar to those used by comprehensions, except that instead of the boundary/delimeter characters being <code>[]</code> or <code>{}</code>, we use <code>()</code>:</p>
+
+<pre><code>(expression for item in collection if condition)
+</code></pre>
+
+<blockquote>
+<p>Note: so although not demonstrated, you can also &lsquo;filter&rsquo; yielded values due to the support for &ldquo;if&rdquo; conditions.</p>
+</blockquote>
+
+<h3 id="nested-generators-i-e-yield-from">Nested Generators (i.e. <code>yield from</code>)</h3>
+
+<p>Python 3.3 provided the <code>yield from</code> statement, which offered some basic syntactic sugar around dealing with nested generators.</p>
+
+<p>Let&rsquo;s see an example of what we would have to do if we didn&rsquo;t have <code>yield from</code>:</p>
+
+<pre><code>def baz():
+    for i in range(10):
+        yield i
+
+def bar():
+    for i in range(5):
+        yield i
+
+def foo():
+    for v in bar():
+        yield v
+    for v in baz():
+        yield v
+
+for v in foo():
+    print(v)
+</code></pre>
+
+<p>Notice how (inside the <code>foo</code> generator function) we have two separate <code>for-in</code> loops, one for each nested generator.</p>
+
+<p>Now look at what this becomes when using <code>yield from</code>:</p>
+
+<pre><code>def baz():
+    for i in range(10):
+        yield i
+
+def bar():
+    for i in range(5):
+        yield i
+
+def foo():
+    yield from bar()
+    yield from baz()
+
+for v in foo():
+    print(v)
+</code></pre>
+
+<p>OK so not exactly a ground breaking feature, but if you were ever confused by <code>yield from</code> you now know that it&rsquo;s a simple facade over the <code>for-in</code> syntax.</p>
+
+<p>Although it&rsquo;s worth pointing out that if we didn&rsquo;t have <code>yield from</code> we still could have reworked our original code using the <code>itertool</code> module&rsquo;s <code>chain()</code> function, like so:</p>
+
+<pre><code>from itertools import chain
+
+def baz():
+    for i in range(10):
+        yield i
+
+def bar():
+    for i in range(5):
+        yield i
+
+def foo():
+    for v in chain(bar(), baz()):
+        yield v
+
+for v in foo():
+    print(v)
+</code></pre>
+
+<blockquote>
+<p>Note: refer to <a href="https://www.python.org/dev/peps/pep-0380/" target="_blank">PEP 380</a> for more details on <code>yield from</code> and the rationale for its inclusion in the Python language.</p>
+</blockquote>
+
+<h2 id="coroutines">Coroutines</h2>
+
+<p>Coroutines (as far as Python is concerned) have historically been designed to be an extension to <a href="#generators">Generators</a>.</p>
+
+<blockquote>
+<p>Coroutines are computer program components that generalize subroutines for non-preemptive multitasking, by allowing execution to be suspended and resumed. &ndash; <a href="https://en.wikipedia.org/wiki/Coroutine" target="_blank">Wikipedia</a></p>
+</blockquote>
+
+<h3 id="why-use-coroutines">Why use Coroutines?</h3>
+
+<p>Because coroutines can pause and resume execution context, they&rsquo;re well suited to conconcurrent processing, as they enable the program to determine when to &lsquo;context switch&rsquo; from one point of the code to another.</p>
+
+<p>This is why coroutines are commonly used when dealing with concepts such as an <a href="/posts/python-asyncio/#event-loop">event loop</a> (which Python&rsquo;s <code>asyncio</code> is built upon).</p>
+
+<h3 id="coroutines-implementation">Coroutines Implementation</h3>
+
+<p>Generators use the <code>yield</code> keyword to return a value at some point in time within a function, but with coroutines the <code>yield</code> directive can <em>also</em> be used on the right-hand side of an <code>=</code> operator to signify it will <em>accept a value</em> at that point in time.</p>
+
+<h3 id="coroutines-example">Coroutines Example</h3>
+
+<p>Below is an example of a coroutine. Remember! a coroutine is still a generator and so you&rsquo;ll see our example uses features that are related to generators (such as <code>yield</code> and the <code>next()</code> function):</p>
+
+<blockquote>
+<p>Note: refer to the code comments for extra clarity.</p>
+</blockquote>
+
+<pre><code>def foo():
+    &quot;&quot;&quot;
+    notice we use yield in both the 
+    traditional generator sense and
+    also in the coroutine sense.
+    &quot;&quot;&quot;
+    msg = yield  # coroutine feature
+    yield msg    # generator feature
+
+coro = foo()
+
+# because a coroutine is a generator
+# we need to advance the returned generator
+# to the first yield within the generator function
+next(coro)
+
+# the .send() syntax is specific to a coroutine
+# this sends &quot;bar&quot; to the first yield 
+# so the msg variable will be assigned that value
+result = coro.send(&quot;bar&quot;)
+
+# because our coroutine also yields the msg variable
+# it means we can print that value
+print(result)  # bar
+</code></pre>
+
+<blockquote>
+<p>Note: <code>coro</code> is an identifier commonly used to refer to a coroutine. For more information on other available coroutine methods, please refer to the <a href="https://docs.python.org/3.8/reference/datamodel.html#coroutines" target="_blank">documentation</a>.</p>
+</blockquote>
+
+<p>Below is an example of a coroutine using <code>yield</code> to return a value to the caller prior to the value <em>received</em> via a caller using the <code>.send()</code> method:</p>
+
+<pre><code>def foo():
+    msg = yield &quot;beep&quot;
+    yield msg
+
+coro = foo()
+
+print(next(coro))  # beep
+
+result = coro.send(&quot;bar&quot;)
+
+print(result)  # bar
+</code></pre>
+
+<p>You can see in the above example that when we moved the generator coroutine to the first <code>yield</code> statement (using <code>next(coro)</code>), that the value <code>&quot;beep&quot;</code> was returned for us to <code>print</code>.</p>
+
+<h3 id="asyncio-generator-based-coroutines">Asyncio: generator based coroutines</h3>
+
+<p>When the <code>asyncio</code> module was first released it didn&rsquo;t support the <code>async</code>/<code>await</code> syntax, so when it was introduced, to ensure any legacy code that had a function that needed to be run concurrently (i.e. awaited) would have to use an <code>asyncio.coroutine</code> decorator function to allow it to be compatible with the new <code>async</code>/<code>await</code> syntax.</p>
+
+<blockquote>
+<p>Note: refer to <a href="https://docs.python.org/3.8/library/asyncio-task.html#generator-based-coroutines" target="_blank">the documentation</a> for information on this deprecated (as of Python 3.10) feature, as well as some other functions like <code>asyncio.iscoroutine</code> that are specific to generator based coroutines.</p>
+</blockquote>
+
+<p>The original generator based coroutines meant any <code>asyncio</code> based code would have used <code>yield from</code> to await on <a href="/posts/python-asyncio/#futures">Futures</a> and other coroutines.</p>
+
+<p>The following example demonstrates how to use both the new <code>async</code> coroutines with legacy generator based coroutines:</p>
+
+<pre><code>@asyncio.coroutine
+def old_style_coroutine():
+    yield from asyncio.sleep(1)
+
+async def main():
+    await old_style_coroutine()
+</code></pre>
+
+<h3 id="asyncio-new-async-coroutines">Asyncio: new async coroutines</h3>
+
+<p>Coroutines created with <code>async def</code> are implemented using the more recent <code>__await__</code> dunder method (see <a href="https://docs.python.org/3.8/reference/datamodel.html#coroutines" target="_blank">documentation here</a>), while generator based coroutines are using a legacy &lsquo;generator&rsquo; based implementation.</p>
+
+<h3 id="types-of-coroutines">Types of Coroutines</h3>
+
+<p>This has led to the term &lsquo;coroutine&rsquo; meaning multiple things in different contexts. We now have:</p>
+
+<ul>
+<li><strong>simple coroutines</strong>: traditional generator coroutine (no async io).</li>
+<li><strong>generator coroutines</strong>: async io using legacy <code>asyncio</code> implementation.</li>
+<li><strong>native coroutines</strong>: async io using latest <code>async</code>/<code>await</code> implementation.</li>
+</ul>
+
+<h3 id="miscellaneous">Miscellaneous</h3>
+
+<p>There are a couple of interesting decorator functions provided by Python that can be a bit confusing, due to these functions appearing to have overlapping functionality.</p>
+
+<p>They don&rsquo;t overlap, but do appear to be used together:</p>
+
+<ul>
+<li><code>types.coroutine</code>: converts generator function into a coroutine.</li>
+<li><code>asyncio.coroutine</code>: abstraction ensuring <code>asyncio</code> compatibility.</li>
+</ul>
+
+<blockquote>
+<p>Note: as we&rsquo;ll see in a moment, <code>asyncio.coroutine</code> actually calls <code>types.coroutine</code>. You should ideally use the former when dealing with <code>asyncio</code> code.</p>
+</blockquote>
+
+<p>More specifically, if we look at the implementation of the <a href="https://github.com/python/cpython/blob/master/Lib/asyncio/coroutines.py#L105" target="_blank"><code>asyncio.coroutine</code> code</a> we can see:</p>
+
+<ol>
+<li>If decorated function is already a coroutine, then just return it.</li>
+<li>If decorated function is a generator, then convert it to a coroutine (using <code>types.coroutine</code>).</li>
+<li>Otherwise wrap the decorated function such that when it&rsquo;s converted to a coroutine it&rsquo;ll await any resulting awaitable value.</li>
+</ol>
+
+<p>What&rsquo;s interesting about <code>types.coroutine</code> is that if your decorated function were to remove any reference to a <code>yield</code>, then the function will be executed immediately rather than returning a generator. See <a href="https://stackoverflow.com/a/49477233" target="_blank">this</a> Stack Overflow answer for more information as to where that behaviour was noticed.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

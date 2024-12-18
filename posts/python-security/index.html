@@ -1,0 +1,727 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#security-with-python">Security with Python</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#generate-digest">generate_digest</a></li>
+
+<li><a href="#decrypt-digest-and-validate-digest">decrypt_digest and validate_digest</a></li>
+
+<li><a href="#dependencies">Dependencies</a></li>
+
+<li><a href="#usage">Usage</a></li>
+
+<li><a href="#tests">Tests</a></li>
+
+<li><a href="#implementation">Implementation</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="security-with-python">Security with Python</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>I recently implemented a Python library which acts as an abstraction layer on top of an existing security algorithm (in this case <a href="https://www.tarsnap.com/scrypt.html" target="_blank">scrypt</a>).</p>
+
+<p>The motivation was for allowing teams to have a consistent experience utilising encryption (and hashing) in their applications and services without necessarily having to know the ins-and-outs of what&rsquo;s important with regards to salts, key lengths etc.</p>
+
+<blockquote>
+<p>Note: I always encourage people to understand what it is they&rsquo;re doing, but in some cases that&rsquo;s not always a practical mindset.</p>
+</blockquote>
+
+<p>The library provides three functions:</p>
+
+<ol>
+<li><code>generate_digest</code></li>
+<li><code>decrypt_digest</code></li>
+<li><code>validate_digest</code></li>
+</ol>
+
+<p>{{&lt; adverts/pythonforprogrammers &gt;}}</p>
+
+<p>Before we start looking at the three functions provided by this library/interface, let&rsquo;s very briefly talk about KDF and PBKDF2.</p>
+
+<p>A <a href="https://en.wikipedia.org/wiki/Key_derivation_function" target="_blank">KDF</a> (Key Derivation Function) accepts a message + a key, and produces a digest for its output. They are designed to be more computationally intensive than standard hashing functions, and so they make it harder to use dictionary or rainbow table style attacks (as they would require a lot of extra memory resources and become more unfeasible as an attack vector).</p>
+
+<p>By default the KDF will generate a random salt (thus output is non-deterministic) and have a maximum computational time of <code>0.5</code> (although this can be overridden using a <code>maxtime</code> argument, as we&rsquo;ll see later).</p>
+
+<p>A <a href="https://en.wikipedia.org/wiki/PBKDF2" target="_blank">PBKDF2</a> on the other hand is able to provide deterministic output (as well as the ability to specify an explicit salt value). The internal implementation will repeat its process multiple times, thus reducing the feasibility of automated password cracking attempts (similar to a KDF).</p>
+
+<p>I mention both of these (KDF and PBKDF2) because the <code>generate_digest</code> function I&rsquo;ve written is a multi-arity function that will switch implementation based upon the provided arguments in the method signature.</p>
+
+<p>Originally I had two separate functions to distinguish them a bit more clearly but realised if this library is to make life easier for developers who don&rsquo;t understand encryption or hashing concepts, then I need to provide a single function that intelligently handles things internally.</p>
+
+<p>Because KDF accepts a key and is able to return the original message (given the same key) it&rsquo;s acting as a form of symmetrical encryption, whereas a PBKDF2 is more like a one-way hash function. Hence I named the function in this library <code>generate_digest</code> rather than something like <code>encrypt_message</code> which wouldn&rsquo;t have made sense when dealing with PBKDF2.</p>
+
+<h2 id="generate-digest">generate_digest</h2>
+
+<p>This is a multi-arity function that will generate a digest using either a password-based key derivation function (<a href="https://en.wikipedia.org/wiki/Key_derivation_function" target="_blank">KDF</a>) or a <a href="https://en.wikipedia.org/wiki/PBKDF2" target="_blank">PBKDF2</a> depending on the input given.</p>
+
+<p>If a <code>password</code> argument is provided, then KDF will be used (along with a random salt) to generate a <em>non-deterministic</em> digest.</p>
+
+<p>If a <code>salt</code> is provided, then a PBKDF2 will be used to generate a <em>deterministic</em> digest.</p>
+
+<blockquote>
+<p>Note: salts should be a minimum of 128bits (~16 characters) in length. Also, when specifying a maxtime with <code>generate_digest</code>, ensure you include that same value when decrypting with <code>decrypt_digest</code> or validating via <code>validate_digest</code>.</p>
+</blockquote>
+
+<h2 id="decrypt-digest-and-validate-digest">decrypt_digest and validate_digest</h2>
+
+<p>The <code>decrypt_digest</code> and <code>validate_digest</code> functions only apply to digests that have been generated using a password (i.e. KDF). Given the right password <code>decrypt_digest</code> will return the original message, and thus is considered more a form of symmetrical encryption than a straight one-way hash function. The <code>validate_digest</code> function will return a boolean true or false if the given password was able to decrypt the message.</p>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<p>This abstraction library requires <code>scrypt</code>, which itself requires the following dependencies to be installed within the context of your service: <code>build-essential</code>, <code>libssl-dev</code>, and <code>python-dev</code>. If your service has a Dockerfile, adding these dependencies should be as simple as adding a line like the following:</p>
+
+<pre><code>RUN apt-get update &amp;&amp; apt-get install -y build-essential libssl-dev python-dev
+</code></pre>
+
+<h2 id="usage">Usage</h2>
+
+<p>I suggest looking at the test suite (see below) to get an idea of how you would use the functions in this library.</p>
+
+<blockquote>
+<p>Note: for a glossary of security terms, refer to <a href="https://docs.google.com/document/d/1qs3jEIQvocdVhSxCSPLF1BoLnp91aLnuUIasvl-maYo/edit?usp=sharing" target="_blank">this document</a>.</p>
+</blockquote>
+
+<h2 id="tests">Tests</h2>
+
+<p>Before we look at the implementation of the library, let&rsquo;s take a moment to sift through its test suite.</p>
+
+<blockquote>
+<p>Note: I named the library <code>secure</code> and have it running on a private PyPy instance. This code is <a href="https://github.com/Integralist/Python-Encryption" target="_blank">made available via GitHub</a>.</p>
+</blockquote>
+
+<pre><code>import pytest
+
+from secure.interface import ArgumentError, generate_digest, validate_digest, decrypt_digest
+
+
+message = &quot;my-message&quot;
+password = &quot;my-password&quot;
+salt = &quot;my-salt-is-long-enough&quot;
+
+
+def test_generate_digest_with_both_a_password_and_a_salt():
+    &quot;&quot;&quot;Providing both a password and a salt should raise an exception.&quot;&quot;&quot;
+
+    with pytest.raises(ArgumentError):
+        generate_digest(message, salt=salt, password=password)
+
+
+def test_generate_digest_with_a_password():
+    &quot;&quot;&quot;Generating a digest with a password should be non-deterministic.&quot;&quot;&quot;
+
+    digest1 = generate_digest(message, password=password)
+    digest2 = generate_digest(message, password=password)
+    digest3 = generate_digest(message, password=password, maxtime=1.5)
+    digest4 = generate_digest(message, password=password, maxtime=1.5)
+    digest5 = generate_digest(message, password=password, maxtime=int(1))
+    digest6 = generate_digest(message, password=password, maxtime=int(1))
+
+    assert digest1 != digest2
+    assert digest3 != digest4
+    assert digest5 != digest6
+
+
+def test_generate_digest_without_a_password():
+    &quot;&quot;&quot;Generating a digest without a password should be deterministic.&quot;&quot;&quot;
+
+    digest1 = generate_digest(message)
+    digest2 = generate_digest(message)
+    digest3 = generate_digest(message, salt=salt)
+    digest4 = generate_digest(message, salt=salt)
+    digest5 = generate_digest(message, length=128)
+    digest6 = generate_digest(message, length=128)
+
+    assert digest1 == digest2
+    assert digest3 == digest4
+    assert len(digest5) == len(digest6)
+
+
+def test_generate_digest_with_different_salt_lengths():
+    &quot;&quot;&quot;Salts should be at least 128bits (~16 characters) in length.&quot;&quot;&quot;
+
+    generate_digest(message, salt=salt)
+
+    with pytest.raises(ArgumentError):
+        generate_digest(message, salt=&quot;too-short&quot;)
+
+def test_validate_digest():
+    &quot;&quot;&quot;Validation only applies to digests generated with a password.&quot;&quot;&quot;
+
+    digest1 = generate_digest(message, password=password)
+    digest2 = generate_digest(message, password=password)
+    digest3 = generate_digest(message, password=password, maxtime=1.5)
+    digest4 = generate_digest(message, password=password, maxtime=1.5)
+    digest5 = generate_digest(message, password=password, maxtime=int(1))
+    digest6 = generate_digest(message, password=password, maxtime=int(1))
+
+    assert not validate_digest(digest1, 'incorrect-password')
+    assert validate_digest(digest1, password)
+    assert validate_digest(digest3, password, maxtime=1.5)
+    assert validate_digest(digest5, password, maxtime=int(1))
+
+
+def test_decrypt_digest():
+    &quot;&quot;&quot;Decryption is possible given the right password.&quot;&quot;&quot;
+
+    digest = generate_digest(message, password=password)
+
+    assert decrypt_digest(digest, password) == message
+</code></pre>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>OK, time to see the library code itself.</p>
+
+<blockquote>
+<p>Note: I like to use <a href="http://mypy-lang.org/" target="_blank">MyPy</a> for type hinting.</p>
+</blockquote>
+
+<pre><code>import scrypt
+
+from typing import Union
+
+
+class ArgumentError(Exception):
+    pass
+
+
+def generate_digest(message: str,
+                    password: str = None,
+                    maxtime: Union[float, int] = 0.5,
+                    salt: str = &quot;&quot;,
+                    length: int = 64) -&gt; bytes:
+    &quot;&quot;&quot;Multi-arity function for generating a digest.
+
+    Use KDF symmetric encryption given a password.
+    Use deterministic hash function given a salt (or lack of password).
+    &quot;&quot;&quot;
+
+    if password and salt:
+        raise ArgumentError(&quot;only provide a password or a salt, not both&quot;)
+
+    if salt != &quot;&quot; and len(salt) &lt; 16:
+        raise ArgumentError(&quot;salts need to be minimum of 128bits (~16 characters)&quot;)
+
+    if password:
+        return scrypt.encrypt(message, password, maxtime=maxtime)
+    else:
+        return scrypt.hash(message, salt, buflen=length)
+
+
+def decrypt_digest(digest: bytes,
+                   password: str,
+                   maxtime: Union[float, int] = 0.5) -&gt; bytes:
+    &quot;&quot;&quot;Decrypts digest using given password.&quot;&quot;&quot;
+
+    return scrypt.decrypt(digest, password, maxtime)
+
+
+def validate_digest(digest: bytes,
+                    password: str,
+                    maxtime: Union[float, int] = 0.5) -&gt; bool:
+    &quot;&quot;&quot;Validate digest using given password.&quot;&quot;&quot;
+
+    try:
+        scrypt.decrypt(digest, password, maxtime)
+        return True
+    except scrypt.error:
+        return False
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Let me know what you think on twitter. Have fun.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

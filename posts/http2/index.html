@@ -1,0 +1,722 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#http-2">HTTP/2</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#persistent-connections">Persistent Connections</a></li>
+
+<li><a href="#multiplexing">Multiplexing</a></li>
+
+<li><a href="#header-compression">Header Compression</a></li>
+
+<li><a href="#prioritization">Prioritization</a></li>
+
+<li><a href="#ssl-tls">SSL/TLS</a></li>
+
+<li><a href="#server-push">Server Push</a></li>
+
+<li><a href="#implementations">Implementations</a>
+<ul>
+<li><a href="#nginx">Nginx</a></li>
+
+<li><a href="#go">Go</a></li>
+</ul></li>
+
+<li><a href="#references">References</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="http-2">HTTP/2</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This is a super quick post for demonstrating how to utilise the new HTTP/2 protocol. If you&rsquo;re unfamiliar with it, then let me spend a brief few moments discussing some of the highlights.</p>
+
+<h2 id="persistent-connections">Persistent Connections</h2>
+
+<p>When using HTTP/1.x each resource your web page specified would need its own connection. If you had three images on a page then that would be three separate connections.</p>
+
+<p>With HTTP/2 the situation is improved by utilising a single connection which supports the concept of a &lsquo;stream&rsquo;. A stream is effectively a two way channel, so information flows up and down it; and a single connection will be able to manage as many streams as necessary.</p>
+
+<p>This removes the need for previous &lsquo;performance&rsquo; techniques such as:</p>
+
+<ul>
+<li>domain sharding: a way to side step the problem of browsers only being able to parallelize a limited number of connections to the same domain</li>
+<li>image spriting: combining multiple images into one to reduce multiple connections to the server</li>
+<li>concatenating css/js: combining multiples stylesheets or javascript files into a single file to reduce multiple connections to the server</li>
+</ul>
+
+<p>This also means that the browser is able to more precisely cache resources as there is no need to have to bundle all your static assets together. This also avoids the user downloading assets for a page that they will never visit.</p>
+
+<h2 id="multiplexing">Multiplexing</h2>
+
+<p>This simply means that multiple resources can be loaded in parallel over a single connection. Just to be clear: this is a very good performance boost and facilitates the ability to transfer lots of resources in a much more efficient manner than HTTP/1.x</p>
+
+<h2 id="header-compression">Header Compression</h2>
+
+<p>Header information will no longer be sent over the wire in plaintext format. It&rsquo;ll now be compressed, making it smaller and the responses subsequently quicker to receive (although admittedly this is only a marginal gain).</p>
+
+<p>This also means we should be less concerned about having to serve static assets from a cookie-less domain, which was a problem because the size of the static resources would all become larger due to cookie data being associated with them.</p>
+
+<h2 id="prioritization">Prioritization</h2>
+
+<p>Because all connections are multiplexed into a single connection, we need a way to prioritize certain requests over others in order to ensure the fastest possible overall response. HTTP/2 supports the concept of &lsquo;weighting&rsquo; each &lsquo;stream&rsquo; (see &ldquo;Persistent Connections&rdquo; above for details of what a stream is).</p>
+
+<p>I wont dive into the specifics of how this has been designed, suffice to say, if you want the gory details then I recommend you read the specification document here: <a href="http://http2.github.io/http2-spec/#rfc.section.5.3.2" target="_blank">http2.github.io/http2-spec</a></p>
+
+<h2 id="ssl-tls">SSL/TLS</h2>
+
+<p>The above highlights also suggest a reduction in the overall time cost associated with the SSL/TLS &lsquo;handshake&rsquo; process. Here&rsquo;s why:</p>
+
+<ul>
+<li>A single connection will minimize SSL handshaking back and forth between the client/server</li>
+<li>Multiplexing allows requests to be handled asynchronously</li>
+<li>Compressing the HTTP headers will make the connection smaller (and subsequently faster)</li>
+<li>Prioritized connections means allowing relevant requests to be handled in an appropriate order</li>
+</ul>
+
+<h2 id="server-push">Server Push</h2>
+
+<p>In HTTP/2 the server now has the ability to send additional information along with the initial HTTP request made by the client. Now it&rsquo;s important to realise that the concept of &lsquo;server push&rsquo; isn&rsquo;t the same thing as <a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events" target="_blank">Server-Sent Events</a>.</p>
+
+<p>Server-Sent Events allows the server to push updates to the client and as long as the client is listening for the relevant event, the client will be able to receive the pushed notification.</p>
+
+<p>Server Push isn&rsquo;t the same thing and was designed to solve a different use case. With HTTP/2 the server is able to send the client additional resources, even though the client hadn&rsquo;t explicitly requested them.</p>
+
+<p>A typical example given is when the client requests a HTTP page and that page has some static resources like CSS and JavaScript. In HTTP/1.x the client would request a web page, and then start parsing it only to discover the page includes CSS and JavaScript resources. The client would then have to make additional requests for those static resources.</p>
+
+<p>But with HTTP/2 the server can save the client from making multiple requests by sending all the other static resources in parallel for the client&rsquo;s initial request for the main page/document.</p>
+
+<h2 id="implementations">Implementations</h2>
+
+<p>Im not sure exactly how many implementations are available for the HTTP/2 specification out in the wild, but there are two that we&rsquo;ll look at here in this article: <a href="https://www.nginx.com/" target="_blank">nginx</a> and <a href="https://golang.org/" target="_blank">Go</a>.</p>
+
+<p>If you&rsquo;re interested in other implementations then you can find a list of alternative options here: <a href="https://github.com/http2/http2-spec/wiki/Implementations" target="_blank">github.com/http2/http2-spec/wiki/Implementations</a>.</p>
+
+<h3 id="nginx">Nginx</h3>
+
+<p>The latest release of nginx (both its open-source and paid for models) has good support for HTTP/2, but (for the moment at least) it doesn&rsquo;t support Server Push. I&rsquo;m going to presume that you&rsquo;re already familiar with nginx and how it works, so I won&rsquo;t bother explaining things a basic nginx user would already know.</p>
+
+<p>Below is a snippet from a <code>nginx.conf</code> file that has enabled HTTP/2 support:</p>
+
+<pre><code>http {
+  server {
+    listen *:443 ssl http2;
+    server_name integralist.co.uk;
+
+    ssl_certificate         /etc/nginx/certs/server.crt;
+    ssl_certificate_key     /etc/nginx/certs/server.key;
+    ssl_trusted_certificate /etc/nginx/certs/ca.crt;
+  }
+}
+</code></pre>
+
+<p>As you can see, the <code>listen</code> directive specifies <code>http2</code>. In essence this is all you would need to enable HTTP/2 using nginx. The reason we&rsquo;re restricting nginx to listening on port <code>443</code> and enabling <code>ssl</code> (+ specifying SSL certificates) is because the majority of web browsers require TLS in order to support HTTP/2, and also nginx&rsquo;s implementation relies upon TLS (see below for details).</p>
+
+<blockquote>
+<p>Note: currently Opera and Safari 9 supports HTTP/2 without TLS</p>
+</blockquote>
+
+<p>Nginx is a reverse proxy and so because the client doesn&rsquo;t have direct access to the back-end services/applications, nginx is able to translate HTTP/2 into HTTP/1.x which also allows those services to not have to be rearchitected.</p>
+
+<p>When a client communicates with nginx it&rsquo;ll typically pass a list of protocols it supports along with the request. Nginx will attempt to identify the <code>h2</code> protocol within that list, which indicates HTTP/2 support (specifically nginx implements the <a href="https://tools.ietf.org/html/rfc7301" target="_blank">Application Layer Protocol Negotiation</a> extension for TLS). If HTTP/2 isn&rsquo;t supported then nginx falls back to HTTP/1.x instead.</p>
+
+<h3 id="go">Go</h3>
+
+<p>If you&rsquo;re not using a load balancer or a reverse proxy (such as nginx), then you might still be able to implement HTTP/2 support via your application server. One such example is with the Go programming language.</p>
+
+<p>Below is an example application which demonstrates how to enable HTTP/2 support. Because we&rsquo;re not utilising a reverse proxy we don&rsquo;t have SSL termination handled automatically for us, and so our application will need to handle the TLS handshake process:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;html&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+
+  &quot;golang.org/x/net/http2&quot;
+)
+
+func main() {
+  var server http.Server
+
+  http2.VerboseLogs = true
+  server.Addr = &quot;:8080&quot;
+
+  http2.ConfigureServer(&amp;server, nil)
+
+  http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, &quot;URL: %q\n&quot;, html.EscapeString(r.URL.Path))
+    ShowRequestInfoHandler(w, r)
+  })
+
+  log.Fatal(server.ListenAndServeTLS(&quot;localhost.cert&quot;, &quot;localhost.key&quot;))
+}
+func ShowRequestInfoHandler(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set(&quot;Content-Type&quot;, &quot;text/plain&quot;)
+
+  fmt.Fprintf(w, &quot;Method: %s\n&quot;, r.Method)
+  fmt.Fprintf(w, &quot;Protocol: %s\n&quot;, r.Proto)
+  fmt.Fprintf(w, &quot;Host: %s\n&quot;, r.Host)
+  fmt.Fprintf(w, &quot;RemoteAddr: %s\n&quot;, r.RemoteAddr)
+  fmt.Fprintf(w, &quot;RequestURI: %q\n&quot;, r.RequestURI)
+  fmt.Fprintf(w, &quot;URL: %#v\n&quot;, r.URL)
+  fmt.Fprintf(w, &quot;Body.ContentLength: %d (-1 means unknown)\n&quot;, r.ContentLength)
+  fmt.Fprintf(w, &quot;Close: %v (relevant for HTTP/1 only)\n&quot;, r.Close)
+  fmt.Fprintf(w, &quot;TLS: %#v\n&quot;, r.TLS)
+  fmt.Fprintf(w, &quot;\nHeaders:\n&quot;)
+
+  r.Header.Write(w)
+}
+</code></pre>
+
+<blockquote>
+<p>Note: the above code has been slightly modified from an example originally conceived by <a href="https://plus.google.com/111824860449692850794/posts" target="_blank">Kim Ilyong</a></p>
+</blockquote>
+
+<p>If you stick the above code into a file called <code>http2.go</code>, run the program and visit <code>https://localhost:8080/</code> in your browser (using one that supports HTTP/2 obviously), then you should see the following output (or something similar):</p>
+
+<pre><code>URL: &quot;/&quot;
+Method: GET
+Protocol: HTTP/2.0
+Host: localhost:8080
+RemoteAddr: [::1]:63555
+RequestURI: &quot;/&quot;
+URL: &amp;url.URL{Scheme:&quot;&quot;, Opaque:&quot;&quot;, User:(*url.Userinfo)(nil), Host:&quot;&quot;, Path:&quot;/&quot;, RawPath:&quot;&quot;, RawQuery:&quot;&quot;, Fragment:&quot;&quot;}
+Body.ContentLength: 0 (-1 means unknown)
+Close: false (relevant for HTTP/1 only)
+TLS: &amp;tls.ConnectionState{Version:0x303,
+ HandshakeComplete:true,
+ DidResume:false,
+ CipherSuite:0xc02f,
+ NegotiatedProtocol:&quot;h2&quot;,
+ NegotiatedProtocolIsMutual:true,
+ ServerName:&quot;localhost&quot;,
+ PeerCertificates:[]*x509.Certificate(nil),
+ VerifiedChains:[][]*x509.Certificate(nil),
+ SignedCertificateTimestamps:[][]uint8(nil),
+ OCSPResponse:[]uint8(nil),
+ TLSUnique:[]uint8{0xf6,
+ 0xb,
+ 0xf8,
+ 0x95,
+ 0x6f,
+ 0x73,
+ 0x4f,
+ 0x26,
+ 0x8f,
+ 0x72,
+ 0x26,
+ 0xab}}
+
+Headers:
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: en-US,en;q=0.8
+Cache-Control: max-age=0
+Cookie: _chartbeat2=CAgQSrCqRzJnCmxa4b.1434983427317.1434983759085.1
+Dnt: 1
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36
+</code></pre>
+
+<p>You&rsquo;ll notice the <code>Protocol: HTTP/2.0</code> which indicates we&rsquo;re handling HTTP/2 now. If you&rsquo;re using the Chrome web browser you can also download an extension called &ldquo;HTTP/2 and SPDY indicator&rdquo; which will display a blue lightning bolt on any site that is serving content via the HTTP/2 protocol.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://http2.github.io/faq/" target="_blank">HTTP/2 FAQ</a></li>
+<li><a href="https://github.com/http2/http2-spec/wiki/Implementations" target="_blank">HTTP/2 Implementations</a></li>
+<li><a href="https://http2.golang.org/" target="_blank">Go HTTP/2 Demo Page</a></li>
+<li><a href="https://github.com/bradfitz/http2/tree/master/h2demo" target="_blank">Go HTTP/2 Example Code</a></li>
+</ul>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

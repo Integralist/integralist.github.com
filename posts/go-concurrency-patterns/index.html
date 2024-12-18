@@ -1,0 +1,1314 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#go-concurrency-patterns">Go Concurrency Patterns</a>
+<ul>
+<li><a href="#goroutines">Goroutines</a></li>
+
+<li><a href="#channels">Channels</a></li>
+
+<li><a href="#select-statement">Select Statement</a></li>
+
+<li><a href="#wait-groups">Wait Groups</a></li>
+
+<li><a href="#mutex">Mutex</a></li>
+
+<li><a href="#conditions">Conditions</a></li>
+
+<li><a href="#atomic-operations">Atomic Operations</a></li>
+
+<li><a href="#once">Once</a></li>
+
+<li><a href="#context">Context</a></li>
+
+<li><a href="#map">Map</a></li>
+
+<li><a href="#real-examples">Real Examples</a>
+<ul>
+<li><a href="#update-2024-11-01">UPDATE 2024.11.01</a></li>
+</ul></li>
+
+<li><a href="#reference-material">Reference Material</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="go-concurrency-patterns">Go Concurrency Patterns</h1>
+
+<h2 id="goroutines">Goroutines</h2>
+
+<p>The <code>go</code> keyword is used to start a goroutine.</p>
+
+<p>A goroutine is a lightweight, managed thread used by the Go runtime to run functions concurrently.</p>
+
+<p>Unlike OS threads, which have a fixed stack size (often around 1MB), goroutines start with a very small stack, around 2KB, and can grow or shrink dynamically as needed. This makes it possible to run thousands or even millions of goroutines simultaneously, depending on the available memory.</p>
+
+<p>Goroutines are sometimes compared to &ldquo;green threads,&rdquo; which are threads that are scheduled in user space rather than by the OS. The problem with green threads is that they may not leverage multiple CPU cores efficiently since they don&rsquo;t interact directly with the OS’s scheduler.</p>
+
+<p>Goroutines are similar to green threads in that they are scheduled by the Go runtime rather than the OS. However, they differ in a crucial way: Go uses a model called Mscheduling, where the Go runtime maps multiple goroutines (M) onto multiple OS threads (N). This allows the runtime to distribute goroutines across multiple CPU cores when possible, making Go’s concurrency model more efficient and scalable than traditional green threads.</p>
+
+<blockquote>
+<p>⚠️ <strong>IMPORTANT</strong><br>
+The following example uses a <code>time.Sleep</code> to wait for the goroutine to finish.<br>
+This is done for simplicity. Do NOT use this approach.<br>
+I&rsquo;ll explain alternative options afterwards.</p>
+</blockquote>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;time&quot;
+)
+
+func sayHello() {
+	fmt.Println(&quot;Hello from a goroutine!&quot;)
+}
+
+func main() {
+	go sayHello() // Launches sayHello in a new goroutine
+
+	fmt.Println(&quot;Hello from main!&quot;)
+	time.Sleep(1 * time.Second) // Wait for the goroutine to complete (only for example)
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/SdOdZ90-exI" target="_blank">https://play.golang.com/p/SdOdZ90-exI</a></p>
+
+<blockquote>
+<p>⚠️ <strong>NOTE</strong><br>
+In Go, the <code>main</code> function is effectively the &ldquo;initial&rdquo; goroutine.<br>
+When a Go program starts, the Go runtime creates a goroutine to run <code>main</code>.<br>
+This main goroutine can then spawn additional goroutines as needed.</p>
+</blockquote>
+
+<h2 id="channels">Channels</h2>
+
+<p>Channels in Go are a powerful way to communicate between goroutines and to synchronize them. They allow you to send and receive values across goroutines, and they help avoid race conditions by enabling safe data sharing.</p>
+
+<blockquote>
+<p>⚠️ <strong>IMPORTANT</strong><br>
+In the following example the <code>&lt;-ch</code> BLOCKS the main thread.<br>
+This can cause a deadlock if we don&rsquo;t have a goroutine running to unblock it.</p>
+</blockquote>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+)
+
+func sendMessage(ch chan string) {
+	ch &lt;- &quot;Hello from a goroutine!&quot; // Send a message to the channel
+}
+
+func main() {
+	// Create a new channel of type string
+	ch := make(chan string)
+
+	// Start a goroutine to send a message
+	go sendMessage(ch)
+
+	// Receive the message from the channel
+	msg := &lt;-ch
+	fmt.Println(msg) // Output: Hello from a goroutine!
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/2Qn_NacVw-0" target="_blank">https://play.golang.com/p/2Qn_NacVw-0</a></p>
+
+<h2 id="select-statement">Select Statement</h2>
+
+<p>The <code>select</code> statement is used to wait on multiple channel operations. It blocks until one of its cases can proceed, which makes it essential for handling multiple asynchronous tasks.</p>
+
+<p>Use <code>select</code> when you have multiple channels to listen to, and you want to respond to whichever channel receives data first.</p>
+
+<blockquote>
+<p>⚠️ <strong>NOTE</strong><br>
+In the following example, the first goroutine uses a <code>time.Sleep</code>.<br>
+This is to simulate the operation taking a long time.<br>
+It results in the <code>select</code> pulling a value from the second goroutine.</p>
+</blockquote>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;time&quot;
+)
+
+func main() {
+	ch1 := make(chan string)
+	ch2 := make(chan string)
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		ch1 &lt;- &quot;result from ch1&quot;
+	}()
+
+	go func() {
+		ch2 &lt;- &quot;result from ch2&quot;
+	}()
+
+	select {
+	case msg1 := &lt;-ch1:
+		fmt.Println(&quot;Received:&quot;, msg1)
+	case msg2 := &lt;-ch2:
+		fmt.Println(&quot;Received:&quot;, msg2)
+	}
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/HXe-bZ__EEy" target="_blank">https://play.golang.com/p/HXe-bZ__EEy</a></p>
+
+<p>A common use case for <code>select</code> is to timeout a potential deadlock:</p>
+
+<blockquote>
+<p>⚠️ <strong>NOTE</strong><br>
+In the following example we use <code>time.After</code> to cause a timeout.</p>
+</blockquote>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;time&quot;
+)
+
+func main() {
+	// Create an unbuffered channel
+	ch := make(chan string)
+
+	// Start a goroutine that simulates a delayed send
+	go func() {
+		time.Sleep(3 * time.Second)   // Simulate a delay
+		ch &lt;- &quot;Hello from goroutine!&quot; // Send a message after delay
+	}()
+
+	select {
+	case msg := &lt;-ch:
+		fmt.Println(&quot;Received:&quot;, msg)
+	case &lt;-time.After(2 * time.Second): // Timeout after 2 seconds
+		fmt.Println(&quot;Timeout! No message received.&quot;)
+	}
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/6BMPeUKdqkg" target="_blank">https://play.golang.com/p/6BMPeUKdqkg</a></p>
+
+<h2 id="wait-groups">Wait Groups</h2>
+
+<p>A <code>sync.WaitGroup</code> waits for a collection of goroutines to finish. It helps coordinate a group of goroutines and ensures the program waits until all of them have completed before proceeding.</p>
+
+<p>Use a <code>WaitGroup</code> when you need to wait for multiple goroutines to finish before moving on.</p>
+
+<p>In this example, a <code>sync.WaitGroup</code> is used to wait for three goroutines to complete. Each goroutine represents a worker, and each one calls <code>wg.Done()</code> to signal that it&rsquo;s finished. The <code>main</code> function calls <code>wg.Wait()</code> to block until all workers are done.</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;sync&quot;
+)
+
+func worker(id int, wg *sync.WaitGroup) {
+	defer wg.Done() // Decrement counter when goroutine completes
+	fmt.Printf(&quot;Worker %d starting\n&quot;, id)
+	fmt.Printf(&quot;Worker %d done\n&quot;, id)
+}
+
+func main() {
+	var wg sync.WaitGroup
+
+	for i := range 3 {
+		wg.Add(1) // Track each goroutine started
+		go worker(i, &amp;wg)
+	}
+
+	// Wait for all goroutines to finish
+	wg.Wait()
+
+	fmt.Println(&quot;All workers done.&quot;)
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/LhEdSQIPp1R" target="_blank">https://play.golang.com/p/LhEdSQIPp1R</a></p>
+
+<h2 id="mutex">Mutex</h2>
+
+<p>Go&rsquo;s <code>sync.Mutex</code> provides mutual exclusion, allowing only one goroutine at a time to access a critical section of code. While <code>sync.RWMutex</code> is a variant that allows multiple readers or a single writer but not both.</p>
+
+<p>Use <code>sync.Mutex</code> or <code>sync.RWMutex</code> when you need fine-grained control over data access and want to protect shared data from race conditions.</p>
+
+<p>In the below example <code>sync.Mutex</code> ensures that only one goroutine modifies <code>counter.value</code> at a time, preventing race conditions:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;sync&quot;
+)
+
+type Counter struct {
+	mu    sync.Mutex
+	value int
+}
+
+func (c *Counter) Increment() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.value++
+}
+
+func (c *Counter) Value() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.value
+}
+
+func main() {
+	counter := &amp;Counter{}
+	var wg sync.WaitGroup
+
+	for range 10 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			counter.Increment()
+		}()
+	}
+
+	wg.Wait()
+	
+	fmt.Println(&quot;Final Counter:&quot;, counter.Value())
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/VIbNkQaPfZI" target="_blank">https://play.golang.com/p/VIbNkQaPfZI</a></p>
+
+<blockquote>
+<p>⚠️ <strong>NOTE</strong><br>
+The use of <code>defer</code> in the <code>Increment()</code> method is redundant.<br>
+It&rsquo;s more useful for long complex functions where errors can occur.<br>
+Here I should have just placed the <code>Unlock()</code> call after the <code>c.value++</code>.</p>
+</blockquote>
+
+<h2 id="conditions">Conditions</h2>
+
+<p>Go&rsquo;s <code>sync.Cond</code> is used for signaling between goroutines. It lets goroutines wait until they are notified to continue, which is useful when one goroutine needs to wait for a certain condition to be met by another goroutine.</p>
+
+<p>Use <code>sync.Cond</code> when you need goroutines to wait for certain conditions, such as producer-consumer scenarios.</p>
+
+<p>In the following example, <code>cond.Wait()</code> blocks until <code>cond.Signal()</code> is called. It&rsquo;s useful for waiting on complex conditions where other primitives like <code>chan</code> may not be ideal:</p>
+
+<blockquote>
+<p>⚠️ <strong>IMPORTANT</strong><br>
+The call to <code>cond.L.Lock()</code> in the main goroutine just before <code>for !ready</code> is required, otherwise you&rsquo;ll get the error <code>fatal error: sync: unlock of unlocked mutex</code>. This is because <code>cond.Wait()</code> expects the caller to hold the lock before calling <code>Wait()</code> (see <a href="https://youtu.be/VAV2h1GdgE0?si=cqErfqLXnWOgmcsh" target="_blank">this video</a> for details). Once <code>Wait()</code> returns, it reacquires the lock, ensuring the main goroutine can safely check ready and exit the loop.</p>
+</blockquote>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;sync&quot;
+	&quot;time&quot;
+)
+
+func main() {
+	var mu sync.Mutex
+	cond := sync.NewCond(&amp;mu)
+	ready := false
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		cond.L.Lock()
+		ready = true
+		cond.L.Unlock()
+		cond.Signal() // Notify one waiting goroutine
+	}()
+
+	cond.L.Lock()
+	for !ready {
+		cond.Wait() // Wait until condition is met
+	}
+	fmt.Println(&quot;Ready is true, proceeding.&quot;)
+	cond.L.Unlock()
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/n_txZaH7lPA" target="_blank">https://play.golang.com/p/n_txZaH7lPA</a></p>
+
+<p>In the following example we have multiple worker goroutines waiting on a shared condition to be &ldquo;notified.&rdquo; We&rsquo;ll see how both <code>.Signal()</code> and <code>.Broadcast()</code> work when notifying waiting goroutines:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;sync&quot;
+	&quot;time&quot;
+)
+
+func worker(id int, cond *sync.Cond) {
+	cond.L.Lock() // Lock the condition
+	defer cond.L.Unlock()
+
+	fmt.Printf(&quot;Worker %d is waiting\n&quot;, id)
+	cond.Wait() // Wait for a signal or broadcast
+	fmt.Printf(&quot;Worker %d is proceeding\n&quot;, id)
+}
+
+func main() {
+	lock := &amp;sync.Mutex{}
+	cond := sync.NewCond(lock)
+
+	// Start multiple worker goroutines that will wait on the condition
+	for i := range 3 {
+		go worker(i, cond)
+	}
+
+	// Allow time for all workers to start and wait
+	time.Sleep(1 * time.Second)
+
+	// Use Signal to wake up one goroutine
+	fmt.Println(&quot;Notifying one worker&quot;)
+	cond.Signal() // Notifies one waiting worker
+	time.Sleep(1 * time.Second)
+
+	// Use Broadcast to wake up all remaining goroutines
+	fmt.Println(&quot;Broadcasting to all remaining workers&quot;)
+	cond.Broadcast() // Notifies all remaining waiting workers
+
+	// Allow time for all goroutines to complete
+	time.Sleep(2 * time.Second)
+	fmt.Println(&quot;Main function exiting.&quot;)
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/41ibtmUmKaN" target="_blank">https://play.golang.com/p/41ibtmUmKaN</a></p>
+
+<p>Each worker goroutine locks the condition, calls <code>cond.Wait()</code>, and then waits. This releases the lock (as we now understand from the earlier IMPORTANT note, see above if you missed it), allowing other goroutines to call <code>Wait()</code> as well.</p>
+
+<p>The <code>cond.Signal()</code> call in the <code>main</code> function wakes up one of the waiting goroutines, allowing it to proceed.</p>
+
+<p>After a short delay, <code>cond.Broadcast()</code> wakes up all remaining waiting goroutines, allowing them to proceed simultaneously.</p>
+
+<p>This is useful for scenarios where multiple tasks need to wait for a common event or state change to proceed.</p>
+
+<blockquote>
+<p>⚠️ <strong>IMPORTANT</strong><br>
+Notifications are not ordered.<br>
+Any one of the waiting goroutines can be chosen to proceed first.<br>
+Broadcast ensures that all waiting goroutines eventually proceed.</p>
+</blockquote>
+
+<p>Now you might be thinking &ldquo;hmm, it looks like I could use channels instead and they&rsquo;re more idiomatic&rdquo;.</p>
+
+<p>Well, here are some reasons for why you might need to choose <code>sync.Cond</code> over channels:</p>
+
+<ol>
+<li><p>Fine-Grained Control: <code>sync.Cond</code> allows precise control over waiting and signaling, suitable for cases where specific conditions must be checked or managed.</p></li>
+
+<li><p>Broadcast Capability: Broadcasting to multiple goroutines is straightforward with <code>sync.Cond</code>, whereas channels require individual signaling, which can be inefficient.</p></li>
+
+<li><p>Reduced Complexity for State-Based Waiting: <code>sync.Cond</code> is ideal for situations where goroutines need to wait for specific conditions to be true, rather than for individual values or events passed through a channel.</p></li>
+
+<li><p>Avoiding Channel Overhead: Channels introduce buffering and management overhead, especially with many goroutines, whereas <code>sync.Cond</code> relies on a shared mutex with a direct wait/notify mechanism, which is often faster.</p></li>
+</ol>
+
+<p>In summary, <code>sync.Cond</code> is best suited for use cases that involve waiting for and signaling conditions, especially when you need more control over synchronization and when goroutines are reacting to shared state changes rather than discrete message passing.</p>
+
+<h2 id="atomic-operations">Atomic Operations</h2>
+
+<!--alex ignore simple-->
+
+<p>The <code>sync/atomic</code> package provides low-level atomic operations on simple types like integers and pointers, ensuring operations are performed atomically.</p>
+
+<p>Use atomic operations when you need lock-free synchronization for counters or flags, but only for basic integer or pointer manipulations.</p>
+
+<p>In the following example, <code>atomic.AddInt32</code> safely increments <code>counter</code> without a lock, making it ideal for high-performance counters or flags:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;sync&quot;
+	&quot;sync/atomic&quot;
+)
+
+func main() {
+	var counter int32
+	var wg sync.WaitGroup
+
+	for range 10 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			atomic.AddInt32(&amp;counter, 1)
+		}()
+	}
+
+	wg.Wait()
+	
+	fmt.Println(&quot;Final Counter:&quot;, atomic.LoadInt32(&amp;counter))
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/qsRPoC4GPNv" target="_blank">https://play.golang.com/p/qsRPoC4GPNv</a></p>
+
+<h2 id="once">Once</h2>
+
+<p>Go&rsquo;s <code>sync.Once</code> ensures that a function only executes once, even if multiple goroutines attempt to run it.</p>
+
+<p>Use <code>sync.Once</code> when you need to perform a one-time initialization, such as setting up a shared resource.</p>
+
+<p>In the following example, even though multiple goroutines call <code>once.Do(initialize)</code>, <code>initialize</code> only runs once. This is especially useful for lazy initialization of global resources:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;sync&quot;
+)
+
+var once sync.Once
+
+func initialize() {
+	fmt.Println(&quot;Initializing...&quot;)
+}
+
+func main() {
+	var wg sync.WaitGroup
+	for range 3 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			once.Do(initialize)
+		}()
+	}
+	wg.Wait()
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/5J1ApCPc1iU" target="_blank">https://play.golang.com/p/5J1ApCPc1iU</a></p>
+
+<h2 id="context">Context</h2>
+
+<p>Go&rsquo;s <code>context.Context</code> is not a strict concurrency primitive but is widely used to manage timeouts, cancellations, and deadlines across goroutines.</p>
+
+<p>Use <code>context.Context</code> to signal cancellation or control the lifespan of goroutines, particularly in networked or long-running tasks.</p>
+
+<p>In the following example, <code>context.WithTimeout</code> creates a context that automatically cancels after 1 second, which is useful for controlling tasks that may hang or take too long:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;context&quot;
+	&quot;fmt&quot;
+	&quot;time&quot;
+)
+
+func process(ctx context.Context) {
+	select {
+	case &lt;-time.After(2 * time.Second): // use time.After to simulate slow operation
+		fmt.Println(&quot;Completed work&quot;)
+	case &lt;-ctx.Done():
+		fmt.Println(&quot;Work cancelled&quot;)
+	}
+}
+
+func main() {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	go process(ctx)
+
+	time.Sleep(2 * time.Second)
+}
+</code></pre>
+
+<p><a href="https://play.golang.com/p/diSmAp0SJkg" target="_blank">https://play.golang.com/p/diSmAp0SJkg</a></p>
+
+<h2 id="map">Map</h2>
+
+<p>The <code>sync</code> package has a <a href="https://pkg.go.dev/sync#Map" target="_blank"><code>Map</code></a> type which you will likely not need to use.</p>
+
+<p>The Go authors even document it as such&hellip;</p>
+
+<blockquote>
+<p>The Map type is specialized. Most code should use a plain Go map instead, with separate locking or coordination, for better type safety and to make it easier to maintain other invariants along with the map content.</p>
+
+<p>The Map type is optimized for two common use cases: (1) when the entry for a given key is only ever written once but read many times, as in caches that only grow, or (2) when multiple goroutines read, write, and overwrite entries for disjoint sets of keys. In these two cases, use of a Map may significantly reduce lock contention compared to a Go map paired with a separate Mutex or RWMutex.</p>
+</blockquote>
+
+<h2 id="real-examples">Real Examples</h2>
+
+<p>Below is a &lsquo;real world&rsquo; example where we need to delete a bunch of keys from a data store.</p>
+
+<p>The API that is provided, does not support bulk deleting of keys.</p>
+
+<p>The API does provide an endpoint that lets us paginate the available keys, and we then need to stream that information as quickly as possible using a pool of goroutines coordinated with both channels and wait groups.</p>
+
+<p>It&rsquo;s a nice example because it brings together several different concurrency primitives (goroutines, channels, select, wait groups, atomic operations).</p>
+
+<blockquote>
+<p>💡 <strong>TIP</strong><br>
+Keep reading after the code snippet for a brief breakdown of what the code does.</p>
+</blockquote>
+
+<pre><code class="language-go">const (
+	// PoolSize is the goroutine/thread-pool size.
+	// Each pool will take a 'key' from a channel and issue a DELETE request.
+	const PoolSize int = 100
+
+	// MaxErrors is the maximum number of errors we'll allow before
+	// stopping the goroutines from executing.
+	const MaxErrors int = 100
+)
+
+func DeleteAllKeys(storeID string, out io.Writer) error {
+	// Create a 'spinner' which helps visually update the user on the progress.
+	spinnerMessage := &quot;Deleting keys&quot;
+	var spinner text.Spinner
+
+	var err error
+	spinner, err = text.NewSpinner(out)
+	if err != nil {
+		return err
+	}
+	err = spinner.Start()
+	if err != nil {
+		return err
+	}
+	spinner.Message(spinnerMessage + &quot;...&quot;)
+
+	// Create a keys paginator.
+	p := fastly.NewListKVStoreKeysPaginator(&amp;fastly.ListKVStoreKeysInput{
+		StoreID: storeID,
+	})
+
+	// Channel for tracking errors when deleting keys.
+	errorsCh := make(chan string, MaxErrors)
+	
+	// Channel for tracking keys to delete.
+	keysCh := make(chan string, 1000) // this number correlates to the pagination page size defined by the API
+
+	var (
+		// Track the number of keys deleted.
+		deleteCount atomic.Uint64
+		
+		// Track which keys failed to be deleted.
+		failedKeys []string
+		
+		// This will help us wait for all goroutines to complete.
+		wg sync.WaitGroup
+	)
+
+	// We have two separate execution flows happening at once:
+	//
+	// 1. Pushing keys from pagination data into a key channel.
+	// 2. Pulling keys from key channel and issuing API DELETE call.
+	//
+	// We have a limit on the number of errors. Once that limit is reached we'll
+	// stop the second set of goroutines processing the delete operation.
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		defer close(keysCh)
+		for p.Next() {
+			for _, key := range p.Keys() {
+				keysCh &lt;- key
+			}
+		}
+	}()
+
+	// Limit the number of goroutines spun up to the specified pool size.
+	for range PoolSize {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for key := range keysCh {
+				err := fastly.DeleteKVStoreKey(&amp;fastly.DeleteKVStoreKeyInput{StoreID: c.StoreID, Key: key})
+				if err != nil {
+					select {
+					case errorsCh &lt;- key:
+					default:
+						return // channel is full (i.e. we've reached our MaxErrors limit)
+					}
+				}
+				// Update the TUI (Terminal UI) to reflect the current number of deleted keys.
+				spinner.Message(spinnerMessage + &quot;...&quot; + strconv.FormatUint(deleteCount.Add(1), 10))
+			}
+		}()
+	}
+
+	wg.Wait()
+
+	close(errorsCh)
+	for err := range errorsCh {
+		failedKeys = append(failedKeys, err)
+	}
+
+	spinnerMessage = &quot;Deleted keys: &quot; + strconv.FormatUint(deleteCount.Load(), 10)
+
+	if len(failedKeys) &gt; 0 {
+		spinner.StopFailMessage(spinnerMessage)
+		err := spinner.StopFail()
+		if err != nil {
+			return fmt.Errorf(&quot;failed to stop spinner: %w&quot;, err)
+		}
+		return fmt.Errorf(&quot;failed to delete %d keys&quot;, len(failedKeys))
+	}
+
+	spinner.StopMessage(spinnerMessage)
+	if err := spinner.Stop(); err != nil {
+		return fmt.Errorf(&quot;failed to stop spinner: %w&quot;, err)
+	}
+
+	text.Success(out, &quot;\nDeleted all keys from KV Store '%s'&quot;, c.StoreID)
+	return nil
+}
+</code></pre>
+
+<p>So you can see we have multiple goroutines spun up (and we wait for them using
+<code>sync.WaitGroup</code>):</p>
+
+<ul>
+<li>The first goroutine is iterating over the pagination data and pushing data
+into a channel.</li>
+<li>The other goroutines (we have a limit of <code>PoolSize</code>) are pulling data from the
+channel and issuing key deletion API calls.</li>
+</ul>
+
+<p>We also use the <code>select</code> statement to control whether we stop the goroutines
+processing the deletion operations. The way we do this is to define another
+channel (<code>errorsCh</code>) with a buffer size of <code>MaxErrors</code>, and then every time we
+get an error we push the error into that channel. If the channel becomes full
+(which it will do eventually because there&rsquo;s nothing pulling messages from the
+<code>errorsCh</code> channel), then the <code>select</code> statement will fallthrough to its
+<code>default</code> block and we&rsquo;ll return the goroutine (causing it to stop running)</p>
+
+<p>The last interesting concurrency primitive we use is <code>atomic.Uint64</code> for
+accurately tracking the number of deleted keys. We use its <code>Add()</code> method within
+the goroutine to safely increment the counter, and then at the end of the
+function we use its <code>Load()</code> method to safely extract the final value.</p>
+
+<h3 id="update-2024-11-01">UPDATE 2024.11.01</h3>
+
+<p>Below is a modification to the &lsquo;real world&rsquo; example code.</p>
+
+<p>The difference is in how errors are handled. In the original code we would stop
+processing the deletion of keys when an error threshold was reached. But in the
+following version we don&rsquo;t want that to happen. Instead we want to <em>keep</em>
+processing errors, but that introduces a new challenge related to channel buffer
+size (e.g. we can&rsquo;t set an infinite amount of memory for a channel) and so at
+some point the errors channel is going to get filled up and we need to decide
+what to do.</p>
+
+<p>In this case we can realistically only drop errors. But we can alleviate that a
+little bit by trying to pull messages out from the errors channel and appending
+them to the <code>failedKeys</code> slice concurrently. This will make space in the
+channel&rsquo;s buffer and so we can push more errors into it if they occur.</p>
+
+<p>The problem with pulling errors out of the errors channel concurrently is we
+need to <code>range</code> over the channel, but that will cause a deadlock if we don&rsquo;t
+handle it correctly (because ranging over a channel only terminates the loop
+when the channel is closed). So we need to introduce not one <code>sync.WaitGroup</code>
+but <em>two</em>! See the code comments below for more details&hellip;</p>
+
+<!-- markdownlint-disable -->
+
+<pre><code class="language-go">// deleteAllKVStoreKeys deletes all keys within the specified KV Store.
+func deleteAllKVStoreKeys(conn *gofastly.Client, storeID string, maxErrors, poolSize int) error {
+	p := conn.NewListKVStoreKeysPaginator(&amp;fastly.ListKVStoreKeysInput{
+		StoreID: storeID,
+	})
+
+	errorsCh := make(chan string, maxErrors)
+	keysCh := make(chan string, 1000) // number correlates to pagination page size
+
+	var (
+		failedKeys   []string
+		mu           sync.Mutex
+		wgProcessing sync.WaitGroup
+		wgErrorCh    sync.WaitGroup
+	)
+
+	// We have three separate execution flows happening at once:
+	//
+	// 1. Pushing keys from pagination data into a key channel.
+	// 2. Pulling keys from error channel and appending to failedKeys slice.
+	// 3. Pulling keys from key channel and issuing API DELETE call.
+	//
+	// The second item is problematic, in that ranging over a channel only
+	// terminates when the channel is closed. So we need to ensure we close the
+	// errorsCh once we've finished processing the deletion of all the keys.
+	//
+	// To do that we need two sets of wait groups.
+	//
+	// The first is wgProcessing which keeps track of all goroutines related to
+	// processing the pagination data (e.g. the goroutine ranging over the
+	// paginator keys, and the goroutine ranging over the keysCh as part of the
+	// poolSize loop).
+	//
+	// The second wait group is wgErrorCh which tracks when the first
+	// (wgProcessing) has completed and then closes errorsCh.
+
+	// The following goroutine finishes once all pagination keys have been
+	// processed.
+	wgProcessing.Add(1)
+	go func() {
+		defer wgProcessing.Done()
+		defer close(keysCh)
+		for p.Next() {
+			for _, key := range p.Keys() {
+				keysCh &lt;- key
+			}
+		}
+	}()
+
+	// The following goroutine finishes once the errorsCh is closed.
+	wgErrorCh.Add(1)
+	go func() {
+		defer wgErrorCh.Done()
+		for err := range errorsCh {
+			mu.Lock()
+			failedKeys = append(failedKeys, err)
+			mu.Unlock()
+		}
+	}()
+
+	// The following goroutines close once they've pulled all data from keysCh.
+	for i := 1; i &lt;= poolSize; i++ {
+		wgProcessing.Add(1)
+		go func() {
+			defer wgProcessing.Done()
+			for key := range keysCh {
+				err := conn.DeleteKVStoreKey(&amp;fastly.DeleteKVStoreKeyInput{StoreID: storeID, Key: key})
+				if err != nil {
+					select {
+					case errorsCh &lt;- key:
+					default:
+						continue // the larger we make maxErrors 
+						         // the less likely we'll drop errors 
+						         // (obviously there's a memory trade-off to be made)
+					}
+				}
+			}
+		}()
+	}
+
+	// The following goroutine is closed once the 'processing' goroutines are
+	// finished.
+	wgErrorCh.Add(1)
+	go func() {
+		defer wgErrorCh.Done()
+		wgProcessing.Wait() // Wait for all deletion and pagination tasks.
+		close(errorsCh)
+	}()
+
+	// Wait for the error-handling goroutines to finish processing.
+	wgErrorCh.Wait()
+
+	if len(failedKeys) &gt; 0 {
+		return fmt.Errorf(&quot;failed to delete %d keys&quot;, len(failedKeys))
+	}
+
+	return nil
+}
+</code></pre>
+
+<!-- markdownlint-enable -->
+
+<h2 id="reference-material">Reference Material</h2>
+
+<ul>
+<li><a href="../go-style-guide/index.html">../go-style-guide/index.html</a></li>
+<li><a href="https://go.dev/doc/effective_go#concurrency" target="_blank">go.dev/doc/effective_go</a></li>
+</ul>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

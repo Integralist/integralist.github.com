@@ -1,0 +1,1562 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#advanced-vim-topics-tips-and-tricks">Advanced Vim topics, tips and tricks</a>
+<ul>
+<li><a href="#using-vim-with-no-plugins">Using Vim with no plugins</a></li>
+
+<li><a href="#recording-repeatable-steps-with-macros">Recording repeatable steps with macros</a></li>
+
+<li><a href="#modifying-content-with-global-command">Modifying content with <code>global</code> command</a></li>
+
+<li><a href="#substitutions-magic-regex-mode-and-other-flags">Substitutions, magic regex mode and other flags</a></li>
+
+<li><a href="#searching-and-filtering-content">Searching and filtering content</a>
+<ul>
+<li><a href="#finding-a-single-file">Finding a single file</a></li>
+
+<li><a href="#finding-content-within-one-or-more-files">Finding content within one or more files</a></li>
+
+<li><a href="#using-external-shell-tool">Using external shell tool</a></li>
+
+<li><a href="#search-plugins">Search plugins</a></li>
+</ul></li>
+
+<li><a href="#processing-search-results-with-cdo-and-cfdo">Processing search results with <code>cdo</code> and <code>cfdo</code></a>
+<ul>
+<li><a href="#be-careful-with-tools-that-update-the-quickfix-dynamically">Be careful with tools that update the quickfix dynamically</a></li>
+</ul></li>
+
+<li><a href="#filtering-quickfix-and-location-list-results">Filtering quickfix and location list results</a></li>
+
+<li><a href="#processing-files-with-t-do">Processing files with <code>&lt;T&gt;do</code></a></li>
+
+<li><a href="#automating-content-modification-using-ex-commands-from-the-shell">Automating content modification using Ex commands from the shell</a></li>
+
+<li><a href="#starting-vim-with-your-last-workspace">Starting Vim with your last workspace</a></li>
+
+<li><a href="#vim-s-start-up-process">Vim&rsquo;s start-up process</a>
+<ul>
+<li><a href="#the-after-directory">The <code>after</code> directory</a></li>
+</ul></li>
+
+<li><a href="#debugging-vim-issues">Debugging Vim issues</a></li>
+
+<li><a href="#autocomplete-with-no-plugins">Autocomplete with no plugins</a></li>
+
+<li><a href="#understanding-line-feed-and-carriage-returns">Understanding line feed and carriage returns</a></li>
+
+<li><a href="#auto-highlighting-keywords-and-creating-your-own-custom-highlighting">Auto highlighting keywords (and creating your own custom highlighting)</a></li>
+
+<li><a href="#sorting-and-filtering-duplicates">Sorting and filtering duplicates</a></li>
+
+<li><a href="#miscellaneous-tips-and-tricks">Miscellaneous tips and tricks</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="advanced-vim-topics-tips-and-tricks">Advanced Vim topics, tips and tricks</h1>
+
+<p>I see a lot of posts on Vim &lsquo;tips and tricks&rsquo; and decided I&rsquo;d have a go at putting together my own list of things that don&rsquo;t typically see the light of day, but are super powerful and useful to know about.</p>
+
+<p><strong>IMPORTANT</strong>: I want people to realise that they don&rsquo;t need super complex Vim configurations with lots of third-party plugins, and this entire post is built on that motivation. This means you&rsquo;ll find nearly everything described here is just plain Vim (no plugins). Don&rsquo;t get me wrong, I use <a href="https://github.com/Integralist/dotfiles/blob/master/.vimrc#L120-L142" target="_blank">a few plugins</a>, but I try to keep them to a minimum and rely more on the fundamentals of how Vim works.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: Remember that <code>:help &lt;some_phrase&gt;</code> is your friend! So if you don&rsquo;t know about any features I mention (and I don&rsquo;t explain them in this post), then use Vim&rsquo;s help feature. You can also try <a href="https://vimhelp.org/" target="_blank">https://vimhelp.org/</a> too, which is a nice UI with autocomplete search box.</p>
+</blockquote>
+
+<p><strong>Let&rsquo;s take a look at what we&rsquo;ll be covering&hellip;</strong></p>
+
+<ul>
+<li><a href="#using-vim-with-no-plugins">Using Vim with no plugins</a></li>
+<li><a href="#recording-repeatable-steps-with-macros">Recording repeatable steps with macros</a></li>
+<li><a href="#modifying-content-with-global-command">Modifying content with <code>global</code> command</a></li>
+<li><a href="#substitutions-magic-regex-mode-and-other-flags">Substitutions, magic regex mode and other flags</a></li>
+<li><a href="#searching-and-filtering-content">Searching and filtering content</a></li>
+<li><a href="#processing-search-results-with-cdo-and-cfdo">Processing search results with <code>cdo</code> and <code>cfdo</code></a></li>
+<li><a href="#filtering-quickfix-and-location-list-results">Filtering quickfix and location list results</a></li>
+<li><a href="#processing-files-with-tdo">Processing files with <code>&lt;T&gt;do</code></a></li>
+<li><a href="#automating-content-modification-using-ex-commands-from-the-shell">Automating content modification using Ex commands from the shell</a></li>
+<li><a href="#starting-vim-with-your-last-workspace">Starting Vim with your last workspace</a></li>
+<li><a href="#vims-start-up-process">Vim&rsquo;s start-up process</a></li>
+<li><a href="#debugging-vim-issues">Debugging Vim issues</a></li>
+<li><a href="#autocomplete-with-no-plugins">Autocomplete with no plugins</a></li>
+<li><a href="#understanding-line-feed-and-carriage-returns">Understanding line feed and carriage returns</a></li>
+<li><a href="#auto-highlighting-keywords-and-creating-your-own-custom-highlighting">Auto highlighting keywords (and creating your own custom highlighting)</a></li>
+<li><a href="#sorting-and-filtering-duplicates">Sorting and filtering duplicates</a></li>
+<li><a href="#miscellaneous-tips-and-tricks">Miscellaneous tips and tricks</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+
+<h2 id="using-vim-with-no-plugins">Using Vim with no plugins</h2>
+
+<p>OK we&rsquo;re going to start super basic here and demonstrate a simple, but completely usable, Vim configuration which will keep <em>purists</em> happy.</p>
+
+<pre><code class="language-viml">set nocompatible number cursorline expandtab hlsearch visualbell tabstop=2 shiftwidth=2
+syntax on
+</code></pre>
+
+<ul>
+<li><code>nocompatible</code>: Stops odd issues †.</li>
+<li><code>number</code>: Turn on line numbers.</li>
+<li><code>cursorline</code>: Highlight the current line.</li>
+<li><code>expandtab</code>: Convert tabs to spaces.</li>
+<li><code>hlsearch</code>: Highlight all search matches.</li>
+<li><code>visualbell</code>: Stop Vim from beeping at you when you make a mistake.</li>
+<li><code>tabstop</code>: Set tab size in spaces (this is for manual indenting).</li>
+<li><code>shiftwidth</code>: The number of spaces inserted for a tab (used for auto indenting).</li>
+<li><code>syntax on</code>: Enable basic syntax highlighting.</li>
+</ul>
+
+<blockquote>
+<p>† Example: Using arrow keys in INSERT mode will send key sequences that are misinterpreted by <code>vi</code>.</p>
+</blockquote>
+
+<p>To try out this basic configuration use Vim&rsquo;s <a href="https://vimhelp.org/starting.txt.html#-u" target="_blank"><code>-u</code></a> flag. For example, you can start Vim with no configuration <code>vim -u NONE</code> and then manually apply the configuration as shown above, or you can put it into a separate file and start Vim with that configuration instead of your normal one <code>vim -u ~/.vimrc-basic</code>.</p>
+
+<p><a href="../../assets/images/vimbasic.png">
+<img src="../../assets/images/vimbasic.png">
+</a>
+<p></p></p>
+
+<p>In the above screenshot you can see I&rsquo;m just using the basic configuration (looks quite nice) along with a couple of split buffer windows (<a href="https://vimhelp.org/windows.txt.html#%3Avs" target="_blank"><code>:vs</code></a>).</p>
+
+<p>I&rsquo;m also a big user of Vim&rsquo;s built-in tabs feature <a href="https://vimhelp.org/tabpage.txt.html#%3Atabnew" target="_blank"><code>:tabnew</code></a> (not shown in the screenshot) and also <a href="https://vimhelp.org/editing.txt.html#%3Alcd" target="_blank"><code>:lcd</code></a> for changing each tab&rsquo;s root location (which allows me to easily switch between multiple projects).</p>
+
+<p>In the screen shot you can see I&rsquo;m also using <a href="https://vimhelp.org/quickfix.txt.html#%3Avimgrep" target="_blank"><code>:vimgrep</code></a> to search for code in my current project (e.g. <code>:vimgrep /func/j **/*</code> followed with <a href="https://vimhelp.org/quickfix.txt.html#%3Acopen" target="_blank"><code>:copen</code></a>).</p>
+
+<p>Although not shown in the screenshot I also use the built-in file/directory explorer, AKA &lsquo;netrw&rsquo;, by executing <a href="https://vimhelp.org/pi_netrw.txt.html#%3AExplore" target="_blank"><code>:Ex</code></a>. This let&rsquo;s me manually traverse the current project directory (see also <a href="https://vimhelp.org/pi_netrw.txt.html#%3AVexplore" target="_blank"><code>:Vex</code></a> for vertical split and <a href="https://vimhelp.org/pi_netrw.txt.html#%3ASexplore" target="_blank"><code>:Sex</code></a>, no sniggering at the back, for a horizontal split). When using netrw I like to configure it to ignore certain files, which you can do like so:</p>
+
+<pre><code class="language-viml">&quot; don't display .swp files
+let g:netrw_list_hide= '.*\.swp$,.*\.DS_Store'
+</code></pre>
+
+<p>As mentioned earlier, using <code>:h</code> is a great way to learn about native features. As an example, I only recently discovered <code>:cq</code> which quits Vim without writing to any files <em>and</em> it will return an error exit code (this is useful in scenarios like writing <code>git</code> commit messages where you want to bail out at the last minute).</p>
+
+<p>Another core feature of Vim I like to use is <a href="https://vimhelp.org/motion.txt.html#%3Amarks" target="_blank"><code>:marks</code></a> which is a bookmark feature (see <a href="https://vimhelp.org/usr_03.txt.html#bookmark" target="_blank"><code>:h bookmark</code></a> for more details). This can be useful for jumping around multiple locations within a single large file. The cool thing about marks is that they are unique to each file, so I tend to create marks using the registers a, b, c &hellip;etc as it&rsquo;s easier to remember, and then I can use those same registers in each file (meaning I don&rsquo;t have to jump to another file and be like &ldquo;oh was I using d, e, f in this file or a, b, c?).</p>
+
+<p>As well as using <a href="https://vimhelp.org/change.txt.html#%21" target="_blank"><code>!</code></a> which lets me filter content through an external program. So for example, if I have the following lines&hellip;</p>
+
+<pre><code>foo
+foobar
+baz
+quxfoo
+</code></pre>
+
+<p>&hellip;and I want to filter out any lines that contains <code>foo</code>, then I can visually select those lines and pass the selection through to my shell&rsquo;s <code>grep</code> command like so:</p>
+
+<pre><code class="language-viml">:'&lt;,'&gt;!grep -v foo
+</code></pre>
+
+<p>This would result in those lines being replaced with the single line containing <code>baz</code>, as all the other lines were containing <code>foo</code>. Now a more Vim idiomatic approach to this particular problem is demonstrated in the section &ldquo;<a href="#modifying-content-with-global-command">Modifying content with <code>global</code> command</a>&rdquo;, but the takeaway is that the <code>!</code> command is awesome.</p>
+
+<p>Now a more practical example of using <code>!</code> might be to take a single line of JSON and pipe it into a tool that pretty prints the data (the following example uses the <code>%</code> range to send the whole buffer to the program):</p>
+
+<pre><code class="language-viml">:%!python -m json.tool
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: If you use <a href="https://stedolan.github.io/jq/" target="_blank">jq</a> you can both prettify <code>%!jq</code> <em>and</em> minify <code>%!jq -c</code>.</p>
+</blockquote>
+
+<p>Or if you didn&rsquo;t want to replace the current buffer, but instead <em>append</em> a pretty printed version on the line(s) after the current line, then you would use <code>:read</code> like so:</p>
+
+<pre><code class="language-viml">:read !cat % | python -m json.tool
+</code></pre>
+
+<p>Want to populate the Vim quickfix list with output from some shell command? No problem: Vim already supports <code>make</code> by default so that <code>:make &lt;target&gt;</code> will execute the specified Makefile target for you (you&rsquo;ll need to manually open the quickfix window <code>:copen</code>).</p>
+
+<p>But you can also change the default program using <code>set makeprg=&lt;whatever&gt;</code>! Now you can pass your current buffer to it using <code>:make %</code>.</p>
+
+<p>You can also do clever things like:</p>
+
+<pre><code class="language-viml">autocmd BufWritePost *.go :cex system('revive '..expand('%:p')) | copen
+</code></pre>
+
+<p>&hellip;which executes a command (in this case <code>revive</code>, a golang code linter) and passes it the current file path, and opens the results up in the quickfix window!</p>
+
+<p>And the great thing about all of this is that there are <em>no</em> plugins required. It&rsquo;s all standard Vim features. You just need to know they exist.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: If you do decide to use plugins, then don&rsquo;t forget to <code>vim -c &quot;:helptags ALL&quot; -c &quot;:q&quot;</code> to ensure you get all the relevant help information loaded.</p>
+</blockquote>
+
+<p>Now, there may be times where you want a minimal config but with some extra treats, I&rsquo;ll typically have a <code>~/.vimrc-core</code> file with the following configuration that gives me the above &lsquo;basic&rsquo; configuration (with some other configuration which isn&rsquo;t essential but also isn&rsquo;t superfluous either) along with some <em>core</em> plugins I like to use):</p>
+
+<pre><code class="language-viml">set nocompatible number autoread cursorline expandtab hlsearch visualbell tabstop=2 shiftwidth=2 clipboard+=unnamed wildmenu hidden noswapfile
+syntax on
+packadd cfilter
+
+call plug#begin('~/.vim/plugged')
+Plug 'junegunn/fzf', { 'do': { -&gt; fzf#install() } }
+Plug 'junegunn/fzf.vim' &quot; &lt;Tab&gt; to select multiple results
+Plug 'mileszs/ack.vim'
+Plug 'unblevable/quick-scope'
+call plug#end()
+
+map &lt;leader&gt;f :FZF&lt;CR&gt;
+map &lt;leader&gt;b :Buffers!&lt;CR&gt;
+map &lt;leader&gt;g :GFiles?&lt;CR&gt;
+map &lt;leader&gt;w :Windows&lt;CR&gt;
+map &lt;leader&gt;l :Lines&lt;CR&gt;
+map &lt;leader&gt;t :AgC&lt;CR&gt;
+
+set wildignore+=*/.git/*,*/node_modules/*,*/.hg/*,*/.svn/*.,*/.DS_Store
+set wildmode=list:longest,list:full
+
+autocmd VimEnter * command! -nargs=* -bang AgC \
+call fzf#vim#ag(&lt;q-args&gt;, '--path-to-ignore ~/.ignore --hidden --ignore &quot;node_modules&quot; --ignore-dir=&quot;vendor&quot; --skip-vcs-ignores', &lt;bang&gt;0)
+
+let g:ackprg = 'ag --vimgrep --smart-case --path-to-ignore ~/.ignore --hidden --ignore-dir=node_modules --ignore-dir=vendor --skip-vcs-ignores'
+
+let g:ack_mappings = {
+  \ &quot;h&quot;: &quot;&lt;C-W&gt;&lt;CR&gt;:exe 'wincmd ' (&amp;splitbelow ? 'J' : 'K')&lt;CR&gt;&lt;C-W&gt;p&lt;C-W&gt;J&lt;C-W&gt;p&quot;,
+  \ &quot;v&quot;: &quot;&lt;C-W&gt;&lt;CR&gt;:exe 'wincmd ' (&amp;splitright ? 'L' : 'H')&lt;CR&gt;&lt;C-W&gt;p&lt;C-W&gt;J&lt;C-W&gt;p&quot;}
+  
+silent! tnoremap &lt;Esc&gt; &lt;C-\&gt;&lt;C-n&gt;
+</code></pre>
+
+<p>Yes it&rsquo;s bigger than the &lsquo;basic&rsquo; version, but remember this is still only 30 lines of configuration and it gives me a much richer experience. Again, the motivation for this post is about <em>not</em> needing plugins, and you should aim for understanding the fundamentals of Vim, but this gives you a little bit of both worlds 😉</p>
+
+<h2 id="recording-repeatable-steps-with-macros">Recording repeatable steps with macros</h2>
+
+<p>Vim allows you to <a href="https://vimhelp.org/repeat.txt.html#recording" target="_blank">record</a> any typed characters so that you can then replay them again. This makes applying a set of complex changes multiple times across a code base much easier.</p>
+
+<p>The workflow is actually really simple&hellip;</p>
+
+<ol>
+<li>Press <code>q</code> followed by any valid <a href="https://vimhelp.org/change.txt.html#registers" target="_blank">register</a> to start recording (you should see something like <code>recording @&lt;register&gt;</code> in the status bar).</li>
+<li>Start typing the changes you need to make.</li>
+<li>Press <code>q</code> again to stop recording.</li>
+<li>Press <code>@&lt;register&gt;</code> to replay the recorded steps.</li>
+</ol>
+
+<p>I typically use the <code>q</code> register as it&rsquo;s the quickest way to start recording a macro, as my finger already has to be over the <code>q</code> key to start recording any way (e.g. <code>qq</code> to record into <code>q</code>).</p>
+
+<p>Now you might be wondering what happens if your steps need to include the <code>q</code> character (if that character is what stops a macro recording). Well luckily <code>q</code> only triggers the macro to stop recording if it&rsquo;s the first character pressed as part of a new operation.</p>
+
+<p>So to demonstrate, if I want a macro that deletes all occurrences of the letter <code>q</code> from the current line, then I would type the following:</p>
+
+<pre><code>qq0V:s/q//g&lt;Enter&gt;q
+</code></pre>
+
+<p>Let&rsquo;s break these steps down&hellip;</p>
+
+<ul>
+<li><code>qq</code>: record into the <code>q</code> register.</li>
+<li><code>0</code>: move to the start of the line.</li>
+<li><code>V</code>: select the entire line.</li>
+<li><code>:</code>: start Ex mode</li>
+<li><code>s/q//g</code>: a substitution that deletes <code>q</code> &lsquo;globally&rsquo; (i.e. multiple times)</li>
+<li><code>&lt;Enter&gt;</code>: I press the Enter key to have the substitution applied to the current line.</li>
+<li><code>q</code>: I stop recording.</li>
+</ul>
+
+<p>If you execute <code>:reg</code> you&rsquo;ll see the <code>q</code> register contains something very similar&hellip;</p>
+
+<pre><code>0V:s/q//g^M
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: Once you&rsquo;ve replayed a macro (e.g. <code>@q</code>) you can trigger it again without having to specify the register by typing <code>@</code> again, e.g. <code>@@</code> will rerun the last used macro.</p>
+</blockquote>
+
+<p>If you need to run a macro a certain number of times then just prefix it with that number. For example, to run a macro six times I&rsquo;d type <code>6@&lt;register&gt;</code>.</p>
+
+<h2 id="modifying-content-with-global-command">Modifying content with <code>global</code> command</h2>
+
+<p>There are times when you want to execute an <a href="https://vimhelp.org/cmdline.txt.html#%3A" target="_blank">Ex</a> command for any lines that match a specific pattern. That is where the <a href="hhttps://vimhelp.org/intro.txt.html#Exttps://vimhelp.org/repeat.txt.html#%3Aglobal" target="_blank"><code>:global</code></a> comes in handy (this is different to <a href="https://vimhelp.org/change.txt.html#%3As" target="_blank">substitution</a>, which we&rsquo;ll look at after).</p>
+
+<p>Imagine you have a file with the following content:</p>
+
+<pre><code>foo
+foobar
+barfoo
+</code></pre>
+
+<p>You want to delete any lines that start with <code>foo</code>. To do that using the global command, would look like:</p>
+
+<pre><code class="language-viml">:g/^foo/d
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: If you just want to see what would match, you could either use the <a href="https://vimhelp.org/various.txt.html#%3Ap" target="_blank"><code>:p</code></a> command (e.g. <code>:g/^foo/p</code>) or just leave off the command altogether as <code>:p</code> is the default behaviour.</p>
+</blockquote>
+
+<p>What&rsquo;s cool about the <code>:global</code> command is that because the command can be <em>any</em> Ex command, it means you can also use <a href="https://vimhelp.org/repeat.txt.html#recording" target="_blank">macros</a> by way of the <a href="https://vimhelp.org/various.txt.html#%3Anorm" target="_blank"><code>:norm</code></a> command. In the following example we search for <code>foo</code> anywhere in the content and then apply the <code>@q</code> register to the matches&hellip;</p>
+
+<pre><code class="language-viml">:g/foo/norm @q | update 
+</code></pre>
+
+<p>With <code>:norm</code> it also means the first example could be mimicked with it:</p>
+
+<pre><code class="language-viml"># both are the same
+:g/^foo/d
+:g/^foo/norm dd
+</code></pre>
+
+<p>Now want if you needed to use controls keys like <code>&lt;Shift&gt;</code>? Well, you can do that with the <code>:global</code> command too, but this time the command to be called would be the <a href="https://vimhelp.org/eval.txt.html#%3Aexecute" target="_blank"><code>:execute</code></a> command. The <code>:execute</code> command will enable you to provide a string that will be evaluated into an Ex command.</p>
+
+<p>So imagine you had a file like:</p>
+
+<pre><code>foo
+bar
+baz
+qux
+</code></pre>
+
+<p>And you wanted it to be like:</p>
+
+<pre><code>foo bar
+baz qux
+</code></pre>
+
+<p>Then you would use the following (note that <code>&lt;Shift-j&gt;</code> in normal mode causes the following line to be joined to the current line):</p>
+
+<pre><code class="language-viml">:g/^/exe &quot;norm \&lt;s-j&gt;&quot;
+</code></pre>
+
+<p>You can also use the <code>!</code> to cause <code>:global</code> to behave in the reverse (i.e. anything that <em>doesn&rsquo;t</em> match the given pattern, apply the command to).</p>
+
+<h2 id="substitutions-magic-regex-mode-and-other-flags">Substitutions, magic regex mode and other flags</h2>
+
+<p>Most people know how to use Vim&rsquo;s <a href="https://vimhelp.org/change.txt.html#%3Asubstitute" target="_blank"><code>:substitute</code></a> command, but it seems people are less familiar with the use of <a href="https://vimhelp.org/pattern.txt.html#%2F%5Cv" target="_blank"><code>\v</code></a> as a way to enable &lsquo;magic mode&rsquo;.</p>
+
+<p>For me &lsquo;magic mode&rsquo; really just means my regex pattern doesn&rsquo;t require escaping characters like <code>+</code> or <code>()</code> which is quite frustrating. I just prefix my pattern with <code>\v</code> and I can forget that for the most part (†). more like I&rsquo;d expect it to from an engine supporting <a href="https://www.pcre.org/" target="_blank">PCRE</a> (Perl Compatible Regular Expressions, probably the most common implementation).</p>
+
+<blockquote>
+<p>† One caveat when using magic mode is that you <em>do</em> need to escape curly brackets as most regex engines treat <code>{}</code> as a &lsquo;quantifier&rsquo; such as <code>{1,3}</code> and so if I&rsquo;m programming/coding and I need to search for a <code>{</code> (which is common in programming languages), then I have to escape it <code>\{</code>. You can learn more about Vim&rsquo;s regex engine via the help but also via <a href="http://vimregex.com/" target="_blank">vimregex.com</a>.</p>
+</blockquote>
+
+<p>Let&rsquo;s start off by looking at <code>\v</code> not using a substitution but with a standard <a href="https://vimhelp.org/pattern.txt.html#%2F" target="_blank"><code>/</code></a> search.</p>
+
+<p>Imagine we have a project that instruments logging with different levels throughout. In this scenario imagine we have three log levels: debug, error and info that are used multiple times across the project. The log calls look something like:</p>
+
+<pre><code class="language-python">log('foo', level='debug')
+log('bar', level='error')
+log('baz', level='info')
+</code></pre>
+
+<p>Lastly, imagine we want to find every instance of a log call but only those that are of the &lsquo;debug&rsquo; and &lsquo;error&rsquo; level, we <em>don&rsquo;t</em> want to get any results for an &lsquo;info&rsquo; level log call.</p>
+
+<p>To do this we need a <a href="https://www.regular-expressions.info/lookaround.html" target="_blank">lookaround assertion</a>. For our purposes we&rsquo;re going to use a lookaround ahead (specifically a <em>negative</em> lookahead). The way a negative lookahead assertion works is that you provide a pattern you <em>don&rsquo;t</em> want to be matched.</p>
+
+<p>For our use case, if using a normal PCRE engine, could look something like:</p>
+
+<pre><code>level='(?!info)
+</code></pre>
+
+<p>In Vim this translates to:</p>
+
+<pre><code class="language-viml">level='\(info\)\@!
+</code></pre>
+
+<p>Or if you&rsquo;re using &lsquo;magic mode&rsquo;:</p>
+
+<pre><code class="language-viml">\vlevel\='(info)@!
+</code></pre>
+
+<p>Notice with magic mode we don&rsquo;t have to escape a bunch of things like the capture groups (i.e. the parenthesis) or the <code>@</code>.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: If the number of permutations was small enough, then it&rsquo;s arguably simpler to use an alternator pipe like <code>/\vlevel\='(debug|error)</code> because remembering the lookaround syntax like <code>@!</code> (and its friends) might be hard to recall.</p>
+</blockquote>
+
+<p>Next we&rsquo;ll look at <code>\u</code> and <code>\U</code> (they have lowercase equivalents: <code>\l</code> and <code>\L</code>).</p>
+
+<p>Remember our example log instrumentation calls from earlier, imagine we need to make the word <code>level</code> capitalised. Here&rsquo;s how we could achieve that (note: I&rsquo;ll show a better way after) using substitutions with magic mode and the <code>\u</code> special flag:</p>
+
+<pre><code class="language-viml">:%s/\v(l)(evel)/\u\1\2/
+</code></pre>
+
+<p>In this example we&rsquo;ve used the <code>%</code> range to represent the entire content buffer, and we&rsquo;ve used two capturing groups, one around the letter <code>l</code> and another capture group around the remainder of the word. In the replacement section we use <code>\u</code> to trigger an uppercase on the capture group <code>\1</code> and then we print out the second capture group <code>\2</code> following it.</p>
+
+<p>Now this is actually more work than it needs to be because no matter what you capture, <code>\u</code> will only ever uppercase the <em>first</em> character, so we only really need a single capture group:</p>
+
+<pre><code class="language-viml">:%s/\v(level)/\u\1/
+</code></pre>
+
+<p>But what about the <code>\U</code> equivalent? That will uppercase everything that follows, so if we needed the word <code>level</code> to be <code>LEVEL</code> then that&rsquo;s exactly what we&rsquo;d need to use:</p>
+
+<pre><code class="language-viml">:%s/\v(level)/\U\1/
+</code></pre>
+
+<p>You could also use <code>\U</code> for uppercasing just the first letter, but you&rsquo;d need to use either <code>\e</code> or <code>\E</code> (as a terminator) along with the two capture group design we had originally, like so:</p>
+
+<pre><code class="language-viml">:%s/\v(l)(evel)/\U\1\e\2/
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: For more details refer to <a href="https://vimhelp.org/change.txt.html#sub-replace-special" target="_blank"><code>:h sub-replace-special</code></a>, but also <a href="https://vimhelp.org/pattern.txt.html#whitespace" target="_blank"><code>:h whitespace</code></a> which elaborates on some other special regex pattern flags.</p>
+</blockquote>
+
+<h2 id="searching-and-filtering-content">Searching and filtering content</h2>
+
+<p>The following are native Vim solutions to finding files (and also searching multiple files for specific content).</p>
+
+<ul>
+<li><a href="#finding-a-single-file">Finding a single file</a></li>
+<li><a href="#finding-content-within-one-or-more-files">Finding content within one or more files</a></li>
+<li><a href="#using-external-shell-tool">Using external shell tool</a></li>
+<li><a href="#search-plugins">Search plugins</a></li>
+</ul>
+
+<h3 id="finding-a-single-file">Finding a single file</h3>
+
+<p>To find a <em>single</em> file you can use the <code>:find</code> Ex command and pass it a wildcard glob character to help search recursively for the specified file pattern.</p>
+
+<p>Example: we want to find a file called <code>next.config.js</code>:</p>
+
+<pre><code class="language-viml">:find **/next.*.js 
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: We could have just done <code>**/next.config.js</code> but in case you weren&rsquo;t familiar with the filename, then using another wildcard like we did helps to narrow things down.</p>
+</blockquote>
+
+<h3 id="finding-content-within-one-or-more-files">Finding content within one or more files</h3>
+
+<p>You have two options for locating a string within a file (or multiple files) and that&rsquo;s the following Ex commands&hellip;</p>
+
+<ol>
+<li><code>:vimgrep</code></li>
+<li><code>:lvimgrep</code></li>
+</ol>
+
+<p>The difference is that <code>lvimgrep</code> opens the results in a &lsquo;location&rsquo; window and every open split window can have its own location window, while <code>vimgrep</code> opens the results in a &lsquo;quickfix&rsquo; window and there can only be one of those shown.</p>
+
+<p>Meaning if you ran <code>vimgrep</code> in one split window and then ran it again (e.g. you&rsquo;re looking for something different now) from another window, then your first set of results would be replaced with the latter results. If you instead used <code>lvimgrep</code> then you could have multiple search results displayed (one for each split window).</p>
+
+<p>This is the basic syntax structure:</p>
+
+<pre><code class="language-viml">:vimgrep  /&lt;searchTerm&gt;/[gj] &lt;/path/to/project/**/*.go&gt;
+:lvimgrep /&lt;searchTerm&gt;/[gj] &lt;/path/to/project/*&gt;
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: <code>j</code> prevents Vim from trying to open the first file match (also, if you don&rsquo;t use <code>j</code> then the location list won&rsquo;t be populated with results as it&rsquo;ll presume the first match was all you wanted), while <code>g</code> means &ldquo;ensure every match on a single line is displayed&rdquo;.</p>
+</blockquote>
+
+<p>Example usage (we&rsquo;re searching for any reference to <code>class</code> anywhere in the project):</p>
+
+<pre><code class="language-viml">:vimgrep /class/gj **/*
+:copen
+</code></pre>
+
+<p>For anyone unfamiliar, the <code>copen</code> command will open Vim&rsquo;s &lsquo;quickfix&rsquo; window, while the <code>lopen</code> command will open the &lsquo;location list&rsquo; (refer to <code>:h copen</code> and <code>:h lopen</code> to find related commands).</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: a nice trick if you&rsquo;re using the <em>append</em> version of <code>vimgrep</code> (i.e. <a href="https://vimhelp.org/quickfix.txt.html#%3Avimgrepa" target="_blank"><code>vimgrepa</code></a>), is if you make a mistake populating the quickfix window, then you can use <code>:cex []</code> to clear it! See <a href="https://vimhelp.org/quickfix.txt.html#%3Acex" target="_blank"><code>:cex</code></a> for details.</p>
+</blockquote>
+
+<p>One interesting feature of <code>:vimgrep</code> is that you can use the result of a backtick expression to be the file source:</p>
+
+<pre><code class="language-viml">:vimgrep /ssh/j `find . -type f -name 'tmux*'`
+</code></pre>
+
+<p>You can also use a prior <code>/</code> search pattern like so:</p>
+
+<pre><code class="language-viml">:vimgrep /&lt;C-r&gt;// *
+</code></pre>
+
+<p>To clarify the above command, imagine you have a complex pattern you want to play around with and test with a single file so you use <code>/</code> to get Vim to jump into search mode for the current buffer content and then type in your complex pattern.</p>
+
+<p>Once happy with your pattern, you now want to use it again for multiple files but you don&rsquo;t want to have to type the pattern out again (especially in case it&rsquo;s complex enough to easily include an unexpected typo).</p>
+
+<p>So you type <code>:vimgrep /</code> and after that is where you would typically start typing your search pattern, at this point press <code>&lt;Ctrl-r&gt;</code> followed by <code>/</code> and Vim will automatically insert the last search pattern for you.</p>
+
+<p>Imagine <code>...</code> was the last search pattern, this would mean the Ex mode command would currently look like <code>:vimgrep /...</code> so you would need to finish the command <code>/ *</code> (so it&rsquo;s almost like you wrote the command in its entirety).</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: if you use another plugin like <code>:Ack!</code> then <code>&lt;C-r&gt;/</code> works to insert the last search pattern still (e.g. <code>:Ack! '&lt;C-r&gt;/'</code>)</p>
+</blockquote>
+
+<h3 id="using-external-shell-tool">Using external shell tool</h3>
+
+<p>The <code>:vimgrep</code> and <code>:lvimgrep</code> commands use an internal Vim search implementation. Which might not be as performant as using a separate/external search tool.</p>
+
+<p>This is why Vim also provides a <code>:grep</code> command, which allows you to utilise an <em>external</em> search program.</p>
+
+<p>The default program it uses can be seen by running:</p>
+
+<pre><code class="language-viml">:set grepprg
+</code></pre>
+
+<p>Which should return something like the following (which is the system provided <code>grep</code> tool):</p>
+
+<pre><code class="language-viml">grepprg=grep -n $* /dev/null
+</code></pre>
+
+<p>I have mine set to use <code>ag</code> (i.e. the <a href="https://github.com/ggreer/the_silver_searcher" target="_blank">Silver Searcher</a>):</p>
+
+<pre><code class="language-viml">set grepprg=ag\ --nogroup\ --nocolor\ --skip-vcs-ignores
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: spaces have to be escaped with a backslash <code>\</code>.</p>
+</blockquote>
+
+<p>You can now use the new program like so (e.g. to find any reference to the word <code>class</code> using the Silver Searcher tool):</p>
+
+<pre><code class="language-viml">:grep class
+:copen
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: you still need to open the &lsquo;quickfix&rsquo; window manually afterwards to see the results.</p>
+</blockquote>
+
+<p>All this said, you can improve the performance of <code>:vimgrep</code> by prefixing it with <a href="https://vimhelp.org/autocmd.txt.html#%3Anoautocmd" target="_blank"><code>:noautocmd</code></a>.</p>
+
+<pre><code class="language-viml">:noautocmd vimgrep /{pattern}/[flags] {file(s)}
+</code></pre>
+
+<p>This is because <code>:vimgrep</code> uses Vim&rsquo;s procedures to read files, which can involve execution of several autocommands. So this disables autocommands.</p>
+
+<h3 id="search-plugins">Search plugins</h3>
+
+<p>OK, the built-in tools are great and flexible, but I&rsquo;ll be honest with you and say that in my day-to-day Vim usage you&rsquo;ll find me using <a href="https://github.com/junegunn/fzf.vim" target="_blank"><code>:FZF</code></a> to find files and <a href="https://github.com/mileszs/ack.vim" target="_blank"><code>:Ack! '&lt;regex&gt;' &lt;path&gt;</code></a> to find files that contain a particular string.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: Although I use the <a href="https://github.com/mileszs/ack.vim" target="_blank">Ack</a> Vim plugin, I actually configure it to use the <code>ag</code> &lsquo;<a href="https://github.com/ggreer/the_silver_searcher" target="_blank">Silver Searcher</a>&rsquo; shell command.</p>
+</blockquote>
+
+<pre><code class="language-viml">&quot; Plugin Managment
+&quot; https://github.com/junegunn/vim-plug#example
+&quot;
+&quot; Reload .vimrc and :PlugInstall to install plugins.
+&quot; Use single quotes as requested by vim-plug.
+&quot;
+&quot; Specify a directory for plugins
+call plug#begin('~/.vim/plugged')
+
+Plug 'junegunn/fzf', { 'do': { -&gt; fzf#install() } }
+Plug 'junegunn/fzf.vim' &quot; &lt;Tab&gt; to select multiple results
+Plug 'mileszs/ack.vim'
+
+&quot; Initialize plugin system
+call plug#end()
+
+&quot; PLUGIN CONFIGURATION...
+
+&quot; FZF (search files)
+&quot;
+&quot; Shift-Tab to select multiple files
+&quot;
+&quot; Ctrl-t = tab
+&quot; Ctrl-x = split
+&quot; Ctrl-v = vertical
+&quot;
+&quot; We also set FZF_DEFAULT_COMMAND in ~/.bashrc
+&quot; Also we use --ignore-dir multiple times there
+&quot; Using --hidden to allow searching hidden directories like .github
+&quot; The --hidden still respects .ignore where we ignore things like .git
+&quot; NOTE: you need --path-to-ignore ~/.ignore otherwise ag only uses local ignore ./.ignore
+&quot;
+&quot; Note use :map command to see current mappings (also :vmap, :nmap, :omap).
+&quot; Can also restrict to specific mapping `:map &lt;Leader&gt;w`
+&quot; https://vi.stackexchange.com/questions/7722/how-to-debug-a-mapping
+map &lt;leader&gt;f :FZF!&lt;CR&gt;
+map &lt;leader&gt;b :Buffers!&lt;CR&gt;
+map &lt;leader&gt;g :GFiles!?&lt;CR&gt;
+map &lt;leader&gt;w :Windows!&lt;CR&gt;
+map &lt;leader&gt;t :AgC!&lt;CR&gt;
+set wildignore+=*/.git/*,*/node_modules/*,*/.hg/*,*/.svn/*.,*/.DS_Store &quot; Files matched are ignored when expanding wildcards
+set wildmode=list:longest,list:full
+
+&quot; configure FZF text search command to have default flags included
+autocmd VimEnter * command! -nargs=* -bang AgC call fzf#vim#ag(&lt;q-args&gt;,\
+'--path-to-ignore ~/.ignore --hidden --ignore &quot;node_modules&quot; --ignore-dir=&quot;vendor&quot; --skip-vcs-ignores', &lt;bang&gt;0)
+
+&quot; ack
+let g:ackprg = 'ag --vimgrep --smart-case --path-to-ignore ~/.ignore \
+--hidden --ignore-dir=node_modules --ignore-dir=vendor --skip-vcs-ignores'
+
+&quot; help Ack mappings to respect my split settings
+let g:ack_mappings = {
+  \ &quot;h&quot;: &quot;&lt;C-W&gt;&lt;CR&gt;:exe 'wincmd ' (&amp;splitbelow ? 'J' : 'K')&lt;CR&gt;&lt;C-W&gt;p&lt;C-W&gt;J&lt;C-W&gt;p&quot;,
+  \ &quot;v&quot;: &quot;&lt;C-W&gt;&lt;CR&gt;:exe 'wincmd ' (&amp;splitright ? 'L' : 'H')&lt;CR&gt;&lt;C-W&gt;p&lt;C-W&gt;J&lt;C-W&gt;p&quot;}
+</code></pre>
+
+<p>Now it&rsquo;s probably worth me quickly mentioning that there are two <em>small</em> plugins I really like that&rsquo;s related to this section:</p>
+
+<ol>
+<li><a href="https://github.com/google/vim-searchindex" target="_blank">vim-searchindex</a> which shows how many times a search pattern, such as <code>/your_pattern</code>, occurs in the current buffer. After each search, it displays total number of matches, as well as the index of a current match.</li>
+<li><a href="https://github.com/unblevable/quick-scope" target="_blank">quick-scope</a> which highlights a unique character in every word on a line to help you more efficiently jump around on a single line using the standard <code>f</code>, <code>F</code>, <code>t</code> and <code>T</code> motions.</li>
+</ol>
+
+<h2 id="processing-search-results-with-cdo-and-cfdo">Processing search results with <code>cdo</code> and <code>cfdo</code></h2>
+
+<p>So you&rsquo;ve run a search using something like <code>:vimgrep</code> or <code>:grep</code> or maybe a plugin like <code>:Ack</code>, and you&rsquo;ve populated a &lsquo;quickfix&rsquo; window (or maybe a &lsquo;location list&rsquo; if using something like <code>:lvimgrep</code>) with search results. Now you want to apply some sort of change to each search result.</p>
+
+<p>This is where the <code>&lt;c|l&gt;[f]do</code> commands come in handy:</p>
+
+<ul>
+<li>quickfix:
+
+<ul>
+<li><code>cdo</code></li>
+<li><code>cfdo</code></li>
+</ul></li>
+<li>location list:
+
+<ul>
+<li><code>ldo</code></li>
+<li><code>lfdo</code></li>
+</ul></li>
+</ul>
+
+<p>The first thing you need to think about is whether you want your &lsquo;action&rsquo; to be applied to each &lsquo;entry&rsquo; in the list or to each &lsquo;file&rsquo; in the list. Think about the list of results you have&hellip; depending on what you searched for it&rsquo;s possible you&rsquo;ll see the same file appear multiple times because there were multiple entries found within the file.</p>
+
+<p>So commands like <code>cdo</code> and <code>ldo</code> will operate on each entry, while <code>cfdo</code> and <code>lfdo</code> will only operate on each file. Meaning if a file appears 10 times, then you&rsquo;ll have your action applied to the file just <em>once</em> rather than having the action applied to each entry.</p>
+
+<p>Which command type you choose will depend on what your &lsquo;action&rsquo; is intending to achieve.</p>
+
+<p>Let&rsquo;s consider an example scenario such as having a quickfix window containing two files:</p>
+
+<ol>
+<li><code>example1.txt</code></li>
+<li><code>example2.txt</code></li>
+</ol>
+
+<p>The file <code>example1.txt</code> shows up multiple times, while <code>example2.txt</code> only shows up once.</p>
+
+<p>The file <code>example1.txt</code> shows up multiple times because we searched for a phrase such as <code>foo</code> and that phrase happened to appear multiple times within <code>example1.txt</code>, while it only appeared once within <code>example2.txt</code>.</p>
+
+<p>If you wanted to replace <code>foo</code> with <code>bar</code> using a subtitution like <code>s/foo/bar/</code>, and you used <code>cdo</code>, then all occurrences of <code>foo</code> would be replaced (i.e. across both <code>example1.txt</code> and <code>example2.txt</code>) because the substitution would be executed across each <em>entry</em> in the quickfix window.</p>
+
+<p>But if you used <code>cfdo</code> then the substitution would only be applied once to each <em>file</em>, which would result in <code>example2.txt</code> having its only instance of <code>foo</code> replaced with <code>bar</code> while <code>example1.txt</code> would have only one instance of <code>foo</code> replaced with <code>bar</code> and the other nine instances left unchanged. This is because we didn&rsquo;t provide a &lsquo;range&rsquo;, in this case <code>%</code>, in our substitution operation (e.g. <code>:%s/foo/bar/</code> meaning apply the substitution across the entire buffer).</p>
+
+<p>You could still use <code>cfdo</code> but you would need to specify <code>%</code>.</p>
+
+<hr>
+
+<h3 id="be-careful-with-tools-that-update-the-quickfix-dynamically">Be careful with tools that update the quickfix dynamically</h3>
+
+<p>The summary of this subsection is: be aware of any active plugins/tools that might dynamically update your quickfix window while your <code>cdo</code> command is still running.</p>
+
+<p>To elaborate: I&rsquo;ve found that my quickfix window is updated frequently/dynamically when using certain build tools.</p>
+
+<p>For example, vim-go using gopls will update the quickfix list every time a file is written to. This is because it wants to display an updated list of files that might potentially contain broken code. That&rsquo;s great when I&rsquo;m generally developing on a go program, but not when I&rsquo;m in the middle of trying to apply a set of changes globally using <code>cdo</code>.</p>
+
+<p>The reason this causes problems when trying to apply changes is because <code>cdo</code> gets confused when it attempts to process the next quickfix entry but discovers the quickfix list of results has changed!</p>
+
+<p>One way I could work around this is by using a location list, but most tools I use put results into a quickfix window so that&rsquo;s not going to help me.</p>
+
+<p>In this case I&rsquo;ve found I&rsquo;m better off using <code>cfdo</code> with <code>%s/foo/bar/e | update</code> which will write the buffer once, rather than the multiple times when using <code>cdo</code> with <code>s/foo/bar/e | update</code>. It&rsquo;s also much more efficient using <code>cfdo</code> as it won&rsquo;t write the buffer multiple times.</p>
+
+<p>Your mileage may vary, but it&rsquo;s important to think about this if you have certain build tools active that might mess around with the quickfix window half way through you processing the current list of results.</p>
+
+<hr>
+
+<p>Let&rsquo;s now look at an example where we execute a substitution for every &lsquo;entry&rsquo; listed in the quickfix window:</p>
+
+<pre><code class="language-viml">:cdo s/foo/bar/ | update
+</code></pre>
+
+<p>You don&rsquo;t need to pipe to <a href="https://vimhelp.org/editing.txt.html#%3Aupdate" target="_blank"><code>update</code></a>. I just do that because, most of the time, when I modify a file it&rsquo;s because I want to save the changes 🙂</p>
+
+<p>Now, to execute a macro introduces some interesting things to think about. For example, macros only execute <em>once</em> so if you need them to be executed multiple times, then you need to tell them to execute across a &lsquo;range&rsquo; (e.g. the entire buffer or a section of lines, like <code>%norm! @q</code>). Having a macro run multiple times is fine when you&rsquo;re dealing with content that is grouped together sequentially, but when wanting to apply a macro on a &lsquo;search pattern&rsquo;, then there&rsquo;s no guarantees that the search results will be in the required order/grouping.</p>
+
+<p>This is why I always use <a href="https://vimhelp.org/quickfix.txt.html#%3Acdo" target="_blank"><code>cdo</code></a> when needing to apply a macro across multiple files (you&rsquo;ll notice I also need to use <a href="https://vimhelp.org/eval.txt.html#%3Aexecute" target="_blank"><code>execute</code></a> so I can evaluate my expression <code>norm @q</code> as an Ex command):</p>
+
+<pre><code class="language-viml">:cdo execute &quot;norm @q&quot; | update
+</code></pre>
+
+<h2 id="filtering-quickfix-and-location-list-results">Filtering quickfix and location list results</h2>
+
+<p>What&rsquo;s interesting about &lsquo;quickfix&rsquo; and &lsquo;location&rsquo; lists is that you can further filter their results. Now, admittedly if you&rsquo;re using a third-party plugin like <a href="https://github.com/mileszs/ack.vim" target="_blank">Ack</a>, then yes you do have more control over the search pattern using additional flags provided by a third-party plugin that will help to filter the number of results, but I&rsquo;d argue there are still situations where you need even <em>more</em> fine grained control over what&rsquo;s displayed in the quickfix/location lists.</p>
+
+<p>If you&rsquo;ve taken the purist (i.e. no plugins) approach, then using the built-in Vim search (e.g. <code>vimgrep</code>/<code>lvimgrep</code> or even a custom configured <code>grep</code> to use an external command) will not offer much in the way of configuring the filtering of results (at the end of the day these built-in tools are useful but limited).</p>
+
+<p>So what additional tools does Vim provide to us? In this case you can utilise either <a href="https://vimhelp.org/quickfix.txt.html#%3ACfilter" target="_blank"><code>Cfilter</code></a> or <a href="https://vimhelp.org/quickfix.txt.html#%3ALfilter" target="_blank"><code>Lfilter</code></a> to filter your search results. These two commands are internal Vim plugins that need to be loaded using Vim&rsquo;s <a href="https://vimhelp.org/repeat.txt.html#%3Apackadd" target="_blank"><code>packadd</code></a> command (I actually have this added to my <a href="https://github.com/Integralist/dotfiles/blob/master/.vimrc#L75-L77" target="_blank"><code>.vimrc</code></a> as I always forget to call <code>packadd</code>).</p>
+
+<p>Here is an example of how to use <code>Cfilter</code>. I&rsquo;m going to search for the phrase &ldquo;vim&rdquo; across my blog, which ends up returning quite a few results across multiple files. Turns out I&rsquo;m only interested in files that are Markdown files and so I need to filter the results to only show me those files&hellip;</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: Sure you could use <a href="https://vimhelp.org/options.txt.html#%27wildignore%27" target="_blank"><code>wildignore</code></a> (or maybe even <a href="https://vimhelp.org/options.txt.html#%27suffixes%27" target="_blank"><code>suffixes</code></a>, although it won&rsquo;t solve our problem, only alleviate it slightly) but it&rsquo;s really a <em>hammer</em> solution, where we want a scalpel.</p>
+</blockquote>
+
+<pre><code class="language-viml">:vimgrep /vim/ **/*
+:packadd cfilter
+:Cfilter /\.md$/
+</code></pre>
+
+<p>You&rsquo;ll see I&rsquo;ve used <code>/</code> as delimiters around the regex pattern, but you can also use other single-byte characters (refer to <code>:h pattern-delimiter</code> or <a href="https://vimhelp.org/change.txt.html#pattern-delimiter" target="_blank">the online help</a>).</p>
+
+<p>OK, so what&rsquo;s interesting here is that <code>Cfilter</code>/<code>Lfilter</code> will search (using a regex pattern) <em>both</em> the filename and the text entry itself. So trying to filter for just <code>\.md</code> would still include more files than just Markdown files because the content of the file is also searched and I have <code>.txt</code> files that include both <code>vim</code> and the filter pattern <code>.md</code>.</p>
+
+<p>This is why I also use the regex anchor <code>$</code> because it&rsquo;s less likely for me to accidentally hit a match, and so I&rsquo;m more likely to just get back results that are Markdown files containing the phrase <code>vim</code>.</p>
+
+<p>As you can see the default behaviour of the filter is to keep only those results that match your pattern. If you want the filter to work in reverse so it <em>removes</em> anything that matches your pattern, then add <code>!</code> to the command like so <code>:Cfilter! /your_pattern/</code>.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: As this is a regex pattern you can still use <code>\v</code> to get &lsquo;magic&rsquo; mode. For example <code>/\vyour_pattern/</code>.</p>
+</blockquote>
+
+<h2 id="processing-files-with-t-do">Processing files with <code>&lt;T&gt;do</code></h2>
+
+<p>We&rsquo;ve already seen <code>:cdo</code> and <code>:cfdo</code>, but there&rsquo;s so many more &lsquo;do&rsquo; commands that can enrich your Vim experience:</p>
+
+<ul>
+<li><a href="https://vimhelp.org/windows.txt.html#%3Abufdo" target="_blank"><code>:bufdo</code></a>: apply action to all buffers (<a href="https://vimhelp.org/windows.txt.html#%3Als" target="_blank"><code>:h ls</code></a>).</li>
+<li><a href="https://vimhelp.org/tabpage.txt.html#%3Atabdo" target="_blank"><code>:tabdo</code></a>: apply action to all tabs.</li>
+<li><a href="https://vimhelp.org/windows.txt.html#%3Awindo" target="_blank"><code>:windo</code></a>: apply action to all windows (multiple windows might all display the same buffer).</li>
+<li><a href="https://vimhelp.org/editing.txt.html#%3Aargdo" target="_blank"><code>:argdo</code></a>: apply action to all arguments in the <a href="https://vimhelp.org/editing.txt.html#arglist" target="_blank"><code>:h arglist</code></a>.</li>
+</ul>
+
+<p>Now admittedly I mostly use <code>:cdo</code>/<code>:cfdo</code> over any of the above because they are, for me, the most practical tools that give me massive value in my day-to-day work. That said, I do like to use <code>:bufdo</code> as well (I don&rsquo;t think I ever use <code>:tabdo</code> or <code>:windo</code> to be honest, although it&rsquo;s good to know they exist in my toolbox), and the <em>action</em> I do the most when using <code>:bufdo</code> is when I want to clear out a bunch of buffers. So I&rsquo;ll run <code>:bufdo bd</code> (<a href="https://vimhelp.org/windows.txt.html#%3Abd" target="_blank"><code>:h bd</code></a>).</p>
+
+<p>I&rsquo;ll give you another example of how you might want to use something like <code>:bufdo</code> which came in handy for me recently. I had a git project which caused a bunch of conflicts in my files when I had rebased another branch. So I opened up all the conflicting files so I could locate the specific git syntax <code>&lt;&lt;&lt; HEAD</code> that surrounds where the conflicts were.</p>
+
+<p>At this point I went through each file and was fixing the issues, but then I realised I wasn&rsquo;t sure if I had fixed all occurrences of <code>&lt;&lt;&lt; HEAD</code> in each file I had edited. I guess I could have just run <code>vimgrep</code> over the whole project, but it&rsquo;s a large project and it would have taken a lot longer than I would have liked because of the fact it was a <em>very</em> large project.</p>
+
+<p>the solution in this case was to search over the files that I had open using <code>:bufdo</code> mixed with the <a href="https://vimhelp.org/eval.txt.html#%3Aexecute" target="_blank"><code>:execute</code></a> command and the <em>append</em> specific version of <code>vimgrep</code> (i.e. <a href="https://vimhelp.org/quickfix.txt.html#%3Avimgrepa" target="_blank"><code>vimgrepa</code></a>):</p>
+
+<pre><code class="language-viml">:bufdo execute &quot;vimgrepa /&lt;&lt;&lt; HEAD/ %&quot;
+</code></pre>
+
+<p>As you can see I was also able to utilise the <a href="https://vimhelp.org/change.txt.html#%3Aregisters" target="_blank"><code>%</code> register</a> to access the current file name. So for each iteration of <code>bufdo</code> through the buffer list, the <code>%</code> register would be updated to reflect the name of the file.</p>
+
+<p>Each of these &lsquo;do&rsquo; commands are all fairly self-explanatory, but let&rsquo;s take a moment to look at <code>argdo</code> as it has some interesting extra considerations. When you open Vim for the first time there is an &lsquo;argument list&rsquo; that gets populated. All files open in the argument list will match what&rsquo;s in your buffer list, unless you start opening/closing buffers. But regardless of changes to the buffer list, the arglist will stay the same, which means just because you have a file name in the argument list doesn&rsquo;t mean you have a buffer open for that file.</p>
+
+<p>That last bit is important because it can be a reason for using <code>:argdo</code> over <code>:bufdo</code>. Typically they produce the same end result because when you open Vim with three files given as arguments, then the arglist will contain those three file names, but there will also be three buffers opened with those files as content.</p>
+
+<p>You can&rsquo;t <em>accidentally</em> add a new argument to the arglist because you have to explicitly call <a href="https://vimhelp.org/editing.txt.html#%3Aargadd" target="_blank"><code>:argadd</code></a> (for deleting you need <a href="https://vimhelp.org/editing.txt.html#%3Aargdelete" target="_blank"><code>:argdelete</code></a>). Where as with the list of buffers, that gets updated whenever you open a new file (and that is very easily done, especially when searching for content), but importantly the arglist will stay unchanged.</p>
+
+<h2 id="automating-content-modification-using-ex-commands-from-the-shell">Automating content modification using Ex commands from the shell</h2>
+
+<p>Vim has a nice feature where it allows you to easily run Ex commands against a file from the shell. The summary of which is:</p>
+
+<pre><code>$ vim -E -s some_file.txt &lt;&lt;-EOF
+  :%s/foo/bar/
+  :update
+  :quit
+EOF
+</code></pre>
+
+<p>But stick around for a few more details&hellip;</p>
+
+<p>Vim doesn&rsquo;t handle stdin like other posix commands:</p>
+
+<pre><code class="language-bash">$ echo foo | vim
+
+Vim: Warning: Input is not from a terminal
+Vim: Error reading input, exiting...
+Vim: Finished.
+</code></pre>
+
+<p>If you pass <code>-</code> to Vim, then it will accept the stdin and copy it to a new buffer&hellip;</p>
+
+<pre><code class="language-bash">$ echo foo | vim -
+</code></pre>
+
+<p>Before we look ahead at how to handle stdin a bit better, let&rsquo;s consider the <code>+</code> flag which tells Vim what line to start on (the following example tells Vim to jump to line 10):</p>
+
+<pre><code class="language-bash">$ vim ~/.vimrc +10
+</code></pre>
+
+<p>This will become relevant when we look at two other flags <code>-e</code> and <code>-s</code> (<a href="https://vimhelp.org/starting.txt.html#-e" target="_blank"><code>:h -e</code></a>, <a href="https://vimhelp.org/starting.txt.html#-s" target="_blank"><code>:h -s</code></a> and <a href="https://vimhelp.org/starting.txt.html#-s-ex" target="_blank"><code>:h -s-ex</code></a>)&hellip;</p>
+
+<pre><code class="language-bash">$ echo foo | vim - -es +'%p' +'qa!'
+
+Vim: Reading from stdin...
+foo
+</code></pre>
+
+<p>When using the <code>-e</code> and <code>-s</code> flags, we&rsquo;re able to use <code>+</code> to execute Ex mode commands.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: If you don&rsquo;t use <code>+'qa!'</code> then Vim will cause the terminal to hang. You also need the <code>!</code> otherwise <code>qa</code> would (if dealing with a traditional Vim UI) show a message saying the buffer has been edited and can&rsquo;t be quit.</p>
+</blockquote>
+
+<p>To avoid the <code>Vim: Reading from stdin...</code> message we need an additional flag <code>--not-a-term</code>:</p>
+
+<pre><code class="language-bash">$ echo foo | vim - -es +'%p' +'qa!' --not-a-term
+
+foo
+</code></pre>
+
+<p>So now if we want to manipulate the content (let&rsquo;s say uppercase the word <code>foo</code> to <code>FOO</code>) we can do:</p>
+
+<pre><code>$ echo foo | vim - -es --not-a-term +'norm VgU' +'%p' +'qa!'
+
+FOO
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: <code>norm</code> says execute the following characters as if the user is typing them, so <code>V</code> selects the entire line and <code>gU</code> uppercases the selection. We then print the output to stdout <code>%p</code> and then quit without trying to save the modifications.</p>
+</blockquote>
+
+<h2 id="starting-vim-with-your-last-workspace">Starting Vim with your last workspace</h2>
+
+<p>Now this feature I&rsquo;m going to describe I don&rsquo;t use that often, but there&rsquo;s been a few occasions where it&rsquo;s saved me a lot of hassle. The feature i&rsquo;m going to talk about is <a href="https://vimhelp.org/starting.txt.html#%3Amksession" target="_blank"><code>:mksession</code></a>. There are lots of things you can do with <code>:mksession</code> so read the help documents, but I&rsquo;m only going to cover the basics here because that&rsquo;s mostly all I ever need to use.</p>
+
+<p>The summary of this Ex command is that it will take a snapshot of your working environment inside Vim and will reproduce it the next time you startup Vim.</p>
+
+<p>The way it does this is to stick every buffer, window, window size and layout configuration into a <code>Session.vim</code> file (don&rsquo;t forget to add this file to your <code>.gitignore</code>).</p>
+
+<p>So if you need to stop Vim suddenly (for whatever reason) and you don&rsquo;t want to lose your workspace layout because you&rsquo;ve got lots of files open that you&rsquo;d have to write down filename/paths to, and maybe you have specific window splits setup to work on multiple files in a specific order and you don&rsquo;t want to have to remember what the layout was (especially if like me you have multiple Vim tabs open and each one has its own window splits etc) then you just need to run <code>:mksession</code> before closing Vim.</p>
+
+<p>To start Vim with the session snapshot you would run:</p>
+
+<pre><code class="language-bash">vim -S Session.vim
+</code></pre>
+
+<p>That&rsquo;s it! Your entire workspace is spun up exactly how you left it.</p>
+
+<p>Once you open Vim again you might want to change some of your workspace. If that&rsquo;s the case and you want the <code>Session.vim</code> file to record that updated layout in its snapshot, then run the <code>:mksession!</code> command (notice the extra <code>!</code> at the end to force overwriting the original <code>Session.vim</code> file).</p>
+
+<h2 id="vim-s-start-up-process">Vim&rsquo;s start-up process</h2>
+
+<p>The Vim documentation explains all the various steps that are gone through during &lsquo;start-up&rsquo;, see <a href="https://vimhelp.org/starting.txt.html#startup" target="_blank"><code>:h startup</code></a>.</p>
+
+<p>In short, Vim executes <code>:runtime! plugin/**/*.vim</code> meaning any directories listed in the runtime path (<a href="https://vimhelp.org/options.txt.html#%27runtimepath%27" target="_blank"><code>:h runtimepath</code></a>) will be searched for a <code>plugin</code> sub-directory and all files ending in &ldquo;.vim&rdquo; will be sourced (in alphabetical order per directory).</p>
+
+<p>If you want to see what&rsquo;s in your runtime path you can execute:</p>
+
+<pre><code class="language-viml">:set runtimepath?
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: if you want to debug the start-up process: <a href="https://vimhelp.org/starting.txt.html#--startuptime" target="_blank"><code>vim --startuptime some_log_filename</code></a>.</p>
+</blockquote>
+
+<p>To learn more about the various directories Vim uses, then refer to the <code>:help</code> documentation, for example:</p>
+
+<ul>
+<li><code>~/.vim/autoload/...</code> (<a href="https://vimhelp.org/eval.txt.html#autoload" target="_blank"><code>:h autoload</code></a>)</li>
+<li><code>~/.vim/plugin/...</code> (<a href="https://vimhelp.org/usr_05.txt.html#plugin" target="_blank"><code>:h plugin</code></a>)</li>
+<li><code>~/.vim/ftplugin/...</code> (<a href="https://vimhelp.org/usr_41.txt.html#ftplugin" target="_blank"><code>:h ftplugin</code></a>)</li>
+<li><code>~/.vim/after/...</code> (<a href="https://vimhelp.org/options.txt.html#after-directory" target="_blank"><code>:h after-directory</code></a>)</li>
+</ul>
+
+<p>Although I will take a brief detour through that last item&hellip;</p>
+
+<h3 id="the-after-directory">The <code>after</code> directory</h3>
+
+<p>The <code>after</code> directory can be used by both Vim &lsquo;users&rsquo; <em>and</em> by Vim &lsquo;plugin authors&rsquo; to override specific plugin configuration (that could be either <code>~/.vim/plugin/...</code> or <code>~/.vim/ftplugin/...</code>).</p>
+
+<p>For example, the Vim plugin author for <code>vim-polyglot</code> adds this file: <code>~/.vim/plugin/vim-polyglot/after/ftdetect/rspec.vim</code> which overrides the filetype configuration for <code>rspec</code> files.</p>
+
+<p>Where as a Vim user might want to override the behaviour of a plugin they&rsquo;re using (e.g. the FZF plugin) by adding the file <code>~/.vim/after/plugin/config/fzf.vim</code>, and due to how Vim loads &lsquo;after&rsquo; scripts, that file would get loaded. Although it&rsquo;s important to add a guard into the code to ensure it only executes if the FZF plugin actually is loaded (otherwise this after script could cause an error)&hellip;</p>
+
+<pre><code class="language-viml">&quot; include guard; quit if fzf isn't loaded
+if ! exists(':FZF')
+    finish
+endif
+</code></pre>
+
+<h2 id="debugging-vim-issues">Debugging Vim issues</h2>
+
+<p>First thing first, run <a href="https://vimhelp.org/options.txt.html#%3Ase" target="_blank"><code>:se</code></a> to see all the Vim options that have changed from the Vim defaults. This can be a good &lsquo;at a glance&rsquo; perspective on what might be wrong or why you&rsquo;re seeing some sort of unexpected behaviour.</p>
+
+<p>To check a specific setting and who (i.e. which plugin or script) last modified it, use <a href="https://vimhelp.org/various.txt.html#%3Averbose" target="_blank"><code>:verbose set &lt;setting&gt;?</code></a>.</p>
+
+<p>For example, <code>:verbose set shiftwidth?</code> returns&hellip;</p>
+
+<pre><code class="language-viml">shiftwidth=2
+      Last set from ~/.vimrc
+</code></pre>
+
+<p>You can also see what mappings have been configured using the <a href="https://vimhelp.org/map.txt.html#%3Amap" target="_blank"><code>map</code></a> command.</p>
+
+<p>For example, to see all mappings with the leader key&hellip;</p>
+
+<pre><code class="language-viml">:verbose map &lt;leader&gt;
+
+x  \y            :Buffers&lt;CR&gt;
+        Last set from ~/.vimrc
+   \t            :FZF&lt;CR&gt;
+        Last set from ~/.vimrc
+        
+n  \z            :ALEPrevious&lt;CR&gt;
+        Last set from ~/.vimrc
+n  \x            :ALENext&lt;CR&gt;
+        Last set from ~/.vimrc
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: see <code>:h map-listing</code> for the various modes (<code>n</code> = normal, <code>x</code> = visual, etc).</p>
+</blockquote>
+
+<p>The same principle works with other mappings like <code>&lt;Ctrl-k&gt;</code> and <code>&lt;Ctrl-j</code>&hellip;</p>
+
+<pre><code class="language-viml">:verbose map &lt;c-k&gt;
+
+n  &lt;C-K&gt;         &lt;Plug&gt;MoveLineUp
+        Last set from ~/.vim/plugged/vim-move/plugin/move.vim
+v  &lt;C-K&gt;         &lt;Plug&gt;MoveBlockUp
+        Last set from ~/.vim/plugged/vim-move/plugin/move.vim
+
+:verbose map &lt;c-j&gt;
+
+n  &lt;NL&gt;          &lt;Plug&gt;MoveLineDown
+        Last set from ~/.vim/plugged/vim-move/plugin/move.vim
+v  &lt;NL&gt;          &lt;Plug&gt;MoveBlockDown
+        Last set from ~/.vim/plugged/vim-move/plugin/move.vim
+</code></pre>
+
+<p>If you want to know what the default commands that Vim defines, then take a look at <a href="https://vimhelp.org/index.txt.html#index" target="_blank"><code>:h index</code></a> and drill down into the various commands per &lsquo;mode&rsquo;.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: Vim also has a debugger you can use: <code>vim -D ~/.vimrc</code> (see reference below for details).</p>
+</blockquote>
+
+<p>Lastly, there is the <code>-V&lt;N&gt;</code> flag that sets the verbosity of Vim output when starting up&hellip;</p>
+
+<pre><code class="language-txt">&quot; &gt;= 1  When the viminfo file is read or written.
+&quot; &gt;= 2  When a file is &quot;:source&quot;'ed.
+&quot; &gt;= 5  Every searched tags file and include file.
+&quot; &gt;= 8  Files for which a group of autocommands is executed.
+&quot; &gt;= 9  Every executed autocommand.
+&quot; &gt;= 12 Every executed function.
+&quot; &gt;= 13 When an exception is thrown, caught, finished, or discarded.
+&quot; &gt;= 14 Anything pending in a &quot;:finally&quot; clause.
+&quot; &gt;= 15 Every executed Ex command (truncated at 200 characters).
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: see <code>:h vbs</code> for details.</p>
+</blockquote>
+
+<p>Usage example: <code>vim -V9 ~/.vimrc</code>, but you can also write the output to a log file instead (pro tip: use the log file approach) such as <code>vim -V9foo ~/.vimrc</code> which will write the output to the log file <code>foo</code>.</p>
+
+<p>OK, time for the short sections&hellip; 🙂</p>
+
+<h2 id="autocomplete-with-no-plugins">Autocomplete with no plugins</h2>
+
+<p>So you want some form of auto-complete feature without the need for a third-party plugin, no problem&hellip;</p>
+
+<pre><code class="language-viml">filetype plugin on
+set omnifunc=syntaxcomplete#Complete
+</code></pre>
+
+<p>Now you can execute <code>&lt;C-x&gt;&lt;C-o&gt;</code> to get a very basic form of native code autocompletion.</p>
+
+<p>Vim also provides the native command <code>&lt;C-n&gt;</code> for autocompletion based on words existing in all opened buffers.</p>
+
+<h2 id="understanding-line-feed-and-carriage-returns">Understanding line feed and carriage returns</h2>
+
+<p>This isn&rsquo;t necessarily a Vim specific thing but it used to catch me out all the time. <em>Looking</em> for line breaks and <em>inserting</em> line breaks are two different things.</p>
+
+<blockquote>
+<p>The term <strong>CRLF</strong> refers to Carriage Return (ASCII 13, <code>\r</code>) Line Feed (ASCII 10, <code>\n</code>). They&rsquo;re used to note the termination of a line, however, dealt with differently in today&rsquo;s popular Operating Systems.</p>
+</blockquote>
+
+<ul>
+<li>Windows: CRLF (<code>\r\n</code>)</li>
+<li>Linux/Unix: LF (<code>\n</code>)</li>
+</ul>
+
+<p>Imagine in Vim you have a buffer like:</p>
+
+<pre><code>a
+b
+c
+d
+</code></pre>
+
+<p>If you wanted to add an extra line space between each line, so it looked like:</p>
+
+<pre><code>a
+
+b
+
+c
+
+d
+
+
+</code></pre>
+
+<p>You would need to use a substitution like:</p>
+
+<pre><code class="language-viml">:%s/\n/\r\r/
+</code></pre>
+
+<p>Notice we&rsquo;re looking for a &lsquo;line feed&rsquo; <code>\n</code> (because that&rsquo;s how macOS denotes a new line), while to get Vim to insert a line break we need it to <em>insert</em> two separate &lsquo;carriage returns&rsquo; <code>\r</code>.</p>
+
+<h2 id="auto-highlighting-keywords-and-creating-your-own-custom-highlighting">Auto highlighting keywords (and creating your own custom highlighting)</h2>
+
+<p>Vim can highlight certain words inside of code comments, such as&hellip;</p>
+
+<ul>
+<li><code>BUG</code> (Golang)</li>
+<li><code>FIXME</code></li>
+<li><code>NOTE</code></li>
+<li><code>NOTES</code> (Python)</li>
+<li><code>TODO</code></li>
+<li><code>XXX</code></li>
+</ul>
+
+<blockquote>
+<p>The <code>NOTE</code> works in both Go and Python files and yet it&rsquo;s not defined in the Go syntax file, which means it&rsquo;s likely inherited from a default syntax file.</p>
+</blockquote>
+
+<p>See the syntax files for&hellip;</p>
+
+<ul>
+<li><a href="https://github.com/vim/vim/blob/a87b72cc316e065d66dcbcf7ec1cde330adef3a3/runtime/syntax/python.vim#L134" target="_blank">Python</a></li>
+<li><a href="https://github.com/vim/vim/blob/a87b72cc316e065d66dcbcf7ec1cde330adef3a3/runtime/syntax/go.vim#L95" target="_blank">Go</a></li>
+</ul>
+
+<p>You can add your own, see <a href="https://vi.stackexchange.com/a/15531" target="_blank">this StackOverflow post</a> for the full details, but in summary it looks something like:</p>
+
+<pre><code class="language-vim">augroup myTodo
+  autocmd!
+  autocmd Syntax * syntax match myTodo /\v\_.&lt;(TODO|FIXME).*/hs=s+1 containedin=.*Comment
+augroup END
+
+highlight link myTodo Todo
+</code></pre>
+
+<h2 id="sorting-and-filtering-duplicates">Sorting and filtering duplicates</h2>
+
+<p>This is such a small &lsquo;tip&rsquo;, and is probably obvious to most Vim users, but just in case it isn&rsquo;t&hellip;</p>
+
+<p>Imagine you have some content that consists of a list that might also contain some duplicates, like:</p>
+
+<pre><code>foo
+bar
+baz
+foo
+bar
+baz
+</code></pre>
+
+<p>To sort the contents you just need:</p>
+
+<pre><code class="language-viml">:sort
+</code></pre>
+
+<p>Resulting in:</p>
+
+<pre><code>bar
+bar
+baz
+baz
+foo
+foo
+</code></pre>
+
+<p>While if you wanted to remove the duplicates too you would pass <code>u</code>:</p>
+
+<pre><code class="language-viml">:sort u
+</code></pre>
+
+<p>Resulting in:</p>
+
+<pre><code>bar
+baz
+foo
+</code></pre>
+
+<h2 id="miscellaneous-tips-and-tricks">Miscellaneous tips and tricks</h2>
+
+<p>If you need your cursor to always be in the middle of the screen (this is modifying the &lsquo;scroff offset&rsquo; option):</p>
+
+<pre><code>:set so=999
+</code></pre>
+
+<p>Move the cursor to the top, middle, bottom of the visible screen:</p>
+
+<ul>
+<li><code>H</code>: high (i.e. top of the screen)</li>
+<li><code>M</code>: middle</li>
+<li><code>L</code>: low (i.e. bottom of the screen)</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>So there you have it, my collection of useful Vim features that I use regularly. Let me know what you think. Anything surprising? What do you use that maybe I&rsquo;ve missed?</p>
+
+<p>Thanks for reading! ❤️</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

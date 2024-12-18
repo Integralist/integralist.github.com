@@ -1,0 +1,1203 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#designing-for-simplicity">Designing for Simplicity</a>
+<ul>
+<li><a href="#complexity-vs-complicated">Complexity vs Complicated</a></li>
+
+<li><a href="#promoting-simplicity">Promoting simplicity</a></li>
+
+<li><a href="#naming-things">Naming things</a></li>
+
+<li><a href="#growth">Growth</a></li>
+
+<li><a href="#the-micro-fallacy">The micro fallacy?</a></li>
+
+<li><a href="#decoupling-systems">Decoupling systems</a></li>
+
+<li><a href="#broker-renderers">Broker/Renderers</a>
+<ul>
+<li><a href="#push">Push</a></li>
+
+<li><a href="#pull">Pull</a></li>
+
+<li><a href="#design-and-architecture">Design and architecture</a></li>
+</ul></li>
+
+<li><a href="#how-low-can-you-or-should-you-go">How low can you (or should you) go?</a></li>
+
+<li><a href="#language-agnostic-templates">Language agnostic templates</a></li>
+
+<li><a href="#automation-and-duplication">Automation and Duplication</a>
+<ul>
+<li><a href="#continuous-delivery">Continuous Delivery</a></li>
+
+<li><a href="#aws-cloudformation">AWS CloudFormation</a></li>
+
+<li><a href="#custom-library-abstractions">Custom library abstractions</a></li>
+
+<li><a href="#docker">Docker</a></li>
+</ul></li>
+
+<li><a href="#tooling">Tooling</a></li>
+
+<li><a href="#fp-oop-and-mvc">FP, OOP and MVC</a></li>
+
+<li><a href="#inherent-complexity">Inherent complexity</a></li>
+
+<li><a href="#containerization">Containerization</a>
+<ul>
+<li><a href="#tooling-1">Tooling</a></li>
+
+<li><a href="#scaling">Scaling</a></li>
+
+<li><a href="#orchestration">Orchestration</a></li>
+
+<li><a href="#layers">Layers</a></li>
+</ul></li>
+
+<li><a href="#optimizing-user-experience">Optimizing user experience</a></li>
+
+<li><a href="#where-have-we-succeeded-failed">Where have we succeeded/failed?</a></li>
+
+<li><a href="#summary">Summary</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="designing-for-simplicity">Designing for Simplicity</h1>
+
+<blockquote>
+<p>⚠️  This post was originally written for <a href="https://davidwalsh.name/designing-simplicity" target="_blank">David Walsh back in 2015</a>. I&rsquo;ve since decided to reproduce it here for my own records - Integralist: August, 2017.</p>
+</blockquote>
+
+<p>Before we get started, it&rsquo;s worth me spending a brief moment introducing myself to you. My name is Mark (or <a href="https://twitter.com/integralist" target="_blank">@integralist</a> if Twitter happens to be your communication tool of choice) and I currently work for BBC News in London England as a principal engineer/tech lead; and I&rsquo;m also the author of &ldquo;<a href="http://www.apress.com/9781484202517" target="_blank">Pro Vim</a>&rdquo;.</p>
+
+<blockquote>
+<p>Quick shout out to <a href="https://twitter.com/stevenjack85" target="_blank">Steven Jack</a> who took the time to review this post. A lot of what we&rsquo;ve done right, he either helped instigate or was a fundamental part of its success</p>
+</blockquote>
+
+<p>The &ldquo;responsive&rdquo; BBC News website receives approximately 8 million visits per day (that&rsquo;s on average for a quiet news day). Those numbers will go much higher once the responsive site replaces the current static desktop offering and starts to incur many more users. But for the moment that gives a rough idea of the sort of traffic we get on a daily basis.</p>
+
+<p>This post aims to take a whirlwind tour of different code design and architectural discussion points that have cropped up at one point or another while I&rsquo;ve been working at the BBC. We will be peeking at some top-level system infrastructure in a bid to provide you with some &ldquo;food for thought&rdquo; on these topics. I&rsquo;ll talk about some techniques and tools that work for us, and we&rsquo;ll also see some that didn&rsquo;t work quite so well. I&rsquo;ve always been intrigued by how other developers work and think about different types of problems, so let&rsquo;s consider this a knowledge sharing experience from me to you.</p>
+
+<blockquote>
+<p>Note: the thoughts and comments here are my own and do not necessarily represent those of my employer. Yup, I had to go there&hellip; just in case</p>
+</blockquote>
+
+<p>Now some readers will probably not have to worry about the same sort of scalability problems the BBC has to deal with, when designing/building systems and applications. But this isn&rsquo;t to say the information and thoughts I&rsquo;m going to share with you here in this post aren&rsquo;t transferable. In fact, much of what I&rsquo;ll be discussing are concepts that can be utilized in applications of any size (because good design is effective at any scale).</p>
+
+<blockquote>
+<p>Note: this post covers very little front-end technologies and techniques. That topic of discussion is much more vast and has been covered substantially over the past few years (especially the topic of performance, which has - since ~2007 - been brought into the mainstream mindset of front-end engineers by <a href="http://stevesouders.com/" target="_blank">Steve Souders</a>.</p>
+</blockquote>
+
+<p>So without further ado, let&rsquo;s begin&hellip;</p>
+
+<h2 id="complexity-vs-complicated">Complexity vs Complicated</h2>
+
+<p>When describing a piece of software, you&rsquo;ll often here the words &ldquo;complex&rdquo; and &ldquo;complicated&rdquo; used. We need to be careful when using these phrases that we select the one that accurately expresses our opinion. For example, some one might say a piece of software is &ldquo;complicated&rdquo;, when really they mean it&rsquo;s &ldquo;complex&rdquo; (and vice versa). Unfortunately the definition of both these words doesn&rsquo;t help to clarify which we should use and in which context. This can make it harder to express what we really mean to say.</p>
+
+<p>For me, describing something as being &ldquo;complicated&rdquo;, infers a negative connotation (it has used either bad logic or implemented a bad design). Usually the phrase &ldquo;this feels over-engineered&rdquo; will follow.</p>
+
+<p>The word &ldquo;complexity&rdquo; on the other hand represents to me a varying value (in that it&rsquo;s dependent on the system being reviewed) and so it feels like a more appropriate term to use when recognizing the software&rsquo;s design has evolved and become much larger over time.</p>
+
+<p>You can also still apply the term &ldquo;complex&rdquo; to individual units of code. If a class or function is taking on too much responsibility then it can feel like it&rsquo;s becoming too complex, and subsequently some of its logic will need to be extracted into another class or function. This is apposed to, let&rsquo;s say, a function using a bad algorithm, in which you may identify that code as being &ldquo;complicated&rdquo;.</p>
+
+<p>Now if a piece of software has a lot of moving parts (most applications do) and you have a difficult time building a mental model of it all, and subsequently are not able to follow its thread very easily, doesn&rsquo;t necessarily mean the application is &ldquo;complicated&rdquo;. Lots of small, simple, and non-complicated functional components can be composed together to create a much larger system and subsequently can make the overall picture become a little harder to decipher. This is what makes software &ldquo;complex&rdquo;.</p>
+
+<p>Good code design doesn&rsquo;t always help you to see the bigger picture. What good code design does help with is making smaller functional units much more easily understood and composable (e.g. SRP - Single Responsibility Principle; one part of <a href="http://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29" target="_blank">S.O.L.I.D</a>).</p>
+
+<p>The reason I&rsquo;m mentioning this upfront is because I do not want people to walk away (mistakenly) thinking their existing software, or its architecture, is fundamentally flawed or broken. You must always take a critical eye to your systems/applications; but be aware that although they may be &ldquo;complex&rdquo;, that might be the natural order of things. A complete rewrite is not necessarily required.</p>
+
+<h2 id="promoting-simplicity">Promoting simplicity</h2>
+
+<p>With the discussion of complexity behind us, let&rsquo;s move onto what it means for software to be &ldquo;simple&rdquo;. Why is simplicity a good thing? Simplicity itself is defined as:</p>
+
+<blockquote>
+<p>&ldquo;the quality or condition of being easy to understand or do&rdquo;.</p>
+</blockquote>
+
+<p>If a piece of software is considered &ldquo;simple&rdquo;, then chances are it has been found to be easy to understand and easy to reason about. Simple software is also easy to manipulate and apply changes to. <a href="http://en.wikipedia.org/wiki/Kent_Beck" target="_blank">Kent Beck</a> (renowned author of many top quality software engineering books and the co-creator of Extreme Programming, which then evolved into &ldquo;agile&rdquo; practices) made the following statement back in 2012:</p>
+
+<blockquote>
+<p>&ldquo;make the change easy, then make the easy change&rdquo;</p>
+</blockquote>
+
+<p>What Kent was referring to, was that for a piece of software to be easily changed you needed to simplify its design in such a way for it to be able to facilitate a future requirement.</p>
+
+<p>Simplicity will also tend to result in less bugs, because there are less complicated moving parts. The irony of all this, is that writing and designing code to be simple is usually quite a complex task. It&rsquo;s important to realize that <code>simplicity != easy</code>. Lots of people fail to make the distinction between the two.</p>
+
+<p>Simplicity can also (not always mind you) help towards other goals such as reusability and portability of your software.</p>
+
+<h2 id="naming-things">Naming things</h2>
+
+<p>Phil Karlton (Netscape engineer; sadly killed in 1997) once said:</p>
+
+<blockquote>
+<p>There are only two hard things in Computer Science: cache invalidation and naming things</p>
+</blockquote>
+
+<p>You&rsquo;ve likely heard this quote said many times already throughout your career. There&rsquo;s a reason for that: because it&rsquo;s a painfully universal truth. Nothing causes our team to sit pondering in deadlock (or maybe livelock would be more accurate) together, than when we&rsquo;re trying to figure out what to call our new library.</p>
+
+<p>People underestimate how important it is to properly name things. Whether it be a new open-source library, a class, a function, a variable - it doesn&rsquo;t matter what it is - there is a potential to cause confusion and in some cases real problems if named badly.</p>
+
+<p>There&rsquo;s the classic front-end dilemma where a developer creates a class called <code>.red-banner</code> because it is applied to a component that is, well, red; and then a month later the designers step in and change the component to have a blue background. Great, now this doesn&rsquo;t seem like much of an issue but scale up the size of the site and the potential places where that class gets used; now add on top of that a little more ambiguity and you&rsquo;ve suddenly incurred &ldquo;tech debt&rdquo;.</p>
+
+<p>Now that was just a super basic example. In practice you&rsquo;ll find naming issues everywhere. Does the name of your class truly represent its intent. Is the name you&rsquo;ve used too explicit; by that I mean does it reference a particular object type or design aspect that restricts the class from being truly generic?</p>
+
+<p>For example, if you have a class that acts as a mediator between two objects, have you named it &ldquo;MessageBus&rdquo; because you&rsquo;re currently using the Observer/PubSub pattern? What if the class changes functionality to some other pattern or software? Surely naming it to be <code>ComponentMediator</code> would be better, as that is clear enough to express the intent of the class while open enough for the implementation details to change in future (sort of like a less concrete <a href="http://en.wikipedia.org/wiki/Open/closed_principle" target="_blank">Open/Closed principle</a>).</p>
+
+<p>Either way, you need to not underestimate the problems and confusion that can be caused by a badly named object/class/thing. Be vigilant, and if you&rsquo;re unsure then discuss it with your team. But be warned, this isn&rsquo;t always a quick or obvious process.</p>
+
+<h2 id="growth">Growth</h2>
+
+<p>Applications are organic; they grow and evolve over time, which can increase their complexity. But software also needs to contend with growing popularity, which means increased traffic and the need to always be available (i.e. up and running!). All software should have a modicum of scalability in mind when within the design stages. It would be foolish not to at least consider what happens when your system comes under heavy load.</p>
+
+<p>The BBC has specific platform teams dedicated to carrying out load tests before any major software release. The benefit of this is to ensure that a new piece of software can run safely while handling x number of requests per second. The load test results help to indicate what an application&rsquo;s threshold will be.</p>
+
+<p>My team typically uses a command line tool called <a href="http://manpages.ubuntu.com/manpages/hardy/man1/siege.1.html" target="_blank">Siege</a> to stress test our applications <em>before</em> requesting a full load test from our platform team, as this can help weed out any silly mistakes before going through official channels.</p>
+
+<p>The BBC also utilizes <a href="https://github.com/Netflix/SimianArmy/wiki/Chaos-Monkey" target="_blank">Chaos Monkey</a> (a tool developed by Netflix) to help verify the resiliency of its systems. Chaos Monkey itself has been instrumental in how we have started to look at designing and architecting our systems and applications.</p>
+
+<p>The purpose of Chaos Monkey is to bring down (at random) a server instance that is currently running. This sounds like a crazy thing to do within your production environment; but the reality is it forces you to think long and hard at the design stage of your applications to ensure they are resilient and capable of being brought back up automatically.</p>
+
+<p>At any moment, Chaos Monkey could bring down one of our servers running a public facing and highly critical application. This helps bring about an important realization that you need to start considering solutions before writing any code. By really thinking about the design up front, you avoid issues where you may find your existing software just isn&rsquo;t resilient enough and is going to cause unacceptable service outages; and yet the existing system may well be in such a state that it doesn&rsquo;t facilitate an easy path to becoming scalable (e.g. a monolithic application with many responsibilities and domain areas, will introduce a massive single point of failure and is going to take a long time to refactor).</p>
+
+<p>Solutions to the problem of resiliency and scalability (at the design stage) could, for example, involve building microservices to help isolate single points of failure. As well as implementing stateless/immutable servers, where by you can bring up a new instance and not worry that critical state has been lost (along with service discovery mechanisms such as <a href="https://www.consul.io/" target="_blank">Consul</a> or <a href="https://github.com/coreos/etcd" target="_blank">etcd</a>). Infrastructure as code is another important concept and can be achieved using technology such as <a href="http://aws.amazon.com/cloudformation/" target="_blank">AWS CloudFormation</a> (which we&rsquo;ll discuss in more detail later on in this post).</p>
+
+<p>Scaling a system to accommodate more users isn&rsquo;t a free lunch; doing so can cause the introduction of inherent complexity, as it needs to consider many different mechanisms for facilitating an increase in traffic.</p>
+
+<p>Typically the first thing developers do (before considering more extreme architectural changes) is to try running their code in parallel (or support more concurrent operations). There is nothing necessarily wrong with that, unless your code isn&rsquo;t &ldquo;<a href="http://en.wikipedia.org/wiki/Thread_safety" target="_blank">thread safe</a>&rdquo;. Fixing the issue of thread safety isn&rsquo;t always straight forward and if you&rsquo;re new to the concept of multi-threaded code then you&rsquo;ll likely hit a few stumbling blocks as you slowly start to understand the problem space.</p>
+
+<p>If you&rsquo;re interested in understanding thread safety (and the different concurrency abstractions) in more detail then I recommend you take a read of the following article &ldquo;<a href="http://www.integralist.co.uk/posts/concurrency/" target="_blank">Thread Safe Concurrency</a>&rdquo;.</p>
+
+<p>Along side the process of trying to speed up code by multi-threading, you&rsquo;ll nearly always want to have your application scale automatically based upon the current needs of the system. If you&rsquo;re application is running on an infrastructure that is designed to scale &ldquo;horizontally&rdquo; (e.g. it dynamically creates new server instances running your application) then you will quickly start to introduce the problem of data consistency.</p>
+
+<p>Data consistency is where the &ldquo;CAP theorem&rdquo; comes into play. CAP states:</p>
+
+<blockquote>
+<p>&ldquo;it is impossible for a distributed computer system to simultaneously provide all three of the following guarantees: consistency, availability and partition tolerance&rdquo;</p>
+</blockquote>
+
+<p>What this means in practice is:</p>
+
+<ul>
+<li>Consistency: all nodes in your system should have the same view of the world</li>
+<li>Availability: a guaranteed response (whether a success or fail message)</li>
+<li>Partition tolerance: the system as a whole continues to function even when a part of the system completely fails (or messages between decoupled systems are lost)</li>
+</ul>
+
+<p>The problem of growth can also affect the decisions made from both back and front-end development perspectives. For example, when building real-time data processing applications, you have the option of either long polling and handling back pressure vs Web Sockets vs Server-Sent Events; all with varying browser support, and each of these options opens up a different set of concerns regarding how the back-end system is architectured.</p>
+
+<p>The problem of growth and scaling applications can be simplified by splitting up your application into well defined, isolated, functional units. If you&rsquo;re working with a single monolithic application, try to imagine what it would look like if split up into multiple isolated services. Where each part of the application communicated with another service via HTTP (or TCP, or via some other low level mechanism). What would the system look like? Don&rsquo;t you think it would be easier to analyze and scale individual services than one massive monolithic application?</p>
+
+<p>This leads us nicely onto the topic of &ldquo;Microservices&rdquo;&hellip;</p>
+
+<h2 id="the-micro-fallacy">The micro fallacy?</h2>
+
+<p>As of <sup>2014</sup>&frasl;<sub>2015</sub>, microservices is a bit of a buzzword. Lots of organizations and companies are talking about designing microservices and using tools (like <a href="https://www.docker.com/" target="_blank">Docker</a>) to enable them to more easily build and scale their growing set of microservices.</p>
+
+<p>I felt it was important to make a very quick mention of the fact that people tend to see a monolithic application as bad and a system of small services as good. While I would tend to agree, I would state that I&rsquo;ve sat on both sides of the fence and each one has their pros and cons. If you&rsquo;re working on a small scale system then a microservice design can be extra overhead and unnecessary complexity you don&rsquo;t need. Just because all the cool kids are drinking the microservices koolaid doesn&rsquo;t mean you have to (or should). Always take a critical eye to your design and evaluate things based on your own situation/requirements.</p>
+
+<p>With that being said, I personally see microservices as the way we will, and should, be designing and building <em>large scale</em> systems moving forward; as overall it offers many more benefits compared to old school monolithic applications. It&rsquo;s important when designing services that you split up the responsibilities in your application appropriately, and try to find a sweet spot between separation of concerns and domains vs fragmentation.</p>
+
+<h2 id="decoupling-systems">Decoupling systems</h2>
+
+<p>When considering the design of a complex system, we ideally want to decouple our code by individual domain areas. The reason for this is that it allows us to scale any particular part of the system that becomes a bottle neck; rather than carrying out a blanket scale up of the entire system; which is not only expensive but impractical.</p>
+
+<p>Using the following diagram as a basis, let&rsquo;s consider an application where the user uploads an image (1) and the server resizes the image (2) and places the newly created image into an <a href="http://aws.amazon.com/s3/" target="_blank">AWS S3</a> bucket (3). The server is expected to return an auto generated URL to the user (4), which when shared with and visited by another user will show the resized image.</p>
+
+<p><img loading="lazy" src="/../../assets/images//bad-architecture.png" alt="Bad Architecture" /></p>
+
+<p>This architecture will not scale very well, nor very easily.</p>
+
+<blockquote>
+<p>Note: for brevity I&rsquo;ve left out some details from this architecture, such as persisting URLs</p>
+</blockquote>
+
+<p>Instead the process should be more decoupled, like so (see below diagram): user uploads an image (1), the server stores the image into an S3 bucket in its original form (2) and sends a message to an <a href="http://aws.amazon.com/sqs/" target="_blank">AWS SQS</a> queue (3). The server then returns a message to the user to inform them the image is being processed along with the auto generated URL (4).</p>
+
+<p>In the mean time, a separate service is polling the queue for messages (5). The service will read the message (which can include the location of the source image in S3) and then retrieves the relevant image from S3 (6) so it can resize the image (7) and replace the image in S3 with the resized version (8), or whatever needs to happen at that point.</p>
+
+<p><img loading="lazy" src="/../../assets/images//better-architecture.png" alt="Better Architecture" /></p>
+
+<p>So this design might not be perfect, but what&rsquo;s better about this architecture is that we&rsquo;ve decoupled the various parts of the overall system that previously would&rsquo;ve made scaling the application much harder. We&rsquo;re now in a position to scale up the back-end service (the service that polls the queue and resizes the images) separately from the front-end system which handles the user upload.</p>
+
+<p>If the user visits the auto generated URL before the image has been processed, then a message can be displayed to indicate the image is still being processed. Again, this isn&rsquo;t perfect but it has freed up the user to go off and do other things, they&rsquo;re not chained to the browser window watching a message that says &ldquo;Processing&hellip;&rdquo; for the next few minutes (or longer depending on how much load your system is under).</p>
+
+<p>One practical improvement here is that the new system is much more fault tolerant than the original. In the original system, if the server crashed then the user would likely be returned a <a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#500" target="_blank">500 HTTP Status Code</a>, whereas with the new system the user can continue to use the website (they&rsquo;ll see the message &ldquo;Image waiting to be processed&rdquo; until a new back-end server instance can be brought up, where by it&rsquo;ll continue to process messages off the image queue).</p>
+
+<blockquote>
+<p>Note: fault tolerance is often referred to as &ldquo;partition tolerance&rdquo;; I mentioned this earlier when discussing CAP Theorem.</p>
+</blockquote>
+
+<p>In the above example we&rsquo;ve used queues to help decouple the individual parts of our software system (similar in spirit to creating microservices), but there are other mechanisms for decoupling code such as using a <a href="http://en.wikipedia.org/w/index.php?title=Message-oriented_middleware&amp;redirect=no" target="_blank">message bus</a>. Best to research different techniques to see how your architecture could be designed to utilize them to avoid problems with scaling.</p>
+
+<blockquote>
+<p>Note: depending on the purpose of the above application, you might decide that displaying the unoptimized image would be better than displaying a message to the user to say the image is still being processed. The reason I didn&rsquo;t do that here was because of performance reasons (the size of the image could be very large and not something you want a mobile user to have to download - especially if they&rsquo;re traveling with a poor network connection)</p>
+</blockquote>
+
+<h2 id="broker-renderers">Broker/Renderers</h2>
+
+<p>At BBC News in London, my team have released an open-source framework written in Ruby called <a href="https://github.com/BBC-News/Alephant" target="_blank">Alephant</a>, which abstracts a common pattern we find useful for decoupling our data driven applications.</p>
+
+<p>We&rsquo;ve used this particular framework on quite a few projects over the past year and a half; such as the Scottish Referendum, the local and general elections, an upcoming redesign of BBC Newsbeat as well as the World Service Kaleidoscope project (dynamic serving of image based content to devices with poor support for non-latin fonts).</p>
+
+<blockquote>
+<p>Note: I&rsquo;d like to give a shout out to <a href="https://twitter.com/kenturamon" target="_blank">Robert Kenny</a> (formerly of BBC, and now working at the Guardian) as the original inspiration and developer for the Alephant framework. Although it has changed quite significantly since its inception, it was his solid work that helped to support some very important and high traffic events.</p>
+</blockquote>
+
+<p>The pattern is effectively a &ldquo;broker&rdquo; (i.e. mediator) and a &ldquo;renderer&rdquo;. With this pattern, user requests are routed through to the relevant broker, who then decides where the request(s) should be directed. On the other end of the design are a bunch of &ldquo;renderer&rdquo; services, and their role changes depending on the type of model we use: push or pull.</p>
+
+<p>Let&rsquo;s explore this a little further:</p>
+
+<ul>
+<li>Broker: a service which accepts requests (requests are handled differently depending on the model)</li>
+<li>Renderer: a service which gets data from an endpoint and renders it into HTML (or whatever format is required)</li>
+<li>Models: &ldquo;push&rdquo; and &ldquo;pull&rdquo; (we&rsquo;ll see what each of these are in the next section)</li>
+</ul>
+
+<h3 id="push">Push</h3>
+
+<p>The push model is similar to the &ldquo;image processing&rdquo; architecture we discussed in the previous section, in that we&rsquo;re using a queue to decouple our services.</p>
+
+<p>In the push model, messages are placed on a queue. These messages contain data we want rendered into HTML (to use a real world scenario: the election results are pushed into a queue). We then have a renderer service running and this service polls the queue for messages. When a message (e.g. election result) is received we then process that message, render it into HTML and store that rendered content in a storage area (this could be any cloud based storage system, such as AWS S3, for example).</p>
+
+<p>The renderer service is easily scalable because we can set alarm thresholds that indicate whether there are too many messages on a queue (i.e. if there are lots of messages waiting on the queue, then our renderer service isn&rsquo;t processing them quick enough and so we need to scale up more renderer instances to handle the message load).</p>
+
+<p>AWS SQS doesn&rsquo;t guarantee a delivery order (this isn&rsquo;t true of all queues - so if delivery order is important to you then there are other queue types available) and so care needs to be taken to ensure messages don&rsquo;t get overwritten. We found this type of contention could happen when scaling up our Renderer service.</p>
+
+<p>To give you an example, imagine we have two Renderers: R1 and R2. Both of them take a message off the queue. R1 gets version 1 of message &ldquo;A&rdquo;, while R2 gets an updated version 2 of message &ldquo;A&rdquo;. If R2 finishes first, then R1 will finish last and subsequently the older version of the message will be stored and used (a real and practical example of this is getting election results pumped onto a queue; the vote count for a particular party needs to be the latest numbers).</p>
+
+<p>To avoid this contention we use a document store (AWS DynamoDB) to track the version of a message and when we come to store the rendered content of our data in our storage facility, we make sure the key we need to lookup that rendered content also includes its version number.</p>
+
+<blockquote>
+<p>Note: this is something we did before DynamoDB added its &ldquo;Conditional Put&rdquo; feature</p>
+</blockquote>
+
+<p>The broker in the push model, receives a request for a component, and is able to use the information it is provided to lookup the latest rendered version of a message. It does this by constructing a key that determines the location of the latest version within our storage facility. These lookups are also heavily cached to allow us to handle as much load as possible.</p>
+
+<p>The following diagram gives you a top-level view of this architecture:</p>
+
+<p><img loading="lazy" src="/../../assets/images//broker-renderer-pattern-push-model.png" alt="Broker Renderer Pattern Push Model" /></p>
+
+<blockquote>
+<p>Note: for brevity, in the above diagram, I&rsquo;m not demonstrating either the caching of broker requests or the sequencing requirements (i.e. the storing off the version of a message into DynamoDB). As mentioned before, some queues have different guarantees and so I didn&rsquo;t want the diagram to be too tightly coupled to DynamoDB&rsquo;s implementation</p>
+</blockquote>
+
+<p>There is another concern that we&rsquo;ve accounted for, but I&rsquo;ve left out for brevity, which is AWS S3&rsquo;s &ldquo;eventual consistency&rdquo; model. But I think for now this explanation should be enough to give you an idea of how the pattern works.</p>
+
+<h3 id="pull">Pull</h3>
+
+<p>The pull model is simpler in that it doesn&rsquo;t rely on a message queue for its data. In this model our renderers are more &ldquo;connected&rdquo; to our broker.</p>
+
+<p>By this I mean: the broker will receive a request for a component, and it will use the information that has been passed with the request to lookup the relevant renderer it needs to contact (service discovery), in order to retrieve the requested component. The renderer service has a remote endpoint built in, that it uses to make requests to, to retrieve the data required for a successful render to happen (so no storing of rendered components into a storage facility; we&rsquo;re dynamically renderering data upon request).</p>
+
+<p>The reason we created this model was because we had certain domain models where the data changes were vast, and would require a large amount of up-front rendering that might potentially never be seen by (i.e. requested from) an end user. The BBC&rsquo;s Market Data pages were an example of this, where some business data would rarely be viewed).</p>
+
+<p>The following diagram gives you a top-level view of this architecture:</p>
+
+<p><img loading="lazy" src="/../../assets/images//better-architecture.png" alt="Better Architecture" /></p>
+
+<blockquote>
+<p>Note: for brevity, in the above diagram, I&rsquo;m not detailing the complexity of how you feed information to a broker so it knows which renderer to interrogate to satisfy the user&rsquo;s request</p>
+</blockquote>
+
+<p>There are some pitfalls to this model though. The main one being we&rsquo;re coupling our data to our templates. For example, if a change is required within the template (let&rsquo;s say a HTML <code>class</code> attribute is added to an element; but all other &ldquo;structure&rdquo; of the content is the same), then it would require a complete re-render of the component.</p>
+
+<p>We had experimented (briefly) with rendering the data itself, and then letting a layer further downstream handle the template composition, but this resulted in other complications. With looming deadlines and concerns regarding forcing responsibility for the templates onto some other part of the system, we decided to postpone.</p>
+
+<h3 id="design-and-architecture">Design and architecture</h3>
+
+<p>The reason we find the broker/renderer pattern so useful is because of how we&rsquo;ve designed the individual libraries that make up the framework. They allow for consumers of the libraries to provide custom configuration to support their own specific requirements. We also use the strategy design pattern, for the pull model, which allows a consuming application to inject the logic the library should use to determine how to construct remote data endpoints (in case the storage location path is different for your set-up).</p>
+
+<p>This is the essence of composability, it&rsquo;s like lego bricks slotting together to form a large piece. Although you can utilise individual aspects of the frameworks that fit your needs (because each library is self sufficient in providing isolated functionality), the framework works best when utilized to form the broker/renderer pattern we primarily designed the framework around.</p>
+
+<p>It&rsquo;s an interesting mix of SRP (Single Responsibility Principle) and the composability of FP (Functional Programming).</p>
+
+<h2 id="how-low-can-you-or-should-you-go">How low can you (or should you) go?</h2>
+
+<p>For any performance critical (and scalable) application, it&rsquo;s important to consider the overhead of certain technologies. For example, when it came to building the Alephant framework (discussed in the previous section), we decided that <a href="http://sinatrarb.com/" target="_blank">Sinatra</a> (a very popular Ruby web framework that is preferred over a monolithic framework such as <a href="http://rubyonrails.org/" target="_blank">Ruby on Rails</a>) was still too bulky for our needs.</p>
+
+<p>By that I mean, it had all sorts of web related features that we didn&rsquo;t need for our application. So we opted for the lower level (almost, but not quite, bare metal) Rack interface. Depending on your requirements, it may even be worth considering whether you drop down a level from HTTP to TCP or even UDP socket protocols if you genuinely don&rsquo;t need the extra overhead of HTTP for communicating between services (e.g. you may have internal services running on your server instances that aren&rsquo;t publicly exposed).</p>
+
+<p>It&rsquo;s important to realize that stripping back the layers of complexity can help to better reveal the intent of your code. Making it easier to understand and to reason about.</p>
+
+<h2 id="language-agnostic-templates">Language agnostic templates</h2>
+
+<p>At the BBC we discovered (the hard way) that our approach for managing the storage and deployment of front-end components wasn&rsquo;t scalable. The problem stemmed from a more traditional method of structuring front-end applications, which meant separating JavaScript, CSS and images into separate folders.</p>
+
+<p>Let&rsquo;s for the moment consider the JavaScript folder: within this folder we would have multiple &ldquo;modules&rdquo; (a module being a single JavaScript file and represents an isolated piece of functionality). A single HTML component could well have multiple functional requirements meaning it would be dependent on multiple JavaScript modules.</p>
+
+<p>This shouldn&rsquo;t appear strange to any one as the majority of developers separate their concerns in this way. The downside though to this approach is that when your system begins to expand and evolve you will start to notice the problem of fragmentation and being tightly coupled to the application the components <em>currently</em> resides within.</p>
+
+<p>By that I mean: if you have a HTML component and it relies on JavaScript modules X and Y as well as CSS files A and B, then you can&rsquo;t easily reuse that component within another system without either replicating the directory structure that the current application utilizes or making code changes to reflect the location of dependencies within the new system. On top of that, the dependency tree for each component was getting larger and harder to visualize and maintain (as more and more functionality was being added to certain components).</p>
+
+<p>In this classic architectural model you lose (or at least complicate) maintainability, reusability, portability and even the ability to isolate components for easier testing. The ability to share components across teams (who work on different platforms) was also proving difficult as we were being forced to duplicate content, and this led to the decision to create a specification that describes how to build truly atomic components that can be easily consumed by varying services.</p>
+
+<p>Enter <a href="https://twitter.com/pgchamberlin" target="_blank">Peter Chamberlin</a> and Liam Wilkins to take inspiration from both <a href="http://bradfrost.com/blog/post/atomic-web-design/" target="_blank">Brad Frost&rsquo;s atomic design</a> and <a href="http://ianfeather.co.uk/a-maintainable-style-guide/" target="_blank">Ian Feather&rsquo;s Rizzo</a> and helped to resolve this divide by creating the open-source project &ldquo;<a href="https://github.com/BBC-News/chintz" target="_blank">Chintz</a>&rdquo; which combines the best aspects of both the former projects.</p>
+
+<blockquote>
+<p>Note: this project is still WIP (work in progress) but we encourage the community to get involved and create an open discussion around how the specification evolves</p>
+</blockquote>
+
+<p>The driving force behind this specification was for it to be language agnostic. This was a fundamental requirement in allowing different language platforms to consume these components. The processing of components has a few simple requirements:</p>
+
+<ul>
+<li>define a folder structure that will contain the components</li>
+<li>define a manifest that describe the dependencies for a given component</li>
+<li>implement a client parser that resolves the dependencies within the manifest</li>
+<li>build an app that consumes the client parser</li>
+</ul>
+
+<p>In the following diagram we show how two separate platforms (PHP and Ruby) consume a parser specific to their language to resolve the dependencies for a given component and serve up the component(s) in the most appropriate way for their platform:</p>
+
+<p><img loading="lazy" src="/../../assets/images//chintz-specification.png" alt="Better Architecture" /></p>
+
+<p>There are currently two (WIP) client parsers we&rsquo;ve open-sourced:</p>
+
+<ul>
+<li><a href="https://github.com/BBC-News/chintz-php" target="_blank">PHP</a></li>
+<li><a href="https://github.com/BBC-News/chintz-ruby" target="_blank">Ruby</a></li>
+</ul>
+
+<blockquote>
+<p>Note: we also hope to implement one utilizing JavaScript/Node</p>
+</blockquote>
+
+<p>A manifest file could look something like:</p>
+
+<pre><code>name: exampleElement
+dependencies:
+  css: [ base/base.css, base/typography.css ]
+  js: [ exampleElement/someOtherFilename.js ]
+  elements: [ anotherThing ]
+</code></pre>
+
+<p>This manifest file makes it simple to understand the complexity of a single component.</p>
+
+<p>The hope moving forward is for our internal component pattern library, built on top of Chintz, to be utilised across teams working on different platforms. For example, the BBC News core team work on a traditional PHP platform, while the Elections Presentation team develop cloud based components (generated with Ruby) that are consumed by the core team&rsquo;s platform.</p>
+
+<h2 id="automation-and-duplication">Automation and Duplication</h2>
+
+<p>When dealing with large software systems, you&rsquo;ll need to ensure you&rsquo;re automating things and reducing the amount of repeatable work you have. This is essential when managing software of any substantial scale.</p>
+
+<p>There are a few ways my team automates and reduces duplication (you&rsquo;ll likely find similar concepts and processes in many other teams and products):</p>
+
+<ul>
+<li>Continuous Delivery</li>
+<li>AWS CloudFormation</li>
+<li>Custom library abstractions</li>
+<li>Containerisation via Docker</li>
+</ul>
+
+<h3 id="continuous-delivery">Continuous Delivery</h3>
+
+<p>Deploying software within the BBC can be a complex process as we have lots of moving parts to take code from a developer&rsquo;s laptop and into a working release that&rsquo;s deployed to our cloud infrastructure. To make deploying software as simple as possible, we have since developed a complicated deployment pipeline to try and help achieve the end goal of having a &ldquo;simple&rdquo; release process.</p>
+
+<blockquote>
+<p>Notice I said &ldquo;complicated&rdquo; :-(</p>
+</blockquote>
+
+<p>We currently use the <a href="http://jenkins-ci.org/" target="_blank">Jenkins</a> continuous integration server to support our deployment process. Jenkins is an industry standard piece of software and no organization should be releasing software without some form of CI.</p>
+
+<p>When we commit code into GitHub we trigger a build job on Jenkins that builds an RPM that we&rsquo;ll want to deploy onto our distributed cloud servers. But before that deploy can happen we need to make sure that our software is safe to release. This means that we trigger another job that verifies this via different unit and integration tests for our integration environment.</p>
+
+<p>If all is well we then trigger the next set of jobs that do the same for our test environment and once again for our live environment. If any one of these jobs fail then the deployment to that environment will be marked as failed.</p>
+
+<p>Now the reason I used the word &ldquo;complicated&rdquo; earlier (rather than the more ideal &ldquo;complex&rdquo; - see the start of this blog post for the difference between them) is because we&rsquo;ve fundamentally reached the limits of what the Jenkins software can handle and this has resulted in a solution that may work (most of the time) but is far to complicated to be maintainable. If a build breaks then it can be very hard to follow the trail because Jenkins wasn&rsquo;t really designed with Continuous Delivery in mind.</p>
+
+<p>Although Jenkins provides plugins to help extend its functionality so it can support more complex deployment pipeline processes, the various plugin options available aren&rsquo;t as good as they could be, and most don&rsquo;t offer a clear visibility of the status of a particular group of jobs. This is where something like <a href="http://www.go.cd/" target="_blank">GOCD</a>, which aims to streamline the build-test-release life cycle, would come into the equation.</p>
+
+<p>Jenkins has served its purpose, and we&rsquo;ve found that it&rsquo;s no longer a complex piece of software, but has moved into being more of a complicated one instead. If you find yourself in a similar situation, then this should be an indication that you need to be constantly monitoring your processes and evaluating their effectiveness.</p>
+
+<p>Our Jenkins set-up works, so it&rsquo;s &ldquo;good enough&rdquo; for the moment. But don&rsquo;t fall into the trap of accepting the current system as being &ldquo;good enough&rdquo;. The moment you start feeling any pain setting up or implementing a piece of software, then much like a good code smell indicates the need to refactor, you should start re-evaluating how the situation can be improved. This is something we&rsquo;re actively doing at the moment.</p>
+
+<p>Remember not to make any rash decisions (e.g. let&rsquo;s implement a whole new CI/CD system) that could potentially leave you with more tech debt than you initially realized; especially if your team has very tight deadlines already. Adding to your workload isn&rsquo;t a sensible decision. Changing your deployment process is an incredibly important decision and so you must be absolutely certain you&rsquo;ve exhausted all other options first.</p>
+
+<h3 id="aws-cloudformation">AWS CloudFormation</h3>
+
+<p>If you&rsquo;re unfamiliar with CloudFormation, then I&rsquo;ll refer you to the official definition:</p>
+
+<blockquote>
+<p>AWS CloudFormation gives developers and systems administrators an easy way to create and manage a collection of related AWS resources, provisioning and updating them in an orderly and predictable fashion</p>
+</blockquote>
+
+<p>The <a href="http://aws.amazon.com/cloudformation/" target="_blank">AWS CloudFormation</a> service is great for two primary reasons:</p>
+
+<ol>
+<li>It automates the ability to start up and provision a consistent and reproducible infrastructure</li>
+<li>It facilitates the ability to version control your infrastructure</li>
+</ol>
+
+<p>With regards to the first point, this also facilitates a seamless setup of different deployment environments. This means we can configure each specific environment (using CloudFormation parameters) to allow, as an example, an integration and test environments to have very small EC2 server instances while stage and production environments have larger server instances (helping to keep costs down in our non-critical environments such as integration and test).</p>
+
+<p>Depending on your experience with AWS you may feel like CloudFormation falls into the &ldquo;complicated&rdquo; category. This is very much a subjective opinion though, as learning CloudFormation may well (initially) feel quite confusing and complicated; the end result is a much simpler, quicker and easier way to build/automate a fully provisioned system.</p>
+
+<p>There are also tools available that can help ease writing raw CloudFormation (which is just a JSON file). You could go one abstraction level up and start writing CloudFormation stacks using <a href="http://yaml.org/" target="_blank">YAML</a> or you could use a language specific DSL such as <a href="https://github.com/stevenjack/cfndsl/" target="_blank">CFNDSL</a> (which is a Ruby DSL).</p>
+
+<h3 id="custom-library-abstractions">Custom library abstractions</h3>
+
+<p>Most of our projects are built up from a baseline of abstract/generic libraries (RPMs) that provide us with specific default functionality. These abstractions make it very easy for us to construct a complex software stack without having to constantly repeat ourselves.</p>
+
+<p>For example, consider the following three libraries:</p>
+
+<ol>
+<li>Component Base</li>
+<li>JRuby Application</li>
+<li>Puma Init</li>
+</ol>
+
+<p>Each one of these libraries will add their own &ldquo;profile&rdquo; to <code>/home/component</code>. Each library will load their profile, which will add a hook for another downstream consuming library to utilize.</p>
+
+<p>For example&hellip;</p>
+
+<ul>
+<li>Component Base: creates <code>/home/component/.bash_profile</code></li>
+<li>The profile tries to source <code>/home/component/.custom_profile</code></li>
+<li>JRuby Application: creates <code>/home/component/.custom_profile</code></li>
+<li>The profile tries to source <code>/home/component/.component_profile</code></li>
+<li>Puma Init: creates <code>/home/component/.component_profile</code></li>
+<li>The profile tries to source <code>/home/component/.puma_profile</code></li>
+</ul>
+
+<p>This allows our libraries to work in a similar fashion to the <a href="http://en.wikipedia.org/wiki/Template_method_pattern" target="_blank">Template Method Pattern</a>, where by subsequent inheriting layers can add their own behavior while overriding specific upstream configuration.</p>
+
+<p>As well as the above profile files, each library adds its own additional behaviors. For example, the first library &ldquo;Component Base&rdquo; also sets up the following items:</p>
+
+<ul>
+<li>a <code>component</code> user account</li>
+<li>sets up the server instance to utilize our custom logging service</li>
+<li>defines an <code>/app</code> directory with all the correct permissions</li>
+<li>defines an init script that runs a daemon (set via <code>APP_DAEMON</code>)</li>
+<li><code>APP_DAEMON</code> can be overridden by an upstream library</li>
+</ul>
+
+<p>The second library &ldquo;JRuby Application&rdquo;:</p>
+
+<ul>
+<li>loads the &ldquo;Component Base&rdquo; as a dependency</li>
+<li>then loads the JRuby binary</li>
+</ul>
+
+<p>This means a service that utilizes the &ldquo;JRuby Application&rdquo; library can develop an application that is either user-facing (e.g. has an exposed web service) or is an internal application that does data processing. It&rsquo;s up to the developer to decide what they build.</p>
+
+<p>The third library &ldquo;Puma Init&rdquo;:</p>
+
+<ul>
+<li>loads the &ldquo;JRuby Application&rdquo; as a dependency</li>
+<li>creates a <code>/home/component/.component_profile</code> file</li>
+<li>this adds Puma specific configuration (and overrides <code>APP_DAEMON</code> to reference Puma)</li>
+</ul>
+
+<blockquote>
+<p><a href="http://puma.io/" target="_blank">Puma</a> is a popular multi-threaded Ruby web server</p>
+</blockquote>
+
+<p>The following diagram provides a basic visualization of the inherited layers:</p>
+
+<p><img loading="lazy" src="/../../assets/images//rpm-libraries.png" alt="Better Architecture" /></p>
+
+<p>Each library acts as a layer that builds upon the last and provides specific functionality that extends the overall behavior.</p>
+
+<h3 id="docker">Docker</h3>
+
+<p>Chances are you&rsquo;ve already heard the hype around <a href="http://www.docker.com/" target="_blank">Docker</a> and containerization by now. The simple fact is, we use Docker because it helps to keep applications small, focused (think &ldquo;Single Responsibility Principle&rdquo;) and most importantly &ldquo;isolated&rdquo; (think &ldquo;decoupling code&rdquo;).</p>
+
+<p>Docker also helps to make installation of specific low-level software much easier, with standardized communication between running containers helping these services to interact.</p>
+
+<p>We use Docker in a variety of different situations:</p>
+
+<ul>
+<li>Continuous Integration (using a standard master/slave set-up and each build job is its own container)</li>
+<li>Prototyping (super fast to get up and running using new software)</li>
+<li>Monitoring and Logging solutions</li>
+<li>Tooling (e.g. <a href="https://github.com/spurious-io/" target="_blank">Spurious</a> - see the following section - is built using Docker containers)</li>
+</ul>
+
+<p>All that being said: Docker isn&rsquo;t a panacea. It doesn&rsquo;t fit all project requirements and in some cases it&rsquo;s not the right solution at all. As with all things, consider the pros and cons and use where and when appropriate.</p>
+
+<h2 id="tooling">Tooling</h2>
+
+<p>The tools you utilize during (and post) development can be fundamental to the success of your project. I wont cover all the various tooling solutions we have in place (as there are just far too many), but there is one tool in particular I want to focus on: <a href="https://github.com/spurious-io/" target="_blank">Spurious</a>.</p>
+
+<p>What Spurious offers is a set of AWS services that you can run locally (i.e. without costing you anything).</p>
+
+<p>The AWS services it currently works with (CloudFormation and SNS to follow at some point in the future):</p>
+
+<ul>
+<li><a href="http://aws.amazon.com/s3/" target="_blank">S3</a></li>
+<li><a href="http://aws.amazon.com/sqs/" target="_blank">SQS</a></li>
+<li><a href="http://aws.amazon.com/dynamodb/" target="_blank">DynamoDB</a></li>
+<li><a href="http://aws.amazon.com/elasticache/" target="_blank">ElastiCache</a></li>
+</ul>
+
+<p>Currently there are helpers libraries that will configure the AWS SDK to utilise Spurious (making for an almost seamless integration into your application code). These libraries support <a href="https://github.com/spurious-io/ruby-awssdk-helper/" target="_blank">Ruby</a>, <a href="https://github.com/Integralist/spurious-clojure-aws-sdk-helper" target="_blank">Clojure</a> and <a href="https://github.com/spurious-io/js-aws-sdk-helper/" target="_blank">JavaScript</a></p>
+
+<p>Now this by itself is very useful. We can spin up an instance of Spurious on our machine and start writing application code that interacts with a queue (SQS), a record store (DynamoDB) and a data store (S3), along with caching requests (via ElastiCache). But on top of that is the <a href="https://github.com/spurious-io/browser" target="_blank">Spurious Browser</a> which allows us to peek inside each of these services using a standard web browser. Meaning, rather than having to waste time writing code to filter down a long list of results from S3; I can instead open Spurious Browser and click on a few links to drill down into the content I&rsquo;m interested in and when I find it I can open the content to view it.</p>
+
+<blockquote>
+<p>Spurious was born from the need to rapidly prototype new features for our Broker/Renderers, but to also avoid the whole deployment process</p>
+</blockquote>
+
+<p>It&rsquo;s still in development and has some rough edges (there is a rewrite planned, that will change the implementation language from Ruby to Go), but ultimately we&rsquo;ve been using Spurious on quite a few projects now and it has become indepensible. I highly recommend you take a look.</p>
+
+<h2 id="fp-oop-and-mvc">FP, OOP and MVC</h2>
+
+<p>So far in this post we&rsquo;ve been discussing top-level system and architectural design, tooling and other associated processes. In this section I want to take it down a level and briefly express my love for Functional Programming (FP), which will require me to make some comparisons to Object-Oriented Programming (OOP).</p>
+
+<p>OOP and FP are two styles of development that have somewhat apposing interests. OOP is focused more around encapsulation of data, whereas FP likes to <em>filter</em> data.</p>
+
+<p>OOP consists of classes and creating objects where data is hidden inside them, but you can manipulate the data from exposed methods. Whereas FP is generally a collection of pure functions that help to enforce <a href="http://en.wikipedia.org/wiki/Referential_transparency_%28computer_science%29" target="_blank">referential transparency</a>, and data is passed <em>through</em> these functions, manipulating it as it goes.</p>
+
+<p>One of the big selling points for (most) FP languages is support for immutability. Immutability is a way of distinguishing state, identity and value. From a practical standpoint: if you modify data, then the changes will result in a modified <em>copy</em> of the original data (as apposed to mutating it).</p>
+
+<p>We&rsquo;ve seen a recent spurt of interest around immutability (and FP in general) in the JavaScript community as of late (with <a href="https://swannodette.github.io/mori/" target="_blank">Mori.js</a> and <a href="https://facebook.github.io/immutable-js/" target="_blank">immutable-js</a> as a couple of examples, but there have been others and they&rsquo;ve been around for much longer). Immutability can help to eradicate a whole host of bugs that can catch you out in a language as mutable as JavaScript (and even more so in languages where code can be multi-threaded).</p>
+
+<blockquote>
+<p>Languages like Clojure, for example, also implement persistent data structures, that make immutability easy and inexpensive. I recommend visiting the <a href="http://clojure.org/" target="_blank">Clojure website</a> and finding out more about the underlying implementation details, as it&rsquo;s quite an interesting read</p>
+</blockquote>
+
+<p>Typically you&rsquo;ll find a mixed bag of opinions: some organizations are OOP based, others prefer FP. What&rsquo;s worth being aware of is that this isn&rsquo;t an &ldquo;either or&rdquo; situation. You can find some benefits from having the structural/encapsulation benefits of OOP while implementing certain features in a functional way (but I think that&rsquo;s a topic for another day). The &ldquo;OOP with FP&rdquo; methodology is quite easy with a language like <a href="http://www.scala-lang.org/" target="_blank">Scala</a> which seamlessly incorporates both styles within their language design.</p>
+
+<p>You&rsquo;ll also find the Clojure programming language (which isn&rsquo;t a strict FP language, although it offers many of the features you&rsquo;ll expect to find), actually incorporates certain OOP principles in both the language API (as it&rsquo;s built on top of the JVM and so it applies some idiomatic lisp syntax to creating Classes and Interfaces) and in some of its popular libraries developed by the open-source community. One example of this is the popular <a href="https://github.com/stuartsierra/component" target="_blank">Component</a> library that allows for easier management of the lifecycle of software components by encapsulating data.</p>
+
+<p>The reason for a discussion around using OOP vs FP is because there are different pros and cons to both styles of development when it comes to high traffic, distributed and concurrent software systems. Although we&rsquo;re primarily an OOP based organization and through good code design have not suffered any ill-effect from using OOP; some members of the team (myself included) have since been exposed to the greater simplicity and reduction of bugs that inherently occurs when utilizing FP and languages that natively support immutability.</p>
+
+<p>Immutability is the key to avoiding complex mutexes and semaphores when writing multi-threaded code. To find out more on the subject please take a read of <a href="http://www.integralist.co.uk/posts/concurrency/" target="_blank">&ldquo;Thread Safe Concurrency&rdquo;</a>.</p>
+
+<p>One last point I&rsquo;d like to cover is the (ab)use of the MVC <em>pattern</em>.</p>
+
+<p>First of all, there is no official design pattern called &ldquo;MVC&rdquo; (if anything it could be considered an &ldquo;architectural pattern&rdquo;; but most people seem to refer to it as a design pattern). It is merely a collection of smaller patterns that have commonly been grouped together to form what is known as &ldquo;Model, View, Controller&rdquo; (lest we get caught up discussing the confusion around why so many developers design their software around a single global MVC architecture, as apposed to multiple smaller MVC structures within their applications - but that&rsquo;s probably a discussion for another day).</p>
+
+<p>Regardless of its apparent popularity, MVC isn&rsquo;t always the right tool for the job. It&rsquo;s worth being vigilant and recognising when you&rsquo;re about to cargo-cult a particular technology or design pattern, because in a lot of cases MVC can actually be seen as overkill and add additional complexity and complication to your code that you don&rsquo;t need. Let&rsquo;s be clear here: MVC may well be the right choice for you; but I would urge you to investigate the merits of using it against an alternative set of patterns first that could help you simplify your software design (for example, a simple observer pattern can suffice for many applications; build up the layers of complexity as they&rsquo;re needed - don&rsquo;t go and jump straight in with an MVC framework).</p>
+
+<p>The (ab)use of MVC has also become standard fare within the realm of front-end JavaScript libraries. Again, I&rsquo;m not saying MVC is bad or wrong; but what I am saying is &ldquo;do you need it?&rdquo;. Remember to consider what it is you&rsquo;re signing up to when you utilise a particular open-source (or even commercial) library within your application. Simplicity is the key.</p>
+
+<h2 id="inherent-complexity">Inherent complexity</h2>
+
+<p>There are some pieces of software and tools that are inherently complex by design. As an example, I want to demonstrate this by taking a look at our application deployment pipeline, which utilizes <a href="http://jenkins-ci.org/" target="_blank">Jenkins</a> and provides us with a full circle continuous deployment process.</p>
+
+<p>The process can (roughly) be broken down into the following steps:</p>
+
+<ul>
+<li>Merge code into our version control system <a href="https://www.github.com/" target="_blank">GitHub</a></li>
+<li>A webhook is set-up for our repository that alerts Jenkins</li>
+<li>Jenkins starts building our first job (pulls codes and installs dependencies)</li>
+<li>If that job passes, our job is configured to call another Jenkins job</li>
+<li>The next job runs our unit tests, and when they pass it again calls another job</li>
+<li>The next job builds and deploys our application to our integration server</li>
+<li>If the deploy is successful we call another job that runs our integration tests</li>
+<li>If the tests fail, then we mark the job as failed</li>
+<li>If the tests pass, then we trigger the next job which deploys to our test server</li>
+<li>Once deployed to test we again run integration tests and mark the deploy as either successful or failed</li>
+<li>If we&rsquo;re good up until this point, then we will deploy to live</li>
+</ul>
+
+<p>Now, even breaking down this process into individual (simplified) steps, I&rsquo;m sure you can appreciate that this deployment process will look fairly complicated in practice; and it is. We&rsquo;ve got multiple jobs that have been abstracted to a level where we can re-use them across multiple different projects, but this process of abstraction makes understanding what&rsquo;s happening quite complicated because you have to context switch between Jenkins and GitHub.</p>
+
+<p>One method of abstraction we used was to take advantage of IoC (inversion of control). In our jobs - to help us keep a record of changes to the build scripts - we decided the best thing to do was to pull down <a href="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29" target="_blank">bash</a> scripts from GitHub and execute them to implement specific functionality that had been abstracted away behind a reusable function. This is what allows us to create generic jobs that can be reused across many different projects.</p>
+
+<p>This happened because we tried to approach our build jobs the same way we would application code; and although we have a nice DRY set of build jobs, it&rsquo;s a difficult thread to follow (especially when there is an error within a section of your deployment pipeline - it can become quite hard to locate and debug).</p>
+
+<p>This is one of the primary reasons we feel our current solution is &ldquo;complicated&rdquo;. It&rsquo;s because Jenkins wasn&rsquo;t designed with this type of complex workflow in mind, and so although there are plugins that can help visualize and construct full deployment pipelines, they&rsquo;re not ideal. I wont go into the details of why, as that&rsquo;s a little outside the scope of this article, but trust me: it&rsquo;s a bit of a hack to get continuous delivery pipelines working really smoothly in Jenkins.</p>
+
+<p>In a bid to simplify our deployment pipeline we have planned to take the following approach to resolve our issues with Jenkins (note this approach might not work for you, and dependent on your team, your mileage may vary):</p>
+
+<ul>
+<li>Reduce our multiple connected generic jobs down into a single job; meaning we&rsquo;ll manually pass in the environment we wish the component to be deployed to, every time the job is run (this is a temporary measure, as it gives us a sane baseline from which we can build upon)</li>
+<li>We will then investigate alternative methods for making Jenkins work with complex deployment pipelines (such as <a href="https://wiki.jenkins-ci.org/display/JENKINS/Template+Project+Plugin" target="_blank">Jenkin Templates</a>)</li>
+<li>Then, when we get capacity within the team, we&rsquo;ll look to set-up <a href="http://www.go.cd/" target="_blank">GOCD</a> which we set-up as a tech spike previously and found it worked very well with our team&rsquo;s workflow.</li>
+</ul>
+
+<h2 id="containerization">Containerization</h2>
+
+<p>As of <sup>2014</sup>&frasl;<sub>2015</sub> the tech world is buzzing about <a href="https://www.docker.com/" target="_blank">Docker</a>. If you want to find out more about what Docker is and how it works then I recommend going through their website as it has a wealth of good information. But in summary: a docker &ldquo;container&rdquo; is an isolated set of processes that can be connected with other &ldquo;containers&rdquo; to create different types of software applications, but in a more manageable way.</p>
+
+<p>One of Docker&rsquo;s biggest selling points is the mantra: &ldquo;build once, run anywhere&rdquo;. This means you can define your requirements and be confident that it&rsquo;ll run the same, whether your platform is AWS ECS, Google Cloud Compute or Tutum.</p>
+
+<p>A simple example usually given to demonstrate how Docker might be used in a traditional web development workflow is: create a Docker container that runs your web app, then create another container that runs your database and in another container you might have a caching service (e.g. Redis or Memcache). All of these containers can be linked together by Docker so they can communicate safely with each other while providing decoupled isolation.</p>
+
+<p>This description doesn&rsquo;t do justice to what Docker can offer though and if you&rsquo;ve not played around with it yet then I strongly urge you to try it out. To give you some ideas, I&rsquo;ve listed below a few different ways we utilize Docker, and raise some small points about with using it as well.</p>
+
+<p>Here are some use cases we apply Docker to:</p>
+
+<ul>
+<li>Continuous Delivery (each Jenkins job is a fresh container, with an isolated set of dependencies - this allows us to avoid the issue of developer&rsquo;s wanting to upgrade specific software versions and being told they can&rsquo;t because an updated version will cause issue for other products)</li>
+<li>Dynamically building sandboxes at runtime which host specific GitHub branches (for sharing with stake holders)</li>
+<li>Tech spikes (Docker allows us to focus on features and not get caught up with installation/configuration issues)</li>
+<li>Helping us to better structure and develop software (<a href="https://github.com/spurious-io/" target="_blank">Spurious</a> uses Docker to run each of the faked AWS services)</li>
+</ul>
+
+<p>Containerizing your applications will likely become the standard software architecture design pattern in the very near future, so it&rsquo;s worth your time playing around and getting to grips with the tools available, and how best to break down your potential monolith into decoupled microservices.</p>
+
+<p>But with that said, what are the current pain points for containerizing all your software? Are there times when you wouldn&rsquo;t want to use it? Well, there are a couple of things worth considering:</p>
+
+<h3 id="tooling-1">Tooling</h3>
+
+<p>The tooling available to debug containers is still considered to be quite immature. Docker does offer both a <code>log</code> command as well as an <code>exec</code> command (which lets you jump into a running container using a bash shell); but there can be instances where neither of those options will yield success.</p>
+
+<p>For example, a container wasn&rsquo;t logging any thing, and on top of that the application (which when run outside of the container, would run forever in an infinite loop) would run initially and then stop when run inside the container, and so the <code>exec</code> command was not an option as I couldn&rsquo;t jump inside a container that was no longer running.</p>
+
+<blockquote>
+<p>Note: in the latest binary Docker has provided additional stats that are exposed via the <a href="https://docs.docker.com/reference/commandline/cli/#stats" target="_blank"><code>docker stats {container}</code></a> command</p>
+</blockquote>
+
+<h3 id="scaling">Scaling</h3>
+
+<p>Scaling containers requires a new approach that might not fit your current infrastructure model. Also, the question of scalability could potentially be simplified by the upcoming release of Docker&rsquo;s &ldquo;Swarm&rdquo; feature; which offers the ability to control a cluster of machines running Docker via a single endpoint. But how easily this makes actually <em>scaling</em> a cluster of running docker instances within a single host, remains to be seen in practice.</p>
+
+<p>Traditional &ldquo;vertical vs horizontal&rdquo; scaling is quite straight forward: with vertical scaling you increase the size of the box running your application; whereas with horizontal scaling you increase the number of boxes instead. The ability to horizontally scale a cluster of docker containers might not be so straight forward.</p>
+
+<p>Imagine I have an EC2 server instance running with an <a href="http://aws.amazon.com/autoscaling/" target="_blank">auto scaling group</a> that creates a new server instance when the CPU reaches 70%. On this instance I have a web service running inside a Docker container and it&rsquo;s maxing out its resources. We&rsquo;d have to use custom metrics fired off from our Docker container to <a href="http://aws.amazon.com/cloudwatch/" target="_blank">AWS CloudWatch</a>, which would allow us to define an alarm that triggered a new server instance to be created. Otherwise our ASG wouldn&rsquo;t catch the Docker container failing.</p>
+
+<p>Docker Swarm, <em>could</em> help here (it&rsquo;s not released yet and we&rsquo;ve not had a chance to try an early pre-release)? But it appears to only work by having a pre-created pool of servers, rather than dynamically generated server instances. Maybe once we see an official release and get the opportunity to see it in action we&rsquo;ll find it handles the issue of scaling perfectly. But until then, it&rsquo;s just something to consider before going too far ahead with designing your infrastructure around Docker.</p>
+
+<h3 id="orchestration">Orchestration</h3>
+
+<p>Running Docker containers can result in very long commands that are difficult to visually parse and take a long time to retype. This is the primary problem orchestration tools such as (the soon-to-be released) <a href="https://blog.docker.com/2014/12/docker-announces-orchestration-for-multi-container-distributed-apps/" target="_blank">Docker Compose</a> are aiming to solve. I&rsquo;ve used an early release of Docker Compose and it seems promising. It definitely helps to document the infrastructure set-up (much like AWS CloudFormation does) and allow for easily reproducible environments.</p>
+
+<h3 id="layers">Layers</h3>
+
+<p>This is actually quite a specific concern, and one that might not really have any practical basis or realistic solution (from an implementation point of view, or because there are already work arounds); but I&rsquo;ve found building images that need to utilise private security authentication credentials to be more awkward than it feels like it should be.</p>
+
+<p>When building a Docker image, you&rsquo;re constructing it from multiple layers (this allows Docker to create an image using cached layers and greatly improving the build performance), but this means if you add your security credentials then they&rsquo;ll be baked into the resulting image. I would prefer it if it was possible to remove layers so that you could add the credentials, pull down further resources within the Docker image and then remove the layer that included your credentials.</p>
+
+<p>The work around to this is to build a new image from an already running container which has already mounted your credentials. Now there is nothing necessarily wrong with this approach, it just doesn&rsquo;t feel very clean either. I may be complaining about nothing, but it&rsquo;s something that&rsquo;s stuck with me. I&rsquo;d be interested to know how other organizations and developers are handling building images with private authentication.</p>
+
+<p>An alternative suggestion from <a href="https://twitter.com/stevenjack85" target="_blank">Steven Jack</a> was that maybe Docker could add build time environment variables. These would allow you to provide your security credentials at the point of building your image rather than having them baked inside of the image. For example:</p>
+
+<pre><code>docker build -t some/image -e MY_SECRET=KEY
+</code></pre>
+
+<h2 id="optimizing-user-experience">Optimizing user experience</h2>
+
+<p>I said at the start of this post that I wouldn&rsquo;t be covering very much front-end technologies because they were vast, complex and the recommended patterns seem to change on a regular basis. But this isn&rsquo;t to say there aren&rsquo;t things you should be doing when designing your user facing applications. Below is a short list of topics that you should spend some time investigating:</p>
+
+<ul>
+<li>Performance: since 2007 <a href="http://stevesouders.com/" target="_blank">Steve Souders</a> has been the godfather of front-end performance. Read his books and his blog posts. You&rsquo;ll see a massive improvement from following his best practices (which are pretty much industry standard nowadays).</li>
+<li><a href="http://facebook.github.io/react/" target="_blank">React</a> is a &ldquo;JavaScript library for building user interfaces&rdquo;. I wont go into the details of the library here, but suffice to say it offers a lot of interesting features, such as implementing a Virtual DOM for high performance; no templates for building interfaces and avoiding two-way data binding in favor of &ldquo;reconciliation diffing&rdquo;.</li>
+<li>Immutability: this is a tenet of Functional Programming and is finally starting to see a rise within the JavaScript community. There are a few different libraries available to support immutable data, such as <a href="http://facebook.github.io/immutable-js/" target="_blank">immutable-js</a> and <a href="http://swannodette.github.io/mori/" target="_blank">Mori</a>. I would recommend trying out these libraries, as immutability can help to reduce a whole host of hard to reason about bugs.</li>
+<li>BEM: Block Element Modifier is a predescribed notation for writing CSS that allows it to reduce complexity/specificity, while increasing maintainability and reusability. <a href="http://csswizardry.com/" target="_blank">Harry Roberts</a> has written extensively about it; and in fact I would recommend reading anything he has to say on the subject of CSS and how to write it to support large scale applications.</li>
+<li>RWD: Responsive Web Design is neither new or an easy topic. There is a myriad of techniques for implementing RWD properly and in a progressively enhanced/performant fashion. I would recommend reading anything <a href="http://bradfrost.com/" target="_blank">Brad Frost</a> has to say. See his <a href="http://www.pattern-lab.info/" target="_blank">Pattern Library</a> for lots of good code examples.</li>
+</ul>
+
+<h2 id="where-have-we-succeeded-failed">Where have we succeeded/failed?</h2>
+
+<p>Admitting failure is never easy, and so you don&rsquo;t often see blog posts describing how some new feature or technology didn&rsquo;t quite work out as planned. I&rsquo;m personally of the opinion that recognizing situations where we&rsquo;ve failed (and aiming to &ldquo;fail fast&rdquo;) is a healthy way to react. Much like in the world of distributed computing, you have to accept the fact that services are going to fail and instead focus on improving the situation if it were to arise.</p>
+
+<p>With this in mind, I can say that our current deployment pipeline (using Jenkins) hasn&rsquo;t worked out that well for us (as described earlier in this post). It&rsquo;s a bit convoluted and definitely feels too complicated to be used for much longer. Making changes to our deployment process is not easy, and can take quite some time for an engineer to build up a mental model of the pipeline in their head. We shouldn&rsquo;t have to be following a thread in the manner we do at the moment.</p>
+
+<p>Also, although we mark a release as failed if any of the unit/integration tests fail; we still have to manually revert the release which is not good at all. It&rsquo;s hard to explain why this hasn&rsquo;t been solved yet, without getting lost in technical details that are very specific to our infrastructure. This is a problem we are still very keen to resolve in order for us to get a true CD experience in place.</p>
+
+<p>With that being said, we&rsquo;re aware of this problem and are pro-actively looking to resolve the problem by following these steps:</p>
+
+<ol>
+<li>Simplify the problem (get a baseline that works)</li>
+<li>Carry out a technical spike for GOCD (understand if it&rsquo;ll fit our needs)</li>
+<li>Implement new solution based upon results of technical spike (i.e. GOCD or Jenkins Template)</li>
+</ol>
+
+<p>Continuous Delivery can be a hard problem to solve in a non-complicated manner. So you have to be practical with the approach for finding a solution.</p>
+
+<p>Something else I&rsquo;ve realized, is that we&rsquo;re slowly cargo-culting our <a href="https://github.com/BBC-News/alephant" target="_blank">Alephant framework</a>. By that I mean: we&rsquo;re finding ever more ways of fitting the framework to suit the project rather than designing a solution around the problem space. This should not happen. Each project has a unique set of requirements that need to be considered; and if the problem can be solved nicely and efficiently using the pre-described &ldquo;broker/renderer&rdquo; pattern the Alephant Framework implements, then great. But we shouldn&rsquo;t feel required to use it&hellip; you know, just because.</p>
+
+<p>With regards to our abstracted RPM libraries: even though we&rsquo;ve separated certain related functionality into individual libraries, we could still extract certain configuration into their own isolated libraries. For example, our &ldquo;Component Base&rdquo; includes setting up logging on a server instance, as well as defining app specific configuration. Some of our components literally only need logging provided &ldquo;out of the box&rdquo; and nothing else; so extracting this into a logging library means those components can require it as a dependency while also allowing &ldquo;Component Base&rdquo; to consume it as well. This gives us even more flexibility and granularity of control.</p>
+
+<p>When we originally were building our monitoring solution we were able to prototype it really quickly using Docker. We had containers linked together that were using <a href="http://graphite.wikidot.com/" target="_blank">Graphite</a> and <a href="http://grafana.org/" target="_blank">Grafana</a>, but we soon realized this set-up wouldn&rsquo;t scale when along came Chaos Monkey and wiped out our instance in one hit. We needed these services to be decoupled to improve the resiliency. This was an instance where Docker wasn&rsquo;t necessarily the best tool for the job. This helped us to improve our solution by changing to use <a href="http://influxdb.com/" target="_blank">InfluxDB</a> instead and thus reduced the moving parts (as Graphite is actually made up of three separate applications: Whisper, Carbon and Graphite-web). We were then able to run InfluxDB and Grafana as separate services using traditional applications rather than Docker.</p>
+
+<p>In some places we&rsquo;ve succeeded by catching ourselves trying to over engineer specific solutions. As an example, we recently had a need to archive some components that our Alephant Framework was used to render. We needed to move the rendered components from one S3 bucket to another S3 bucket. This archiving process would only happen once (after the event the components were associated with - so this wasn&rsquo;t a service that needed to run <sup>24</sup>&frasl;<sub>7</sub>). We initially started setting up an EC2 server and all that goes along with deploying it via our own infrastructure (which is an abstraction on top of AWS), only to find that really the best solution was to utilize the new (as of 2015) <a href="http://aws.amazon.com/lambda/" target="_blank">AWS Lambda</a> service; which was built specifically for these isolated event based scenarios. It helped to simplify the solution itself as well as reduce overall costs. Plus we had the opportunity to play around with some new technology; which is always fun :-)</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>So here we are finally at the end of my whirlwind tour of software design and tooling. We&rsquo;ve covered mainly back-end/dev-ops related technologies and ever so briefly considered some pointers for the front-end.</p>
+
+<p>It&rsquo;s difficult to reduce many many years of front-end and back-end experience into a single blog post. You may as well write a book (or two, or three) instead. The idea behind this post was to provide a taster for what the current thought process is with regards to our entire tech stack as of 2015. Some of these ideas will become standard practice, others will quietly fade away. But we must always be open to change and experimentation and finding ways to simplify our processes rather than over engineering them and promoting unnecessary complexity.</p>
+
+<p>I hope some of what you&rsquo;ve read here was enlightening. Feel free to get in contact with me via GitHub or Twitter using the handle &ldquo;integralist&rdquo;.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

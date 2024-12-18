@@ -1,0 +1,721 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#mvcp-model-view-controller-presenter">MVCP: Model, View, Controller, Presenter</a>
+<ul>
+<li><a href="#introduction">Introduction</a>
+<ul>
+<li><a href="#model">Model</a></li>
+
+<li><a href="#view">View</a></li>
+
+<li><a href="#controller">Controller</a></li>
+</ul></li>
+
+<li><a href="#mixed-definitions">Mixed definitions</a>
+<ul>
+<li><a href="#god-controller">God Controller</a></li>
+
+<li><a href="#problems">Problems</a></li>
+
+<li><a href="#skinny-controller">Skinny Controller</a></li>
+</ul></li>
+
+<li><a href="#presenters">Presenters</a>
+<ul>
+<li><a href="#what-problem-are-presenters-trying-to-solve">What problem are Presenters trying to solve?</a></li>
+
+<li><a href="#how-do-they-work">How do they work?</a></li>
+</ul></li>
+
+<li><a href="#code-example">Code Example</a>
+<ul>
+<li><a href="#controller-1">Controller</a></li>
+
+<li><a href="#view-1">View</a></li>
+
+<li><a href="#presenter">Presenter</a></li>
+</ul></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="mvcp-model-view-controller-presenter">MVCP: Model, View, Controller, Presenter</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Model, View, Controller (MVC). This is a pretty standard architectural pattern and has been in use when developing software since the early 1970&rsquo;s.</p>
+
+<p>The basic principle of the pattern is to separate the different areas of logic from your application into distinct compartments.</p>
+
+<h3 id="model">Model</h3>
+
+<p>The model holds your business data. Typically this will be data that is pulled in from a database or external data service of some kind.</p>
+
+<h3 id="view">View</h3>
+
+<p>The view is your user interface. This is what the client will interact with when using your application.</p>
+
+<h3 id="controller">Controller</h3>
+
+<p>The controller is the boss. He sits at the top and delegates responsibilities to either the view or the model.</p>
+
+<h2 id="mixed-definitions">Mixed definitions</h2>
+
+<p>There seems to be a dispute in the dev community regarding how the responsibilities should be divided.</p>
+
+<p>Some feel a &lsquo;fat controller&rsquo; principle is best (where by the controller tells the model not only <em>when</em> but <em>where</em> and <em>how</em> it should get its data).</p>
+
+<p>My understanding of the pattern is that it was designed so that the Controller stays &lsquo;skinny&rsquo;. It may be the boss, but like most good bosses it doesn&rsquo;t try and stay in control. It knows the best team member for the job at hand and delegates accordingly.</p>
+
+<p>This is also good code design because the Controller doesn&rsquo;t have too much <em>context</em> (i.e. it doesn&rsquo;t know everything, which means it&rsquo;ll be easier to maintain and scale).</p>
+
+<h3 id="god-controller">God Controller</h3>
+
+<p>There are a few ways we can implement an MVC pattern, one is known as the &lsquo;God Controller&rsquo;.</p>
+
+<p>This is where a single Controller exists and it oversees everything no matter what was requested by the client.</p>
+
+<p>For example, the single Controller would be passed the request from the client (usually handled by a custom routing application, and most frameworks will provide their own).</p>
+
+<p>The Controller would determine what type of request was made (if the request was for a &lsquo;contact&rsquo; page then it&rsquo;ll make a request for the Contact model, or if the request was for the &lsquo;about&rsquo; page then it&rsquo;ll make a request for the About model).</p>
+
+<p>Once it knows the type of request it&rsquo;ll proceed to get the relevant model data and assign it to some View variables and render the required View.</p>
+
+<h3 id="problems">Problems</h3>
+
+<p>Now there are two problems with this implementation:</p>
+
+<ol>
+<li>maintainability</li>
+<li>scalability</li>
+</ol>
+
+<p>As mentioned before, this comes down to bad code design. The &lsquo;God Controller&rsquo; knows too much and tries to do too much. Once you start getting above a few different types of requests you&rsquo;ll start to understand what a mess the code can become by having multiple branches for different routing scenarios.</p>
+
+<p>I work as an engineer for the BBC News team in London and we had suffered from this exact set-up (hence the lessons the team has learnt and improved upon are the reason why I&rsquo;m able to write this post for you now).</p>
+
+<h3 id="skinny-controller">Skinny Controller</h3>
+
+<p>There is another approach we can take which is known as the &lsquo;skinny controller&rsquo; approach.</p>
+
+<p>The way it works is that a request will come into the application and will get passed to a page specific Controller.</p>
+
+<p>The page specific Controller will call the relevant Model and will assign the returned data to a few View variables.</p>
+
+<p>The Controller will then render a View and pass through the variables into the View for it to use.</p>
+
+<p>As you can see, this isn&rsquo;t that different from the &lsquo;God Controller&rsquo; with the exception that the Routing part of the application now will have extra logic which determines which specific Controller should be loaded. This is a better situation to be in because you&rsquo;re making your code base both more maintainable and scalable.</p>
+
+<p>Note: as I mentioned in the previous section, BBC News had a sort of &lsquo;God Controller&rsquo; issue and our first step to resolving the problem was to take a similar approach as described above (i.e. to start creating page specific Controllers). That was a good first step.</p>
+
+<p>The next step from here was to separate out our logic even further by implementing Presenters, and it was our tech lead at BBC News (<a href="http://twitter.com/jcleveley" target="_blank">John Cleveley</a>) who made that decision which resulted in a much more efficient, maintainable and scalable code base.</p>
+
+<h2 id="presenters">Presenters</h2>
+
+<h3 id="what-problem-are-presenters-trying-to-solve">What problem are Presenters trying to solve?</h3>
+
+<p>Let&rsquo;s imagine we&rsquo;ve gone for the &lsquo;Skinny Controller&rsquo; approach. There are still some inherent issues…</p>
+
+<p>First of all, our Controller can still have too much context and be handling more information than it should.</p>
+
+<p>But also, and more importantly, you may find there is still a lot of duplication of code across your Controllers.</p>
+
+<p>The reasoning for this is that if you consider the structure of a web page/application you&rsquo;ll notice that it is typically made up of unique &lsquo;features&rsquo;. For example, if you&rsquo;re displaying your tweets on a page then that&rsquo;s a unique feature.</p>
+
+<p>Each feature must be able to stand on its own. We normally describe these features as being &lsquo;components&rsquo;. Each component can be loaded whenever and wherever needed. Having a component based architecture allows your code base to become more modular and reusable.</p>
+
+<p>For example the navigation menu on a page could be considered a &lsquo;component&rsquo;. Also, the navigation menu component is likely going to need to appear on every single page of the application.</p>
+
+<p>So, if you&rsquo;re splitting up your logic into page specific Controllers then it&rsquo;s possible that you&rsquo;re still repeating code across the Controllers to handle the loading of re-occurring components such as the navigation (e.g. pulling its data from a navigation Model and setting View variables etc).</p>
+
+<p>Now there are ways that this code repetition can be avoided, and one such way is to use the concept of Presenters.</p>
+
+<h3 id="how-do-they-work">How do they work?</h3>
+
+<p>Presenters (like everything in software engineering) can be implemented in many different ways.</p>
+
+<p>For example, at BBC News we initially were manually creating new Presenter instances within our page Controllers. But the team here are quite clever chaps (especially <a href="http://twitter.com/kenturamon" target="_blank">Robert Kenny</a> and <a href="http://twitter.com/sthulb" target="_blank">Simon Thulbourn</a>) and they realised that this process could be greatly improved by using configuration files instead (specifically <a href="http://yaml.org/" target="_blank">YAML</a>). As we have multiple teams working on the BBC News code base and in multiple languages, using configuration files is a much easier and maintainable solution.</p>
+
+<p>I&rsquo;m not going to go into the configuration set-up we use at BBC News. Instead I&rsquo;ll focus on the basic principles of how Presenters work, which is quite simply a case of moving the logic (getting component specific Model data and assigning it to to component specific variables) into separate files called Presenters which you can instantiate within your controller.</p>
+
+<h2 id="code-example">Code Example</h2>
+
+<h3 id="controller-1">Controller</h3>
+
+<p>Here is a basic example in Ruby…</p>
+
+<pre><code>require 'app/presenters/a'
+require 'app/presenters/b'
+
+class AboutController &lt; ApplicationController
+  get '/' do
+    @a = Presenters::A.new
+    @b = Presenters::B.new
+
+    title 'About'
+    erb :about
+  end
+end
+</code></pre>
+
+<p>…in this example we have an &lsquo;About&rsquo; page which is made up of two components <code>a</code> and <code>b</code>. As you can see we <code>require</code> the presenters which handle those two components and within our Controller we instantiate the Presenters.</p>
+
+<p>Notice that&rsquo;s all we do. Each Presenter encapsulates the logic needed to prepare the data to be passed to the <code>:about</code> view template.</p>
+
+<h3 id="view-1">View</h3>
+
+<p>Before I show you the Presenter code itself, I&rsquo;ll show you the View template file…</p>
+
+<pre><code>&lt;h1&gt;&lt;%= @title %&gt;&lt;/h1&gt;
+
+&lt;% if @a.run %&gt;
+  &lt;%= partial :&quot;components/a&quot;, { :title =&gt; @a.title, :summary =&gt; @a.summary, :data =&gt; @a.data } %&gt;
+&lt;% end %&gt;
+
+&lt;% if @b.run %&gt;
+  &lt;%= partial :&quot;components/b&quot;, { :name =&gt; @b.name, :age =&gt; @b.age } %&gt;
+&lt;% end %&gt;
+</code></pre>
+
+<p>…as you can see we have very minimal logic in place. If anything I have too much logic in the View as I initially was re-using the same View template over and over and so I wanted to protect again errors appearing when loading a template which referenced a component I wasn&rsquo;t loading, but I&rsquo;ve since changed how my application was working but left the conditional checks in as an example of how code can evolve over time.</p>
+
+<p>We literally just check to see if the component has been initialised (in this case we created a <code>run</code> property we set to <code>true</code> when the component&rsquo;s Presenter is first initialised).</p>
+
+<p>We then render the View for the component and pass through the variables that were set-up from within the Presenter.</p>
+
+<p>Now I can also open up my <code>:home</code> View file and add in the <code>a</code> component there as well just as easily. It would be even easier if I didn&rsquo;t have to manually add the <code>a</code> component to the <code>:home</code> View file but that&rsquo;s where running from configuration files like we do at BBC News would come in handy (but that would have been too complicated an implementation for the sake of such a basic example as required for this post).</p>
+
+<h3 id="presenter">Presenter</h3>
+
+<p>Now let&rsquo;s take a look at one of our Presenters, in this case the Presenter for our <code>b</code> component…</p>
+
+<pre><code>require 'app/presenters/base'
+require 'app/models/b'
+
+class Presenters::B &lt; Presenters::Base
+  attr_reader :run, :name, :age
+
+  def initialize
+    @run = true
+
+    model = B.new('Mark', '99')
+    prepare_view_data({ :name =&gt; model.name, :age =&gt; model.age })
+  end
+end
+</code></pre>
+
+<p>…as you can see we load a specific Model for this component and then generate our View data by passing the Model information through to a <code>prepare_view_data</code> method (see below for the implementation details).</p>
+
+<p>The <code>Base</code> Presenter which our component Presenters inherit from is very straight forward as you can see from the following example…</p>
+
+<pre><code>module Presenters
+  class Base
+    attr_accessor :model
+
+    def prepare_view_data hash
+      hash.each do |name, value|
+        instance_variable_set(&quot;@#{name}&quot;, value)
+      end
+    end
+  end
+end
+</code></pre>
+
+<p>…it&rsquo;s just a module namespace with a base class that has a single method <code>prepare_view_data</code> which dynamically generates instance variables based on the data we passed through from the inheriting Presenter class and which then are usable within the View.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s all there is to it as far as understanding the Presenter pattern. It&rsquo;s a nice clean solution for componentising your different page features and keeping your code more easily maintainable.</p>
+
+<p>I&rsquo;ve created a repo on GitHub called <a href="https://github.com/Integralist/MVCP" target="_blank">MVCP</a> which is written in <a href="https://www.ruby-lang.org/" target="_blank">Ruby</a> and uses the <a href="http://www.sinatrarb.com/" target="_blank">Sinatra</a> web framework. Note: I had some help from my colleague <a href="http://twitter.com/sthulb" target="_blank">Simon</a> in cleaning up and refactoring some of the code (it may only have been minor changes but as with all good refactorings it made a massive difference to the quality of the code, so thanks to him for helping out).</p>
+
+<p>If you have any questions then feel free to contact me either here on <a href="http://twitter.com/integralist" target="_blank">twitter</a> and let me know your thoughts.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

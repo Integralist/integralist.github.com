@@ -1,0 +1,1142 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#new-laptop-configuration">New Laptop Configuration</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#defaults">Defaults</a></li>
+
+<li><a href="#package-manager">Package Manager</a></li>
+
+<li><a href="#essential-packages">Essential Packages</a></li>
+
+<li><a href="#essential-apps">Essential Apps</a></li>
+
+<li><a href="#curl">Curl</a></li>
+
+<li><a href="#git">Git</a></li>
+
+<li><a href="#shell">Shell</a></li>
+
+<li><a href="#terminal">Terminal</a>
+<ul>
+<li><a href="#update-2020-09-08">UPDATE 2020.09.08</a></li>
+</ul></li>
+
+<li><a href="#github">GitHub</a></li>
+
+<li><a href="#password-store">Password Store</a>
+<ul>
+<li><a href="#mobile-password-store">Mobile Password Store</a></li>
+</ul></li>
+
+<li><a href="#go">Go</a></li>
+
+<li><a href="#python">Python</a>
+<ul>
+<li><a href="#python-packages">Python Packages</a></li>
+</ul></li>
+
+<li><a href="#vim">Vim</a></li>
+
+<li><a href="#tmux">Tmux</a></li>
+
+<li><a href="#miscellaneous">Miscellaneous</a></li>
+
+<li><a href="#macos">macOS</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="new-laptop-configuration">New Laptop Configuration</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>I&rsquo;m an engineer with a <em>new</em> laptop, which requires setting up with various development tools and configuration. This post is my attempt to capture and document my process for getting a new dev environment set-up.</p>
+
+<p>I used to try and automate a lot of this with bash scripts, but realised over time that things go out of date quite quickly (e.g. OS configurations can change substantially, as well as my preferred ways of working).</p>
+
+<p>I also find that if an error occurs with an automated script (unless you&rsquo;ve coded things defensively enough) you can end up with your machine in a weirdly broken state.</p>
+
+<p>Given a straight forward set of instructions, doing things <em>manually</em> doesn&rsquo;t take long at all, and you can modify things at that point in time without just blindly installing various things you no longer need.</p>
+
+<h2 id="defaults">Defaults</h2>
+
+<p>It&rsquo;s good to begin by surveying your current system and understanding what you have already installed. For me this looked something like:</p>
+
+<ul>
+<li>OS: macOS Mojave (<code>10.14.4</code>)</li>
+<li>Curl: <code>/usr/bin/curl</code> (<code>7.54.0</code>)</li>
+<li>Bash: <code>/bin/bash</code> (<code>3.2.57</code>)</li>
+<li>Python: <code>/usr/bin/python</code> (<code>2.7.10</code>)</li>
+<li>Ruby: <code>/usr/bin/ruby</code> (<code>2.3.7p456</code>)</li>
+<li>Git: <code>/usr/bin/git</code> (<code>2.20.1</code>)</li>
+<li>$PATH: <code>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</code></li>
+</ul>
+
+<p>What&rsquo;s worth me noting additionally here is that I primarily use two programming languages: Go and Python. The reason I mention this is because Python has an interesting history with the name of its binaries.</p>
+
+<p>The binary name <code>python</code> generally refers to Python version <code>2.x</code>. Where as Python <code>3.x</code> has traditionally been named <code>python3</code> to help distinguish the two. So looking above we can see <code>which python</code> reveals the location as <code>/usr/bin/python</code> and without checking the version (e.g. <code>python --version</code>) I was fairly certain it would be a <code>2.x</code> version (based on the naming history).</p>
+
+<p>This has been the generally accepted rule for a while, <em>except!</em> when dealing with tools that handle virtual environments.</p>
+
+<p>For example, <a href="https://pipenv.readthedocs.io/" target="_blank">pipenv</a> is a tool that helps you to manage not only different Python versions but also the dependencies installed for different projects (referred to as virtual environments). A tool like pipenv will proxy a command such as <code>python</code> through a shim script (e.g. <code>/Users/integralist/.pyenv/shims/python</code>) and that shim script will then determine which Python interpreter/binary to execute.</p>
+
+<p>A shim script typically identifies the virtual environment you&rsquo;re working under and will then figure out the most appropriate Python interpreter to invoke. So within that virtual env if you call <code>python</code>, then you may not necessarily get the Python2 interpreter, as your virtual env might be configured such that the expectation is to proxy your invocation to a Python3 interpreter.</p>
+
+<p>This is why, when setting up a new laptop, getting a good development environment setup is essential because it can get quite confusing untangling a mess of default Python&rsquo;s vs <code>brew install ...</code> versions of Python 3 and then subsequently using multiple environment tools like <code>pipenv</code> which confuse things further by hiding the actual versions behind the generically named <code>python</code> command.</p>
+
+<p>The situation reminds me a lot of <a href="https://xkcd.com/1987/" target="_blank">XKCD&rsquo;s classic comic strip</a>&hellip;</p>
+
+<p><a href="../../assets/images/python_env.png">
+<img src="../../assets/images/python_env.png">
+</a></p>
+
+<h2 id="package-manager">Package Manager</h2>
+
+<p>Let&rsquo;s begin our journey by first installing a &lsquo;package manager&rsquo;. This software will enable us to search and install various pieces of software. The macOS provides its own GUI implementation referred to as the &lsquo;App Store&rsquo;, but it&rsquo;s heavily moderated by Apple and an app can only be found there if it abides by Apple&rsquo;s own set of rules and criteria for what they consider to be &lsquo;safe&rsquo; software.</p>
+
+<blockquote>
+<p>Note: there are many apps that aren&rsquo;t available in the App Store because Apple can be a bit anti-competition (see <a href="https://timetoplayfair.com" target="_blank">Spotify&rsquo;s &ldquo;time to play fair&rdquo; campaign</a>).</p>
+</blockquote>
+
+<p>So we have to download our own package manager, and the defacto standard for macOS is a program called <a href="https://brew.sh/" target="_blank">Homebrew</a> (which is a terminal based tool, so no GUI). In fact, I&rsquo;m not actually sure what <em>alternatives</em> to Homebrew exist (other than <a href="https://www.macports.org" target="_blank">MacPorts</a>, which if you want to understand the differences between it and Homebrew then <a href="https://saagarjha.com/blog/2019/04/26/thoughts-on-macos-package-managers/" target="_blank">read this</a>)? On Linux you have tools such as <code>yum</code> or <code>apt</code> but for macOS you either use the built-in App Store or find your own alternative (so in this case, we&rsquo;ll use Homebrew).</p>
+
+<p>To install Homebrew, execute the following command in your terminal:</p>
+
+<pre><code>/usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;
+</code></pre>
+
+<blockquote>
+<p>Note: notice that installation command uses the default installation of Ruby which Homebrew presumes is available (and for the most part is a safe presumption to make as Ruby as been provided by macOS for the longest time).</p>
+</blockquote>
+
+<p>If you need to update Homebrew you can execute a <code>brew update</code> command, but the installation will install the latest version any way, so that won&rsquo;t be necessary.</p>
+
+<h2 id="essential-packages">Essential Packages</h2>
+
+<p>OK, so I start with what I refer to as a &lsquo;essential packages&rsquo;, and specifically these are packages that do not require any configuration on my part. Meaning, I can install them and consider the job done, where as with other packages I install I&rsquo;ll have to make some additional tweaks to (which we&rsquo;ll see as we move on past the &lsquo;essential&rsquo; segments of this post).</p>
+
+<p>To install a package via Homebrew, execute the following command in your terminal:</p>
+
+<pre><code>brew install &lt;package_name&gt;
+</code></pre>
+
+<p>Here is a list of the packages I&rsquo;ll install:</p>
+
+<ul>
+<li><code>ag</code>: a <code>grep</code> like tool (aka. the_silver_searcher)</li>
+<li><code>gnu-sed</code>: it&rsquo;s the gnu version of <code>sed</code> (<code>gsed</code>) used for filtering/transforming text</li>
+<li><code>jq</code>: tool for parsing/inspecting json output</li>
+<li><code>docker</code>: useful for running containerized programs</li>
+<li><code>hugo</code>: static site generator (used to make this website)</li>
+<li><code>node</code>: server-side js programming language (used to compile a static search feature for my website)</li>
+<li><code>pwgen</code>: generates random passwords</li>
+<li><code>reattach-to-user-namespace</code>: used by tmux for clipboard storage</li>
+<li><code>shellcheck</code>: bash linter</li>
+<li><code>transmission</code>: torrent client † (alt. <code>npm install -g t-get</code>)</li>
+<li><code>tree</code>: displays directory heirarchy structures as a tree</li>
+<li><code>watch</code>: executes given command every N seconds</li>
+</ul>
+
+<blockquote>
+<p>† see <a href="https://cli-ck.io/transmission-cli-user-guide/" target="_blank">transmission user guide</a></p>
+</blockquote>
+
+<p>Here&rsquo;s a handy one-liner:</p>
+
+<pre><code>brew install ag gnu-sed jq docker hugo node pwgen reattach-to-user-namespace shellcheck tree watch
+</code></pre>
+
+<h2 id="essential-apps">Essential Apps</h2>
+
+<p>Homebrew now allows you to also install GUI applications, not just command line tools, but to do this you&rsquo;ll need to configure Homebrew to use <code>Cask</code>:</p>
+
+<pre><code>brew tap homebrew/cask
+</code></pre>
+
+<p>Once that&rsquo;s done you can install an app via Homebrew using the command:</p>
+
+<pre><code>brew cask install &lt;app_name&gt;
+</code></pre>
+
+<p>Here is a list of the apps I&rsquo;ll install:</p>
+
+<ul>
+<li><code>alfred</code>: like Apple&rsquo;s Spotlight search, but better</li>
+<li><code>caffeine</code>: stops the Mac from going to sleep</li>
+<li><code>dash</code>: offline documentation</li>
+<li><code>docker</code>: this is the counter-part to the &lsquo;package&rsquo; installed earlier †</li>
+<li><code>google-backup-and-sync</code>: syncs files between computer and Google Drive</li>
+<li><code>google-chrome</code>: web browser</li>
+<li><code>lepton</code>: GitHub Gist UI</li>
+<li><code>slack</code>: communication tool</li>
+<li><code>spotify</code>: music streaming service</li>
+<li><code>vlc</code>: video player with support of lots of codecs</li>
+</ul>
+
+<blockquote>
+<p>† if you installed the docker &lsquo;package&rsquo;, then you <em>need</em> the docker &lsquo;app&rsquo; as well for it to work. You can&rsquo;t have one without the other (this is because the app sets up the interface for macOS to interact with the underlying docker client/server implementation).</p>
+</blockquote>
+
+<p>Here&rsquo;s a handy one-liner:</p>
+
+<pre><code class="language-bash">brew cask install alfred caffeine dash docker google-backup-and-sync google-chrome lepton slack spotify vlc
+</code></pre>
+
+<p>The <a href="https://kapeli.com/dash" target="_blank">Dash</a> app will ask you what documentation you would like to download so it&rsquo;s available offline. I use the following docsets (I used to have <em>lots</em> more but realised I never really used them, so this is my &lsquo;essential&rsquo; docs list):</p>
+
+<ul>
+<li>boto3</li>
+<li>Go</li>
+<li>HTTP Header Fields</li>
+<li>HTTP Status Codes</li>
+<li>NGINX</li>
+<li>Python2</li>
+<li>Python3</li>
+<li>Regular Expressions</li>
+<li>tmux</li>
+<li>Tornado</li>
+<li>vim</li>
+</ul>
+
+<p>A couple of apps probably worth mentioning are:</p>
+
+<ul>
+<li><a href="https://github.com/dwarvesf/hidden" target="_blank">https://github.com/dwarvesf/hidden</a></li>
+<li><a href="https://github.com/leits/MeetingBar" target="_blank">https://github.com/leits/MeetingBar</a></li>
+</ul>
+
+<h2 id="curl">Curl</h2>
+
+<p>I like to use a more modern version of <code>curl</code> (e.g. supports HTTP/2, and other features):</p>
+
+<pre><code class="language-bash">brew install curl
+</code></pre>
+
+<p>But in order to use this version of curl you&rsquo;ll need to modify your <code>$PATH</code>:</p>
+
+<pre><code class="language-bash">export PATH=&quot;/usr/local/opt/curl/bin:$PATH&quot;
+</code></pre>
+
+<h2 id="git">Git</h2>
+
+<p>Similarly to curl, I like to have the most recent version of <code>git</code> installed:</p>
+
+<pre><code class="language-bash">brew install git
+</code></pre>
+
+<p>Once that&rsquo;s installed I configure it like so:</p>
+
+<pre><code class="language-bash">curl -LSso ~/.git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+curl -LSso ~/.gitignore-global https://raw.githubusercontent.com/Integralist/dotfiles/master/.gitignore-global
+curl -LSso ~/.gitconfig https://raw.githubusercontent.com/Integralist/dotfiles/master/.gitconfig
+</code></pre>
+
+<blockquote>
+<p>Note: it&rsquo;s always worth checking <code>~/.gitignore-global</code> is up to date (i.e. not referencing file types I no longer work with).</p>
+</blockquote>
+
+<h2 id="shell">Shell</h2>
+
+<p>To install and configure latest version of the Bash shell, execute the following commands:</p>
+
+<pre><code class="language-bash">brew install bash
+echo /usr/local/bin/bash | sudo tee -a /etc/shells
+chsh -s /usr/local/bin/bash
+</code></pre>
+
+<p>Also make sure to install auto-complete for bash:</p>
+
+<pre><code class="language-bash">brew install bash-completion
+</code></pre>
+
+<p>Finally, we&rsquo;ll configure Bash like so:</p>
+
+<pre><code class="language-bash">curl -LSso ~/.bash-preexec.sh https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh
+curl -LSso ~/.bashrc https://raw.githubusercontent.com/Integralist/dotfiles/master/.bashrc
+curl -LSso ~/.bash_profile https://raw.githubusercontent.com/Integralist/dotfiles/master/.bash_profile
+</code></pre>
+
+<blockquote>
+<p>Note: <code>~/.bashrc</code> references <code>~/.fzf.bash</code> which is needed, and comes from installing the FZF vim plugin (which we&rsquo;ll sort out shortly).</p>
+</blockquote>
+
+<h2 id="terminal">Terminal</h2>
+
+<p>To install my custom terminal theme:</p>
+
+<pre><code class="language-bash">curl -LSso /tmp/Integralist.terminal https://raw.githubusercontent.com/Integralist/mac-os-terminal-theme-integralist/master/Integralist.terminal
+open /tmp/Integralist.terminal
+rm /tmp/Integralist.terminal
+</code></pre>
+
+<blockquote>
+<p>Note: don&rsquo;t forget to change the terminal font to menlo (if not already set) and also set <code>Integralist</code> theme as your default. I used to do this via <code>defaults write com.apple.Terminal &quot;Default Window Settings&quot; Integralist</code> and <code>defaults write com.apple.Terminal &quot;Startup Window Settings&quot; Integralist</code> but those have changed now in the latest macOS (see <code>defaults read</code>).</p>
+</blockquote>
+
+<h3 id="update-2020-09-08">UPDATE 2020.09.08</h3>
+
+<p>I&rsquo;ve reverted to using the &ldquo;Basic&rdquo; theme provided by macOS, and just modifying the font to be &ldquo;Menlo Regular 16 pt.&rdquo;</p>
+
+<h2 id="github">GitHub</h2>
+
+<p>Let&rsquo;s now set-up a new SSH key for GitHub access:</p>
+
+<pre><code class="language-bash">mkdir ~/.ssh
+cd ~/.ssh &amp;&amp; ssh-keygen -t rsa -b 4096 -C 'foobar@example.com'
+eval &quot;$(ssh-agent -s)&quot;
+ssh-add -K ~/.ssh/github_rsa
+</code></pre>
+
+<p>Don&rsquo;t forget to <code>pbcopy &lt; ~/.ssh/github_rsa.pub</code> and paste your public key into the GitHub UI. Once that&rsquo;s done you can execute the following command to test your SSH key is set-up correctly and working:</p>
+
+<pre><code class="language-bash">ssh -T git@github.com
+</code></pre>
+
+<blockquote>
+<p>Note: there is a slight catch-22 here which is if your password for GitHub is in your Password Store (see next section), then that makes things trickier. For me I also have a copy of the encrypted store on my phone and so I can utilise that to access the password. But failing that, you can just &lsquo;reset your password&rsquo; in GitHub UI&rsquo;s and follow the email instructions to gain access and thus login and add your new SSH key.</p>
+</blockquote>
+
+<h2 id="password-store">Password Store</h2>
+
+<p>I use the open-source <a href="https://www.passwordstore.org" target="_blank">password store</a> for handling secrets and passwords. This tool provides the <code>pass</code> command, and that requires the use of <code>gpg</code>, so let&rsquo;s start by installing GPG:</p>
+
+<pre><code class="language-bash">brew install gpg
+</code></pre>
+
+<p>Now you have <code>gpg</code>, make sure you pull your private key from wherever you have it stored (e.g. external USB stick), then execute:</p>
+
+<pre><code class="language-bash">gpg --import &lt;private-key&gt;
+gpg --export &lt;key-id&gt; # public key by default
+</code></pre>
+
+<blockquote>
+<p>Note: don&rsquo;t forget you can <em>sign</em> your git commits:<br>
+<code>git config --global user.signingkey &lt;key-id&gt;</code></p>
+</blockquote>
+
+<p>Next, install <code>pass</code> and <code>pass otp</code> commands:</p>
+
+<pre><code>brew install pass pass-otp zbar
+</code></pre>
+
+<p>You can now pass a QR code into <code>pass otp</code> and use the terminal for generating one-time pass codes for 2FA/MFA authentication:</p>
+
+<pre><code class="language-bash">zbarimg -q --raw /tmp/qr.png | pass otp insert Work/Acme/totp/foo`  
+
+pass otp -c Work/Acme/totp/foo
+</code></pre>
+
+<blockquote>
+<p>Note: installing <code>zbar</code> provides the <code>zbarimg</code> command</p>
+</blockquote>
+
+<p>Lastly, we need to setup a new Password Store, and to do that we need to provide our GPG key id:</p>
+
+<pre><code class="language-bash"># &lt;ref&gt; needs to be your email, or part of the key's description
+keyid=$(gpg --list-keys &lt;ref&gt; | head -n 2 | tail -n 1 | cut -d ' ' -f 7)
+
+pass init $keyid
+</code></pre>
+
+<p>Now we can pull our Password Store from a <em>private</em> repository:</p>
+
+<pre><code class="language-bash">pass git init
+pass git remote add origin git@github.com:Foo/Bar.git
+pass git pull
+git branch --set-upstream-to=origin/master master
+</code></pre>
+
+<blockquote>
+<p>Note: I also like to ensure my encrypted datastore is sync&rsquo;ed up to other online providers, and symlinked to <code>~/.password-store</code> as well so changes are backed up automatically in multiple places.</p>
+</blockquote>
+
+<h3 id="mobile-password-store">Mobile Password Store</h3>
+
+<p>There is also a <a href="https://github.com/android-password-store/Android-Password-Store" target="_blank">mobile app for Android</a> that you can download from the Google Play store (and other places) that allows you to access the Password Store if it has been pushed to a distributed version-control system such as GitHub (better still if the repository is private &ndash; &ldquo;out of sight, out of mind&rdquo;).</p>
+
+<p>To get set-up, go through the following steps:</p>
+
+<ul>
+<li>Install Password Store app.</li>
+<li>Select &ldquo;Clone from Server&rdquo; option.</li>
+<li>Add in github credentials (e.g. <code>git@github.com:Foo/Bar.git</code>)</li>
+<li>Create new SSH key via Password Store app (give it a password).</li>
+<li>Encrypt your SSH key with symmetrical encryption (e.g. <code>gpg --symmetric</code>)</li>
+<li>Email SSH key to self.</li>
+<li>Decrypt SSH key and copy it into GitHub UI.</li>
+<li>Password Store app will ask for SSH key password, then it&rsquo;ll clone the repo.</li>
+</ul>
+
+<p>Before you can access the content of the Password Store (remember all the content is individual GPG keys) you&rsquo;ll need the GPG <em>private</em> key in order to decrypt files that would have been encrypted using your public key.</p>
+
+<ul>
+<li>Export your private key as ASCII (via laptop: <code>gpg --armor --output passkey.txt --export-secret-keys &lt;key_id&gt;</code>).</li>
+<li>Encrypt your exported private key with symmetrical encryption (<code>gpg --symmetric passkey.txt</code>)</li>
+<li>Email your private key to yourself.</li>
+<li>Download private key to your phone.</li>
+<li>Install OpenKeychain app (via Google Play)</li>
+<li>Locate the downloaded encrypted private key and open with OpenKeychain app.</li>
+<li>Enter password used to encrypt the private key.</li>
+<li>Then click into the extracted <code>passkey.txt</code> file and then click &ldquo;Import&rdquo;.</li>
+<li>In Password Store app set the options:
+
+<ul>
+<li>Select &ldquo;OpenPGP Provider&rdquo; (choose: OpenKeychain)</li>
+<li>Select &ldquo;OpenPGP Key id&rdquo; (choose: the imported public key)</li>
+</ul></li>
+</ul>
+
+<h2 id="go">Go</h2>
+
+<p>We&rsquo;ll install the latest version of <code>go</code> (as far as Homebrew is concerned):</p>
+
+<pre><code class="language-bash">brew install go
+</code></pre>
+
+<p>This is required because in order to handle different versions of <code>go</code> we&rsquo;ll want to <a href="https://gist.github.com/af300f602fa4da8cc14863f36a24bd1e" target="_blank">manually compile go</a>, and <em>that</em> ironically requires <em>a</em> version of the go compiler.</p>
+
+<p>Finally, make sure the default Go directory is set in your <code>$PATH</code> so that any installed binaries will be available:</p>
+
+<pre><code class="language-bash">export PATH=&quot;$HOME/go/bin:$PATH&quot;
+</code></pre>
+
+<h2 id="python">Python</h2>
+
+<p>The macOS comes only with Python 2.x and although the specific version <em>should</em> (according to the Python docs) have the <code>pip</code> command available, that&rsquo;s not the case. So we have to install pip for Python2 manually using the <em>very old</em> (but built-in) <code>easy_install</code> command:</p>
+
+<pre><code class="language-bash">sudo easy_install pip
+</code></pre>
+
+<p>Now when running <code>pip --version</code> we should see:</p>
+
+<pre><code>pip 19.0.3 from /Library/Python/2.7/site-packages/pip-19.0.3-py2.7.egg/pip (python 2.7)
+</code></pre>
+
+<p>At this point I&rsquo;m going to ask you to read <a href="/posts/python-app-dependencies/">Python Management and Project Dependencies</a> which is separate/dedicated post I wrote about installing multiple Python versions and how to utilize virtual environments.</p>
+
+<h3 id="python-packages">Python Packages</h3>
+
+<p>Here are some packages I like to install as a general rule&hellip;</p>
+
+<ul>
+<li><a href="https://github.com/python/black" target="_blank">black</a>: formatter (like golang&rsquo;s <code>gofmt</code>)</li>
+<li><a href="http://flake8.pycqa.org" target="_blank">flake8</a>: linter</li>
+<li><a href="https://github.com/PyCQA/flake8-import-order" target="_blank">flake8-import-order</a>: validates imports</li>
+<li><a href="http://www.mypy-lang.org" target="_blank">mypy</a>: static analysis</li>
+<li><a href="https://ipython.org" target="_blank">ipython</a>: REPL</li>
+<li><a href="https://pytest.org" target="_blank">pytest</a>: testing framework</li>
+<li><a href="http://www.structlog.org/en/stable/" target="_blank">structlog</a>: structured logging</li>
+<li><a href="https://www.tornadoweb.org" target="_blank">tornado</a>: async web framework</li>
+<li><a href="https://boto3.amazonaws.com/v1/documentation/api/latest/index.html" target="_blank">boto3</a>: AWS CLI tool</li>
+<li><a href="https://tox.readthedocs.io/en/latest/" target="_blank">tox</a>: generic virtualenv management and testing tool</li>
+</ul>
+
+<blockquote>
+<p>Note: for an example of how to configure Flake8 and its plugins, see <a href="https://gist.github.com/0ce27db1d7294f3af9896c0807ccfeed" target="_blank">this gist</a>.</p>
+</blockquote>
+
+<p>I would also strongly recommend installing the following tools:</p>
+
+<ul>
+<li><code>isort</code></li>
+<li><code>autopep8</code></li>
+<li><code>unimport</code></li>
+</ul>
+
+<p>Here&rsquo;s a one liner to install some of these packages that I&rsquo;m guaranteed to use in all projects&hellip;</p>
+
+<pre><code>python3 -m pip install isort autopep8 unimport tox mypy flake8 flake8-import-order
+</code></pre>
+
+<p>I then reference these in my <code>.vimrc</code>:</p>
+
+<pre><code>&quot; Execute Python isort
+autocmd BufWritePost *.py :execute '!isort %' | edit
+
+&quot; Execute Python autopep8
+autocmd BufWritePost *.py :execute '!autopep8 --experimental --verbose --aggressive --aggressive --recursive --in-place %' | edit
+
+&quot; Execute Python unimport
+autocmd BufWritePost *.py :execute '!unimport --remove %' | edit
+</code></pre>
+
+<p>If you&rsquo;re using pipx (a tool that helps to install packages as self isolated binaries) just be sure the <code>pipx ensurepath</code> call doesn&rsquo;t update the shell <code>PATH</code> by <em>appending</em> the <code>/Users/integralist/.local/bin</code> but by <em>prepending</em> it instead. This might require you to manually update your <code>~/.bash_profile</code> like so:</p>
+
+<pre><code>export PATH=&quot;/Users/integralist/.local/bin:$PATH&quot;
+</code></pre>
+
+<blockquote>
+<p>Note: if you install pipx via Homebrew then it&rsquo;ll be attached to that Python version. Meaning if you upgrade your Python version, then pipx could break (e.g. none of the installed packages will work). The solution is to run <code>pipx reinstall-all --python python3</code>.</p>
+</blockquote>
+
+<h2 id="vim">Vim</h2>
+
+<p>You can either install more recent version of vim via Homebrew:</p>
+
+<pre><code class="language-bash">brew install vim
+</code></pre>
+
+<p>Or you can manually compile vim yourself:</p>
+
+<blockquote>
+<p>Note: I manually compile vim as I need Python3 support baked in, which Homebrew&rsquo;s version no longer does (it used to, but not any more). Python3 support means my Python linting tools will work as expected.</p>
+</blockquote>
+
+<p>So let&rsquo;s start at the beginning. To manually compile Vim you would think to do something like the following&hellip;</p>
+
+<pre><code class="language-bash">git clone https://github.com/vim/vim.git
+
+cd vim
+
+./configure --with-features=huge \
+            --enable-multibyte \
+            --enable-rubyinterp=yes \
+            --enable-python3interp=yes \  # relies on `brew install python3`
+            --enable-perlinterp=yes \
+            --enable-luainterp=yes \
+            --enable-gui=gtk2 \
+            --enable-cscope \
+            --prefix=/usr/local
+            
+make &amp;&amp; make install
+</code></pre>
+
+<p>The above code will copy the compiled vim binary into <code>/usr/local/bin</code> so <code>which vim</code> will show <code>/usr/local/bin/vim</code></p>
+
+<p>This works but I&rsquo;ve found that it only works when the <code>python3</code> interpreter is the same version as what Vim is itself internally expecting to be available.</p>
+
+<p>What I mean by that is I recently upgraded my Python version to <code>3.7.7</code> and Vim suddenly broke. I tried the above compilation and it didn&rsquo;t work. I could see from the errors being printed that Vim was looking around my system for a Python version <code>3.7.4</code> which didn&rsquo;t exist (hence Python3 support wasn&rsquo;t compiled into vim).</p>
+
+<p>The solution was to firstly to tell Vim what version of Python3 to use, and secondly (and just as important) to ignore any previously cached aspects of a compilation (e.g. if I tell you to use Python <code>3.7.7</code> don&rsquo;t then go and try to be helpful and use a cached run where I was using <code>3.7.4</code> &ndash; which really confused me for a long time!):</p>
+
+<blockquote>
+<p>Note: now I should say, that if you can use the above example compilation code, but just run <code>make clean distclean</code> first, then do that! I suspect I could have done that and Vim would have been compiled with Python <code>3.7.7</code> just by using the <code>--enable-python3interp</code> flag set. I didn&rsquo;t think about that at the time though, hence the following still worked.</p>
+</blockquote>
+
+<pre><code class="language-bash">make clean distclean
+
+./configure --with-features=huge \
+  --enable-multibyte \
+  --enable-rubyinterp=yes \
+  --enable-python3interp=yes \
+  --with-python3-command=/usr/local/Cellar/python/3.7.7/Frameworks/Python.framework/Versions/3.7/bin/python3.7 \
+  --with-python3-config-dir=/usr/local/Cellar/python/3.7.7/Frameworks/Python.framework/Versions/3.7/lib/python3.7/config-3.7m-darwin/ \
+  --enable-perlinterp=yes \
+  --enable-luainterp=yes \
+  --enable-gui=gtk2 \
+  --enable-cscope \
+  --prefix=/usr/local
+
+make &amp;&amp; make install
+</code></pre>
+
+<p>The key flags are&hellip;</p>
+
+<ul>
+<li><code>--enable-python3interp</code>: tell the compilation you want Python3 support</li>
+<li><code>--with-python3-command</code>: give it a path to a Python3 interpreter/binary (†)</li>
+<li><code>--with-python3-config-dir</code>: a configuration directory used by the version of Python3 you want to use.</li>
+</ul>
+
+<blockquote>
+<p>† e.g. if I run that full path in my terminal shell it&rsquo;ll actually run the Python3 REPL so I know it&rsquo;s a valid path to provide.</p>
+</blockquote>
+
+<p>Things get even more confusing when you are using a Python version manager like <code>pyenv</code> as that overrides the Python interpreter version. So although Vim might report it&rsquo;s using Python <code>3.7.7</code> (as shown in the vim Ex command below), if you shell out to a command like <code>isort</code> (e.g. <code>!isort %</code>) you&rsquo;ll find that the shell will complain no such command exists.</p>
+
+<p>This is because the command doesn&rsquo;t exist. Not for the version of Python that&rsquo;s running in the shell! The shell is running whatever version of Python <code>pyenv</code> has activated. So you need to make sure when you start vim that you activate a virtual environment that has these tools available.</p>
+
+<p>Here is the Ex command to see what version of Python vim is compiled with:</p>
+
+<pre><code>:py3 import sys; print(sys.version)
+
+3.7.7 (default, Mar 10 2020, 15:43:03) 
+[Clang 11.0.0 (clang-1100.0.33.17)]
+</code></pre>
+
+<p>So as I mentioned, the approach I take with Vim is to activate a specific virtual environment when in a project repo.</p>
+
+<p>This could be a <code>pyenv</code> virtual environment but actually it can just be a standard Homebrew Python virtual environment:</p>
+
+<pre><code># in a new shell where pyenv has no affect on the python interpreter
+
+python3 -m venv venv/vim
+source venv/vim/bin/activate
+python3 -m pip install isort autopep8 unimport tox mypy flake8 flake8-import-order
+</code></pre>
+
+<p>Now I know that if I start up a new shell and <code>cd</code> to my project repo, and even if <code>pyenv</code> has set the python interpreter I can activate the Homebrew Python virtual environment I created (which is going via the Homebrew installed version of Python) and Vim will know about the packages installed in that virtual environment.</p>
+
+<blockquote>
+<p>Note: even if I do <code>python3 --version</code> the shell will now report the Homebrew version of Python (so it overrides the <code>pyenv</code> version that might have been set via a <code>.python-version</code> file)!</p>
+</blockquote>
+
+<p>Next, I configure vim with <a href="https://github.com/junegunn/vim-plug" target="_blank">vim-plug</a> plugin manager:</p>
+
+<pre><code class="language-bash">curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+curl -LSso ~/.vimrc https://raw.githubusercontent.com/Integralist/dotfiles/master/.vimrc
+</code></pre>
+
+<p>Ensure Vim is configured with spell checking options:</p>
+
+<pre><code class="language-bash">vim -E -s &lt;&lt;EOF
+:set spell
+:quit
+EOF
+</code></pre>
+
+<p>Install plugins by opening vim and executing:</p>
+
+<pre><code>:PlugInstall
+</code></pre>
+
+<blockquote>
+<p>Note: <a href="https://github.com/junegunn/fzf" target="_blank">fzf</a> doesn&rsquo;t need a brew install when installed via vim. See my <code>.vimrc</code> configuration file for more details, but in essence it contains: <code>Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }</code></p>
+</blockquote>
+
+<p>Also ensure the Golang environment has what it needs by executing:</p>
+
+<pre><code>:GoInstallBinaries
+</code></pre>
+
+<h2 id="tmux">Tmux</h2>
+
+<p>Install <code>tmux</code>:</p>
+
+<pre><code class="language-bash">brew install tmux
+</code></pre>
+
+<p>Configure tmux and expose <code>tmuxy</code> command (defined in my <code>~/.bashrc</code> for quickly spinning up a new working environment):</p>
+
+<pre><code class="language-bash">curl -LSso ~/.tmux.conf https://raw.githubusercontent.com/Integralist/dotfiles/master/.tmux.conf
+curl -LSso ~/tmux.sh https://raw.githubusercontent.com/Integralist/dotfiles/master/tmux.sh
+</code></pre>
+
+<blockquote>
+<p>Note: check <code>$PATH</code> to make sure tmux isn&rsquo;t double setting values in your PATH as it starts up. If it does you can check an older version of my <a href="https://github.com/Integralist/dotfiles/blob/cc906bd14636543e71d9c034d6507f5986a80bbd/.bash_profile#L18-L21" target="_blank"><code>~/.bash_profile</code></a> for a work-around.</p>
+</blockquote>
+
+<h2 id="miscellaneous">Miscellaneous</h2>
+
+<p>Not every app can be installed via Homebrew. <a href="https://monosnap.com/welcome" target="_blank">Monosnap</a> is one such example.</p>
+
+<p>If you want an easy way to hide menu bar items, then try the <a href="https://apps.apple.com/app/hidden-bar/id1452453066" target="_blank">hidden-bar</a> app (<a href="https://github.com/dwarvesf/hidden" target="_blank">github</a>)</p>
+
+<p>Also, if you&rsquo;re into torrents, then the <a href="https://cli-ck.io/transmission-cli-user-guide/" target="_blank">transmission server/client</a> (or alternatively <code>npm install -g t-get</code>) might be of interest to you.</p>
+
+<h2 id="macos">macOS</h2>
+
+<p>It can be cool to configure the macOS via the terminal, things like mouse cursor speed or keyboard repeat key performance. But unfortunately that all changed with macOS Mojave and I couldn&rsquo;t be bothered to figure out the correct way to do it via the terminal when doing the setup via the GUI is just as quick (and I know the few things I like to tweak off-by-heart).</p>
+
+<p>For example, you used to be able to do things like:</p>
+
+<pre><code class="language-bash">defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+</code></pre>
+
+<p>But since macOS Mojave those settings and namespaces seem to have changed. If you&rsquo;re interested in figuring it out, then I&rsquo;d recommend starting with:</p>
+
+<pre><code class="language-bash">defaults read
+</code></pre>
+
+<p>The above command will display <em>all</em> the current macOS settings for you. From there you can drill down into individual namespaces like so:</p>
+
+<pre><code class="language-bash">defaults read &quot;Apple Global Domain&quot; com.apple.mouse.tapBehavior
+</code></pre>
+
+<blockquote>
+<p>Note: <a href="https://github.com/Integralist/dotfiles/blob/cc906bd14636543e71d9c034d6507f5986a80bbd/bootstrap.sh#L7-L53" target="_blank">here</a> are the settings I used to configure via the terminal.</p>
+</blockquote>
+
+<p>One thing I like to do is to make sure macOS&rsquo; &ldquo;Spaces&rdquo; feature doesn&rsquo;t rearrange spaces based on their recent usage, and to do that you need to open up the &lsquo;Mission Control&rsquo; settings panel and disable the option:</p>
+
+<pre><code>Automatically rearrange Spaces based on most recent use
+</code></pre>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

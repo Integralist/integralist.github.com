@@ -1,0 +1,1000 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#profiling-python">Profiling Python</a>
+<ul>
+<li><a href="#memory-management">Memory Management</a></li>
+
+<li><a href="#types-of-profiling">Types of Profiling</a></li>
+
+<li><a href="#tools-matrix">Tools Matrix</a></li>
+
+<li><a href="#analysis-steps">Analysis Steps</a></li>
+
+<li><a href="#base-example">Base Example</a></li>
+
+<li><a href="#timer">Timer</a></li>
+
+<li><a href="#built-in-module-timeit">Built-in module: timeit</a></li>
+
+<li><a href="#built-in-module-profiler">Built-in module: profiler</a></li>
+
+<li><a href="#line-profiler">Line Profiler</a></li>
+
+<li><a href="#basic-memory-profiler">Basic Memory Profiler</a></li>
+
+<li><a href="#tracemalloc">Tracemalloc</a></li>
+
+<li><a href="#pyflame-flame-graphs">PyFlame (Flame Graphs)</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="profiling-python">Profiling Python</h1>
+
+<h2 id="memory-management">Memory Management</h2>
+
+<p>Before we dive into the techniques and tools available for profiling Python applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.</p>
+
+<p>Python manages memory using <strong>reference counting</strong> semantics. What this means is, every time an object is referenced, either by a variable assignment or similar, the counter for that object is incremented. Once an object is not referenced anymore its memory is deallocated (its counter is decremented every time a reference is removed, until it reaches zero). But as long as there is a reference (somewhere in the program), then the object will not be deallocated (as the internal counter will be greater than zero).</p>
+
+<p>Now this can cause <a href="http://engineering.hearsaysocial.com/2013/06/16/circular-references-in-python/" target="_blank">problems</a> when dealing with <a href="https://stackoverflow.com/questions/9910774/what-is-a-reference-cycle-in-python" target="_blank">cyclical references</a>, so that&rsquo;s something to be aware of when investigating memory leaks and other memory related concerns.</p>
+
+<blockquote>
+<p>Note: for lots of details of how Python allocates memory, I highly recommend <a href="https://dmalcolm.fedorapeople.org/presentations/PyCon-US-2011/MemoryUsage.pdf" target="_blank">this presentation</a>.</p>
+</blockquote>
+
+<h2 id="types-of-profiling">Types of Profiling</h2>
+
+<p>There are a couple of approaches available to us for monitoring performance&hellip;</p>
+
+<ul>
+<li><strong>Timers</strong>: useful for benchmarking, as well as comparing <em>before</em> and <em>after</em> fixes.</li>
+<li><strong>Profilers</strong>: useful for high-level verification.</li>
+</ul>
+
+<h2 id="tools-matrix">Tools Matrix</h2>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><a href="#5">timer (decorator)</a></td>
+<td>- Simple, quick and easy.</td>
+<td>- Requires code change.<br>- Adds latency &amp; skews results.</td>
+</tr>
+
+<tr>
+<td><a href="#6">timeit module</a></td>
+<td>- Calculate repeat averages.<br>- Doesn’t require code change.</td>
+<td>- More complicated API.</td>
+</tr>
+
+<tr>
+<td><a href="#7">profiler module</a></td>
+<td>- Granular CPU by file.<br>- Can be run from terminal.</td>
+<td>- More complicated results.<br>- Read docs to understand.</td>
+</tr>
+
+<tr>
+<td><a href="#8">line_profiler</a></td>
+<td>- Granular line-by-line CPU.</td>
+<td>- Slow.<br>- Not built-in package.<br>- Requires code change.</td>
+</tr>
+
+<tr>
+<td><a href="#9">memory_profiler</a></td>
+<td>- Clear and easy results.</td>
+<td>- Slow †<br>- Not built-in package.<br>- † additional packages help.</td>
+</tr>
+
+<tr>
+<td><a href="#10">tracemalloc</a></td>
+<td>- Built-in memory package.</td>
+<td>- Requires code change.<br>- More complicated API.</td>
+</tr>
+
+<tr>
+<td><a href="#11">pyflame</a></td>
+<td>- Visualise problem area easily.<br>- Details CPU and Memory</td>
+<td>- Requires Linux.<br>- Most complex to setup.</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="analysis-steps">Analysis Steps</h2>
+
+<p>Regardless of the tool you use for analysis, a general rule of thumb is to:</p>
+
+<ol>
+<li><strong>Identify a bottleneck at a high-level</strong></li>
+</ol>
+
+<ul>
+<li>For example, you might notice a long running function call.</li>
+</ul>
+
+<ol>
+<li><strong>Reduce the operations</strong></li>
+</ol>
+
+<ul>
+<li>Look at time spent, or number of calls, and figure out an alternative approach.</li>
+<li>Look at the number of memory allocations, figure out an alternative approach.</li>
+</ul>
+
+<ol>
+<li><strong>Drill down</strong></li>
+</ol>
+
+<ul>
+<li>Use a tool that gives you data at a lower-level.</li>
+</ul>
+
+<p>Think about more performant algorithms or data structures.<br>
+There may also be simpler solutions.<br>
+Take a pragmatic look at your code.</p>
+
+<h2 id="base-example">Base Example</h2>
+
+<p>Let’s begin with a simple program written using Python 3…</p>
+
+<pre><code>def get_number():
+    for i in range(10000000):
+        yield i
+
+
+def expensive_function():
+    for n in get_number():
+        r = n ^ n ^ n
+    return f&quot;some result! {r}&quot;
+
+
+print(expensive_function())
+</code></pre>
+
+<blockquote>
+<p>Note: I’m currently using Python version 3.6.3</p>
+</blockquote>
+
+<p>Running this program can take ~1.8 seconds and returns the value:</p>
+
+<pre><code>some result! 9999999
+</code></pre>
+
+<h2 id="timer">Timer</h2>
+
+<p>We can use a simple decorator to time the length of our <code>expensive_function</code> call&hellip;</p>
+
+<pre><code>from time import time
+from functools import wraps
+
+
+def timefn(fn):
+    &quot;&quot;&quot;Simple timer decorator.&quot;&quot;&quot;
+    @wraps(fn)
+    def measure_time(*args, **kwargs):
+        t1 = time()
+        result = fn(*args, **kwargs)
+        t2 = time()
+        print(f&quot;@timefn: {fn.__name__} took {str(t2 - t1)} seconds&quot;)
+        return result
+    return measure_time
+</code></pre>
+
+<p>The problem with this approach is that the decorator results in additional latency. Meaning the program takes slightly longer to complete. Not a lot, but if you’re after precision then this can skew the results (which is a common theme when benchmarking or profiling).</p>
+
+<h2 id="built-in-module-timeit">Built-in module: timeit</h2>
+
+<p>The built-in <a href="https://docs.python.org/3/library/timeit.html" target="_blank"><code>timeit</code></a> module is another simple way of benchmarking the time it takes for a function to execute. Simply import the module and call its interface.</p>
+
+<pre><code>import timeit
+…
+result = timeit.timeit(expensive_function, number=1)  # one repetition
+print(result)
+</code></pre>
+
+<blockquote>
+<p>Note: you can tweak the number param to determine how many repetitions it’ll run.</p>
+</blockquote>
+
+<p>Along with the <code>timeit</code> method, there is a <code>repeat</code> method that returns a set of averages across the number of repeated code executions.</p>
+
+<pre><code>result = timeit.repeat(expensive_function, number=1, repeat=5)
+</code></pre>
+
+<p>In this case result would contain something like:</p>
+
+<pre><code>[1.7263835030025803, 1.7080924350011628, 1.6802870190003887, 1.6736655100103235, 1.7003267239924753]
+</code></pre>
+
+<blockquote>
+<p>Note: according to the Python documentation when utilising the <code>repeat</code> method you should only be interested in the <code>min()</code> because…</p>
+
+<p>“In a typical case, the lowest value gives a lower bound for how fast your machine can run the given code snippet; higher values in the result vector are typically not caused by variability in Python’s speed, but by other processes interfering with your timing accuracy”.</p>
+</blockquote>
+
+<p>Finally, there is also a command line version you can utilise:<br>
+<code>python -m timeit</code></p>
+
+<h2 id="built-in-module-profiler">Built-in module: profiler</h2>
+
+<p>There are two flavours of <a href="https://docs.python.org/3/library/profile.html" target="_blank">profiler</a>, a pure Python version (<code>import profile</code>) and a C extension version (<code>import cProfile</code>) which is preferred, as the former is remarkably slower.</p>
+
+<p>For example, the C profile took ~3 seconds to complete,
+whereas the Python version took over a minute.</p>
+
+<blockquote>
+<p>Note: if using <code>cProfile</code> you would execute: <code>cProfile.run(&quot;expensive_function()&quot;)</code> otherwise you would execute <code>profile.run(&quot;expensive_function()&quot;)</code>.</p>
+</blockquote>
+
+<p>You should see something like the following displayed after executing your program:</p>
+
+<pre><code>         10000005 function calls in 3.132 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+ 10000001    1.042    0.000    1.042    0.000 3_profile.py:4(get_number)
+        1    2.090    2.090    3.132    3.132 3_profile.py:9(expensive_function)
+        1    0.000    0.000    3.132    3.132 &lt;string&gt;:1(&lt;module&gt;)
+        1    0.000    0.000    3.132    3.132 {built-in method builtins.exec}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+</code></pre>
+
+<p>So from these results we can see:</p>
+
+<ul>
+<li>There were a total of <code>10000005</code> function calls.</li>
+<li>The <code>get_number</code> function was called the most (<code>10000001</code>).</li>
+<li>Every other function in the total recorded, were called just the once.</li>
+<li>The <code>expensive_function</code> took a total of 2.090 seconds (exc. sub function calls).</li>
+<li>The cumulative time (<code>cumtime</code>) is the <code>tottime</code> plus sub function calls.</li>
+</ul>
+
+<blockquote>
+<p>Note: when there are two numbers in the first column (for example <code>3/1</code>), it means that the function recursed. The second value is the number of primitive calls and the former is the total number of calls. Note that when the function does not recurse, these two values are the same, and only the single figure is printed.</p>
+</blockquote>
+
+<p>Instead of printing the results you can pass the run method a second argument which is a filename you want to store the results in. Once there you can use the <a href="https://docs.python.org/3/library/profile.html#pstats.Stats" target="_blank">pstats.Stats</a> module to carry out some post-processing on those results.</p>
+
+<p>Finally, there is also a command line version you can utilise:<br>
+<code>python -m cProfile [-o output_file] [-s sort_order] &lt;your_script.py&gt;</code></p>
+
+<h2 id="line-profiler">Line Profiler</h2>
+
+<p>The <a href="https://pypi.python.org/pypi/line_profiler" target="_blank">Line Profiler</a> option gives much more granular detail than the built-in profile module, but it is an external package and so needs to be installed:</p>
+
+<pre><code>pip install line_profiler
+</code></pre>
+
+<p>Once installed you can write a decorator to wrap the functionality and make it easier for applying to specific functions you want to profile (as demonstrated below).</p>
+
+<pre><code>from line_profiler import LineProfiler
+
+
+def do_profile(follow=None):
+    if not follow:
+        follow = []
+
+    def inner(func):
+        def profiled_func(*args, **kwargs):
+            try:
+                profiler = LineProfiler()
+                profiler.add_function(func)
+                for f in follow:
+                    profiler.add_function(f)
+                profiler.enable_by_count()
+                return func(*args, **kwargs)
+            finally:
+                profiler.print_stats()
+        return profiled_func
+    return inner
+
+
+def get_number():
+    for i in range(10000000):
+        yield i
+
+
+@do_profile(follow=[get_number])
+def expensive_function():
+    for n in get_number():
+        r = n ^ n ^ n
+    return f&quot;some result! {r}&quot;
+
+
+print(expensive_function())
+</code></pre>
+
+<p>We can see the result of executing this program below…</p>
+
+<pre><code>Timer unit: 1e-06 s
+
+Total time: 7.59566 s
+File: 4_line_profile.py
+Function: get_number at line 23
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    23                                           def get_number():
+    24  10000001      3924533      0.4     51.7      for i in range(10000000):
+    25  10000000      3671129      0.4     48.3          yield i
+
+Total time: 27.477 s
+File: 4_line_profile.py
+Function: expensive_function at line 28
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    28                                           @do_profile(follow=[get_number])
+    29                                           def expensive_function():
+    30  10000001     22122124      2.2     80.5      for n in get_number():
+    31  10000000      5354911      0.5     19.5          r = n ^ n ^ n
+    32         1            3      3.0      0.0      return f&quot;some result! {r}&quot;
+
+some result! 9999999
+</code></pre>
+
+<blockquote>
+<p>Note: the Line Profiler is pretty slow (~35s) in comparison to the cProfiler (~4s)</p>
+</blockquote>
+
+<p>The Line Profiler will typically only analyse the function being decorated. In order for it to include sub function calls, you’ll need to specify them (hence the decorator allows you to provide a list of functions and in there we’ve specified the <code>get_number</code> function).</p>
+
+<p>The order in which you list the sub functions to ‘follow’ doesn’t matter, as the results will always display (top to bottom) the deepest nested sub function to the top level function (so we can see that <code>get_number</code> is nested inside of <code>expensive_function</code> and so it is top of the output).</p>
+
+<p>From these results we can get a line-by-line breakdown of how long (in percentages) each function took to complete. So <code>expensive_function</code> spent ~20% of its time calculating a value to assign to the variable <code>r</code>, and the remaining 80% was spent calculating a value to assign to the variable <code>n</code> (which was the call out to the <code>get_number</code> function).</p>
+
+<p>As for <code>get_number</code>, it was approximately <sup>50</sup>&frasl;<sub>50</sub> for time between looping the <code>range(10000000)</code> and <code>yield</code>’ing a value back to the caller context (i.e. <code>expensive_function</code>).</p>
+
+<p>Finally, there is also a command line version you can utilise:</p>
+
+<pre><code>kernprof -l [-v view_results] &lt;your_script.py&gt;
+</code></pre>
+
+<p>If you omit the <code>-l</code> flag, then you can view the results at a later time using:</p>
+
+<pre><code>python -m line_profiler &lt;your_script.py&gt;.lprof
+</code></pre>
+
+<h2 id="basic-memory-profiler">Basic Memory Profiler</h2>
+
+<p>There is a module called <code>memory_profiler</code> which is very simple to use, although with the example code we’ve been using it was so painfully slow it was pretty much unusable (I gave up after 5 minutes of waiting). So, because of that issue, I’ll demonstrate a simpler example.</p>
+
+<p>But first you need to install the module:</p>
+
+<pre><code>pip install memory_profiler
+pip install psutil  # recommended to help speed up the reporting time
+</code></pre>
+
+<p>Now you can import the decorator, and apply that to our <em>new</em> ‘slow’ function:</p>
+
+<pre><code>from memory_profiler import profile
+
+@profile
+def expensive_memory_allocations():
+    a = [1] * (10 ** 6)
+    b = [2] * (2 * 10 ** 7)
+    del b
+    return a
+
+print(len(expensive_memory_allocations()))
+</code></pre>
+
+<p>When you run this program, you’ll see a memory breakdown similar to the following:</p>
+
+<pre><code>Line #    Mem usage    Increment   Line Contents
+================================================
+    35     27.8 MiB      0.0 MiB   @profile
+    36                             def beep():
+    37     35.4 MiB      7.6 MiB       a = [1] * (10 ** 6)
+    38    188.0 MiB    152.6 MiB       b = [2] * (2 * 10 ** 7)
+    39     35.4 MiB   -152.6 MiB       del b
+    40     35.4 MiB      0.0 MiB       return a
+</code></pre>
+
+<p>The second column “Mem usage” indicates the memory consumption for the Python interpreter after that line was executed. The third column “Increment” indicates the difference in increased memory compared to the previous line that was executed. So you can see, for example, when we delete the <code>b</code> variable we are able to reclaim the memory it was holding on to.</p>
+
+<h2 id="tracemalloc">Tracemalloc</h2>
+
+<p>There is another basic memory profiler that provides similar features called <a href="https://docs.python.org/3/library/tracemalloc.html" target="_blank">tracemalloc</a> but this particular tool is part of the standard library in Python so it might be preferable to the external library <a href="#9">memory_profiler</a> (shown earlier).</p>
+
+<pre><code>import tracemalloc
+
+
+def get_number():
+    for i in range(10000000):
+        yield i
+
+
+def expensive_function():
+    for n in get_number():
+        r = n ^ n ^ n
+    return f&quot;some result! {r}&quot;
+
+
+tracemalloc.start()
+
+print(expensive_function())
+
+snapshot = tracemalloc.take_snapshot()
+top_stats = snapshot.statistics(&quot;lineno&quot;)
+
+print(&quot;[ Top 10 ]&quot;)
+for stat in top_stats[:10]:
+    print(stat)
+</code></pre>
+
+<p>The output from this example is as follows:</p>
+
+<pre><code>$ time python tracemalloc_example.py
+
+some result! 9999999
+
+[ Top 10 ]
+tracemalloc_example.py:17: size=106 B, count=2, average=53 B
+</code></pre>
+
+<blockquote>
+<p>Note: You might also consider <a href="https://pythonhosted.org/Pympler/muppy.html" target="_blank">Pympler</a> or <a href="http://mg.pov.lt/objgraph/" target="_blank">ObjGraph</a> for tracking memory usage &amp; object refs.</p>
+</blockquote>
+
+<h2 id="pyflame-flame-graphs">PyFlame (Flame Graphs)</h2>
+
+<p>Flame graphs are a visualization of profiled software (stack traces), allowing the most frequent code-paths to be identified quickly and accurately. Flame graphs allows hot code-paths to be identified quickly.</p>
+
+<p><a href="https://github.com/uber/pyflame" target="_blank">PyFlame</a> is an effective tool (written in C++) for generating flame graph data, which can help you to understand the CPU and memory characteristics of your services. In some cases it can report more accurate results than those provided by the built-in Python modules.</p>
+
+<p>For more details on the design decisions behind PyFlame and the shortcomings of the other built-in options, then I would recommend reading <a href="https://eng.uber.com/pyflame/" target="_blank">this article</a>.</p>
+
+<p>PyFlame only works with Linux operating systems and so in order to profile our code (if you’re using macOS like I am), then we’ll have to utilise <a href="https://www.docker.com/" target="_blank">Docker</a> to help us. Below is a <code>Dockerfile</code> you can use as a basic starting point to try out PyFlame.</p>
+
+<blockquote>
+<p>Note: we also require <a href="https://github.com/brendangregg/FlameGraph" target="_blank">FlameGraph</a> in order to generate the flame graphs.</p>
+</blockquote>
+
+<pre><code>FROM python:3.6.3
+
+WORKDIR /pyflame
+
+# Install dependencies required to ‘build’ PyFlame
+RUN apt-get update -y
+RUN apt-get install -y git autoconf automake autotools-dev g++ pkg-config python-dev python3-dev libtool make
+
+# Build PyFlame
+RUN git clone https://github.com/uber/pyflame.git &amp;&amp; \
+    cd pyflame &amp;&amp; ./autogen.sh &amp;&amp; ./configure &amp;&amp; make
+
+WORKDIR /flamegraph
+
+RUN git clone https://github.com/brendangregg/FlameGraph
+
+COPY 7_pyflame.py /app/app.py
+
+WORKDIR /app
+
+CMD /pyflame/pyflame/src/pyflame -o prof.txt -t python app.py &amp;&amp;\
+    /flamegraph/FlameGraph/flamegraph.pl ./prof.txt
+</code></pre>
+
+<p>In order to build and run this <code>Dockerfile</code>, you’ll need to execute the following code…</p>
+
+<pre><code>docker build -t pyflame .
+
+docker run --privileged pyflame &gt; output.svg &amp;&amp; tail -n+2 output.svg &gt; output_stripped.svg
+</code></pre>
+
+<blockquote>
+<p>Note: our application sends data to stdout (e.g. <code>some result! 9999999</code>) and so this ends up at the top of our <code>output.svg</code> file. This means we need to remove it. We could either modify the application code or you could do what I’ve done and strip it after the file is created by using the <code>tail</code> command and redirecting the stripped output to a new file: <code>output_stripped.svg</code>.</p>
+</blockquote>
+
+<p>If we now open <code>output_stripped.svg</code> we should see the following interactive flame graph.</p>
+
+<p><a href="../../assets/images/pyflame.png">
+<img src="../../assets/images/pyflame.png">
+</a></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s our tour of various tools for profiling your Python code. I&rsquo;ll follow this article up with a Go based one in the very near future. But if you&rsquo;re interested in further reading then the following blog posts from rushter.com are worth a look:</p>
+
+<ul>
+<li><a href="https://rushter.com/blog/python-garbage-collector/" target="_blank">Python Garbage Collection</a></li>
+<li><a href="https://rushter.com/blog/python-memory-managment/" target="_blank">Python Memory Management</a></li>
+</ul>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

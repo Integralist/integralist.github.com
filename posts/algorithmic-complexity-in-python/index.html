@@ -1,0 +1,855 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#algorithmic-complexity-in-python">Algorithmic Complexity in Python</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#asymptotic-analysis">Asymptotic Analysis</a></li>
+
+<li><a href="#measuring-algorithmic-performance">Measuring Algorithmic Performance</a></li>
+
+<li><a href="#orders-of-complexity">Orders of Complexity</a></li>
+
+<li><a href="#growth-types">Growth Types</a>
+<ul>
+<li><a href="#constant-time">Constant Time</a></li>
+
+<li><a href="#logarithmic-time">Logarithmic Time</a></li>
+
+<li><a href="#square-root-time">Square Root Time</a></li>
+
+<li><a href="#linear-time">Linear Time</a></li>
+
+<li><a href="#linearithmic-time">Linearithmic Time</a></li>
+
+<li><a href="#quadratic-time">Quadratic Time</a></li>
+
+<li><a href="#polynomial-time">Polynomial Time</a></li>
+
+<li><a href="#exponential-time">Exponential Time</a></li>
+
+<li><a href="#factorial-time">Factorial Time</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="algorithmic-complexity-in-python">Algorithmic Complexity in Python</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>In this post we&rsquo;re going to review some different algorithmic time complexities. Let me begin by clarifying, when I say &lsquo;algorithm&rsquo; I mean: &lsquo;logic written in code&rsquo; and when I say &lsquo;operation&rsquo; I mean: &lsquo;a unit of code was evaluated&rsquo;, and that operation could be something as simple as <code>x + y</code>.</p>
+
+<h2 id="asymptotic-analysis">Asymptotic Analysis</h2>
+
+<p>Asymptotic analysis is the computing of an algorithm&rsquo;s running time, and there are actually a few different variations that allow us to measure different aspects of that running time:</p>
+
+<ul>
+<li><strong>Big Omega</strong>: represents the lower bound.</li>
+<li><strong>Big Theta</strong>: represents both the lower and upper bounds.</li>
+<li><strong>Big O</strong>: represents the upper bound.</li>
+</ul>
+
+<p>We&rsquo;re interested in the last notation in that list (<a href="https://en.wikipedia.org/wiki/Big_O_notation" target="_blank">Big O notation</a>) and what the various algorithmic complexity symbols mean when applied to simplified implementations of specific algorithms written in Python.</p>
+
+<p>The reason for selecting Big O over other notations is that it&rsquo;s the most relevant for performance analysis, as it helps us to understand the worst case behaviour.</p>
+
+<blockquote>
+<p>Note: a fantastic &lsquo;quick&rsquo; reference for Big O notation is <a href="http://bigocheatsheet.com/" target="_blank">bigocheatsheet.com</a>, but also Python <a href="https://wiki.python.org/moin/TimeComplexity" target="_blank">documents the time complexity</a> associated with its various builtin functions (which is super useful).</p>
+</blockquote>
+
+<h2 id="measuring-algorithmic-performance">Measuring Algorithmic Performance</h2>
+
+<p>When measuring the performance of an algorithm we&rsquo;re interested in how the increase in input size will affect the growth rate of operations required, and this attribute is typically referred to as the algorithm&rsquo;s &lsquo;time complexity&rsquo;.</p>
+
+<p>There are two types of complexity we might be interested in (both dependant upon the length of the input to be processed):</p>
+
+<ol>
+<li><strong>time</strong>: quantifies the amount of time taken by the algorithm.</li>
+<li><strong>space</strong>: quantifies the amount of memory used by the algorithm.</li>
+</ol>
+
+<blockquote>
+<p>Note: the Big O notation used to describe these complexities is telling us the &lsquo;growth rate&rsquo; of a function, which is typically referred to as the &lsquo;<strong>order</strong> of the function&rsquo; (hence the &lsquo;O&rsquo; in Big O).</p>
+</blockquote>
+
+<h2 id="orders-of-complexity">Orders of Complexity</h2>
+
+<ul>
+<li>Good:
+
+<ul>
+<li><code>O(1)</code></li>
+<li><code>O(log n)</code></li>
+<li><code>O(√n)</code></li>
+</ul></li>
+<li>OK:
+
+<ul>
+<li><code>O(n)</code></li>
+</ul></li>
+<li>Bad:
+
+<ul>
+<li><code>O(n log n)</code></li>
+</ul></li>
+<li>Awful:
+
+<ul>
+<li><code>O(n^2)</code></li>
+<li><code>O(2^n)</code></li>
+<li><code>O(n!)</code></li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p>Note: when writing a logarithm you are expected to specify the base: <code>log 2(n)</code> but with Big O notation you typically omit the two, resulting in: <code>O(log n)</code>.</p>
+</blockquote>
+
+<h2 id="growth-types">Growth Types</h2>
+
+<ul>
+<li><code>O(1)</code>: <a href="#constant-time">constant time</a></li>
+<li><code>O(Log n)</code>: <a href="#logarithmic-time">logarithmic time</a></li>
+<li><code>O(√n)</code>: <a href="#square-root-time">square root time</a></li>
+<li><code>O(n)</code>: <a href="#linear-time">linear time</a></li>
+<li><code>O(n Log n)</code>: <a href="#linearithmic-time">linearithmic time</a></li>
+<li><code>O(n*n)</code>: <a href="#quadratic-time">quadratic time</a> (squared)</li>
+<li><code>O(n^2)</code>: <a href="#polynomial-time">polynomial time</a></li>
+<li><code>O(2^n)</code>: <a href="#exponential-time">exponential time</a></li>
+<li><code>O(n!)</code>: <a href="#factorial-time">factorial time</a></li>
+</ul>
+
+<h3 id="constant-time">Constant Time</h3>
+
+<p>An algorithm has &lsquo;constant time&rsquo; when the number of operations doesn&rsquo;t change as the number of elements increase.</p>
+
+<pre><code>l = []
+l.append(1)
+len(l)  # 1
+
+l = list(range(1000))
+len(l)  # 1000
+l.append(1)
+len(l)  # 1001
+</code></pre>
+
+<p>In the above example code it doesn&rsquo;t matter how many elements are contained with the list (<code>l</code>). Regardless of whether we append a new element to a list consisting of one element or a thousand elements, the time complexity is <code>O(1)</code> constant time.</p>
+
+<p>Similarly for acquiring the length of a list <code>len(l)</code>, regardless of whether the list has one element or a thousand, the time complexity stays constant time.</p>
+
+<h3 id="logarithmic-time">Logarithmic Time</h3>
+
+<p>An algorithm is &lsquo;logarithmic&rsquo; when the number of operations <em>decreases</em> by a specific factor with each step.</p>
+
+<p>Consider an algorithm for searching a specific element from a given input:</p>
+
+<pre><code>def binary_search(l, item):
+    first = 0
+    last = len(l)-1
+    found = False
+
+    while first&lt;=last and not found:
+        midpoint = round((first + last)/2)
+        if l[midpoint] == item:
+            found = True
+        else:
+            if item &lt; l[midpoint]:
+                last = midpoint-1
+            else:
+                first = midpoint+1
+
+    return found
+
+input = [0, 1, 2, 8, 13, 17, 19, 32, 42,]
+
+print(binary_search(input, 3))   # found: False
+print(binary_search(input, 13))  # fount: True
+</code></pre>
+
+<p>The algorithm used here is known as a &lsquo;binary search&rsquo; and only works when the given input is sorted/ordered. It works on the principle of dividing the range of elements to be searched by two.</p>
+
+<p>This algorithm fits the requirements of logarithmic time complexity because instead of iterating over the entire input list, we actually <em>shorten</em> the input by half on each &lsquo;step&rsquo; of the algorithm.</p>
+
+<blockquote>
+<p>Note: I discuss <a href="/posts/big-o-for-beginners/#binary-search">binary search</a> in more detail in an older post.</p>
+</blockquote>
+
+<h3 id="square-root-time">Square Root Time</h3>
+
+<p>An algorithm has &lsquo;sqrt&rsquo; (or <code>√</code>) time complexity when the number of operations increases dependant on the number of primes under the square root of the given number.</p>
+
+<p>Consider an algorithm for checking if a number is a prime. This would have square root time complexity:</p>
+
+<pre><code>def is_prime_number(x):
+    if x &gt;= 2:
+        for y in range(2,x):
+            # if x divides with zero remainder (i.e. equal to bool False)
+            if not (x % y):
+                return False
+    else:
+        return False
+    return True
+</code></pre>
+
+<h3 id="linear-time">Linear Time</h3>
+
+<p>An algorithm is &lsquo;linear&rsquo; when the number of operations increases linearly with the number of elements.</p>
+
+<p>Consider an algorithm for searching a specific element from a given input:</p>
+
+<pre><code>def search(x, input):
+    for i in input:
+        print(i)
+        if i == x:
+            print('found element')
+            return
+
+search(5, range(10))
+</code></pre>
+
+<p>This example <code>search</code> function will loop over every element until it finds the number <code>5</code>, resulting in it having <code>O(n)</code> linear time complexity. Meaning: if the input range changes from <code>10</code> to <code>1000</code>, then the number of operations (i.e. loop iterations) increases linearly with it.</p>
+
+<p>The worst case scenario is if <code>x</code> happens to be a number that doesn&rsquo;t exist in the given input. We would have to iterate over the entire input before we realized the number didn&rsquo;t exist.</p>
+
+<blockquote>
+<p>Note: a much better algorithm to use (if the input was guaranteed to be ordered/sorted) would be a <a href="/posts/big-o-for-beginners/#binary-search">binary search</a>.</p>
+</blockquote>
+
+<p>What&rsquo;s interesting to keep in mind is that there are algorithms that are slower still than the example we&rsquo;ve given above but are <em>still</em> considered to be &lsquo;linear time&rsquo; (e.g. <code>O(n)</code>). Consider a collection of ten items that you loop over twice! That&rsquo;s twice as many operations as our initial example but it&rsquo;s still <code>O(n)</code> and not something like <code>O(n*2)</code>.</p>
+
+<p>Why is that? Well, it stems from how you <em>calculate</em> algorithmic complexity (see <a href="/posts/calculating-big-o/">my blog post on the subject</a>). But in essence the calculation starts off very explicit until you identify which portion of the algorithm is the &lsquo;dominant&rsquo; (e.g. as the size of the input grows, which part of the algorithm gets worse). In the case of <code>O(n*2)</code> the &lsquo;constant&rsquo; value is <code>2</code>, but if the collection size changed from <code>10</code> to <code>1000</code> then (that being the <code>n</code> part) the <code>n</code> becomes the &lsquo;dominant&rsquo; portion of the algorithm and so we can simplify big-o to just <code>O(n)</code>.</p>
+
+<h3 id="linearithmic-time">Linearithmic Time</h3>
+
+<p>An algorithm is &lsquo;linearithmic&rsquo; when the number of operations increases by the number of elements (i.e. linear time) times the result of <code>log n</code> (i.e. logarithmic time).</p>
+
+<p>Consider the &lsquo;quick sort&rsquo; algorithm whose implementation (below) selects a random element as the &lsquo;pivot&rsquo; and then loops the entire input list (minus the pivot) in order to identify elements that are less than the pivot and elements that are greater than the pivot (this is the &lsquo;reduce by half&rsquo; logarithmic principle). The function recursively calls itself passing in smaller and smaller subsets of input which are iterated over:</p>
+
+<pre><code>from random import randrange
+
+input = [10, 5, 2, 3, 7, 0, 9, 12]
+
+def quicksort(arr):
+    if len(arr) &lt; 2:
+        return arr
+    else:
+        rand = randrange(0, len(arr))  # grab a random index
+        pivot = arr.pop(rand)
+        less = [i for i in arr if i &lt;= pivot]
+        greater = [i for i in arr if i &gt; pivot]
+        return quicksort(less) + [pivot] + quicksort(greater)
+
+print(&quot;sorted:  &quot;, quicksort(input))
+</code></pre>
+
+<blockquote>
+<p>Note: I discuss <a href="/posts/big-o-for-beginners/#quick-sort">quick sort</a> in more detail in an older post.</p>
+</blockquote>
+
+<h3 id="quadratic-time">Quadratic Time</h3>
+
+<p>An algorithm is &lsquo;quadratic&rsquo; when the number of operations become the square of the number of elements.</p>
+
+<p>Consider an algorithm whose implementation is looping over some input and then nesting another loop of that same input:</p>
+
+<pre><code>def search(input):
+    for i in input:
+        for j in input:
+            print(f'i: {i}, j: {j}')
+
+search(range(10))
+</code></pre>
+
+<p>This example <code>search</code> function will loop over every element in <code>input</code> and then for each item iterated over it&rsquo;ll loop through the same top-level input collection again, resulting in it having <code>O(n*n)</code> quadratic time complexity.</p>
+
+<p>In our example code our collection is a list of ten items. Item 1 is the initial list value <code>0</code>, and for that we&rsquo;ll loop again ten times. We move to Item 2 (which is the value <code>1</code>) and <em>again</em> we&rsquo;ll end up looping ten times &hellip;and so on.</p>
+
+<p>This means if the input range changed from <code>10</code> to <code>1000</code>, then the number of operations (i.e. total loop iterations) increases as a square of the number of elements.</p>
+
+<h3 id="polynomial-time">Polynomial Time</h3>
+
+<p>A polynomial time complexity <em>is</em> effectively a &lsquo;quadratic&rsquo; algorithm in the sense that with quadratic <code>O(n*n)</code> (where <code>n</code> is <code>10</code>) we have a number of operations equal to <code>100</code>, and if we compare that to polynomial <code>O(n^2)</code> (where <code>n</code> is <code>10</code>) then again we have the number of operations equal to <code>100</code>.</p>
+
+<p>Now the difference comes when the exponent (<code>2</code>) in the polynomial equation is increased (where as with quadratic it will always be a squared number). For example, <code>O(n^3)</code> is also referred to as being polynominal.</p>
+
+<h3 id="exponential-time">Exponential Time</h3>
+
+<p>An algorithm is &lsquo;exponential&rsquo; when the number of operations grows exponentially with the number of elements (i.e. growth whose rate becomes ever more rapid in proportion to the growing total number or size).</p>
+
+<blockquote>
+<p>Note: exponential time complexity <code>O(2^n)</code> is worse than polynomial <code>O(n^2)</code> because maths tells us that <em>over time</em> exponential will quickly overtake polynomial.</p>
+</blockquote>
+
+<p>Consider an algorithm whose implementation is calculating fibonacci numbers (which grows exponentially relative to the calculated output).</p>
+
+<p>The fibonacci numbers are calculated as the addition of the last element with the current element. The sequence itself starts at zero, so the first seven numbers in the sequence would be:</p>
+
+<pre><code>0, 1, 1, 2, 3, 5, 8
+</code></pre>
+
+<p>So we can see <code>0 + 1 = 1</code>, then <code>1 + 1 = 2</code>, then <code>1 + 2 = 3</code> and so on.</p>
+
+<p>Below is a possible implementation:</p>
+
+<pre><code>def fibonacci(num):
+    if (num &lt;= 1):
+       return num
+    return fibonacci(num - 2) + fibonacci(num - 1)
+</code></pre>
+
+<p>Meaning, if we wanted the sixth number in the sequence (<code>8</code>) we would call our function with <code>fibonacci(6)</code> (as the numbers are zero indexed).</p>
+
+<p>Recursive functions can be difficult to build a mental model from, so let&rsquo;s attempt to pick it apart with some pseudo-logic:</p>
+
+<pre><code># f is our fibonacci function
+# the logic below is the result of calling f(3)
+# the third sequence number is 2
+# remembering the sequence is zero indexed
+# [0] = 0, [1] = 1, [2] = 1, [3] = 2, [4] = 3, [5] = 5, [6] = 8
+
+f(3):
+  3 - 2 = 1
+  3 - 1 = 2
+  f(1) + f(2)
+
+  f(1) = 1
+  f(2) =
+     2 - 2 = 0
+     2 - 1 = 1
+     f(0) = 0
+     f(1) = 1
+
+  1 + 1 = 2
+</code></pre>
+
+<h3 id="factorial-time">Factorial Time</h3>
+
+<p>An algorithm is &lsquo;factorial&rsquo; when the number of operations increases in line with the number of permutations associated with the number of elements.</p>
+
+<p>Consider an algorithm whose implementation is calculating the factorial, i.e. the number of permutations, for a given number (this is classically known as &lsquo;<a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem" target="_blank">the travelling salesman</a>&rsquo; problem):</p>
+
+<pre><code>def factorial(n):
+    for i in range(n):
+        print(f'iteration [{i}]: {n}')
+        factorial(n-1)
+</code></pre>
+
+<p>The factorial function recursively calls itself, and the output of this function should be the various permutations of the given number:</p>
+
+<pre><code>3
+2
+1
+2
+1
+3
+2
+1
+2
+1
+3
+2
+1
+2
+1
+</code></pre>
+
+<p>There are six permutations for a number up to three (<code>123, 132, 213, 231, 312, 321</code>), but imagine if you wanted the various permutations of a number up to ten?</p>
+
+<p>The calculation for that would yield a disastrously large number:</p>
+
+<pre><code>10*9*8*7*6*5*4*3*2*1 = 3,628,800
+</code></pre>
+
+<p>Hence this is the worst performing time complexity of the lot.</p>
+
+<blockquote>
+<p>Note: I discuss <a href="/posts/big-o-for-beginners/#factorials">factorials</a> in more detail in an older post.</p>
+</blockquote>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

@@ -1,0 +1,955 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#the-power-of-openapi-simplifying-api-design-and-documentation">The Power of OpenAPI: Simplifying API Design and Documentation</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#why-openapi-matters">Why OpenAPI Matters</a></li>
+
+<li><a href="#summary-for-those-short-on-time">Summary for those short on time</a></li>
+
+<li><a href="#getting-started-with-openapi">Getting Started with OpenAPI</a>
+<ul>
+<li><a href="#basic-structure">Basic Structure</a></li>
+</ul></li>
+
+<li><a href="#defining-endpoints">Defining Endpoints</a>
+<ul>
+<li><a href="#paths-and-methods">Paths and Methods</a></li>
+
+<li><a href="#parameters">Parameters</a></li>
+</ul></li>
+
+<li><a href="#structuring-data">Structuring Data</a>
+<ul>
+<li><a href="#request-and-response-bodies">Request and Response Bodies</a></li>
+
+<li><a href="#data-types">Data Types</a></li>
+</ul></li>
+
+<li><a href="#adding-metadata">Adding Metadata</a>
+<ul>
+<li><a href="#api-information">API Information</a></li>
+
+<li><a href="#tags-and-grouping">Tags and Grouping</a></li>
+</ul></li>
+
+<li><a href="#handling-errors">Handling Errors</a>
+<ul>
+<li><a href="#status-codes">Status Codes</a></li>
+
+<li><a href="#error-responses">Error Responses</a></li>
+</ul></li>
+
+<li><a href="#testing-and-validation">Testing and Validation</a>
+<ul>
+<li><a href="#tools-for-validation">Tools for Validation</a></li>
+
+<li><a href="#generating-client-sdks">Generating Client SDKs</a></li>
+</ul></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="the-power-of-openapi-simplifying-api-design-and-documentation">The Power of OpenAPI: Simplifying API Design and Documentation</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>In the rapidly evolving landscape of software development, creating robust and user-friendly APIs has become essential. One tool that has gained immense popularity for designing, documenting, and testing APIs is OpenAPI.</p>
+
+<p>In this comprehensive guide, we&rsquo;ll explore why OpenAPI is so important, how to write an OpenAPI document, and the key sections you need to know. Whether you&rsquo;re a seasoned developer or just getting started, mastering OpenAPI can greatly enhance your API development process.</p>
+
+<h2 id="why-openapi-matters">Why OpenAPI Matters</h2>
+
+<p>OpenAPI, formerly known as Swagger, is an open-standard format for describing APIs. It serves as both a machine-readable and human-friendly documentation that enables developers to understand, visualize, and interact with APIs effortlessly. By defining your API using OpenAPI, you unlock a host of benefits:</p>
+
+<ul>
+<li><strong>Clear Documentation</strong>: OpenAPI provides a clear and structured way to document your API, making it easy for both developers and non-developers to understand how to use it.</li>
+<li><strong>Consistency</strong>: With a standardized format, your API documentation and implementation remain consistent, reducing confusion and enhancing collaboration among teams.</li>
+<li><strong>Code Generation</strong>: OpenAPI enables automatic code generation for client libraries and server stubs in various programming languages, saving time and effort during development.</li>
+<li><strong>Testing and Validation</strong>: The OpenAPI specification can be used to validate requests and responses, ensuring that your API adheres to the defined contract.</li>
+<li><strong>Interactive Documentation</strong>: Tools like <a href="https://swagger.io/tools/swagger-ui/" target="_blank">Swagger UI</a> and <a href="https://github.com/Redocly/redoc" target="_blank">ReDoc</a> allow you to create interactive documentation that lets users explore and test your API in real-time.</li>
+</ul>
+
+<h2 id="summary-for-those-short-on-time">Summary for those short on time</h2>
+
+<p>OpenAPI is straightforward to write once you understand the high-level structure.</p>
+
+<p>Below is an OpenAPI document to get you going as a basic example<br>
+but read the full post to understand the details.</p>
+
+<p>Also check out the related blog post on <a href="https://dev.to/fastly" target="_blank">Fastly&rsquo;s dev.to blog</a>:<br>
+<a href="https://dev.to/fastly/better-fastly-api-clients-with-openapi-generator-3lno" target="_blank">Better Fastly API clients with OpenAPI Generator</a></p>
+
+<pre><code class="language-yaml">openapi: 3.0.3
+
+info:
+  title: Your API
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.com
+
+paths:
+  /teams/{team_id}/members:
+    parameters:
+      - $ref: &quot;#/components/parameters/team_id&quot;
+    get:
+      summary: List team members
+      description: List all members for the specified team.
+      operationId: list-members
+      responses:
+        &quot;200&quot;:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: &quot;#/components/schemas/list_members_response&quot;
+              examples:
+                body:
+                  $ref: &quot;#/components/examples/list_members_response&quot;
+
+components:
+  parameters:
+    team_id:
+      name: team_id
+      in: path
+      required: true
+      style: simple
+      schema:
+        $ref: &quot;#/components/schemas/team_id&quot;
+
+  schemas:
+    team_id:
+      type: string
+      description: Alphanumeric string identifying a team.
+      example: AB1C2defGhijKLMNop3qR
+
+    list_members_response:
+      type: array
+      description: List of members within the specified team.
+      items:
+        type: string
+
+  examples:
+    list_members_response:
+      value:
+        - &quot;Andrew&quot;
+        - &quot;Bob&quot;
+        - &quot;Christine&quot;
+</code></pre>
+
+<p>The above example OpenAPI document describes an API. Specifically it describes:</p>
+
+<ul>
+<li>The OpenAPI version supported (i.e. <code>openapi:</code>)</li>
+<li>Some API Metadata (i.e. <code>info:</code>)</li>
+<li>The API address (i.e. <code>server:</code>)</li>
+<li>Supported API endpoints (i.e. <code>paths:</code>)</li>
+<li>Different &lsquo;components&rsquo; referenced by the <code>paths:</code> configuration (i.e.
+<code>components:</code>)</li>
+</ul>
+
+<p>In practice the last section <code>components:</code> is where most of the &lsquo;meat&rsquo; of the
+API configuration happens. You&rsquo;ll see it contains different sections like
+<code>parameters</code>, <code>schemas</code> and <code>examples</code>.</p>
+
+<p>The <code>paths:</code> section typically doesn&rsquo;t define behaviours <em>inline</em> but instead
+will reference objects defined inside of <code>components:</code> whenever they need to
+describe some behaviour of the endpoint.</p>
+
+<p>Any time you see <code>$ref</code> that means we&rsquo;re about to reference an object defined
+elsewhere (might be in the same file, under <code>components:</code> or it could be from a
+separate file).</p>
+
+<p>So in the above example we can see the <code>paths:</code> config references a few
+different components:</p>
+
+<ul>
+<li><code>#/components/parameters/team_id</code>: this describes the API path&rsquo;s <code>team_id</code> input parameter.
+
+<ul>
+<li>This parameter object also references a component (<code>#/components/schemas/team_id</code>) for describing the
+team_id.</li>
+</ul></li>
+<li><code>#/components/schemas/list_members_response</code>: this describes the schema for
+how the response body should look for this API endpoint.</li>
+<li><code>#/components/examples/list_members_response</code>: this demonstrates an example of
+what the schema looks like in practice.</li>
+</ul>
+
+<p>This is the basic <em>structure</em> of an OpenAPI document. Yes, they can become more
+complex as the API grows, but at its foundation you will always find this
+familiar structure.</p>
+
+<p>OK, we&rsquo;ve got the quick &ldquo;summary&rdquo; out of the way, let&rsquo;s dig a little deeper&hellip;</p>
+
+<h2 id="getting-started-with-openapi">Getting Started with OpenAPI</h2>
+
+<p>Before diving into the intricacies of writing an OpenAPI document, let&rsquo;s set up the basics.</p>
+
+<p>If at any point throughout this post you are in doubt or you require some additional clarity, then please refer to the <a href="https://spec.openapis.org/oas/latest.html" target="_blank">specification document</a>.</p>
+
+<blockquote>
+<p><strong>NOTE:</strong> I&rsquo;ve used version <a href="https://spec.openapis.org/oas/v3.0.3" target="_blank"><code>3.0.3</code></a> for my examples.</p>
+</blockquote>
+
+<h3 id="basic-structure">Basic Structure</h3>
+
+<p>An OpenAPI document is written in YAML or JSON format (I&rsquo;ve used YAML for my examples).</p>
+
+<p>It consists of various sections that collectively describe your API.<br>
+At a high level, here&rsquo;s what the structure looks like:</p>
+
+<pre><code class="language-yaml">openapi: 3.0.3
+info:
+  title: Your API
+  version: 1.0.0
+paths: {}
+components: {}
+</code></pre>
+
+<p>The above example is not exhaustive as it only describes three &lsquo;objects&rsquo;:</p>
+
+<ul>
+<li><code>info</code>: <a href="https://spec.openapis.org/oas/v3.0.3#info-object" target="_blank">Info Object</a></li>
+<li><code>paths</code>: <a href="https://spec.openapis.org/oas/v3.0.3#paths-object" target="_blank">Paths Object</a></li>
+<li><code>components</code>: <a href="https://spec.openapis.org/oas/v3.0.3#components-object" target="_blank">Components Object</a></li>
+</ul>
+
+<p>Refer to the <a href="https://spec.openapis.org/oas/v3.0.3#openapi-object" target="_blank">OpenAPI Object</a> for a complete list of top-level (i.e. root object) fields.</p>
+
+<h2 id="defining-endpoints">Defining Endpoints</h2>
+
+<p>Now, let&rsquo;s break down the process of defining endpoints in your OpenAPI document.</p>
+
+<h3 id="paths-and-methods">Paths and Methods</h3>
+
+<p>Endpoints are defined using the <code>paths</code> section. Each endpoint is associated with an HTTP method (e.g., GET, POST) and a URL path. Here&rsquo;s an example:</p>
+
+<pre><code class="language-yaml">paths:
+  /users:
+    get:
+      summary: Get a list of users
+      responses:
+        '200':
+          description: Successful response
+</code></pre>
+
+<blockquote>
+<p><strong>REF:</strong> <a href="https://spec.openapis.org/oas/v3.0.3#path-item-object" target="_blank">Path Item Object</a>.</p>
+</blockquote>
+
+<h3 id="parameters">Parameters</h3>
+
+<p>You can add parameters to your endpoints using the <code>parameters</code> section. Parameters can be path parameters, query parameters, headers, and more. Here&rsquo;s an example of a path parameter:</p>
+
+<pre><code class="language-yaml">paths:
+  /users/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+</code></pre>
+
+<p>Possible values for the <code>in</code> field are: &ldquo;query&rdquo;, &ldquo;header&rdquo;, &ldquo;path&rdquo; or &ldquo;cookie&rdquo;.</p>
+
+<blockquote>
+<p><strong>REF:</strong> <a href="https://spec.openapis.org/oas/v3.0.3#parameter-object" target="_blank">Parameter Object</a>.</p>
+</blockquote>
+
+<h2 id="structuring-data">Structuring Data</h2>
+
+<p>Defining request and response bodies, along with data types, is crucial for a well-documented API.</p>
+
+<h3 id="request-and-response-bodies">Request and Response Bodies</h3>
+
+<p>You can specify request and response bodies using the <code>requestBody</code> and <code>responses</code> sections. Here&rsquo;s how to define a request body:</p>
+
+<pre><code class="language-yaml">paths:
+  /users:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+</code></pre>
+
+<p>The use of <code>$ref</code> allows us to avoid having an inline schema for one that is defined separately from the path object. This is useful in scenarios where the referenced schema might need to be reused across different paths. We&rsquo;ll take a look at the <code>components/schemas</code> section <a href="#data-types">next</a>.</p>
+
+<blockquote>
+<p><strong>REF:</strong> <a href="https://spec.openapis.org/oas/v3.0.3#operationObject" target="_blank">Operation Object</a> and <a href="https://spec.openapis.org/oas/v3.0.3#requestBodyObject" target="_blank">Request Body Object</a>.</p>
+</blockquote>
+
+<h3 id="data-types">Data Types</h3>
+
+<p>Data types are defined under the <code>components/schemas</code> section.<br>
+Here&rsquo;s an example of defining a <code>User</code> schema:</p>
+
+<pre><code class="language-yaml">components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+</code></pre>
+
+<p>The <code>components</code> section not only supports defining <code>schemas</code> separate from where they should be referenced but also <code>responses</code>, <code>parameters</code>, <code>examples</code> and more. We&rsquo;ll take a look at some of these fields in more detail later.</p>
+
+<blockquote>
+<p><strong>REF:</strong> <a href="https://spec.openapis.org/oas/v3.0.3#components-object" target="_blank">Components Object</a>.</p>
+</blockquote>
+
+<h2 id="adding-metadata">Adding Metadata</h2>
+
+<p>Enhance your API documentation by adding metadata and grouping related endpoints.</p>
+
+<h3 id="api-information">API Information</h3>
+
+<p>The <code>info</code> section provides high-level information about your API, such as title, version, and description:</p>
+
+<pre><code class="language-yaml">info:
+  title: Your API
+  version: 1.0.0
+  description: This is a sample API documentation.
+</code></pre>
+
+<blockquote>
+<p><strong>REF:</strong> <a href="https://spec.openapis.org/oas/v3.0.3#info-object" target="_blank">Info Object</a>.</p>
+</blockquote>
+
+<h3 id="tags-and-grouping">Tags and Grouping</h3>
+
+<p>You can group related endpoints using tags (typically added within the <a href="https://spec.openapis.org/oas/v3.0.3#operation-object" target="_blank">Operation Object</a>):</p>
+
+<pre><code class="language-yaml">tags:
+  - name: Users
+    description: Operations related to users
+</code></pre>
+
+<p>But tags can also be defined at the top-level (i.e. root object).</p>
+
+<p>For example, <a href="https://www.fastly.com/" target="_blank">Fastly</a> uses the following conventions for its tags which determine how endpoints are documented on Fastly&rsquo;s <a href="https://developer.fastly.com/reference/api/" target="_blank">Developer Hub</a> (DevHub):</p>
+
+<pre><code class="language-yaml">tags:
+  - name: unlisted # Publish on DevHub at an unlisted URL and exclude from search results
+  - name: excludeFromSearch # Publish on DevHub but exclude from search results
+  - name: internal  # Do not publish on DevHub or build into API clients
+  - name: beta # Display &quot;beta&quot; notice on DevHub
+  - name: limited-availability # Display &quot;LA&quot; notice on DevHub
+</code></pre>
+
+<blockquote>
+<p><strong>REF:</strong> <a href="https://spec.openapis.org/oas/v3.0.3#tagObject" target="_blank">Tag Object</a>.</p>
+</blockquote>
+
+<h2 id="handling-errors">Handling Errors</h2>
+
+<p>Communicating errors is crucial in API design, and OpenAPI helps you to define your error responses.</p>
+
+<h3 id="status-codes">Status Codes</h3>
+
+<p>Specify status codes and their meanings in your <code>responses</code> section:</p>
+
+<pre><code class="language-yaml">paths:
+  /users/{userId}:
+    get:
+      responses:
+        '200':
+          description: Successful response
+        '404':
+          description: User not found
+</code></pre>
+
+<p>The <code>responses</code> field is a container for the expected responses of an operation. The container maps a HTTP response code (e.g. <code>200</code> or <code>404</code> etc) to the expected response.</p>
+
+<blockquote>
+<p><strong>REF:</strong> <a href="https://spec.openapis.org/oas/v3.0.3#responsesObject" target="_blank">Responses Object</a>.</p>
+</blockquote>
+
+<h3 id="error-responses">Error Responses</h3>
+
+<p>You can also define error responses with detailed information, and for specific response types:</p>
+
+<pre><code class="language-yaml">responses:
+  '400':
+    description: Invalid Credit
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/Error'
+</code></pre>
+
+<p>In the above example we describe a <code>400 Bad Request</code> error response that will have the <code>Content-Type</code> of <code>application/json</code> (i.e. the response will use JSON) and we reference an external schema.</p>
+
+<p>Below is an example schema definition that uses the popular &ldquo;Problem Details&rdquo; format from <a href="https://datatracker.ietf.org/doc/html/rfc7807" target="_blank">RFC 7807</a>:</p>
+
+<pre><code class="language-yaml">components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          example: &quot;https://example.com/probs/out-of-credit&quot;
+        title:
+          type: string
+          description: A short, human-readable summary of the problem.
+          example: &quot;You do not have enough credit.&quot;
+        status:
+          type: integer
+          description: The HTTP status code generated by the origin server for this occurrence of the problem.
+          example: 400
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem.
+          example: &quot;Your current balance is 30, but that costs 50.&quot;
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence of the problem.
+          example: &quot;/account/12345/msgs/abc&quot;
+      required:
+        - type
+        - title
+        - status
+</code></pre>
+
+<p>What this schema describes is the following example error JSON that a user might see:</p>
+
+<pre><code class="language-json"> {
+     &quot;type&quot;: &quot;https://example.com/probs/out-of-credit&quot;,
+     &quot;title&quot;: &quot;You do not have enough credit.&quot;,
+     &quot;detail&quot;: &quot;Your current balance is 30, but that costs 50.&quot;,
+     &quot;instance&quot;: &quot;/account/12345/msgs/abc&quot;,
+     &quot;balance&quot;: 30,
+     &quot;accounts&quot;: [&quot;/account/12345&quot;, &quot;/account/67890&quot;]
+ }
+</code></pre>
+
+<blockquote>
+<p><strong>REF:</strong> <a href="https://spec.openapis.org/oas/v3.0.3#responseObject" target="_blank">Response Object</a>.</p>
+</blockquote>
+
+<h2 id="testing-and-validation">Testing and Validation</h2>
+
+<p>Ensure the reliability of your API by testing and validating it using OpenAPI tools.</p>
+
+<h3 id="tools-for-validation">Tools for Validation</h3>
+
+<p>OpenAPI supports validating your API against the defined schemas using a variety of tools, such as <a href="https://swagger.io/tools/swagger-inspector/" target="_blank">Swagger Inspector</a> and <a href="https://stoplight.io/open-source/spectral" target="_blank">Spectral</a>.</p>
+
+<h3 id="generating-client-sdks">Generating Client SDKs</h3>
+
+<p>Using OpenAPI also helps with generating (and maintaining) client SDKs by using tools like <a href="https://swagger.io/tools/swagger-codegen/" target="_blank">Swagger Codegen</a> and <a href="https://openapi-generator.tech/" target="_blank">OpenAPI-Generator</a> to accelerate development for various programming languages.</p>
+
+<p>I&rsquo;ve written about this process on the <a href="https://dev.to/fastly" target="_blank">Fastly dev.to blog</a>:<br>
+<a href="https://dev.to/fastly/better-fastly-api-clients-with-openapi-generator-3lno" target="_blank">Better Fastly API clients with OpenAPI Generator</a></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Embracing OpenAPI as a core component of your API development process can lead to more efficient, well-documented, and collaborative projects.</p>
+
+<p>By understanding the key sections of an OpenAPI document and leveraging its capabilities, you can create APIs that are not only robust but also user-friendly.</p>
+
+<p>Whether you&rsquo;re a solo developer or part of a large team, OpenAPI is a powerful tool that simplifies API design and documentation, ultimately contributing to a better developer experience.</p>
+
+<p>In this brief guide, I&rsquo;ve explored the importance of OpenAPI in API development, discussed its benefits, and walked you through the process of writing an OpenAPI document.</p>
+
+<p>By breaking down the essential sections and providing practical examples, I hope you feel empowered to leverage OpenAPI for your next API project. Happy API designing!</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

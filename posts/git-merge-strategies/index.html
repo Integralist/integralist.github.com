@@ -1,0 +1,1033 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#git-merge-strategies">Git Merge Strategies</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#git-merge"><code>git merge</code></a></li>
+
+<li><a href="#git-merge-no-ff-edit"><code>git merge --no-ff --edit</code></a>
+<ul>
+<li><a href="#git-reset"><code>git reset</code></a></li>
+
+<li><a href="#force-the-merge-commit">Force the merge commit</a></li>
+
+<li><a href="#git-branch-contains"><code>git branch --contains</code></a></li>
+
+<li><a href="#losing-useful-history">Losing useful history</a></li>
+</ul></li>
+
+<li><a href="#git-merge-squash"><code>git merge --squash</code></a></li>
+
+<li><a href="#git-rebase"><code>git rebase</code></a></li>
+
+<li><a href="#git-rebase-interactive"><code>git rebase --interactive</code></a></li>
+
+<li><a href="#git-rebase-onto"><code>git rebase --onto</code></a></li>
+
+<li><a href="#git-format-patch"><code>git format-patch</code></a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="git-merge-strategies">Git Merge Strategies</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Imagine I have a <code>master</code> branch with one commit:</p>
+
+<pre><code>75eb1cb - (origin/master) README
+</code></pre>
+
+<p>This is a single <code>README.md</code> file with the following content:</p>
+
+<pre><code>- A: 1
+</code></pre>
+
+<p>Now imagine I have a branch from <code>master</code> called <code>feat/foo</code> and in that branch I&rsquo;ve made 3 additional commits:</p>
+
+<pre><code>* 41d4115 - Add C (also revert A)
+* 9e5626c - Modify A
+* 8e7965e - Add B
+</code></pre>
+
+<p>The contents of the <code>README.md</code> file is now:</p>
+
+<pre><code>- A: 1
+- B: 2
+- C: 3
+</code></pre>
+
+<p>Just to quickly clarify, you&rsquo;ll notice throughout this post that I use the command <code>git lg</code> which is actually an alias I have set within my <code>~/.gitconfig</code> that uses <code>git log</code> but modifies its behaviour with some additional git flags:</p>
+
+<pre><code>log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+</code></pre>
+
+<h2 id="git-merge"><code>git merge</code></h2>
+
+<p>So <code>git merge</code> is the standard workhorse for merging branches in git. It&rsquo;ll try to resolve the differences between the two branches the best way it can.</p>
+
+<p>If the source branch <code>feat/foo</code> (the branch you want to merge from) can be merged <em>cleanly</em> (e.g. there are no major diverges from the destination branch <code>master</code>, which is the branch the changes are being merged into), then git will be able to perform a simple &ldquo;fast-forward&rdquo;.</p>
+
+<p>What &ldquo;fast-forward: means is that git will change the <code>HEAD</code> (on the destination branch) to point to the new latest commit, and all the other commits from your source branch will also appear in the git log/history of the destination branch.</p>
+
+<blockquote>
+<p>Note: <code>HEAD</code> is an alias that points to a commit (typically <code>HEAD</code> is the latest commit in your branch). Even the branch name itself is an alias that refers to a commit (<em>most things</em> in git do simply resolve to commits). This is why when you have a long branch name, instead of <code>git push origin really-long-branch-name</code> you can just use <code>git push origin head</code> and git will figure out which branch you&rsquo;re on</p>
+</blockquote>
+
+<p>If you check <code>git lg</code> after doing a <code>git merge feat/foo</code>, you should see something like:</p>
+
+<pre><code>* 41d4115 - (HEAD -&gt; master, origin/feat/foo, feat/foo) Add C (also revert A)
+* 9e5626c - Modify A
+* 8e7965e - Add B
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>We can see all the commits from <code>feat/foo</code> were replayed onto <code>master</code> successfully.</p>
+
+<blockquote>
+<p>Note: you might not realise that there is a short cut to checking out a branch and then merging another branch into it: <code>git merge &lt;source&gt; &lt;destination&gt;</code>, which is the same as doing <code>git checkout &lt;destination&gt;</code> followed by <code>git merge &lt;source&gt;</code></p>
+</blockquote>
+
+<h2 id="git-merge-no-ff-edit"><code>git merge --no-ff --edit</code></h2>
+
+<p>Let&rsquo;s say you wanted a &ldquo;merge commit&rdquo; to happen (i.e. merge commits typically only occur if there has been a divergence between the branches which means git has to resolve the problem for you), then you can force git to use a &ldquo;merge commit&rdquo; even when there is no need for one (as is the case for me here).</p>
+
+<p>Using our previous example, which merged cleanly, let&rsquo;s say that a merge commit is what we wanted to have happen. Assuming you&rsquo;ve not pushed the branch to a remote, then you can safely go back to before the merge occurred using:</p>
+
+<pre><code>git reset --hard 75eb1cb
+</code></pre>
+
+<blockquote>
+<p>Note: <code>75eb1cb</code> being my first commit in <code>master</code></p>
+</blockquote>
+
+<h3 id="git-reset"><code>git reset</code></h3>
+
+<p>It&rsquo;s important to understand how <code>git reset</code> works, as it has three flags and if not used correctly could have bad side effects. The flags are:</p>
+
+<ul>
+<li><code>--soft</code></li>
+<li><code>--mixed</code></li>
+<li><code>--hard</code></li>
+</ul>
+
+<p>The way reset works is that you use one of the above flags, followed by the commit you want to reset the <code>HEAD</code> back to. So in our case we used the commit <code>75eb1cb</code>, which was our very first commit.</p>
+
+<p>If I had used the <code>--soft</code> flag instead, then it would have reset the <code>HEAD</code> back to the first commit, but any other commits that happened since would have their changes staged together in our git &lsquo;index&rsquo; waiting to be committed.</p>
+
+<p>If I had used the <code>--mixed</code> flag instead, then it would have reset the <code>HEAD</code> back to the first commit, but any other commits that happened since would have their changes applied to the working directory, ready for us to choose which changes to be added to the index (i.e. staged) and then finally committed.</p>
+
+<p>When using <code>--hard</code> though, any of the changes that came after the commit being reset to, are lost. They&rsquo;re not sitting in your staging index, nor are they available within your working directory either.</p>
+
+<p>So be careful whenever using the <code>--hard</code> flag.</p>
+
+<h3 id="force-the-merge-commit">Force the merge commit</h3>
+
+<p>Now we&rsquo;re back to where we were originally (a separate <code>feat/foo</code> branch and a <code>master</code> branch with a single commit), we can look at how to force a merge commit.</p>
+
+<p>To force a merge commit you&rsquo;ll need to use the <code>--no-ff</code> flag and then also use the <code>--edit</code> flag to allow you to modify the default merge commit message (otherwise git will provide its own commit message which is nearly always not useful or descriptive):</p>
+
+<pre><code>git merge --edit --no-ff feat/foo 
+</code></pre>
+
+<blockquote>
+<p>Note: <code>--edit</code> doesn&rsquo;t work without <code>--no-ff</code>, unless there is a <em>genuine</em> merge conflict</p>
+</blockquote>
+
+<p>Now if I look at my <code>git lg</code> I can see:</p>
+
+<pre><code>*   97f1257 - (HEAD -&gt; master) My custom merge commit message for 'feat/foo'
+|\  
+| * 41d4115 - (origin/feat/foo, feat/foo) Add C (also revert A)
+| * 9e5626c - Modify A
+| * 8e7965e - Add B
+|/  
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>We can see all the commits from <code>feat/foo</code> were replayed onto <code>master</code> successfully, but now you&rsquo;re able to more easily distinguish the three commits came from another branch (if using my <code>git lg</code> alias). Which is one of the main reasons to force a merge commit using <code>--no-ff</code> as it really helps keep a varied branch history.</p>
+
+<blockquote>
+<p>Notice <code>git log</code> will also show in its output for the merge commit<br>
+a field like <code>Merge: 75eb1cb 8e7965e 9e5626c 41d4115</code><br>
+Which helps (at a glance) to know more about what commits are inside the merge commit</p>
+</blockquote>
+
+<h3 id="git-branch-contains"><code>git branch --contains</code></h3>
+
+<p>The following command can be useful in locating where a commit has come from:</p>
+
+<pre><code>git branch --contains 9e5626c
+</code></pre>
+
+<p>In our case this will indicate that the commit we specified is part of our <code>master</code> branch. Now when you use <code>--contains</code> with a commit such as <code>9e5626c</code> (which was merged in from our feature branch) you&rsquo;ll see that git recognises this commit is part of multiple branches †.</p>
+
+<blockquote>
+<p>† until you delete the branch (e.g. <code>git branch -D feat/foo</code>)</p>
+</blockquote>
+
+<h3 id="losing-useful-history">Losing useful history</h3>
+
+<p>It&rsquo;s also worth mentioning, that even after the <code>feat/foo</code> branch has been deleted, git will still show (via <code>git log --graph</code>) those commits from our <code>feat/foo</code> branch as coming from an alternative path/branch history.</p>
+
+<p>This is a useful bit of information that can be lost when using other tools such as <code>git rebase</code> or <code>git merge --squash</code>, so you should discuss with your team what type of information you feel is useful to have when you look back at a project&rsquo;s git history before forging ahead with any one of the strategies I cover here.</p>
+
+<p>For example, some teams don&rsquo;t find being able to see that a set of commits actually came from another branch very useful: considering all commits/features should generally come in from separate branches/Pull Requests. So the use of rebase or squash isn&rsquo;t a concern for them. For a team like this, an aesthetically &lsquo;cleaner&rsquo; git commit history is preferred.</p>
+
+<p>Also, in teams where I&rsquo;ve worked and they&rsquo;ve utilised a &lsquo;squash&rsquo; strategy (see <a href="#4">below</a> for more details), we&rsquo;ve used the following structure for our commit message so it&rsquo;s clearer what&rsquo;s been squashed:</p>
+
+<pre><code>Closes #123 - New Feature X
+
+Squashed commit of the following:
+
+commit c7e4145f6e95e51fcff79d6b3476bcb19c058071
+commit 3275f1805c4f82298676aa3c61db8c65ee9f3428
+commit bb50fb69c2d131d0126fa9ae018377e6451678e2
+commit 7ceb49c352d812a91db0e87a8ed4c4cf426c0365
+commit 86d1de3c5133a403edf45343081353055c02b454
+commit 8f48e5b3c43acf71e8abab4b821cfdc66447b732
+commit ed857784feff091ece52d906e311ef7f64a49c3d
+commit a277e60c39333a55134c3e3ef6d97076f9bc8370
+commit dd7e1973fe91f29887928aad9d991be24efb143a
+commit ff7e7dabf745ac4d73b52644c3d29ea05d5c318f
+commit 36f1c5bc5949f01117c1d57e6ab12f05c2a202f5
+</code></pre>
+
+<h2 id="git-merge-squash"><code>git merge --squash</code></h2>
+
+<p>So what if you don&rsquo;t want all those commits in your <code>master</code>? You could instead &ldquo;squash&rdquo; all the commits down into a single commit using the <code>--squash</code> command:</p>
+
+<pre><code>git merge --squash feat/foo
+</code></pre>
+
+<p>Now what this does is take my changes from the source branch <code>feat/foo</code> and automatically squashes those separate commits into a single change that&rsquo;s placed into the staging area of my destination branch.</p>
+
+<p>These collection of changes <em>now</em> appear as a single change to the file. They aren&rsquo;t actually <em>merged</em> yet. So you have the opportunity to change the commit message:</p>
+
+<pre><code>git commit -m &quot;your own custom commit message&quot;
+</code></pre>
+
+<h2 id="git-rebase"><code>git rebase</code></h2>
+
+<p>The <code>git rebase</code> feature in essence is solving the same problem as <code>git merge</code> (they both integrate a set of changes), but they do them in fundamentally different ways.</p>
+
+<p>With <code>git merge</code> a merge commit is utilised to resolve conflicts and so is considered <em>non-destructive</em>. What this means is that the commits within either branch (destination or source) aren&rsquo;t modified in any way.</p>
+
+<p>With <code>git rebase</code> the source branch commits are placed <em>before</em> the destination branch&rsquo;s commits, but also the source commits are recreated inside the destination branch.</p>
+
+<p>Let&rsquo;s look and see what this does for us:</p>
+
+<pre><code>git rebase feat/foo
+</code></pre>
+
+<p>We can see that as there were no conflicts, git was able to &ldquo;fast-forward&rdquo; the commits. So in theory this is no different right now from originally doing <code>git merge feat/foo</code>.</p>
+
+<p>But what if <code>master</code> had a new change committed to it, and this change happened <em>after</em> we had branched off with <code>feat/foo</code>? For example, I&rsquo;ll add a second commit to <code>master</code> that changes <code>- A: 1</code> to <code>- A: 9</code>.</p>
+
+<p>If I run <code>git rebase feat/foo</code> I should see we get a merge conflict and one that git doesn&rsquo;t know how to resolve:</p>
+
+<pre><code>First, rewinding head to replay your work on top of it...
+Applying: A to 9
+Using index info to reconstruct a base tree...
+M	README.md
+Falling back to patching base and 3-way merge...
+Auto-merging README.md
+CONFLICT (content): Merge conflict in README.md
+error: Failed to merge in the changes.
+Patch failed at 0001 A to 9
+The copy of the patch that failed is found in: .git/rebase-apply/patch
+
+When you have resolved this problem, run &quot;git rebase --continue&quot;.
+If you prefer to skip this patch, run &quot;git rebase --skip&quot; instead.
+To check out the original branch and stop rebasing, run &quot;git rebase --abort&quot;.
+</code></pre>
+
+<p>We can see from the information git has given us that it first rewinded <code>master</code> back to the first commit <code>75eb1cb</code> in order for it to place our <code>feat/foo</code> commits on top of it (as that initial commit is where our branch originally forked from).</p>
+
+<p>From there we can see once git replayed our <code>feat/foo</code> commits on top of <code>75eb1cb</code> that it then tried to apply the new commit that <code>feat/foo</code> didn&rsquo;t have (e.g. <code>Applying: A to 9</code>) and it failed to do so.</p>
+
+<p>Git tells us that there was a merge conflict:</p>
+
+<pre><code>CONFLICT (content): Merge conflict in README.md
+</code></pre>
+
+<p>It&rsquo;s up to us to open <code>README.md</code> and to resolve the conflict ourself. When I open the file I see:</p>
+
+<pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; 41d411564c1dc3106f03427d1b5920d05d95e037
+- A: 1
+- B: 2
+- C: 3
+||||||| merged common ancestors
+- A: 1
+=======
+- A: 9
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; A to 9
+</code></pre>
+
+<p>So the above shows the file is split into three:</p>
+
+<ol>
+<li><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; &lt;commit_hash&gt;</code></li>
+<li><code>||||||| merged common ancestors</code></li>
+<li><code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; &lt;commit_message&gt;</code></li>
+</ol>
+
+<p>I know that I&rsquo;m happy for the line <code>- A: 1</code> (which was changed in my <code>feat/foo</code> branch commit <code>41d4115</code>) to be changed to <code>- A: 9</code> (which was changed in <code>master</code> after I originally branched from it). So I manually make that change by deleting all the added noise (e.g. <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> and <code>||||||| merged common ancestors</code> etc) so I&rsquo;m left with just the content the file should be expected to have now.</p>
+
+<p>I update it to look like:</p>
+
+<pre><code>- A: 9
+- B: 2
+- C: 3
+</code></pre>
+
+<p>I now must run the following commands:</p>
+
+<ul>
+<li><code>git add README.md</code> (as I&rsquo;ve made a change to the file at this point in time)</li>
+<li><code>git rebase --continue</code></li>
+</ul>
+
+<p>We see that git is trying again now to apply the commit (but this time there is no merge conflict info inside of the README) and so we see the output:</p>
+
+<pre><code>Applying: A to 9
+</code></pre>
+
+<p>Now when looking at the output from <code>git lg</code> I see:</p>
+
+<pre><code>* 7c001cd - (HEAD -&gt; master) A to 9
+* 41d4115 - (origin/feat/foo, feat/foo) Add C (also revert A)
+* 9e5626c - Modify A
+* 8e7965e - Add B
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>This shows that the changes from <code>feat/foo</code> where replayed directly on top of <code>75eb1cb</code>. Otherwise if we didn&rsquo;t use git&rsquo;s rebase feature but a standard <code>git merge</code>, we could&rsquo;ve ended up with a git history that looked like the following:</p>
+
+<pre><code>* 41d4115 - (origin/feat/foo, feat/foo) Add C (also revert A)
+* 9e5626c - Modify A
+* 8e7965e - Add B
+* 65553e0 - (HEAD -&gt; master) A to 9
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>Notice the <code>feat/foo</code> commits are on top of the <code>A to 9</code> commit and that might not necessarily be what we want to have happen.</p>
+
+<blockquote>
+<p>Note: it&rsquo;s usually better to use <code>git pull --rebase &lt;remote&gt; &lt;branch&gt;</code> as this will ensure that you get the latest copy of changes for the specified branch (as apposed to <code>git rebase &lt;branch&gt;</code> which will just be the local copy of that branch (remember <code>git pull</code> is an abstraction on top of <code>git fetch</code>, then <code>git merge</code>).</p>
+</blockquote>
+
+<h2 id="git-rebase-interactive"><code>git rebase --interactive</code></h2>
+
+<p>The <code>--interactive</code> flag is useful for letting us rewrite our git history. We&rsquo;re able to move the order of our commits as well as squash commits down and change their recorded message.</p>
+
+<p>So let&rsquo;s assume we want to squash all but the first commit in our <code>feat/foo</code> branch. By that I mean we currently have:</p>
+
+<pre><code>* b4f9dfd - (HEAD -&gt; feat/foo) Add C (also revert A)
+* 7354a41 - Modify A
+* c321b40 - Add B
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>Let&rsquo;s say we want &ldquo;Add B&rdquo;, &ldquo;Modify A&rdquo; and &ldquo;Add C (also revert A)&rdquo; squashed into one commit. To do this we need to locate the parent commit of the earliest commit we want to squash.</p>
+
+<p>So &ldquo;Add B&rdquo; is the earliest commit we want as part of the squash, so the parent commit is &ldquo;README&rdquo;. To action the rebase let&rsquo;s run the following command:</p>
+
+<pre><code>git rebase --interactive 75eb1cb
+</code></pre>
+
+<p>This drops us into an editor with the following output:</p>
+
+<pre><code>pick c321b40 Add B
+pick 7354a41 Modify A
+pick b4f9dfd Add C (also revert A)
+
+# Rebase 75eb1cb..b4f9dfd onto 75eb1cb (3 command(s))
+#
+# Commands:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like &quot;squash&quot;, but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+# d, drop = remove commit
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out
+</code></pre>
+
+<p>We can modify it like so:</p>
+
+<pre><code>pick c321b40 Add B
+squash 7354a41 Modify A
+squash b4f9dfd Add C (also revert A)
+</code></pre>
+
+<p>This will result in the following combined commit details:</p>
+
+<pre><code># This is a combination of 3 commits.
+# The first commit's message is:
+Add B
+
+# This is the 2nd commit message:
+
+Modify A
+
+# This is the 3rd commit message:
+
+Add C (also revert A)
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Sun May 15 17:29:32 2016 +0100
+#
+# interactive rebase in progress; onto 75eb1cb
+# Last commands done (3 commands done):
+#    squash 7354a41 Modify A
+#    squash b4f9dfd Add C (also revert A)
+# No commands remaining.
+# You are currently editing a commit while rebasing branch 'feat/foo' on '75eb1cb'.
+#
+# Changes to be committed:
+#	modified:   README.md
+#
+</code></pre>
+
+<p>Now if we run <code>git lg -p</code> we&rsquo;ll see the new squashed commit does indeed contain all the previous commit&rsquo;s contents:</p>
+
+<pre><code>* b63857d - (HEAD -&gt; feat/foo) Add B (16 minutes ago)| 
+| diff --git a/README.md b/README.md
+| index 428f59e..f2e26b6 100644
+| --- a/README.md
+| +++ b/README.md
+| @@ -1 +1,3 @@
+|  - A: 1
+| +- B: 2
+| +- C: 3
+</code></pre>
+
+<h2 id="git-rebase-onto"><code>git rebase --onto</code></h2>
+
+<p>Imagine we&rsquo;ve merged our <code>feat/foo</code> branch at this point into <code>master</code> using:</p>
+
+<pre><code>git merge --squash feat/foo
+</code></pre>
+
+<blockquote>
+<p>Note: you&rsquo;ll need to fix a conflict first for it to be successful</p>
+</blockquote>
+
+<p>So <code>master</code> should now have three commits:</p>
+
+<pre><code>* 19ec1bb - (HEAD -&gt; master) Merge feat/foo
+* 3fc460b - A to 9
+* 75eb1cb - (origin/master) README
+</code></pre>
+
+<p>What&rsquo;s the easiest way to delete the middle/second commit <code>3fc460b</code>? We could use <code>git rebase --interactive</code> to delete the commit from history, but there is an alternative that&rsquo;s much easier:</p>
+
+<pre><code>git rebase --onto 75eb1cb 3fc460b
+</code></pre>
+
+<blockquote>
+<p>Note: in this scenario you&rsquo;ll get a conflict that you&rsquo;ll need to resolve first (e.g. we&rsquo;re removing a commit that sets A to the value 9 but that change was also pulled into the <code>feat/foo</code> branch so git isn&rsquo;t sure whether you definitely want that change any more or not), but in most cases you&rsquo;ll likely have a clean rebase</p>
+</blockquote>
+
+<p>The basic structure of this command is:</p>
+
+<pre><code>git rebase --onto &lt;commit_to_become_new_base&gt; &lt;commit_to_delete&gt;
+</code></pre>
+
+<p>For more information see the documentation for <code>git rebase</code>:</p>
+
+<ul>
+<li><code>man git-rebase</code></li>
+<li><a href="https://git-scm.com/docs/git-rebase" target="_blank">git-scm.com/docs/git-rebase</a></li>
+</ul>
+
+<h2 id="git-format-patch"><code>git format-patch</code></h2>
+
+<p>At this point you&rsquo;re likely using a service such as <a href="https://github.com/" target="_blank">GitHub</a> or <a href="https://about.gitlab.com/" target="_blank">GitLab</a> for creating projects and opening pull requests, as apposed to Git&rsquo;s own native pull request feature which is substantially less feature rich than these commercial abstraction layers.</p>
+
+<p>But sometimes just accepting a &lsquo;patch&rsquo; from someone and being able to apply it quickly and easily is what you want to do. So that&rsquo;s where <code>git format-patch</code> comes in.</p>
+
+<p>Imagine you have a centralised <code>master</code> branch and someone has branched off from its <code>HEAD</code> to a new branch called <code>cool-new-features</code> and they would like you to merge their changes directly with the centralised repository&rsquo;s <code>master</code> branch.</p>
+
+<p>This person would need to execute the following command:</p>
+
+<pre><code>git format-patch master
+</code></pre>
+
+<blockquote>
+<p>Note: you can swap the branch <code>master</code> for any valid commit, alias or range</p>
+</blockquote>
+
+<p>What this will end up doing is generating a &lsquo;patch&rsquo; file for each new commit that isn&rsquo;t available in master. Below is an example patch file generated from a test repo I was messing around with, and which actually generated two patch files for me (this being the first one):</p>
+
+<pre><code>From 64a903d2ed6b4280d4a0914aaf50f014ae05cdd3 Mon Sep 17 00:00:00 2001
+From: Integralist &lt;mark.mcdx@gmail.com&gt;
+Date: Tue, 31 May 2016 08:28:56 +0100
+Subject: [PATCH 1/2] G
+
+---
+ foo.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/foo.txt b/foo.txt
+index b1e6722..6f04b1d 100644
+--- a/foo.txt
++++ b/foo.txt
+@@ -1,3 +1,4 @@
+ A
+ B
+ C
++G
+-- 
+2.7.4
+</code></pre>
+
+<blockquote>
+<p>Note: if you want a single patch file you can use<br>
+the <code>--stdout</code> flag and redirect the output to a file<br>
+<code>git format-patch master --stdout &gt; new-feature.patch</code></p>
+</blockquote>
+
+<p>The person who generates the patch file(s) will then need to send them to you (which can be done using <code>git send-email</code>):</p>
+
+<pre><code>git send-email -to devlist@example.org 0001-A.patch
+</code></pre>
+
+<p>If it&rsquo;s you sending the patch via git, then you may need to configure git to use your mail server details:</p>
+
+<pre><code>git config --global sendemail.smtpserver smtp.my-isp.com
+git config --global sendemail.smtpserverport 465
+</code></pre>
+
+<p>You, as the recipient of the patch file(s), can then review and apply the patch using:</p>
+
+<pre><code>git checkout review-new-feature
+cat new-feature.patch | git am # single patch file
+cat *.patch | git am           # multiple patch files
+</code></pre>
+
+<p>Also of interest, if using GitHub for Pull Requests, is that you can add a <code>.patch</code> extension to the end of a PR path or commit path for it to generate a patch for you! So you can utilise GitHub for some of the nice &lsquo;review&rsquo; features, but then utilise classic/traditional communication and application of patches if you so choose (maybe for an older/internal system).</p>
+
+<p>So if you have a GitHub PR URL like <code>https://github.com/my-org/my-repo/pull/123</code>, then you can convert this into a patch file using <code>https://github.com/my-org/my-repo/pull/123.patch</code></p>
+
+<p>Git also offers you the <code>git apply</code> command to use in place of <code>git am</code>. The reason being is that <code>git am</code> actually commits the changes in the patch, whereas <code>git apply</code> will only affect your working directory, so you&rsquo;ll have the opportunity to stage and commit the changes however you like. Unless you use the <code>--cached</code> or <code>--index</code> flags (see <code>man git-apply</code> for details).</p>
+
+<blockquote>
+<p>Note: <code>git apply</code> also has a <code>--reverse</code> flag to manipulate the order when applying multiple patchess</p>
+</blockquote>
+
+<p>The other difference is that <code>git am</code> only accepts patch files, whereas <code>git apply</code> accepts patch files and also output from <code>git diff</code>. So you have more options available to you that way. For example:</p>
+
+<pre><code>curl https://gist.githubusercontent.com/anonymous/x/raw/x/test.diff | git apply
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There are so many aspects to merging commits and dealing with git&rsquo;s commit history, that it&rsquo;s difficult to cover everything without people having to mentally store too much information that most of the time you wont utilise.</p>
+
+<p>For example, I&rsquo;ve not covered anything to do with pulling commits: <code>git pull --strategy</code>, <code>git pull --squash</code>, <code>git pull --rebase</code>, <code>git pull --ff-only</code> and <code>git pull --no-commit</code>. Each have their use cases, but I think sometimes you&rsquo;re better picking a single strategy and defining it as a standard within your development team.</p>
+
+<p>If you&rsquo;re interested in one git workflow approach that utilises git&rsquo;s rebasing feature, and I&rsquo;ve used with success in the past at the BBC, then I recommend you have a read of this blog post I wrote a few years ago: <a href="http://www.integralist.co.uk/posts/github-workflow.html" target="_blank">integralist.co.uk/posts/github-workflow</a></p>
+
+<p>I&rsquo;ve also written about other types of git &ldquo;workflows&rdquo; as part of BBC News&rsquo; &ldquo;Coding Best Practices&rdquo; working group: <a href="https://github.com/bbc/news-coding-best-practices/blob/master/git-workflow.md" target="_blank">github.com/bbc/news-coding-best-practices/git-workflow</a></p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

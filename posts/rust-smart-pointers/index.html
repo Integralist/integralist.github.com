@@ -1,0 +1,615 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#rust-smart-pointers">Rust Smart Pointers</a>
+<ul>
+<li><a href="#summary">Summary</a>
+<ul>
+<li><a href="#quick-notes">Quick notes</a></li>
+</ul></li>
+
+<li><a href="#important">IMPORTANT</a></li>
+
+<li><a href="#context">Context</a></li>
+
+<li><a href="#box-t"><code>Box&lt;T&gt;</code></a></li>
+
+<li><a href="#rc-t"><code>Rc&lt;T&gt;</code></a></li>
+
+<li><a href="#arc-t"><code>Arc&lt;T&gt;</code></a></li>
+
+<li><a href="#cell-t-refcell-t"><code>Cell&lt;T&gt;</code>/<code>RefCell&lt;T&gt;</code></a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="rust-smart-pointers">Rust Smart Pointers</h1>
+
+<h2 id="summary">Summary</h2>
+
+<p>The five types covered: <code>Box</code>, <code>Rc</code>, <code>Arc</code>, <code>Cell</code>, <code>RefCell</code>.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: Not discussed are <code>Mutex&lt;T&gt;</code> and <code>RwLock&lt;T&gt;</code>,<br>
+which provide mutual-exclusion.</p>
+</blockquote>
+
+<ul>
+<li><code>Box&lt;T&gt;</code>: A pointer type for heap allocation.</li>
+<li><code>Rc&lt;T&gt;</code>: Single-threaded &lsquo;multiple owners&rsquo; pointer (immutable).</li>
+<li><code>Arc&lt;T&gt;</code>: Thread-safe &lsquo;multiple owners&rsquo; pointer (immutable).</li>
+<li><code>Cell&lt;T&gt;</code>: Single-threaded mutability for <code>Copy</code> types.</li>
+<li><code>RefCell&lt;T&gt;</code>: Single-threaded mutability for reference types.</li>
+</ul>
+
+<h3 id="quick-notes">Quick notes</h3>
+
+<p><code>Rc&lt;T&gt;</code> and <code>Arc&lt;T&gt;</code> both support mutability by wrapping the inner value with another type. <code>Cell&lt;T&gt;</code> or <code>RefCell&lt;T&gt;</code> for <code>Rc</code>, and <code>Mutex&lt;T&gt;</code>, <code>RwLock&lt;T&gt;</code> or one of the <code>Atomic*</code> types for <code>Arc</code>.</p>
+
+<p><code>Arc&lt;T&gt;</code>&rsquo;s thread-safety comes at a cost: additional performance overhead.<br>
+So choose <code>Rc</code> whenever possible.</p>
+
+<p><code>Cell&lt;T&gt;</code> behaves like an exclusive borrow, aka a <code>&amp;mut T</code> (meaning the compiler won&rsquo;t let you have multiple mutable borrows), while <code>RefCell&lt;T&gt;</code> removes the compile-time borrow-checks so that it can provide more flexibility than <code>Cell&lt;T&gt;</code> has (which is constrained to <code>Copy</code> types only).</p>
+
+<p>Subsequently <code>RefCell</code> introduces the possibility of ending up with multiple mutable borrows. The borrow rules for <code>RefCell</code> aren&rsquo;t statically checked at compile time but dynamically checked at <em>runtime</em>, which means this type is capable of triggering a panic if multiple mutable borrows is detected.</p>
+
+<h2 id="important">IMPORTANT</h2>
+
+<p>I&rsquo;m not the author of the <em>following</em> content.</p>
+
+<p>My own summary/quick notes (above) are sufficient for my own reference, but in case it&rsquo;s not, then the following content may be useful to you.</p>
+
+<p>Rather than link off to various intertwined documentation pages, with lots of extra cruft that can muddy the essentials of what you need to know. I read through the official Rust documentation and cherry-picked useful subsets of that information and grouped it in a way that helped me to more easily make sense of the topic.</p>
+
+<p>This means I take no credit for the following content.<br>
+It was written by many people much smarter than me.</p>
+
+<h2 id="context">Context</h2>
+
+<p>A <em>pointer</em> is a general concept for a variable that contains an address in memory. This address refers to, or “points at,” some other data. The most common kind of pointer in Rust is a reference. References are indicated by the &amp; symbol and borrow the value they point to. They don’t have any special capabilities other than referring to data, and have no overhead.</p>
+
+<p><em>Smart pointers</em>, on the other hand, are data structures that act like a pointer but also have additional metadata and capabilities.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: Both <code>String</code> and <code>Vec&lt;T&gt;</code> types count as smart pointers because they own some memory and allow you to manipulate it. They also have metadata and extra capabilities or guarantees.</p>
+</blockquote>
+
+<p>Smart pointers are usually implemented using structs. Unlike an ordinary struct, smart pointers implement the <code>Deref</code> and <code>Drop</code> traits. The <code>Deref</code> trait allows an instance of the smart pointer struct to behave like a reference so you can write your code to work with either references or smart pointers. The <code>Drop</code> trait allows you to customize the code that&rsquo;s run when an instance of the smart pointer goes out of scope.</p>
+
+<h2 id="box-t"><code>Box&lt;T&gt;</code></h2>
+
+<p>Boxes allow you to store data on the heap rather than the stack. What remains on the stack is the pointer to the heap data.</p>
+
+<p>Usage:</p>
+
+<ul>
+<li>When you have a type whose size can’t be known at compile time and you want to use a value of that type in a context that requires an exact size (e.g. recursive data types).</li>
+<li>When you have a large amount of data and you want to transfer ownership but ensure the data won’t be copied when you do so (e.g. only the small amount of pointer data is copied around on the stack, while the data it references stays in one place on the heap).</li>
+<li>When you want to own a value and you care only that it’s a type that implements a particular trait rather than being of a specific type (i.e. <em>trait objects</em> used for dynamic dispatch).</li>
+</ul>
+
+<h2 id="rc-t"><code>Rc&lt;T&gt;</code></h2>
+
+<p>This type is an abbreviation for <em>reference counting</em> and it enables multiple ownership. It lets us have multiple “owning” pointers to the same data, and the data will be freed (destructors will be run) when all pointers are out of scope.</p>
+
+<p>We use the <code>Rc&lt;T&gt;</code> type when we want to allocate some data on the heap for multiple parts of our program to read and we can’t determine at compile time which part will finish using the data last.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: <code>Rc&lt;T&gt;</code> is only for use in single-threaded scenarios. When shared ownership between threads is needed, <code>Arc&lt;T&gt;</code> (Atomic Reference Counted) can be used.</p>
+</blockquote>
+
+<h2 id="arc-t"><code>Arc&lt;T&gt;</code></h2>
+
+<p>The same as <code>Rc&lt;T&gt;</code> but thread-safe (it has the same API as <code>Rc&lt;T&gt;</code> to make them interchangeable). But thread-safety comes with a performance cost so if you don&rsquo;t need thread-safety, then definitely opt for <code>Rc&lt;T&gt;</code> instead.</p>
+
+<h2 id="cell-t-refcell-t"><code>Cell&lt;T&gt;</code>/<code>RefCell&lt;T&gt;</code></h2>
+
+<p>Rust memory safety is based on this rule: Given an object <code>T</code>, it is only possible to have one of the following:</p>
+
+<ul>
+<li>Having several immutable references (<code>&amp;T</code>) to the object.</li>
+<li>Having one mutable reference (<code>&amp;mut T</code>) to the object.</li>
+</ul>
+
+<p>This rule can be bent using <code>Cell&lt;T&gt;</code> and is referred to as <em>interior mutability</em>.</p>
+
+<p><code>Cell&lt;T&gt;</code> implements interior mutability by moving values in and out of the <code>Cell&lt;T&gt;</code>. To use references instead of values, use the <code>RefCell&lt;T&gt;</code> type, and acquire a write lock before mutating.</p>
+
+<p>Borrows for <code>RefCell&lt;T&gt;</code>s are tracked <em>at runtime</em>, unlike Rust’s native reference types which are entirely tracked statically, at compile time.</p>
+
+<p>Because <code>RefCell&lt;T&gt;</code> borrows are <em>dynamic</em> it is possible to attempt to borrow a value that is already mutably borrowed; when this happens it results in thread panic.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: Neither <code>Cell&lt;T&gt;</code> nor <code>RefCell&lt;T&gt;</code> are thread-safe.<br>
+The <code>Sync</code> marker trait is not implemented.</p>
+</blockquote>
+
+<p>Many shared smart pointer types, including <code>Rc&lt;T&gt;</code> and <code>Arc&lt;T&gt;</code>, provide containers that can be cloned and shared between multiple parties. The contained values can only be borrowed with <code>&amp;</code>, not <code>&amp;mut</code>. Without cells it would be impossible to mutate data inside of these smart pointers at all.</p>
+
+<p>It’s very common then to put a <code>RefCell&lt;T&gt;</code> inside shared pointer types to reintroduce mutability. But as <code>RefCell&lt;T&gt;</code>s are for single-threaded scenarios, consider using <code>RwLock&lt;T&gt;</code> or <code>Mutex&lt;T&gt;</code> instead of <code>RefCell&lt;T&gt;</code> if you need shared mutability in a multi-threaded situation.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

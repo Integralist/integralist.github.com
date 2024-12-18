@@ -1,0 +1,1132 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#github-actions">GitHub Actions</a>
+<ul>
+<li><a href="#terminology">Terminology</a></li>
+
+<li><a href="#documentation">Documentation</a></li>
+
+<li><a href="#experimenting">Experimenting</a></li>
+
+<li><a href="#workflows">Workflows</a></li>
+
+<li><a href="#events">Events</a></li>
+
+<li><a href="#environment">Environment</a></li>
+
+<li><a href="#example-job">Example Job</a></li>
+
+<li><a href="#environment-variables">Environment Variables</a></li>
+
+<li><a href="#secrets">Secrets</a></li>
+
+<li><a href="#third-party-actions">Third Party Actions</a></li>
+
+<li><a href="#conditions">Conditions</a></li>
+
+<li><a href="#persisting-data">Persisting Data</a>
+<ul>
+<li><a href="#using-shared-job-data-to-determine-if-subsequent-job-should-run">Using shared job data to determine if subsequent job should run</a></li>
+
+<li><a href="#persist-data-using-strategy-matrix">Persist data using <code>strategy.matrix</code></a></li>
+
+<li><a href="#clarify-the-cache-action">Clarify the cache action</a></li>
+</ul></li>
+
+<li><a href="#reusable-workflows">Reusable Workflows</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="github-actions">GitHub Actions</h1>
+
+<blockquote>
+<p><a href="https://github.com/features/actions" target="_blank">GitHub Actions</a> makes it easy to automate all your software workflows, now with world-class CI/CD. Build, test, and deploy your code right from GitHub.</p>
+</blockquote>
+
+<p>I&rsquo;ve been using GitHub Actions a lot recently and I&rsquo;ve found it to be immensely flexible and feature rich. I think it&rsquo;s well worth your time learning how to run your CI/CD pipelines via GitHub Actions, and in this post that&rsquo;s exactly what we&rsquo;re going to dig into.</p>
+
+<h2 id="terminology">Terminology</h2>
+
+<p>It all starts with a &lsquo;workflow&rsquo;.</p>
+
+<p>A workflow is a yaml configuration file that defines:</p>
+
+<ul>
+<li><strong>Jobs</strong>: a job represents a collection of &lsquo;steps&rsquo;.</li>
+<li><strong>Steps</strong>: each &lsquo;step&rsquo; does something useful (e.g. executes a piece of code).</li>
+<li><strong>Events</strong>: an event determines when your &lsquo;jobs&rsquo; should run.</li>
+</ul>
+
+<p>GitHub has a nice visualisation of this&hellip;</p>
+
+<p><a href="../../assets/images/overview-actions-simple.png">
+<img src="../../assets/images/overview-actions-simple.png">
+</a>
+<p></p></p>
+
+<blockquote>
+<p><strong>NOTE</strong>: Each job you define will run in parallel. If you need jobs to run sequentially, then you&rsquo;ll need to configure a job to depend on another job using the <code>needs</code> property (we&rsquo;ll see an example of this later).</p>
+</blockquote>
+
+<h2 id="documentation">Documentation</h2>
+
+<p>I would strongly suggest bookmarking the <a href="https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions" target="_blank">official documentation</a> because it&rsquo;s very thorough. Unfortunately it&rsquo;s so thorough that it can be a bit overwhelming, but don&rsquo;t worry, once you&rsquo;ve gotten familiar with the various concepts you&rsquo;ll start to remember where the important information is located.</p>
+
+<p>The pages I use the most are:</p>
+
+<ul>
+<li><strong><a href="https://docs.github.com/en/actions/learn-github-actions/expressions" target="_blank">Expressions</a></strong>: explains how to use GitHub&rsquo;s builtin functions, like <code>contains()</code>, <code>fromJSON()</code>, and functions like <code>success()</code> and <code>failure()</code> that tell you the state of previous steps that have run.</li>
+<li><strong><a href="https://docs.github.com/en/actions/learn-github-actions/contexts" target="_blank">Contexts</a></strong>: there are lots of contextual objects your jobs can use, such as objects for getting information about git (what branch we&rsquo;re dealing with, the commit SHA etc), environment variables, secrets, data exposed by other jobs and lots more.</li>
+<li><strong><a href="https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions" target="_blank">Syntax</a></strong>: this is the most important page as it details all the yaml configuration syntax (so I come here often).</li>
+<li><strong><a href="https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions" target="_blank">Commands</a></strong>: when executing a shell command (or script) you can use <code>echo</code> with a specific format and, depending on the format used, it&rsquo;ll take on special meaning to the workflow runner and can be used (among other things) for displaying rich messaging in the GitHub UI.</li>
+<li><strong><a href="https://docs.github.com/en/actions/learn-github-actions/environment-variables" target="_blank">Environment variables</a></strong>: most of the &lsquo;context&rsquo; properties are also exposed as environment variables to make it easier for your shell commands/scripts to utilise.</li>
+<li><strong><a href="https://docs.github.com/en/actions/learn-github-actions/reusing-workflows" target="_blank">Reusing workflows</a></strong>: If you have a bunch of jobs all doing a similar thing (e.g. you&rsquo;ve three jobs and each of them setup a specific set of environment variables before installing the rust programming language), then you can move that duplication into a separate workflow file that your main workflow can call out to.</li>
+</ul>
+
+<h2 id="experimenting">Experimenting</h2>
+
+<p>The best thing to do when it comes to learning GitHub Actions is to create a test repo as a playground, like I did here: <a href="https://github.com/Integralist/actions-testing" target="_blank">https://github.com/Integralist/actions-testing</a>.</p>
+
+<p>You can of course use an existing repo if you want, but I prefer to use something completely decoupled when I&rsquo;m testing a new tool.</p>
+
+<h2 id="workflows">Workflows</h2>
+
+<p>As I mentioned earlier: everything starts with a workflow.</p>
+
+<p>To create a workflow you must save a yaml file into the <code>.github/workflows</code> directory of your project&rsquo;s git repo.</p>
+
+<p>In the following example you&rsquo;ll see I have created three separate workflows:</p>
+
+<pre><code>├── .github
+│   └── workflows
+│       ├── my-first-workflow.yaml
+│       ├── my-second-workflow.yaml
+│       └── my-third-workflow.yaml
+</code></pre>
+
+<p>You can create as many workflows as you need to, and you can name a workflow file anything you like.</p>
+
+<h2 id="events">Events</h2>
+
+<p>Once we create a workflow file, let&rsquo;s see how we can trigger any jobs that are defined within the workflow. Be aware that in the following example workflow I have not defined any jobs, I&rsquo;m focusing on the events configuration only:</p>
+
+<pre><code class="language-yaml">name: My Workflow
+on:
+  push:
+  schedule:
+    - cron: &quot;0 0 1 * *&quot;   # https://crontab.guru/every-month
+    - cron: &quot;*/5 * * * *&quot; # https://crontab.guru/every-5-minutes
+</code></pre>
+
+<p>So we can see I&rsquo;ve given my workflow a name using the <code>name</code> key, and I&rsquo;ve defined some events using the <code>on</code> key:</p>
+
+<ul>
+<li><code>push</code>: any push to your repo, whether it be to your <code>main</code> branch or a pull-request branch, will trigger your job(s) to run.</li>
+<li><code>schedule</code>: run your job(s) on a schedule using cron syntax, which in this example triggers job(s) every five minutes and monthly.</li>
+</ul>
+
+<blockquote>
+<p><strong>NOTE</strong>: <a href="https://crontab.guru/" target="_blank">https://crontab.guru/</a> makes dealing with cron syntax easy.</p>
+</blockquote>
+
+<p>Refer to GitHub&rsquo;s <a href="https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows" target="_blank">events documentation</a> to learn more about the various events you can configure. For example, you can restrict a workflow to only execute against a specific branch.</p>
+
+<h2 id="environment">Environment</h2>
+
+<p>Each job runs inside its own virtual machine &lsquo;runner&rsquo;, which means (just as an example) files you create, or data you produce, will not persist across jobs. This includes things like environment variables.</p>
+
+<h2 id="example-job">Example Job</h2>
+
+<p>Let&rsquo;s take a look at a very simple job:</p>
+
+<pre><code class="language-yaml">name: Test Workflow
+on: push
+jobs:
+  simple-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say Hello
+        run: echo 'hello'
+</code></pre>
+
+<p>Let&rsquo;s now break apart this workflow to understand what it&rsquo;s doing&hellip;</p>
+
+<ul>
+<li><code>name</code>: the name for the workflow.</li>
+<li><code>on</code>: the event(s) we want to have trigger our job(s).</li>
+<li><code>jobs</code>: a list of jobs we want to be executed under this workflow.
+
+<ul>
+<li><code>simple-job</code>: a job that consists of nested configuration.
+
+<ul>
+<li><code>runs-on</code>: the environment I want the job to run in.</li>
+<li><code>steps</code>: a list of steps to run under the job.
+
+<ul>
+<li><code>name</code>: the name of the step, which can be omitted but it makes the output in the GitHub UI nicer.</li>
+<li><code>run</code>: the shell command/script I want to run (in this example, my command prints the string <code>hello</code>).</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p><strong>NOTE</strong>: Refer to the GitHub <a href="https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#github-hosted-runners" target="_blank">runner documentation</a> to see what other environments are available. Also refer to the <a href="https://github.com/actions/virtual-environments" target="_blank">virtual-environments</a> repo to see what is installed on each runner&rsquo;s operating system.</p>
+</blockquote>
+
+<p>As you can see, defining a workflow and its jobs/steps is actually very simple and intuitive. Now we can start looking at using more features and how to take advantage of the platform.</p>
+
+<h2 id="environment-variables">Environment Variables</h2>
+
+<p>GitHub Actions let you configure environment variables in multiple places depending on the scope they should have.</p>
+
+<p>You can define environment variables globally, so they&rsquo;re available to all jobs (and all steps within those jobs), or at a job level (so they can be accessed by all steps within the specific job) or at a step level, meaning only a specific step will have access to them.</p>
+
+<p>I&rsquo;ll demonstrate environment variable configuration in the following example:</p>
+
+<pre><code class="language-yaml">name: Testing Environment Variables
+on: push
+env:
+  FOO: bar
+jobs:
+  validate-env-vars:
+    runs-on: ubuntu-latest
+    env:
+      LITERAL: whatever
+      INTERPOLATION: ${{ github.ref_name }}
+      EXPRESSION: $(echo ${{ github.ref_name }} | perl -pe 's/[^a-zA-Z0-9]+/-/g' | perl -pe 's/(\A-|-\Z)//g' | awk '{print tolower($0)}')
+    steps:
+      - name: Print Global Environment Variables
+        run: echo $FOO
+      - name: Print Job Environment Variables
+        run: |
+          echo ${{ env.LITERAL }}
+          echo ${{ env.INTERPOLATION }}
+          echo ${{ env.EXPRESSION }}
+          echo $LITERAL
+          echo $INTERPOLATION
+          echo $EXPRESSION
+      - name: Print Step Environment Variables:
+        env:
+          STEPVAR: my step
+        run: |
+          echo ${{ env.STEPVAR }}
+          echo $STEPVAR
+</code></pre>
+
+<p>OK, so there&rsquo;s a few things to unpack from the above example workflow.</p>
+
+<p>The first thing I want to clarify is that when running shell commands/scripts using <code>steps.run</code> you can either define multiple steps like so:</p>
+
+<pre><code class="language-yaml">- run: echo hello
+- run: echo world
+</code></pre>
+
+<p>Or alternatively you can use the pipe <code>|</code> character to indicate the value spans multiple lines, like so:</p>
+
+<pre><code class="language-yaml">- run: |
+  echo hello
+  echo world
+</code></pre>
+
+<p>I would tend towards using separate <code>run</code> steps rather than one long multi-line <code>run</code> because it&rsquo;s harder to handle errors (or know where an error occurred) in the latter approach.</p>
+
+<p>The next thing to clarify is that there are two ways to access an environment variable:</p>
+
+<ol>
+<li><strong>Interpolation</strong>: <code>${{ ... }}</code> (e.g. <code>echo ${{ env.LITERAL }}</code>).</li>
+<li><strong>Variable reference</strong>: <code>$VARNAME</code> (e.g. <code>echo $LITERAL</code>).</li>
+</ol>
+
+<p>It&rsquo;s important to understand that although the output between the two approaches is the same, there is still a distinction worth being aware of.</p>
+
+<p>With interpolation the value is acquired by looking up the relevant key within the <a href="https://docs.github.com/en/actions/learn-github-actions/contexts#env-context" target="_blank"><code>env</code> context object</a>, and then the value is injected into the shell command to be executed, while the more traditional variable reference approach works by the shell instance looking up the environment variable to access the value.</p>
+
+<p>So when you look at the GitHub Actions GUI (e.g. <code>https://github.com/&lt;USER&gt;/&lt;REPO&gt;/actions/runs/&lt;ID&gt;</code>) and you look through the job output for the <code>LITERAL</code> example, then you&rsquo;ll see something like:</p>
+
+<pre><code class="language-bash">echo whatever
+echo $LITERAL
+</code></pre>
+
+<p>This is because the first line used interpolation, so really the shell command was just echo&rsquo;ing the literal value, where as the second line was echo&rsquo;ing the <em>result</em> of looking up the environment variable.</p>
+
+<p>In our example workflow you can see we defined a global environment variable called <code>FOO</code>, we also defined a job level set of environment variables (<code>LITERAL</code>, <code>INTERPOLATED</code> and <code>EXPRESSION</code>), and finally we defined a step level environment variable called <code>STEPVAR</code>.</p>
+
+<p>Let&rsquo;s take a moment to clarify the job level environment variables as these demonstrate something important, which is although the <code>EXPRESSION</code> variable was assigned a shell command, that command isn&rsquo;t <em>evaluated</em> and so the literal characters are assigned as the value.</p>
+
+<p>If you thought the <em>result</em> of the shell command (e.g. acquire the branch name from the <code>github</code> context object, and then do some normalisation of the name using a combination of <code>perl</code> and <code>awk</code>) would be assigned to the environment variable, then you would have been wrong.</p>
+
+<p>Only the <a href="https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idstepsrun" target="_blank"><code>steps.run</code></a> key will actually evaluate a given shell command/script.</p>
+
+<p>Now if the only way to evaluate a shell command is via <code>steps.run</code>, then how can we dynamically assign a value to an environment variable?</p>
+
+<p>Consider this example, you&rsquo;re a <a href="https://nodejs.org/en/" target="_blank">Node.js</a> developer and you&rsquo;re using the Node version manager <code>nvm</code> along with a <a href="https://github.com/nvm-sh/nvm#nvmrc" target="_blank"><code>.nvmrc</code> file</a> to control which version of Node your project uses.</p>
+
+<p>You&rsquo;re also using GitHub actions and you want to use a pre-existing action to manage installing Node on your job runner (we&rsquo;ll dig into third-party actions later, but for now just know that they are a thing).</p>
+
+<p>This is where things get a little funky, because third-party actions can&rsquo;t evaluate shell commands given as inputs. So the most popular third-party action for installing Node is <a href="https://github.com/actions/setup-node" target="_blank"><code>actions/setup-node</code></a> and it allows you to specify the version of Node to install but it has to be a literal value.</p>
+
+<p>The following example demonstrates how to side-step this restriction by using a <code>steps.run</code> to dynamically access the value inside the <code>.nvmrc</code> file and to then update the local environment with a new variable holding that value. This means you can then use interpolation to access that value and pass it into the <code>actions/setup-node</code> action:</p>
+
+<pre><code class="language-yaml">name: Testing Dynamic Environment Variable Value
+on: push
+jobs:
+  validate-env-vars:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Dynamic Environment Variable
+        run: echo &quot;NODE_VERSION=$(cat .nvmrc)&quot; &gt;&gt; $GITHUB_ENV
+      - name: Print NODE_VERSION
+        run: |
+          echo ${{ env.NODE_VERSION }}
+          echo $NODE_VERSION
+      - uses: actions/setup-node@v2
+        with:
+          node-version: &quot;${{ env.NODE_VERSION }}&quot;
+</code></pre>
+
+<p>The trick is to update a GitHub Actions provided environment variable called <code>$GITHUB_ENV</code>. All the following steps will then have an environment that includes whatever is in <code>$GITHUB_ENV</code>.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: You could also use the output of a step as the input to the <code>actions/setup-node</code> action, but we&rsquo;ll look at that feature later.</p>
+</blockquote>
+
+<h2 id="secrets">Secrets</h2>
+
+<p>The previous Node.js example workflow actually leads us quite nicely into this section about <a href="https://docs.github.com/en/actions/security-guides/encrypted-secrets#using-encrypted-secrets-in-a-workflow" target="_blank">secrets</a>.</p>
+
+<p>Let&rsquo;s see a common solution to accessing a private NPM repository&hellip;</p>
+
+<pre><code class="language-yaml">name: Testing GITHUB_TOKEN access restrictions
+on: push
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acquire Node Version
+        run: echo &quot;NODE_VERSION=$(cat .nvmrc)&quot; &gt;&gt; $GITHUB_ENV
+      - uses: actions/setup-node@v2
+        with:
+          node-version: &quot;${{ env.NODE_VERSION }}&quot;
+      - name: Authorize access to private packages
+        run: echo &quot;//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}&quot; &gt; ~/.npmrc
+</code></pre>
+
+<p>What we&rsquo;re doing here is installing Node.js and then modifying a <code>.npmrc</code> file so that it knows, when we do an <code>npm install</code>, to use an authentication token because the repository we want to use to get at our dependencies is otherwise private.</p>
+
+<p>You&rsquo;ll see we&rsquo;re using a <a href="https://docs.github.com/en/actions/security-guides/encrypted-secrets" target="_blank"><code>secrets</code> context object</a> to access a <code>GITHUB_TOKEN</code> value to use as our authentication token. This should be fine, but it doesn&rsquo;t work and our authentication with the private NPM repository fails.</p>
+
+<p>Let&rsquo;s take a moment to learn a bit about GitHub &lsquo;secrets&rsquo;&hellip;</p>
+
+<p>In the GitHub UI for a repo/project you can add secrets that are encrypted and made accessible to your workflow via the <code>secrets</code> context object. But additionally GitHub Actions provides access to a secret called <a href="https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret" target="_blank"><code>GITHUB_TOKEN</code></a>.</p>
+
+<p>I&rsquo;ll just refer you to the GitHub documentation, as it explains it best:</p>
+
+<blockquote>
+<p>At the start of each workflow run, GitHub automatically creates a unique GITHUB_TOKEN secret to use in your workflow. When you enable GitHub Actions, GitHub installs a GitHub App on your repository. The GITHUB_TOKEN secret is a GitHub App installation access token. You can use the installation access token to authenticate on behalf of the GitHub App installed on your repository. The token&rsquo;s permissions are limited to the repository that contains your workflow.</p>
+</blockquote>
+
+<p>That last sentence is the important bit! What essentially it means is that you can&rsquo;t use <code>secrets.GITHUB_TOKEN</code> to access things outside of the project repo.</p>
+
+<p>So to solve our problem we still need to use the <code>secrets</code> context object, but instead of using the default <code>GITHUB_TOKEN</code> we&rsquo;re going to need to create a new <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token" target="_blank">Personal Access Token</a> (PAT).</p>
+
+<p>Once you create a PAT, as long as the user account that creates the PAT has access to the private repository, we can paste the PAT into the GitHub secrets UI.</p>
+
+<p>For the sake of an example let&rsquo;s say you create a new secret called <code>NPM_AUTH_TOKEN</code> and paste the PAT value into it. We can now reference the secret token value via the <code>secrets</code> context object in our workflow file:</p>
+
+<pre><code class="language-yaml">name: Testing with Personal Access Token
+on: push
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acquire Node Version
+        run: echo &quot;NODE_VERSION=$(cat .nvmrc)&quot; &gt;&gt; $GITHUB_ENV
+      - uses: actions/setup-node@v2
+        with:
+          node-version: &quot;${{ env.NODE_VERSION }}&quot;
+      - name: Authorize access to private packages
+        run: echo &quot;//npm.pkg.github.com/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}&quot; &gt; ~/.npmrc
+</code></pre>
+
+<p>Notice that the workflow file basically hasn&rsquo;t changed, except we swapped <code>secrets.GITHUB_TOKEN</code> for <code>secrets.NPM_AUTH_TOKEN</code>.</p>
+
+<h2 id="third-party-actions">Third Party Actions</h2>
+
+<p>An action is just code that interacts with your repository. It&rsquo;s possible to write your own custom actions and to share them with the community.</p>
+
+<p>If you want to learn more about creating your own actions, then refer to GitHub&rsquo;s &ldquo;<a href="https://docs.github.com/en/actions/creating-actions/about-custom-actions" target="_blank">About custom actions</a>&rdquo;.</p>
+
+<p>There are a bunch of third-party actions that you&rsquo;ll see used a lot&hellip;</p>
+
+<ul>
+<li><a href="https://github.com/actions/checkout" target="_blank"><code>actions/checkout</code></a></li>
+<li><a href="https://github.com/actions/cache" target="_blank"><code>actions/cache</code></a></li>
+<li><a href="https://github.com/actions/setup-go" target="_blank"><code>actions/setup-go</code></a></li>
+<li><a href="https://github.com/actions/setup-node" target="_blank"><code>actions/setup-node</code></a></li>
+<li><a href="https://github.com/actions-rs/toolchain" target="_blank"><code>actions-rs/toolchain</code></a></li>
+</ul>
+
+<p>All of the above actions, with the exception of the last, are official GitHub maintained actions. This means they are considered safe to use in your workflows (remember that an action runner will be able to use your <code>secrets.GITHUB_TOKEN</code>). See also <a href="https://github.com/actions" target="_blank">https://github.com/actions</a> for more official/verified actions you can use.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: I&rsquo;ve no idea why they don&rsquo;t provide a Rust action.</p>
+</blockquote>
+
+<h2 id="conditions">Conditions</h2>
+
+<p>You can use an <code>if</code> conditional statement to control whether a job or step is run. It&rsquo;s best to use this feature if you need to <em>skip</em> a job/step apposed to using an exit code from within a <code>run</code> shell command/script to stop a job/step that has already started to run.</p>
+
+<p>One important caveat to using <code>if</code> in a workflow is that you <em>must</em> use single quotes and not double quotes. Consider the following example, which you might expect to only run the job if the GitHub branch affected is <code>main</code>&hellip;</p>
+
+<pre><code class="language-yaml">name: Testing with Double Quotes
+on: push
+jobs:
+  run-if-main:
+    if: ${{ github.ref_name == &quot;main&quot; }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo hello
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: Expressions can omit the surrounding <code>${{ ... }}</code> but I tend to include it.</p>
+</blockquote>
+
+<p>The above example won&rsquo;t work simply because the string <code>&quot;main&quot;</code> is using double quotes. You&rsquo;ll find the requirement for using single quotes is mentioned in the GitHub documentation for &ldquo;<a href="https://docs.github.com/en/actions/learn-github-actions/expressions#literals" target="_blank">Literals</a>&rdquo;.</p>
+
+<p>If you want to learn more about the available operators, like <code>==</code>, <code>!=</code> and <code>&amp;&amp;</code> etc, then refer to the <a href="https://docs.github.com/en/actions/learn-github-actions/expressions#operators" target="_blank">operators documentation</a>.</p>
+
+<h2 id="persisting-data">Persisting Data</h2>
+
+<p>A GitHub Action job does not persist data by default, as each job runs within its own &lsquo;runner&rsquo;. To persist data we can use either a:</p>
+
+<ol>
+<li>Cache (<a href="https://github.com/actions/cache" target="_blank"><code>actions/cache</code></a>)</li>
+<li>Artifact (<a href="https://github.com/actions/upload-artifact" target="_blank"><code>actions/upload-artifact</code></a>, <a href="https://github.com/actions/download-artifact" target="_blank"><code>actions/download-artifact</code></a>)</li>
+<li>Job Output (<a href="https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idoutputs" target="_blank"><code>outputs</code> documenation</a>)</li>
+</ol>
+
+<p>Caching is quick but isn&rsquo;t always ideal as it requires the use of I/O to create files to be cached, and then also we have to coordinate reading values back from disk and parsing the data contained within those files etc. Caching is best used for simple situations such as caching installed programming language dependencies.</p>
+
+<p>Artifacts are slow as they need to upload and download files from GitHub&rsquo;s servers and also this requires two separate external actions to configure, making them not ideal for quick data persistence (and also makes &lsquo;simple&rsquo; data persistence scenarios tedious).</p>
+
+<p>To persist data using a job&rsquo;s output requires a job to produce some data and to expose that data via the job&rsquo;s <code>outputs</code> field. A consumer can then use and parse that data however they see fit. This approach can also be useful for dynamically generating job matrix variants using a job&rsquo;s <a href="https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idstrategy" target="_blank"><code>strategy.matrix</code></a> field.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: A job has an <code>outputs</code> field, but also individual steps can access the output from a previous step by way of the same mechanism, which is a step needs to set an <code>id</code> field which either another step or the job itself can reference.</p>
+</blockquote>
+
+<p>The way your <code>run</code> code (or an external shell script) can produce data that the GitHub job can reference is to <code>echo</code> a specially formatted string:</p>
+
+<pre><code class="language-bash">echo &quot;::set-output name=&lt;name&gt;::&lt;data&gt;&quot;
+</code></pre>
+
+<p>So in the following example we produce the data <code>bar</code> and we make it accessible via the name <code>foo</code>:</p>
+
+<pre><code class="language-bash">echo &quot;::set-output name=foo::bar&quot;
+</code></pre>
+
+<p>Now in the following example our GitHub job has two steps, and the latter step is accessing data produced by the first step:</p>
+
+<pre><code class="language-yaml">name: Produce Data
+on: push
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - id: produce-data
+        run: echo &quot;::set-output name=foo::bar&quot;
+      - run: echo ${{ steps.produce-data.outputs.foo }}
+</code></pre>
+
+<blockquote>
+<p><strong>NOTE</strong>: Be sure to use the <code>id</code> field so the second step can use it to reference the first step&rsquo;s output!</p>
+</blockquote>
+
+<h3 id="using-shared-job-data-to-determine-if-subsequent-job-should-run">Using shared job data to determine if subsequent job should run</h3>
+
+<p>In the following example the <code>bar</code> job will not run if the required fields <code>foo</code> and <code>baz</code> aren&rsquo;t set to <code>true</code>.</p>
+
+<p>Notice the data I produce within job <code>foo</code> is a simple array/list whose elements are strings who have a format of <code>key=value</code>:</p>
+
+<pre><code class="language-yaml">name: Produce Data To Control Job Run
+on: push
+jobs:
+  foo:
+    runs-on: ubuntu-latest
+    outputs:
+      data: ${{ steps.footest.outputs.data }}
+    steps:
+      - run: |
+          echo &quot;FOO=true&quot; &gt;&gt; $GITHUB_ENV
+          echo &quot;BAR=false&quot; &gt;&gt; $GITHUB_ENV
+          echo &quot;BAZ=true&quot; &gt;&gt; $GITHUB_ENV
+      - id: footest
+        run: echo ::set-output name=data::[\&quot;foo=$FOO\&quot;, \&quot;bar=$BAR\&quot;, \&quot;baz=$BAZ\&quot;]
+
+  bar:
+    needs: foo
+    if: ${{ contains(needs.foo.outputs.data, 'foo=true') &amp;&amp; contains(needs.foo.outputs.data, 'baz=true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'yay! we ran because the fields were set to true'
+
+  build:
+    needs: bar
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'yay! this job ran as the bar job was successful'
+</code></pre>
+
+<p>The key part to getting job <code>bar</code> to determine if it should run is to use an <code>if</code> along with one of GitHub&rsquo;s native functions called <a href="https://docs.github.com/en/actions/learn-github-actions/expressions#contains" target="_blank"><code>contains()</code></a>. You can see I use it twice to check if the persisted data contains the values I&rsquo;m looking for.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: You&rsquo;ll likely want to use the <code>needs</code> property to help make the jobs run sequentially. Otherwise without it the jobs will run in parallel and this means there would be a data race in <code>bar</code> trying to access the <code>foo</code> job&rsquo;s output which might not yet be available and this would cause both the <code>bar</code> job and its dependant <code>build</code> job to not be run.</p>
+</blockquote>
+
+<h3 id="persist-data-using-strategy-matrix">Persist data using <code>strategy.matrix</code></h3>
+
+<p>Below is an example of using JSON data from <code>job1</code> and exposing it to <code>job2</code>. This approach of using <a href="https://docs.github.com/en/actions/learn-github-actions/expressions#fromjson" target="_blank"><code>fromJSON</code></a> with data from another job to create a matrix is really cool, but otherwise this approach (as far as data persistence is concerned) isn&rsquo;t ideal because it requires the JSON data produced by the first job to have a very specific structure that the <code>strategy.matrix</code> expects. So to reiterate I&rsquo;m not using <code>strategy.matrix</code> in this example because I want a matrix but just to demonstrate a clever way to persist data without having to resort to using either caching or artifacts.</p>
+
+<p>With this in mind I needed to ensure I set the value of each matrix field to be a <em>list</em> type that contains a <em>single</em> entry.</p>
+
+<p>If I didn&rsquo;t use a list type then the <code>strategy.matrix</code> would fail to parse my JSON data. I purposely ensure there is only a single value within the list because I don&rsquo;t actually need my data to cause the job to be run multiple times. This is because a <code>strategy.matrix</code> is typically used to generate multiple &lsquo;variants&rsquo; of a job. By setting a single value inside a list, we ensure there is only ever one job variant generated (i.e. only one job is created), and that single job can simply reference the fields within the matrix as data points of interest.</p>
+
+<pre><code class="language-yaml">name: example
+on: push
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: echo &quot;::set-output name=matrix::{\&quot;FOO\&quot;:[&quot;abc&quot;],\&quot;BAR\&quot;:[&quot;xyz&quot;]}&quot;
+  job2:
+    needs: job1
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJSON(needs.job1.outputs.matrix)}}
+    env:
+      FOO: ${{ matrix.FOO }}
+      BAR: ${{ matrix.BAR }}
+    steps:
+      - run: echo ${{ matrix.FOO }} # abc
+      - run: echo ${{ matrix.BAR }} # xyz
+</code></pre>
+
+<h3 id="clarify-the-cache-action">Clarify the cache action</h3>
+
+<p>OK, so as far as data persistence is concerned, we have the <code>actions/cache</code> action we can use as an option. It&rsquo;s actually not very obvious how this action works and so I thought I&rsquo;d take a brief moment to clarify my understanding, which then helped me to better understand how I could use it for data persistence outside of just caching language dependencies (which is what most examples are based on).</p>
+
+<p>The <code>actions/cache@v2</code> works like so, you have to define a new step like so:</p>
+
+<pre><code class="language-yaml">- uses: actions/cache@v2
+  with:
+    path: path/to/be/cached
+    key: ${{ runner.os }}-my-cache-key
+</code></pre>
+
+<p>When the step that implements the action is executed (see above snippet), the cache action simply looks up the cache key (e.g. <code>Linux-my-cache-key</code>) and if it finds something in the cache, then it restores the cache to the path you specified (e.g. <code>path/to/be/cached</code>).</p>
+
+<p>If the cache action doesn&rsquo;t find anything in the cache, then nothing happens.</p>
+
+<p>Now the important bit: the cache action has a &lsquo;post run&rsquo; event that executes once your job has finished successfully. The cache action will be run again and this time it stores whatever was in your given path into the cache using the key you said it should be stored under.</p>
+
+<p>This means, when it comes to running another job, you need to ensure you define the cache action <em>again</em> (the same as you defined it in your first job). This is so all of what I&rsquo;ve just explained will happen again in your second job (i.e. it&rsquo;ll lookup the key but this time it&rsquo;ll find something in the cache thanks to the &lsquo;post run&rsquo; step from the first job). The only difference now in the second job is that in the &lsquo;post run&rsquo; event, when the action gets run again, you&rsquo;ll now see something like&hellip;</p>
+
+<blockquote>
+<p>Cache hit occurred on the primary key <code>Linux-my-cache-key</code>, not saving cache.</p>
+</blockquote>
+
+<p>Meaning there was nothing else to do. I imagine if there were changes to the files in the given path then it would indicate the cache was updated with the latest files.</p>
+
+<h2 id="reusable-workflows">Reusable Workflows</h2>
+
+<p>If you have a bunch of setup configuration that is the same between jobs, then you can move that configuration into a separate workflow file that can then be imported and used by each job in your main workflow file.</p>
+
+<p>The following example, demonstrates how to <em>call</em> (i.e. import) a reusable workflow:</p>
+
+<pre><code class="language-yaml">jobs:
+  build:
+    ...
+
+  deploy:
+    ...
+
+  validate-foo:
+    uses: integralist/actions-testing/.github/workflows/resuable-setup@main # install node, rust, setup env vars etc
+    steps: 
+      - ...
+
+  validate-bar:
+    uses: integralist/actions-testing/.github/workflows/resuable-setup@main # install node, rust, setup env vars etc
+    steps: 
+      - ...
+</code></pre>
+
+<p>An example implementation of a reusable workflow would be:</p>
+
+<pre><code class="language-yaml">name: Reusable workflow for validation scripts
+on:
+  workflow_call:
+    inputs:
+      install_node:
+        type: bool
+      name:
+        required: true
+        type: string
+      description:
+        required: true
+        type: string
+      script:
+        required: true
+        type: string
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - if: ${{ github.event_name != 'schedule' }}
+        run: exit 1
+      - if: ${{ inputs.install_node }}
+        name: Environment
+        run: |
+          echo &quot;NODE_VERSION=$(cat .nvmrc)&quot; &gt;&gt; $GITHUB_ENV
+      - if: ${{ inputs.install_node }}
+        uses: actions/setup-node@v2
+        id: node-yarn
+        with:
+          node-version: &quot;${{ env.NODE_VERSION }}&quot;
+          cache: yarn
+      - name: status update
+        uses: ouzi-dev/commit-status-updater@v1.1.2
+        with:
+          name: ${{ inputs.name }}
+          description: ${{ inputs.description }}
+          status: pending
+      - id: validator
+        run: ${{ inputs.script }}
+      - if: ${{ success() }}
+        name: status update
+        uses: ouzi-dev/commit-status-updater@v1.1.2
+        with:
+          name: ${{ inputs.name }}
+          description: ${{ steps.validator.outputs.description }}
+          status: ${{ steps.validator.outputs.status }}
+</code></pre>
+
+<p>Notice that in the reusable workflow we have a new event <code>workflow_call</code> that helps us to define <em>inputs</em> for the job being called.</p>
+
+<p>In this reusable job we define a bunch of inputs which helps us to control whether the steps in the job are run (making the reusable job even more flexible) by utilising a step&rsquo;s <code>if</code> condition and interpolating the input value.</p>
+
+<p>For example, we don&rsquo;t always install the Node.js programming language, only if the caller requests it:</p>
+
+<pre><code class="language-yaml">- if: ${{ inputs.install_node }}
+  uses: actions/setup-node@v2
+  id: node-yarn
+  with:
+    node-version: &quot;${{ env.NODE_VERSION }}&quot;
+    cache: yarn
+</code></pre>
+
+<p>Now one important consideration is that the reusable workflow will not inherit the parent workflow&rsquo;s environment. This means secrets and environment variables need to be passed in via either <code>workflow_call.inputs</code> or <code>workflow_call.secrets</code>.</p>
+
+<p>Annoyingly you can&rsquo;t just set an input with <code>${{ env.FOO }}</code> because the <code>env</code> context object can&rsquo;t be referenced. So if your reusable job is used a lot then you either have to hardcode the value as an <code>input</code> to the reusable workflow or you store the environment variable as a secret in the GitHub UI so that you can reference it from the <code>workflow_call.secrets</code> property.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There is so much more to explore with GitHub Actions. The bits I&rsquo;ve mentioned here are just the tip of the iceberg. I strongly recommend you read the documentation and have a play around with these, and other features. Let me know on twitter what you think of GitHub Actions and whether you&rsquo;re using it in your projects.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

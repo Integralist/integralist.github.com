@@ -1,0 +1,1185 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#beginner-s-guide-to-creating-a-terraform-provider">Beginner&rsquo;s guide to creating a Terraform Provider</a>
+<ul>
+<li><a href="#prerequisite">Prerequisite</a></li>
+
+<li><a href="#go-mod">go.mod</a></li>
+
+<li><a href="#main-go">main.go</a></li>
+
+<li><a href="#create">Create</a></li>
+
+<li><a href="#read">Read</a></li>
+
+<li><a href="#update">Update</a></li>
+
+<li><a href="#delete">Delete</a></li>
+
+<li><a href="#data-sources">Data Sources</a></li>
+
+<li><a href="#how-to-use-this-provider">How to use this provider</a></li>
+
+<li><a href="#local-development">Local Development</a></li>
+
+<li><a href="#debugging-a-terraform-provider">Debugging a Terraform Provider</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="beginner-s-guide-to-creating-a-terraform-provider">Beginner&rsquo;s guide to creating a Terraform Provider</h1>
+
+<p>You have an API and you want your customers to be able to use that API via <a href="https://www.terraform.io" target="_blank">Terraform</a>. In this post I&rsquo;m going to explain how you can write your own Terraform provider to enable your customers to integrate your API into their &ldquo;infrastructure as code&rdquo; pipeline.</p>
+
+<p>You don&rsquo;t need an API to be able to follow along, nor am I going to make you write one as part of the learning process (that&rsquo;s just a waste of time). Instead I&rsquo;m going to demonstrate how a Terraform provider works by talking through the code for an example provider I&rsquo;ve written.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: You can find my &lsquo;mock&rsquo; provider <a href="https://github.com/integralist/terraform-provider-mock" target="_blank">here on GitHub</a> if you&rsquo;d prefer to read the code yourself. It&rsquo;s heavily commented to make it as easy as possible.</p>
+</blockquote>
+
+<p>The idea is that once you finish reading this post, you should (in theory) be able to just copy my mock provider code base and start adding in your own <em>real</em> API calls rather than using the stubbed data I&rsquo;ve provided for the sake of keeping the example provider simple.</p>
+
+<p>In case you&rsquo;re interested, I am the maintainer for the popular <a href="https://github.com/fastly/terraform-provider-fastly" target="_blank">Fastly Terraform provider</a> (which demonstrates a much more <em>complex</em> provider). If you want to know how to use the Fastly Terraform provider, then you&rsquo;re in luck as I&rsquo;ve written about that subject on the Fastly blog <a href="https://www.fastly.com/blog/how-to-configure-your-fastly-services-with-terraform" target="_blank">here</a> as well as written a Terraform &lsquo;best practices&rsquo; guide on the Fastly Developer Hub <a href="https://developer.fastly.com/learning/integrations/orchestration/terraform/" target="_blank">here</a> (which is definitely worth checking out).</p>
+
+<p>I should also be clear and say that this isn&rsquo;t a &lsquo;complete&rsquo; guide. There are many aspects to writing a Terraform provider I will gloss over or omit entirely.</p>
+
+<p>That all said, let&rsquo;s get started&hellip;</p>
+
+<h2 id="prerequisite">Prerequisite</h2>
+
+<p>I&rsquo;ve presumed the reader:</p>
+
+<ol>
+<li>Is familiar with the <a href="https://go.dev" target="_blank">Go</a> programming language and how to write programs with it.</li>
+<li>Is familiar with what <a href="https://www.terraform.io" target="_blank">Terraform</a> is (and ideally has used it before).</li>
+</ol>
+
+<h2 id="go-mod">go.mod</h2>
+
+<p>Let&rsquo;s start with the <em>direct</em> dependencies needed by my &lsquo;mock&rsquo; provider:</p>
+
+<pre><code class="language-go.mod">go 1.19
+
+require (
+	github.com/google/uuid v1.3.0
+	github.com/hashicorp/terraform-plugin-docs v0.13.0
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.24.0
+)
+</code></pre>
+
+<p>The first dependency <a href="https://github.com/google/uuid" target="_blank"><code>google/uuid</code></a> is only used because I needed a quick and convenient way to generate a unique ID (as we&rsquo;ll see later on), while the <a href="https://github.com/hashicorp/terraform-plugin-docs" target="_blank"><code>hashicorp/terraform-plugin-docs</code></a> dependency is only used for the sake of generating documentation from your provider code (a really useful tool actually so you should definitely check it out).</p>
+
+<p>The last dependency, <a href="https://github.com/hashicorp/terraform-plugin-sdk" target="_blank"><code>hashicorp/terraform-plugin-sdk</code></a>, is what fundamentally enables a Terraform provider to work like it does.</p>
+
+<p>Hashicorp is working on a replacement to the terraform-plugin-sdk called the <a href="https://github.com/hashicorp/terraform-plugin-framework" target="_blank">Terraform Plugin Framework</a>. I&rsquo;ve not yet played with the new SDK, so I may well write a follow-up post where I migrate my mock provider to this new framework and/or do so for the Fastly Terraform provider, from which I&rsquo;ll share any useful lessons learned.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: It&rsquo;s worth clarifying that the terraform-plugin-sdk isn&rsquo;t going anywhere any time soon and in the meantime Hashicorp provides guidelines for <a href="https://developer.hashicorp.com/terraform/plugin/which-sdk" target="_blank">which SDK you should use</a>, so I recommend reading that if you&rsquo;re unsure of which route to take.</p>
+</blockquote>
+
+<p><strong>UPDATE</strong>: I have since discovered there is a &lsquo;scaffold&rsquo; project that Hashicorp provides here <a href="https://github.com/hashicorp/terraform-provider-scaffolding" target="_blank">https://github.com/hashicorp/terraform-provider-scaffolding</a> that is similar to my mock provider! So I would recomend, once you finish reading this post, giving that a read to see how their hierarchy compares to my mock provider (there&rsquo;s also one for the new plugin framework, which I&rsquo;ll be checking out: <a href="https://github.com/hashicorp/terraform-provider-scaffolding-framework" target="_blank">https://github.com/hashicorp/terraform-provider-scaffolding-framework</a>).</p>
+
+<h2 id="main-go">main.go</h2>
+
+<p>Now let&rsquo;s take a look at our <code>main</code> package entry point, which is &lsquo;short and sweet&rsquo;&hellip;</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;github.com/hashicorp/terraform-plugin-sdk/v2/plugin&quot;
+	&quot;github.com/integralist/terraform-provider-mock/mock&quot;
+)
+
+
+func main() {
+	plugin.Serve(&amp;plugin.ServeOpts{
+		ProviderFunc: mock.Provider,
+	})
+}
+</code></pre>
+
+<p>We import the SDK&rsquo;s <a href="https://pkg.go.dev/github.com/hashicorp/terraform-plugin-sdk/v2@v2.24.0/plugin" target="_blank">plugin</a> package and call the <a href="https://pkg.go.dev/github.com/hashicorp/terraform-plugin-sdk/v2@v2.24.0/plugin#Serve" target="_blank"><code>Serve</code></a> function, telling it where to find our provider (i.e. <code>mock.Provider</code>) which is where we define the structure of our Terraform provider.</p>
+
+<p>The following implementation of my mock provider is small because, well, my mock provider is small (by design), where as you&rsquo;ll find real-world providers to be a lot larger than this:</p>
+
+<pre><code class="language-go">func Provider() *schema.Provider {
+	return &amp;schema.Provider{
+		Schema: map[string]*schema.Schema{
+			&quot;foo&quot;: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc(&quot;MOCK_FOO&quot;, nil),
+			},
+		},
+		ResourcesMap: map[string]*schema.Resource{
+			&quot;mock_example&quot;: resourceExample(),
+		},
+		DataSourcesMap: map[string]*schema.Resource{
+			&quot;mock_example&quot;: dataSourceExample(),
+		},
+	}
+}
+</code></pre>
+
+<p>So there two parts to a Terraform provider, which will help to explain the above chunk of code:</p>
+
+<ol>
+<li><strong>Resources</strong>: A resource is a &lsquo;thing&rsquo; you create, and then manage its life cycle via Terraform.</li>
+<li><strong>Data Sources</strong>: A data source is data you can query and reference within your resources.</li>
+</ol>
+
+<p>The following diagram is one I designed for the <a href="https://www.fastly.com/blog/how-to-configure-your-fastly-services-with-terraform" target="_blank">Fastly blog post</a> I mentioned earlier, and it does a good job visualising the overall Terraform workflow coordination between your terminal shell, the Terraform CLI and the Terraform provider itself.</p>
+
+<p><img src="../../assets/images/terraform-workflow.png">
+<p></p></p>
+
+<blockquote>
+<p><strong>NOTE</strong>: A data source is actually a <em>subset</em> of a resource. This will become apparent shortly when we discuss CRUD (Create, Read, Update, Delete) operations.</p>
+</blockquote>
+
+<p>Looking at the above code, the first thing we do is define a provider (<code>schema.Provider</code>) and its &lsquo;schema&rsquo; (<code>schema.Schema</code>). In the case of our mock provider we actually have a super simple provider schema, it&rsquo;s just a single &lsquo;attribute&rsquo; called <code>foo</code>.</p>
+
+<p>Here is an example of what that would look like in a consumer&rsquo;s Terraform configuration:</p>
+
+<pre><code class="language-terraform">provider &quot;mock&quot; {
+  foo = &quot;example_value&quot;
+}
+</code></pre>
+
+<p>Because of the <code>DefaultFunc</code> field in our schema, if <code>foo</code> wasn&rsquo;t set in the above example configuration, then the value would default to the value assigned to the environment variable <code>MOCK_FOO</code> (or <code>nil</code> if the environment variable wasn&rsquo;t set).</p>
+
+<p>Typically the provider&rsquo;s schema is for defining top-level attributes such as an API key or API endpoint. Take a look at the Fastly Terraform provider for an example:</p>
+
+<pre><code class="language-go">func Provider() *schema.Provider {
+	provider := &amp;schema.Provider{
+		Schema: map[string]*schema.Schema{
+			&quot;api_key&quot;: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc(&quot;FASTLY_API_KEY&quot;, nil),
+				Description: &quot;Fastly API Key from https://app.fastly.com/#account&quot;,
+			},
+			&quot;base_url&quot;: {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc(&quot;FASTLY_API_URL&quot;, gofastly.DefaultEndpoint),
+				Description: &quot;Fastly API URL&quot;,
+			},
+			&quot;force_http2&quot;: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: &quot;Set this to `true` to disable HTTP/1.x fallback mechanism&quot;
+			},
+			&quot;no_auth&quot;: {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: &quot;Set to `true` if your configuration only consumes data sources that do not require authentication&quot;,
+			},
+		},
+
+    ...
+  }
+
+  ...
+}
+</code></pre>
+
+<p>Now there&rsquo;s one aspect to our provider that I&rsquo;ve omitted and that&rsquo;s the <code>ConfigureFunc</code> field. Because my mock provider doesn&rsquo;t have a real API to use I&rsquo;ve not defined that field in my mock provider but here is an example from the Fastly Terraform provider to give you an idea of what it could look like:</p>
+
+<pre><code class="language-go">func Provider() *schema.Provider {
+	provider := &amp;schema.Provider{
+		Schema: map[string]*schema.Schema{
+      // ...
+		},
+		DataSourcesMap: map[string]*schema.Resource{
+			// ...
+		},
+		ResourcesMap: map[string]*schema.Resource{
+			// ...
+		},
+	}
+
+	provider.ConfigureContextFunc = func(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
+		config := Config{
+			APIKey:     d.Get(&quot;api_key&quot;).(string),
+			BaseURL:    d.Get(&quot;base_url&quot;).(string),
+			NoAuth:     d.Get(&quot;no_auth&quot;).(bool),
+			ForceHTTP2: d.Get(&quot;force_http2&quot;).(bool),
+			UserAgent:  provider.UserAgent(TerraformProviderProductUserAgent, version.ProviderVersion),
+		}
+		return config.Client()
+	}
+
+	return provider
+}
+</code></pre>
+
+<p>In the Fastly Terraform provider you can see the <code>ConfigureContextFunc</code> (there are &lsquo;context&rsquo; aware versions of most functions) we return a <code>config.Client()</code> which is effectively the Fastly API client. I&rsquo;ll come back to this later when we look at the CREATE function of a resource to show you how you can get access to this API client.</p>
+
+<p>For now, let&rsquo;s jump back to our mock provider to remind ourselves of what was configured after the <code>Schema</code> field&hellip;</p>
+
+<pre><code class="language-go">ResourcesMap: map[string]*schema.Resource{
+	&quot;mock_example&quot;: resourceExample(),
+},
+DataSourcesMap: map[string]*schema.Resource{
+	&quot;mock_example&quot;: dataSourceExample(),
+},
+</code></pre>
+
+<p>So now we have a basic understanding of what a &lsquo;resource&rsquo; is and what a &lsquo;data source&rsquo; is, we can clearly see that a Terraform provider can be setup with <em>multiple</em> of each type.</p>
+
+<p>The interesting part here is that there is a &lsquo;convention over configuration&rsquo; style pattern at play here. Specifically, the map key has to be of the format <code>&lt;provider_name&gt;_&lt;resource|data_source&gt;</code>, and in my mock provider I only have one resource and one data source and I name them the same <code>mock_example</code> (as &lsquo;mock&rsquo; is the name of my provider, and &lsquo;example&rsquo; is the resource/data-source name).</p>
+
+<p>In the case of the resource, the provider will attempt to resolve the function assigned to the map key by looking up the file <code>resource_&lt;provider_name&gt;_&lt;resource_name&gt;.go</code>, i.e. <code>resource_mock_example.go</code> while it will attempt to resolve the data source using <code>data_source_&lt;provider_name&gt;_&lt;data_source_name&gt;</code>, i.e. <code>data_source_mock_example.go</code>.</p>
+
+<p>If we look at the tree structure of my mock provider we&rsquo;ll see that&rsquo;s exactly what it contains:</p>
+
+<pre><code class="language-txt">.
+├── main.go
+├── mock
+│   ├── data_source_mock_example.go
+│   ├── provider.go
+│   └── resource_mock_example.go
+</code></pre>
+
+<p>OK, all good so far. Now let&rsquo;s get into the meat of these two files, what exactly do they do?</p>
+
+<p>Well, firstly the &lsquo;example&rsquo; resource defines its own schema (e.g. the attributes it contains) and it also specifies CRUD operation functions (i.e. Create, Read, Update, Delete) for managing the life cycle of the resource. In our mock provider it looks like this:</p>
+
+<pre><code class="language-go">func resourceExample() *schema.Resource {
+	return &amp;schema.Resource{
+		Create: resourceCreate,
+		Read:   resourceRead,
+		Update: resourceUpdate,
+		Delete: resourceDelete,
+
+		Schema: map[string]*schema.Schema{
+			&quot;last_updated&quot;: {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			&quot;not_computed_optional&quot;: {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			&quot;not_computed_required&quot;: {
+				Type:     schema.TypeString,
+				Required: true,
+			},
+			&quot;foo&quot;: {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &amp;schema.Resource{
+					Schema: map[string]*schema.Schema{
+						&quot;bar&quot;: {
+							Type:     schema.TypeList,
+							MaxItems: 1,
+							Required: true,
+							Elem: &amp;schema.Resource{
+								Schema: map[string]*schema.Schema{
+									&quot;number&quot;: {
+										Type:     schema.TypeInt,
+										Optional: true,
+									},
+									&quot;version&quot;: {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			&quot;baz&quot;: {
+				Type:     schema.TypeList,
+				Required: true,
+				Elem: &amp;schema.Resource{
+					Schema: map[string]*schema.Schema{
+						&quot;qux&quot;: {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+			},
+			&quot;some_list&quot;: {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &amp;schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+		},
+	}
+}
+</code></pre>
+
+<p>There are a few things to pay attention to in this schema:</p>
+
+<ul>
+<li><p><code>last_updated</code> is a &lsquo;computed&rsquo; attribute, meaning the user shouldn&rsquo;t attempt to set that in their configuration but instead leave it to the Terraform provider to set it dynamically. A user would then use <a href="https://developer.hashicorp.com/terraform/language/values/outputs" target="_blank">output variables</a> to access the value set by the provider.</p></li>
+
+<li><p><code>not_computed_required</code>: is marked as &lsquo;required&rsquo; and so a user of our provider <em>must</em> set this attribute, while other attributes are marked as &lsquo;optional&rsquo;.</p></li>
+
+<li><p><code>foo</code> has a type of <code>TypeList</code>, meaning we need to define what schema its &lsquo;elements&rsquo; should have. We use <code>Elem</code> to specify there should be a nested <code>bar</code> block, which itself contains <code>number</code> and <code>version</code> attributes (the latter being a &lsquo;computed&rsquo; attribute).</p></li>
+</ul>
+
+<p>In terms of a consumer of our Terraform provider, someone might write their configuration like so:</p>
+
+<pre><code class="language-terraform">resource &quot;mock_example&quot; &quot;testing&quot; {
+  not_computed_required = &quot;some value&quot;
+
+  foo {
+    bar {
+      number = 1
+    }
+  }
+  foo {
+    bar {
+      number = 2
+    }
+  }
+  foo {
+    bar {
+      number = 3
+    }
+  }
+
+  baz {
+    qux = &quot;x&quot;
+  }
+  baz {
+    qux = &quot;y&quot;
+  }
+  baz {
+    qux = &quot;z&quot;
+  }
+
+  some_list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+}
+</code></pre>
+
+<p>In the above example the user has set the attribute <code>not_computed_required</code> because it was marked as &lsquo;required&rsquo; in our provider schema, while providing multiple instances of the optional <code>foo</code> block, and multiple instances of the required <code>bar</code> blocks. The <code>some_list</code> attribute is also provided, although it&rsquo;s marked as &lsquo;optional&rsquo;.</p>
+
+<p>It&rsquo;s worth noting the above configuration can, through clever use of the Terraform Configuration Language (TCL), be made more concise/dynamic&hellip;</p>
+
+<pre><code class="language-terraform">resource &quot;mock_example&quot; &quot;testing&quot; {
+  not_computed_required = &quot;some value&quot;
+
+  dynamic &quot;foo&quot; {
+    for_each = [{ number = 1 }, { number = 2 }, { number = 3 }]
+    content {
+      bar {
+        number = foo.value.number
+      }
+    }
+  }
+
+  dynamic &quot;baz&quot; {
+    for_each = [{ something = &quot;x&quot; }, { something = &quot;y&quot; }, { something = &quot;z&quot; }]
+    content {
+      qux = baz.value.something
+    }
+  }
+
+  some_list = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+}
+</code></pre>
+
+<p>&hellip;but this blog post isn&rsquo;t about TCL so I&rsquo;d recommend reading the official Terraform documentation.</p>
+
+<p>Let&rsquo;s now look back at the CRUD functions for our resource:</p>
+
+<pre><code class="language-txt">Create: resourceCreate,
+Read:   resourceRead,
+Update: resourceUpdate,
+Delete: resourceDelete,
+</code></pre>
+
+<p>These functions are called at specific times depending on what <code>terraform</code> CLI command was executed by a user, and also depending on what state their project is in at the time the command is executed.</p>
+
+<p>For example, running <code>terraform apply</code> for the first time will cause the &lsquo;Create&rsquo; function to be called (so all the relevant resources defined in the user&rsquo;s configuration will be created), followed (typically) by the &lsquo;Read&rsquo; function (so that the user&rsquo;s local project state will be updated with the new resources created via the &lsquo;Create&rsquo; function).</p>
+
+<p>The next time the user runs <code>terraform apply</code> they&rsquo;ll find Terraform will trigger the &lsquo;Read&rsquo; function to execute first (so that Terraform can update the project state and know if anything has changed), before then determining if the &lsquo;Update&rsquo; function needs to be called, because let&rsquo;s say the user has modified their configuration in such a way as to require one of the resources defined to be updated (e.g. to make API calls on our behalf).</p>
+
+<p>Let&rsquo;s now look at each CRUD function individually&hellip;</p>
+
+<h2 id="create">Create</h2>
+
+<p>The CREATE operation typically will make API calls to create resources. It won&rsquo;t set anything in the terraform state, with the exception of setting a unique ID that will be used by all the other functions to access the resource data from state.</p>
+
+<p>Let&rsquo;s look at the code in our &lsquo;mock&rsquo; provider to see what we&rsquo;re doing&hellip;</p>
+
+<pre><code class="language-go">func resourceCreate(d *schema.ResourceData, m any) error {
+	foo := d.Get(&quot;foo&quot;).([]any)
+	d.SetId(&quot;123&quot;)
+	return resourceRead(d, m)
+}
+</code></pre>
+
+<p>So we can see the function is passed a <code>schema.ResourceData</code> type. This is essentially the user&rsquo;s local configuration data, and we can see that the first thing we do is try to get the value of the <code>foo</code> attribute. It also has a second argument which is effectively additional &lsquo;metadata&rsquo; and is what we would reference in order to get access to our API client.</p>
+
+<p>Now if this was a real provider, then we&rsquo;d have an API client that would be creating an actual resource for the user. Remember earlier we talked about the <code>ConfigureFunc</code> function of the provider, which was responsible for defining an instance of an API client? Well, the way we get access to the API client would look something like this (where <code>APIClient</code> is some type that represents your API client):</p>
+
+<pre><code class="language-go">client := m.(*APIClient).conn
+</code></pre>
+
+<p>Because <code>foo</code> is a <code>TypeList</code> you can see we type assert it to <code>[]any</code>. Now as I said at the start, we don&rsquo;t have an API to make calls to and so we don&rsquo;t actually <em>do</em> anything here with the <code>foo</code> value defined in the user&rsquo;s configuration.</p>
+
+<p>Let&rsquo;s pretend we made an API call, and in the response we got back an ID that we wanted to use as a unique key to track this resource in our terraform state file. To set the unique ID we call <code>d.SetId(&quot;123&quot;)</code>, where <code>123</code> is the unique ID we got back from the API response.</p>
+
+<p>The mere existence of the ID, and lack of error returned, means Terraform will presume the CREATE operation was successful and store the user&rsquo;s &ldquo;foo&rdquo; data in the local state file.</p>
+
+<p>Finally, we call the READ function (<code>resourceRead()</code>) and pass through the <code>d</code> and <code>m</code> arguments. In this case, the way we&rsquo;ve setup our CREATE function means that if the READ operation fails, then the error it returns will be returned through our CREATE function and will cause the create operation to fail as well.</p>
+
+<p>It&rsquo;s up to you whether that&rsquo;s something you want to do, as a READ could fail due to a network issue and not necessarily mean there was an error with the CREATE operation.</p>
+
+<h2 id="read">Read</h2>
+
+<p>The READ operation must handle three things:</p>
+
+<ol>
+<li>Calling out to the API to get the latest data for our resource.</li>
+<li>Flatten the API response (or at least extract the values we need) and marshal the data into a format that Terraform understands (i.e. <code>map[string]any</code>).</li>
+<li>Set the latest data into Terraform&rsquo;s state file so it can identify if there were any differences between what the user has defined in their configuration and what actually exists on the remote data side.</li>
+</ol>
+
+<p>Let&rsquo;s look at the code in our &lsquo;mock&rsquo; provider to see what we&rsquo;re doing&hellip;</p>
+
+<pre><code class="language-go">func resourceRead(d *schema.ResourceData, m any) error {
+  resourceID := d.Id()
+  foo := d.Get(&quot;foo&quot;)
+
+  for _, f := range foo.([]any) {
+    f := f.(map[string]any)
+
+    for _, b := range f[&quot;bar&quot;].([]any) {
+      b := b.(map[string]any)
+      b[&quot;version&quot;] = uuid.New().String()
+    }
+  }
+
+  if err := d.Set(&quot;foo&quot;, foo); err != nil {
+    return err
+  }
+
+  d.Set(&quot;last_updated&quot;, time.Now().Format(time.RFC850))
+
+  return nil
+}
+</code></pre>
+
+<p>OK, so there&rsquo;s a little more going on here, but nothing too complicated. First thing we do is get the ID we set into the Terraform state after we had initially created the resource (<code>d.Id()</code>).</p>
+
+<p>Next, because we don&rsquo;t have a real API to get live data from, I&rsquo;m going to hardcode data to be set into terraform state. To do that I&rsquo;m going to get the data out from the Terraform state using <code>d.Get(&quot;foo&quot;)</code> and I&rsquo;m going to dynamically update the nested <code>version</code> attribute, which if you remember was defined as a &lsquo;computed&rsquo; value (meaning its an attribute the Terraform provider must set).</p>
+
+<p>But as this is a nested attribute I have to iterate over each parent structure until I reach the relevant level of the data structure where I can then set a value on the <code>version</code> attribute. That&rsquo;s effectively what the two <code>for</code> loops are doing, and you&rsquo;ll see this is where the <code>github.com/google/uuid</code> dependency comes in.</p>
+
+<p>Once that&rsquo;s done we&rsquo;re able to set the updated data structure into the local state file using <code>d.Set()</code> and be aware that we can&rsquo;t just set the <code>version</code> attribute directly, we must set the root <code>foo</code> attribute and this means constructing its complete data structure.</p>
+
+<p>Remember that the <code>last_updated</code> attribute was also marked as &lsquo;computed&rsquo; as so we need to set that dynamically too (and for that I just set the value using the current timestamp, and to be fair I could of done the same for the <code>version</code> attribute rather than use an external uuid package).</p>
+
+<h2 id="update">Update</h2>
+
+<p>The UPDATE operation is similar to the READ but we typically use additional SDK methods to help us know if there&rsquo;s been a change that would require a modification to the data.</p>
+
+<p>Let&rsquo;s look at the code in our &lsquo;mock&rsquo; provider to see what we&rsquo;re doing&hellip;</p>
+
+<pre><code class="language-go">func resourceUpdate(d *schema.ResourceData, m any) error {
+  resourceID := d.Id()
+
+  if d.HasChange(&quot;foo&quot;) {
+    foo := d.Get(&quot;foo&quot;).([]any)
+    d.Set(&quot;last_updated&quot;, time.Now().Format(time.RFC850))
+  }
+
+  return resourceRead(d, m)
+}
+</code></pre>
+
+<p>So some similar stuff here. First we get the resource&rsquo;s ID with <code>d.Id()</code> but now we&rsquo;re using <code>d.HasChange()</code> to see if the <code>foo</code> attribute has changed, and if it has, then we modify the local state. Of course the mock provider is just setting a value for <code>last_updated</code> as if there was a change but in reality your real provider would be making an &lsquo;update&rsquo; API call to update the resource.</p>
+
+<p>Lastly, we do a READ operation to be sure we get the updated API changes stored into our local state.</p>
+
+<h2 id="delete">Delete</h2>
+
+<p>The DELETE operation is very simple. In order to delete a resource from the local Terraform state we simply need to set the ID for the resource to an empty string&hellip;</p>
+
+<pre><code class="language-go">func resourceDelete(d *schema.ResourceData, m any) error {
+  resourceID := d.Id()
+  d.SetId(&quot;&quot;)
+  return nil
+}
+</code></pre>
+
+<p>Now in our mock provider you&rsquo;ll see we get the resource ID and although that looks pointless, in a real provider, you would want to get the resource ID because remember you&rsquo;d need to make an API call to delete the resource first before deleting it from the Terraform state.</p>
+
+<h2 id="data-sources">Data Sources</h2>
+
+<p>OK, before we wrap up, let&rsquo;s look at our example data source to see the schema structure:</p>
+
+<pre><code class="language-go">func dataSourceExample() *schema.Resource {
+	return &amp;schema.Resource{
+		Read: dataSourceRead,
+		Schema: map[string]*schema.Schema{
+			&quot;things&quot;: {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &amp;schema.Resource{
+					Schema: map[string]*schema.Schema{
+						&quot;id&quot;: {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						&quot;version&quot;: {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
+		},
+	}
+}
+</code></pre>
+
+<p>So there&rsquo;s a lot of similarities between a &lsquo;resource&rsquo; and a &lsquo;data source&rsquo;, and that&rsquo;s because a data source is a <em>subset</em> of a resource. So the main difference is we have a READ operation/function but none of the other CRUD functions (e.g. Create, Update, Delete) because a data source is only used for <em>querying</em> data and not something you create/update/delete.</p>
+
+<p>As far as the schema is concerned we&rsquo;ve defined a <code>things</code> attribute, which is &lsquo;computed&rsquo; along with all its nested attributes, and that makes sense as this isn&rsquo;t something a user defines in their configuration.</p>
+
+<p>Now let&rsquo;s take a look at the READ function to see what that&rsquo;s doing:</p>
+
+<pre><code class="language-go">func dataSourceRead(d *schema.ResourceData, m any) error {
+	const jsonStream = `
+		[
+			{&quot;id&quot;: 1, &quot;version&quot;: &quot;a&quot;},
+			{&quot;id&quot;: 2, &quot;version&quot;: &quot;b&quot;},
+			{&quot;id&quot;: 3, &quot;version&quot;: &quot;c&quot;},
+		]`
+
+	things := make([]map[string]any, 0)
+	err := json.NewDecoder(strings.NewReader(jsonStream)).Decode(&amp;things)
+	if err != nil {
+		return err
+	}
+
+	if err := d.Set(&quot;things&quot;, things); err != nil {
+		return err
+	}
+
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
+
+	return nil
+}
+</code></pre>
+
+<p>The <code>jsonStream</code> variable is creating stubbed data. This is as if we had made an actual API call and received back a bunch of data from the API.</p>
+
+<p>In order for us to store the returned data into Terraform we need to marshal the data into a format that matches what the schema expects (e.g. <code>[]map[string]any</code>) and in this case we&rsquo;re imagining our API returned JSON formatted data and so we use <code>json.NewDecoder</code> to decode the API response into the <code>things</code> variable.</p>
+
+<p>We then set the <code>things</code> data back into the local state using <code>d.Set()</code>.</p>
+
+<p>Now we&rsquo;ve reached the final interesting part, which is the <code>d.SetId()</code> call. So to explain, we don&rsquo;t have a unique ID for this data resource so we create one using a timestamp format. I typically see people use a hash of the returned API data as a unique key, so pick your poison.</p>
+
+<h2 id="how-to-use-this-provider">How to use this provider</h2>
+
+<p>Now if my mock provider was published to the Terraform registry it would be very simple to consume, but I&rsquo;ve not done that because I wanted an opportunity to explain how to test your own provider locally to be sure it&rsquo;s working first.</p>
+
+<p>So, to consume this mock provider without it being published to the Terraform registry, follow these steps:</p>
+
+<ul>
+<li>Clone the repo and build the <code>terraform-provider-mock</code> binary:
+
+<pre><code class="language-bash">
+make build
+</code></pre>
+</li>
+<li>Create a separate directory for your own Terraform project.
+
+<ul>
+<li>e.g. <code>cd ../ &amp;&amp; mkdir example-tf</code></li>
+</ul></li>
+<li>Create a <code>dev.tfrc</code> file in your own Terraform project&rsquo;s directory:
+
+<pre><code class="language-tf">
+provider_installation {
+dev_overrides {
+  &quot;integralist/mock&quot; = &quot;../terraform-provider-mock&quot; // the directory where the binary was built.
+}
+direct {}
+}
+</code></pre>
+</li>
+<li>In that shell instance set the <code>TF_CLI_CONFIG_FILE</code> environment variable.
+
+<ul>
+<li>e.g. <code>export TF_CLI_CONFIG_FILE=/example-tf/dev.tfrc</code></li>
+</ul></li>
+<li>Create Terraform project files.
+
+<ul>
+<li>e.g. see the <a href="https://github.com/Integralist/terraform-provider-mock/blob/main/README.md#example-terraform-consumer-code" target="_blank">Example Terraform Consumer Code</a> in my mock provider&rsquo;s README.</li>
+</ul></li>
+<li>Initialize your Terraform project and then execute a plan.
+
+<ul>
+<li>e.g. <code>terraform init &amp;&amp; terraform plan</code></li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p><strong>NOTE</strong>: every time you make a change to the Terraform provider code, you&rsquo;ll need to rebuild the binary and then go to your consuming Terraform project and reinitialize (i.e. <code>terraform init</code>) so it picks up the latest version of the <code>terraform-provider-mock</code> binary.</p>
+</blockquote>
+
+<h2 id="local-development">Local Development</h2>
+
+<p>When running:</p>
+
+<pre><code class="language-bash">$ TF_LOG=TRACE terraform init
+</code></pre>
+
+<p>You should notice a couple of things different from what you&rsquo;d normally see when initializing a new Terraform project.</p>
+
+<p>The first is a message highlighting the fact that a provider &lsquo;override&rsquo; is in place:</p>
+
+<pre><code class="language-txt">Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI configuration:
+ - integralist/mock in /Users/integralist/Code/terraform/terraform-provider-mock
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+</code></pre>
+
+<p>That is expected in this case we&rsquo;ve followed the instructions above, which tells us how to implement an override for the sake of local testing of the provider code.</p>
+
+<p>The other thing you&rsquo;ll notice is an error:</p>
+
+<pre><code class="language-txt">Error: Failed to query available provider packages
+
+Could not retrieve the list of available versions for provider
+integralist/mock: provider registry registry.terraform.io does not have a
+provider named registry.terraform.io/integralist/mock
+
+If you have just upgraded directly from Terraform v0.12 to Terraform v0.14
+then please upgrade to Terraform v0.13 first and follow the upgrade guide for
+that release, which might help you address this problem.
+</code></pre>
+
+<p>This error is expected because we&rsquo;ve not actually published this provider to the Terraform registry, so indeed it cannot be found. But the error doesn&rsquo;t prevent you from consuming the local provider binary still.</p>
+
+<blockquote>
+<p><strong>NOTE</strong>: don&rsquo;t use <code>Print</code> functions from the <code>fmt</code> package in the Terraform provider as, depending on the execution flow, Terraform can treat it as input to its internal program and treat it as an error. So use <code>Print</code> functions from the <code>log</code> package instead.</p>
+</blockquote>
+
+<p><strong>UPDATE</strong>: I&rsquo;ve since discovered <a href="https://pkg.go.dev/github.com/hashicorp/terraform-plugin-log/tflog" target="_blank">https://pkg.go.dev/github.com/hashicorp/terraform-plugin-log/tflog</a></p>
+
+<h2 id="debugging-a-terraform-provider">Debugging a Terraform Provider</h2>
+
+<p>There are essentially two approaches:</p>
+
+<ol>
+<li>Log-Based Debugging</li>
+<li>Debugger-Based Debugging.</li>
+</ol>
+
+<p>Refer to the <a href="https://www.terraform.io/plugin/sdkv2/debugging" target="_blank">official Hashicorp plugin documentation</a> and also the <a href="https://github.com/fastly/terraform-provider-fastly#debugging-the-provider" target="_blank">Fastly Terraform provider</a> documents, which demonstrates the latter approach.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There we have it! A simple Terraform provider broken down as simply as I could manage.</p>
+
+<p>Hopefully you can now mentally model your own API into a provider for your users.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

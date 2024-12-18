@@ -1,0 +1,1697 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#refactoring-techniques">Refactoring Techniques</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#languages">Languages</a></li>
+
+<li><a href="#why-refactor">Why refactor?</a></li>
+
+<li><a href="#when-should-you-refactor">When should you refactor?</a></li>
+
+<li><a href="#tests">Tests</a></li>
+
+<li><a href="#refactoring-techniques-1">Refactoring Techniques</a>
+<ul>
+<li><a href="#rename-method">Rename Method</a></li>
+
+<li><a href="#introduce-explaining-variable">Introduce Explaining Variable</a></li>
+
+<li><a href="#inline-temp">Inline Temp</a></li>
+
+<li><a href="#split-temp-variable">Split Temp Variable</a></li>
+
+<li><a href="#replace-temp-with-query">Replace Temp With Query</a></li>
+
+<li><a href="#replace-temp-with-chain">Replace Temp With Chain</a></li>
+
+<li><a href="#extract-method">Extract Method</a></li>
+
+<li><a href="#inline-method">Inline Method</a></li>
+
+<li><a href="#move-method">Move Method</a></li>
+
+<li><a href="#replace-method-with-method-object">Replace Method With Method Object</a></li>
+
+<li><a href="#replace-loop-with-collection-closure-method">Replace Loop With Collection Closure Method</a></li>
+
+<li><a href="#pull-up-method">Pull Up Method</a></li>
+
+<li><a href="#form-template-method">Form Template Method</a></li>
+
+<li><a href="#extract-surrounding-method">Extract Surrounding Method</a></li>
+
+<li><a href="#self-encapsulate-field">Self Encapsulate Field</a></li>
+
+<li><a href="#introduce-named-parameter">Introduce Named Parameter</a></li>
+
+<li><a href="#remove-redundancy">Remove Redundancy</a></li>
+
+<li><a href="#dynamic-method-definition">Dynamic Method Definition</a></li>
+
+<li><a href="#extract-class">Extract Class</a></li>
+
+<li><a href="#hide-delegate">Hide Delegate</a></li>
+
+<li><a href="#replace-array-with-object">Replace Array with Object</a></li>
+
+<li><a href="#replace-conditional-with-polymorphism">Replace Conditional with Polymorphism</a></li>
+
+<li><a href="#decompose-conditional">Decompose Conditional</a></li>
+
+<li><a href="#introduce-null-object">Introduce Null Object</a></li>
+</ul></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="refactoring-techniques">Refactoring Techniques</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Let&rsquo;s begin by considering: &ldquo;What is Refactoring?&rdquo;</p>
+
+<p>The definition of refactoring is:</p>
+
+<blockquote>
+<p>a disciplined technique for restructuring an existing body of code, altering its internal structure without changing its external behaviour</p>
+</blockquote>
+
+<p>Refactoring is a term originated from the <a href="http://en.wikipedia.org/wiki/Smalltalk" target="_blank">Smalltalk</a> community of developers back in the mid-late nineties.</p>
+
+<p>Two of the most prolific programmers of recent times, <a href="http://martinfowler.com/" target="_blank">Martin Fowler</a> and <a href="http://en.wikipedia.org/wiki/Kent_Beck" target="_blank">Kent Beck</a> literally wrote the book on the subject of refactoring called &ldquo;<a href="http://www.amazon.com/gp/product/0201485672" target="_blank">Refactoring: Improving the Design of Existing Code</a>&rdquo; (well, written by Martin with contributions from Kent).</p>
+
+<p>In 2009 both Martin and Kent helped with a rewrite of the book that focused more on the Ruby language than the original book&rsquo;s target language of Java. This follow-up book was called &ldquo;<a href="http://www.amazon.com/Refactoring-Ruby-Edition-Jay-Fields/dp/0321603508" target="_blank">Refactoring: The Ruby Edition</a>&rdquo; and it&rsquo;s that book which is the primary driving force of this post.</p>
+
+<p>Since reading the Ruby edition I wanted to have a short summarised version of some of the more commonly used refactoring techniques (mainly for my own reference). By that I mean the techniques described in the book that I find interesting and use a lot in my day to day programming life.</p>
+
+<h2 id="languages">Languages</h2>
+
+<p>These refactoring techniques aren&rsquo;t specific to the Ruby language (although my <em>implementation</em> examples are). You can use them when working with JavaScript or PHP (or any other language for that matter).</p>
+
+<p>Programming languages don&rsquo;t all offer identical APIs and so sometimes you might need to tweak the examples slightly to fit your environment.</p>
+
+<p>Regardless, the idioms and syntax differences between languages become redundant when you just focus on the pattern(s) behind the proposed solution.</p>
+
+<h2 id="why-refactor">Why refactor?</h2>
+
+<p>The purpose of refactoring is to improve the quality, clarity and maintainability of your code. Simple really.</p>
+
+<p>But also, refactoring can be a great lesson in understanding an unfamiliar code base.</p>
+
+<p>Think about it, if you inherit a poorly designed code base that you&rsquo;ve not seen before and you now need to either fix a bug or add a new feature, then implementing the code necessary would be a lot easier once you had refactored it to be in a more stable, maintainable and ultimately &lsquo;understandable&rsquo; state.</p>
+
+<p>Otherwise you would be forced to retro fit your new code on top of a poorly designed foundation and that would be the start of a very unhappy relationship.</p>
+
+<h2 id="when-should-you-refactor">When should you refactor?</h2>
+
+<p>You&rsquo;ll usually find the time you start refactoring the most is when you are fixing bugs or adding new features.</p>
+
+<p>For example, you typically first need to understand the code that has already been written (regardless of whether it was you who wrote it originally or someone else).</p>
+
+<p>The process of refactoring helps you better understand the code, in preparation for modifying it.</p>
+
+<p>But don&rsquo;t fall into the trap of thinking that refactoring is something you set aside time for, or only consider at the start/end of a project. It&rsquo;s not. Refactoring should be done in small chunks throughout the entire life cycle of the project.</p>
+
+<p>As the great <a href="http://www.cleancoder.com/" target="_blank">Uncle Bob</a> once said:</p>
+
+<blockquote>
+<p>leave a module in a better state than you found it</p>
+</blockquote>
+
+<p>&hellip;what this suggests is that refactoring is essential to your daily coding process.</p>
+
+<h2 id="tests">Tests</h2>
+
+<p>Before we get started, it&rsquo;s important to mention that you should have tests in place when you&rsquo;re refactoring.</p>
+
+<p>You <em>can</em> refactor without tests, but realise that without tests to back you up then you can have no confidence in the refactoring you are implementing.</p>
+
+<p>Refactoring can result in substantial changes to the code and architecture but still leave the top layer API the same. So while you&rsquo;re refactoring remember the old adage&hellip;</p>
+
+<blockquote>
+<p>program to an interface, not an implementation</p>
+</blockquote>
+
+<p>We want to avoid changing a public API where ever possible (as that&rsquo;s one of the tenets of refactoring).</p>
+
+<p>If you don&rsquo;t have tests then I recommend you write some (now)&hellip; don&rsquo;t worry, I&rsquo;ll wait.</p>
+
+<p>Remember, the process of writing tests (even for an application you don&rsquo;t know) will help solidify your understanding and expectations of the code you&rsquo;re about to work on.</p>
+
+<p>Code should be tested regularly while refactoring to ensure you don&rsquo;t break anything. Keep the &lsquo;red, green, refactor&rsquo; feedback loop tight. Tests help confirm if your refactoring has worked or not. Without them you&rsquo;re effectively flying blind.</p>
+
+<p>So although I won&rsquo;t explicitly mention it below when discussing the different refactoring techniques, it is implied that on every change to your code you should really be running the relevant tests to ensure no broken code appears.</p>
+
+<h2 id="refactoring-techniques-1">Refactoring Techniques</h2>
+
+<p>There are many documented refactoring techniques and I do not attempt to cover them all, as this post would end up becoming a book in itself. So I&rsquo;ve picked what I feel are the most common and useful refactoring techniques and I try my best to explain them in a short and concise way.</p>
+
+<p>I&rsquo;ve put these techniques in order of how you might approach refactoring a piece of code, in a linear, top to bottom order. This is a personal preference and doesn&rsquo;t necessarily represent the best way to refactor.</p>
+
+<p>Final note: with some of the techniques I have provided a basic code example, but to be honest some techniques are so simple they do not need any example. The <a href="#extract-method">Extract Method</a> is one such technique that although really useful and important, providing a code example would be a waste of time and space.</p>
+
+<p>So without further ado, let&rsquo;s begin&hellip;</p>
+
+<h3 id="rename-method">Rename Method</h3>
+
+<p>The single most effective and simple refactoring you can implement is to rename a property/attribute, method or object.</p>
+
+<p>Renaming identifiers can reduce the need for code comments and nearly always helps to promote greater clarity.</p>
+
+<p>You&rsquo;ll find that renaming things is a fundamental part of other refactoring techniques to aid understanding of the code.</p>
+
+<p>This technique relies on giving items a descriptive name to ensure the developer knows at a glance exactly what it does. The following technique <a href="#introduce-explaining-variable">Introduce Explaining Variable</a> is effectively the same.</p>
+
+<h3 id="introduce-explaining-variable">Introduce Explaining Variable</h3>
+
+<p>So here is a technique specifically based around the premise of renaming.</p>
+
+<p>If you have a complicated expression (for example, you&rsquo;ll typically have a long winded set of conditions within an <code>if</code> statement) then place that complex expression into a temp variable and give it a descriptive identifier.</p>
+
+<p>For example:</p>
+
+<pre><code>unless &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?
+  puts &quot;capitalised text was found&quot;
+end
+</code></pre>
+
+<p>Should be:</p>
+
+<pre><code>caps_not_found = &quot;This is a String with some CAPS&quot;.scan(/([A-Z])/).empty?
+
+unless caps_not_found
+  puts &quot;capitalised text was found&quot;
+end
+</code></pre>
+
+<p>Note: this is the only technique that finds temps (i.e. local variables) acceptable. This is because temps are deemed to be less reusable than methods (due to their very nature being &lsquo;local&rsquo;) and so introducing temps is something that shouldn&rsquo;t be considered lightly. Maybe consider using the <a href="#extract-method">Extract Method</a> technique instead before using this particular technique.</p>
+
+<p>Also, don&rsquo;t worry about performance until you know you have a performance issue to worry about. Developers will always suggest that calling methods is slower than running code inline, but good programming is about readability and maintainability, and extracted methods are not only easier to understand but are much more reusable by other methods.</p>
+
+<p>So if you are considering using the <a href="#introduce-explaining-variable">Introduce Explaining Variable</a> technique, first decide whether the temp would be more useful if it was available to other methods (that way you could use <a href="#extract-method">Extract Method</a> instead and avoid defining a temp altogether).</p>
+
+<h3 id="inline-temp">Inline Temp</h3>
+
+<p>Temp variables are a bit of a code smell as they make methods longer and can make the <a href="#extract-method">Extract Method</a> more awkward (as you&rsquo;d have to pass through more data to the extracted method).</p>
+
+<p>Inline Temp effectively removes the temp variable altogether by just using the value assigned to it (I&rsquo;d only suggest doing this if the temp is only used once or if the resulting value has come from a method invocation).</p>
+
+<p>For example:</p>
+
+<pre><code>def add_stuff
+    1 + 1
+end
+
+def do_something
+    temp_variable_with_descriptive_name = add_stuff
+    puts &quot;Number is #{temp_variable_with_descriptive_name}&quot;
+end
+</code></pre>
+
+<p>Should be:</p>
+
+<pre><code>def add_stuff
+    1 + 1
+end
+
+def do_something
+    puts &quot;Number is #{add_stuff}&quot;
+end
+</code></pre>
+
+<p>Note: a temp by itself doesn&rsquo;t do any harm, and in some instances can actually make the code clearer (especially if using a result from a method invocation and the method identifier doesn&rsquo;t indicate the intent as well as it should).</p>
+
+<p>But most likely you&rsquo;ll end up using this technique to aid the <a href="#extract-method">Extract Method</a> technique as less temp vars means less requirement to pass through additional parameters to the extracted method.</p>
+
+<h3 id="split-temp-variable">Split Temp Variable</h3>
+
+<p>This technique aims to resolve the concern of violating the SRP (Single Responsibility Principle), although slightly tamer in the sense that SRP is aimed more at Classes/Objects and methods, not typically variable assignments.</p>
+
+<p>But regardless if a temporary variable is assigned to more than once and it is not a loop variable or a collecting/accumulator variable then it is a temp considered to have too many responsibilities.</p>
+
+<p><strong>For example</strong>: (this is a daft example, but what the heck)</p>
+
+<pre><code>temp = 2 * (height + width)
+temp = height * width
+</code></pre>
+
+<p><strong>Becomes</strong>:</p>
+
+<pre><code>perimeter = 2 * (height + width)
+area = height * width
+</code></pre>
+
+<p>As you can see, the temp variable was handling more responsibility than it should be and so by creating two appropriately distinct temps we ensure greater code clarity.</p>
+
+<h3 id="replace-temp-with-query">Replace Temp With Query</h3>
+
+<p>This technique has a very similar intent to <a href="#inline-temp">Inline Temp</a> in that one of its primary focuses is to aid the <a href="#extract-method">Extract Method</a>.</p>
+
+<p>The subtle but important difference between this technique and <a href="#inline-temp">Inline Temp</a> is that the complex expression assigned to the temp needs to be first moved to a method (whereas the <a href="#inline-temp">Inline Temp</a> technique is different in that the temp may already be using a method invocation).</p>
+
+<p>For example:</p>
+
+<pre><code>class Box
+  attr_reader :length, :width, :height
+
+  def initialize length, width, height
+    @length = length
+    @width  = width
+    @height = height
+  end
+
+  def volume
+    # `area` is the temp
+    area = length * width
+    area * height
+  end
+end
+</code></pre>
+
+<p>Becomes:</p>
+
+<pre><code>class Box
+  attr_reader :length, :width, :height
+
+  def initialize length, width, height
+    @length = length
+    @width  = width
+    @height = height
+  end
+
+  def volume
+    # notice `area` is now a direct method call
+    area * height
+  end
+
+  def area
+    length * width
+  end
+end
+</code></pre>
+
+<p>This technique can help to shorten a long method by not having to define lots of temp variables just to hold values.</p>
+
+<p>If the extracted query method is given an identifier that aptly describes its purpose then the code still can be considered clear and descriptive.</p>
+
+<p>Also, it is considered bad form to define a variable which changes once it has been set (hence moving to a method better indicates an unstable value).</p>
+
+<p>Note: this technique can sometimes be made easier to implement once you&rsquo;ve used <a href="#split-temp-variable">Split Temp Variable</a>.</p>
+
+<p>Remember this technique (as with other techniques) is an incremental step towards removing non-essential temps, so consider using <a href="#inline-temp">Inline Temp</a> afterwards, thus removing the need for the temp altogether.</p>
+
+<h3 id="replace-temp-with-chain">Replace Temp With Chain</h3>
+
+<p>This is yet another technique designed to rid your code of temp variables.</p>
+
+<p>If you have a temp variable holding the result of calling an object&rsquo;s method, and follow the assignment by using that temp to carry out more method calls, then you should consider chaining method calls instead.</p>
+
+<p>The implementation is quite simple, you just have to ensure the methods called return <code>self</code> (or <code>this</code> if using a language like JavaScript).</p>
+
+<p>By allowing methods to chain we again have the opportunity to remove an unnecessary temps.</p>
+
+<p><strong>For example</strong>:</p>
+
+<pre><code>class College
+    def create_course
+        puts &quot;create course&quot;
+    end
+
+    def add_student
+        puts &quot;add student&quot;
+    end
+end
+
+temp = College.new
+temp.create_course
+temp.add_student
+temp.add_student
+temp.add_student
+</code></pre>
+
+<p><strong>Becomes</strong>:</p>
+
+<pre><code>class College
+    # static method so can be accessed without creating an instance
+    def self.create_course
+        college = College.new
+        puts &quot;create course&quot;
+        college # return new object instance
+    end
+
+    def add_student
+        puts &quot;add student&quot;
+        self # refers to the new object instance
+    end
+end
+
+college = College.create_course
+                 .add_student
+                 .add_student
+                 .add_student
+</code></pre>
+
+<h3 id="extract-method">Extract Method</h3>
+
+<p>Here it is! In my opinion &lsquo;<em>The</em>&rsquo; most used and important refactoring technique.</p>
+
+<p>The implementation behind this technique is very simple. It consists of breaking up long methods by shifting overly complex chunks of code into new methods which have very descriptive identifiers.</p>
+
+<p>For example:</p>
+
+<pre><code>class Foo
+  attr_reader :bar
+
+  def initialize bar
+    @bar = bar
+  end
+
+  def do_something
+    puts &quot;my baz&quot; # notice this is duplication
+    puts bar
+  end
+
+  def do_something_else
+    puts &quot;my baz&quot; # notice this is duplication
+    puts &quot;Something else&quot;
+    puts bar
+  end
+end
+</code></pre>
+
+<p>Becomes:</p>
+
+<pre><code>class Foo
+  attr_reader :bar
+
+  def initialize bar
+    @bar = bar
+  end
+
+  def do_something
+    baz
+    puts bar
+  end
+
+  def do_something_else
+    baz
+    puts &quot;Something else&quot;
+    puts bar
+  end
+
+  def baz
+    puts &quot;my baz&quot;
+  end
+end
+</code></pre>
+
+<p>But be careful with handling local variables as you&rsquo;ll need to pass them through to the extracted method and that can be difficult if there are lots of temps in use. Sometimes to facility the Extract Method you&rsquo;ll need to first incorporate other techniques such as <a href="#replace-temp-with-query">Replace Temp With Query</a> and <a href="#inline-temp">Inline Temp</a>.</p>
+
+<h3 id="inline-method">Inline Method</h3>
+
+<p>Sometimes you want the opposite of the <a href="#extract-method">Extract Method</a> technique. Imagine a method exists whose content is already simple and clear, and whose identifier adds no extra benefit. In this instance we&rsquo;re just making an extra call for no real benefit.</p>
+
+<p>So to fix this problem we&rsquo;ll convert the method invocation into an inlined piece of code (unless of course the method is used in multiple places, in that case leave it where it is as having it in a separate method keeps our code DRY).</p>
+
+<h3 id="move-method">Move Method</h3>
+
+<p>In a previous post about <a href="http://www.integralist.co.uk/posts/design-ood/#class-analysis" target="_blank">Object-Oriented Design</a> I explained that you should query your classes/objects to ensure the methods they define are actually where they should be (another reason is &lsquo;feature envy&rsquo;, if a method is asking another class a lot of questions then it may be an indication the method is on the wrong object).</p>
+
+<p>The Move Method technique ensures this decoupling by simply moving the identified misplaced method onto the correct one.</p>
+
+<p>Once the method has been moved you should clean up the previously passed parameters by seeing what can be moved over to the other object or whether additional data needs to be passed over now via the method invocation.</p>
+
+<p>For example:</p>
+
+<pre><code>class Gear
+    attr_reader :chainring, :cog, :rim, :tire
+
+    def initialize (chainring, cog, rim, tire)
+      @chainring = chainring
+      @cog       = cog
+      @rim       = rim
+      @tire      = tire
+
+      # let's asked the question:
+      # &quot;Please Mr. Gear what is your tire size?&quot;
+      # hmm? notice this doesn't sound like it quite fits the purpose of a 'Gears' class
+    end
+
+    def ratio
+      chainring / cog.to_f
+    end
+
+    def gear_inches
+        # tire goes around rim twice for diameter
+        ratio * (rim + (tire * 2))
+    end
+end
+</code></pre>
+
+<p>Becomes:</p>
+
+<pre><code>class Gear
+    attr_reader :chainring, :cog, :rim, :tire
+
+    def initialize (chainring, cog, rim, tire)
+      @chainring = chainring
+      @cog       = cog
+      @rim       = rim
+      @tire      = tire.size
+    end
+
+    def ratio
+      chainring / cog.to_f
+    end
+
+    def gear_inches
+        # tire goes around rim twice for diameter
+        ratio * (rim + (tire * 2))
+    end
+end
+
+class Tire
+  def self.size
+    5
+  end
+end
+</code></pre>
+
+<p>From the original class/object keep the original method in place while you test and change it so it now delegates to the method on the new object. Then slowly refactor by replacing delegating calls throughout your code base with direct calls to the method via its new host.</p>
+
+<p>Finally, remove the old method altogether and the tests should tell you if you missed a replacement somewhere.</p>
+
+<h3 id="replace-method-with-method-object">Replace Method With Method Object</h3>
+
+<p>You may run into a problem where you have a long method you want to use <a href="#extract-method">Extract Method</a> on, but the number of temporary local variables are too great to allow you to utilise the <a href="#extract-method">Extract Method</a> technique (because passing around that many variables would be just as messy as the long method itself).</p>
+
+<p>To resolve this issue you could look at different types of smaller refactors (such as <a href="#inline-temp">Inline Temp</a>) but in some cases it would actually be better to first move the contents of the long method into an entirely new object.</p>
+
+<p>So the first thing to do is create a new class named after the long method and add the temp local vars as properties/attributes of the class/object.</p>
+
+<p>Now when you try to implement <a href="#extract-method">Extract Method</a> you don&rsquo;t have to pass around the temp vars because they are now available throughout the class/object.</p>
+
+<p>Then from within the original class/object you can delegate any calls to the original method on to the object (you&rsquo;ll still pass on the original arguments to the method within the new object but from there on the method extraction becomes easier).</p>
+
+<p>For example:</p>
+
+<pre><code>class Foo
+  def bar
+    puts &quot;We're doing some bar stuff&quot;
+  end
+
+  def baz(a, b, c)
+    if a == 'something'
+      # do something
+    end
+
+    if b == 'else'
+      # do else
+    end
+
+    if c == 'none'
+      # do none
+    end
+  end
+end
+</code></pre>
+
+<p>Becomes:</p>
+
+<pre><code>class Foo
+  def bar
+    puts &quot;We're doing some bar stuff&quot;
+  end
+end
+
+class Baz
+  attr_accessor :a, :b, :c
+
+  def initialize(a, b, c)
+    @a = a
+    @b = b
+    @c = c
+
+    if a == 'something'
+      # do something
+    end
+
+    if b == 'else'
+      # do else
+    end
+
+    if c == 'none'
+      # do none
+    end
+  end
+end
+</code></pre>
+
+<p>From here we&rsquo;re now in a better state to use both the <a href="#extract-method">Extract Method</a> and <a href="/posts/refactoring-techniques/#replace-conditional-with-polymorphism">Replace Conditional with Polymorphism</a> techniques to refactor the <code>Baz</code> class.</p>
+
+<h3 id="replace-loop-with-collection-closure-method">Replace Loop With Collection Closure Method</h3>
+
+<p>If you write a loop that parses a collection and interacts with the individual elements within the collection then move that interaction out into a separate closure based method (meaning you replace the loop with an Enumerable method).</p>
+
+<p>This refactoring may not be as clear or impressive as other refactoring techniques but the motivation behind it is that you hide the ugly details of the loop behind a nicer iteration method, allowing the developer looking at the code to focus on the business logic instead.</p>
+
+<p><strong>For example</strong>:</p>
+
+<pre><code>managers = []
+employees.each do |e|
+    managers &lt;&lt; e if e.manager?
+end
+</code></pre>
+
+<p><strong>Becomes</strong>:</p>
+
+<pre><code>managers = employees.select { |e| e.manager? }
+</code></pre>
+
+<p>Ruby has a few of these types of enumerable methods but other languages such as PHP and JavaScript aren&rsquo;t so lucky.</p>
+
+<p>JavaScript has a couple of accumulators: <code>Array#reduce</code> and <code>Array#reduceRight</code> but they aren&rsquo;t very useful as closure based collection methods compared to Ruby which has methods such as <code>Enumerable#inject</code>, <code>Enumerable#select</code> (seen in above example) or <code>Enumerable#collect</code>.</p>
+
+<p>Note: in JavaScript you can implement a similar effect with clever use of closures.</p>
+
+<h3 id="pull-up-method">Pull Up Method</h3>
+
+<p>When you have duplicated code across two separate classes then the best refactoring technique to implement is to pull that duplicate code up into a super class so we DRY (Don&rsquo;t Repeat Yourself) out the code and allow it to be used in multiple places without duplication (meaning changes in future only have to happen in one place).</p>
+
+<p>For example:</p>
+
+<pre><code>class Person
+  attr_reader :first_name, :last_name
+
+  def initialize first_name, last_name
+    @first_name = first_name
+    @last_name = last_name
+  end
+
+end
+
+class MalePerson &lt; Person
+  # This is duplicated in the `FemalePerson` class
+  def full_name
+    first_name + &quot; &quot; + last_name
+  end
+
+  def gender
+    &quot;M&quot;
+  end
+end
+
+class FemalePerson &lt; Person
+  # This is duplicated in the `MalePerson` class
+  def full_name
+    first_name + &quot; &quot; + last_name
+  end
+
+  def gender
+    &quot;F&quot;
+  end
+end
+</code></pre>
+
+<p>Becomes:</p>
+
+<pre><code>class Person
+  attr_reader :first_name, :last_name
+
+  def initialize first_name, last_name
+    @first_name = first_name
+    @last_name = last_name
+  end
+
+  def full_name
+    first_name + &quot; &quot; + last_name
+  end
+end
+
+class MalePerson &lt; Person
+  def gender
+    &quot;M&quot;
+  end
+end
+
+class FemalePerson &lt; Person
+  def gender
+    &quot;F&quot;
+  end
+end
+</code></pre>
+
+<h3 id="form-template-method">Form Template Method</h3>
+
+<p>The technique is reliant on inheritance: a parent class and two sub classes of
+that parent. The two sub classes have methods which have similar steps, in the
+same order and yet the steps themselves are different.</p>
+
+<p>The technique involves moving the sequence of steps into the parent class and
+then using polymorphism to allow the sub classes to handle the differences in
+the steps.</p>
+
+<p>Here is a silly example (I’m no good at giving real examples; you may have noticed), here is an
+example of our problematic code…</p>
+
+<pre><code>class Foo; end
+
+class Bar &lt; Foo
+  def initialize
+    @hey = 1
+    @hai = 2
+  end
+
+  def qux
+    @a = @hey + @hai
+    @b = @a * 10
+    @a + @b
+  end
+end
+
+class Baz &lt; Foo
+  def initialize
+    @hey = 5
+    @hai = 7
+  end
+
+  def qux
+    @a = @hey + @hai
+    @b = @a * 10 * 20
+    @a + @b
+  end
+end
+
+bar = Bar.new
+baz = Baz.new
+
+puts bar.qux
+puts baz.qux
+</code></pre>
+
+<p>…we could try to inject the values each sub class requires but then we still
+have a lot of duplication in this code.</p>
+
+<p>We can see the sequence of steps is:</p>
+
+<p>determine what <code>a</code> should be<br>
+determine what <code>b</code> should be<br>
+return a specific calculation</p>
+
+<p>…so we can clean up our code a little by abstracting the commonality&hellip;</p>
+
+<pre><code>class Foo
+  def initialize(hey=1, hai=1)
+    @hey = hey
+    @hai = hai
+  end
+
+  def qux
+    determine_a
+    determine_b
+    result
+  end
+
+  def determine_a
+    @a = @hey + @hai
+  end
+
+  def result
+    @a + @b
+  end
+end
+
+class Bar &lt; Foo
+  protected
+
+  def determine_b
+    @b = @a * 10
+  end
+end
+
+class Baz &lt; Foo
+  protected
+
+  def determine_b
+    @b = @a * 10 * 20
+  end
+end
+
+bar = Bar.new(1, 2)
+baz = Baz.new(5, 7)
+
+puts bar.qux
+puts baz.qux
+</code></pre>
+
+<h3 id="extract-surrounding-method">Extract Surrounding Method</h3>
+
+<p>If you find you have different methods which contain almost identical code but with a slight variant in the middle, then pull up the duplicated code into a single method and pass a code block to the newly created method which it yields to in order to execute the unique behaviour&hellip;</p>
+
+<pre><code>def do_something
+    puts 1
+    yield
+    puts 3
+end
+
+do_something { puts 2 }
+</code></pre>
+
+<p>This is actually a common pattern in Ruby known as the &lsquo;wrap around&rsquo; method. This technique is similar to the <a href="#form-template-method">Form Template Method</a>, but is different in that you can use it without forcing an inheritance model on your code.</p>
+
+<p>Note: JavaScript doesn&rsquo;t have the ability to pass a code block but it can be replicated by passing a function that acts like a callback&hellip;</p>
+
+<pre><code>function doSomething (callback) {
+        console.log(1);
+        callback();
+        console.log(3);
+}
+
+doSomething(function(){
+        console.log(2);
+});
+</code></pre>
+
+<p>&hellip;although in the latest versions of Node (as of November 2013) Generators are implemented and would allow JavaScript code to <code>yield</code> similar to how Ruby works.</p>
+
+<h3 id="self-encapsulate-field">Self Encapsulate Field</h3>
+
+<p>When inheriting properties from a parent class/object then it can be more flexible if the parent class only allows access to the properties from within a getter/setter.</p>
+
+<p>The motivation for this technique is that a sub class can override and modify the behaviour of the getter/setter without affecting the parent class&rsquo; implementation. Which is similar to how the Decorator design pattern works (e.g. modifying the behaviour without affecting the original).</p>
+
+<p>This technique should only be used once you find the coupling between objects is becoming a problem. Otherwise direct access to properties and instance variables should be acceptable initially.</p>
+
+<p>For example:</p>
+
+<pre><code>def total
+  @base_price * (1 + @tax_rate)
+end
+</code></pre>
+
+<p>Becomes:</p>
+
+<pre><code>attr_reader :base_price, :tax_rate
+
+def total
+  base_price * (1 + tax_rate)
+end
+</code></pre>
+
+<h3 id="introduce-named-parameter">Introduce Named Parameter</h3>
+
+<p>When method arguments are unclear then convert them into named parameters so they become clearer (and easier to remember).</p>
+
+<p>Although Ruby supports named parameters&hellip;</p>
+
+<pre><code>def turnOnTheTV (channel: 1, volume: 1); end
+turnOnTheTV(channel: 101, volume: 10)
+</code></pre>
+
+<p>&hellip;neither PHP or JavaScript do, so for PHP you can pass an associated Array and with JavaScript you can pass an Object/Hash.</p>
+
+<p><strong>For example (JavaScript)</strong>:</p>
+
+<pre><code>function turnOnTheTV(c, v){}
+turnOnTheTV(101, 10);
+</code></pre>
+
+<p><strong>Becomes</strong>:</p>
+
+<pre><code>function turnOnTheTV (config) {
+    // config.channel === 101
+    // config.volume  === 10
+}
+turnOnTheTV({ channel: 101, volume: 10 });
+</code></pre>
+
+<p>Note: ECMAScript 6.0 (the latest JavaScript specification - which is still being worked on as of Nov 2013) implements named parameters.</p>
+
+<h3 id="remove-redundancy">Remove Redundancy</h3>
+
+<p>This isn&rsquo;t an explicit technique, more a grouping of techniques.</p>
+
+<p>The principle idea being that: code evolves, and as it evolves you may find techniques you previously implemented (as part of an earlier refactoring) have since become redundant.</p>
+
+<p>Imagine you implemented the &ldquo;<a href="refactoring-techniques.html#22" target="_blank">Introduce Named Parameter</a>&rdquo; technique (passing a hash with named properties as a single argument instead of multiple unidentified arguments).</p>
+
+<p>Now, after some other refactorings have taken place, you discover the method originally refactored is no longer as complex and so your argument hash refactor has been reduced down to just a single named property.</p>
+
+<p>In this particular scenario you should remove the named parameter and simply pass a single argument instead.</p>
+
+<p>This principle applies with other refactoring techniques.</p>
+
+<p>Imagine an earlier refactoring included implementing a default parameter value for a method call. As your code evolves, if you discover you now only ever call the method <em>with</em> an argument then the default value becomes redundant and makes the code more complex than it needs to be by providing a default value. So just remove the redundant code.</p>
+
+<h3 id="dynamic-method-definition">Dynamic Method Definition</h3>
+
+<p>Sometimes defining multiple methods can be wasteful when functionally they carry out similar steps.</p>
+
+<p>For example, imagine we had the following code&hellip;</p>
+
+<pre><code>def failure do 
+  self.result = &quot;failure&quot; 
+end 
+
+def success do 
+  self.result = &quot;success&quot; 
+end 
+
+def error do 
+  self.result = &quot;error&quot; 
+end 
+</code></pre>
+
+<p>Notice how the functions are structurally identical. They simply set a <code>result</code> property to have a value
+This can be refactored using Ruby&rsquo;s <code>define_method</code> method (which let&rsquo;s you create methods dynamically at run time)&hellip;</p>
+
+<pre><code>[:failure, :success, :error].each do |method| 
+  define_method method do 
+    self.result = method.to_s 
+  end 
+end 
+</code></pre>
+
+<p>Note: you could also abstract this code into a more reusable (and easier to maintain) function like so&hellip;</p>
+
+<pre><code>def dynamic_methods(*method_names, &amp;block) 
+  method_names.each do |method_name| 
+    define_method method_name do 
+      instance_exec(method_name, &amp;block)
+    end 
+  end 
+end 
+</code></pre>
+
+<p>You can also use this technique to help ease creating properties on an object. For example, I used this technique in my <a href="http://www.integralist.co.uk/posts/design-mvcp/" target="_blank">MVCP</a> blog post to dynamically create instance variables&hellip;</p>
+
+<pre><code>require 'app/presenters/base' 
+require 'app/models/person' 
+
+class Presenters::Person &lt; Presenters::Base 
+  attr_reader :run, :name, :age 
+
+  def initialize 
+    @run = true 
+
+    model = Person.new('Mark', '99') 
+    prepare_view_data({ :name =&gt; model.name, :age =&gt; model.age }) 
+  end 
+end 
+
+module Presenters 
+  class Base 
+    attr_accessor :model 
+
+    def prepare_view_data hash 
+      hash.each do |name, value| 
+        instance_variable_set(&quot;@#{name}&quot;, value) 
+      end 
+    end 
+  end 
+end 
+</code></pre>
+
+<h3 id="extract-class">Extract Class</h3>
+
+<p>This is a pretty standard technique which helps ensure your objects abide by the SRP (Single Responsibility Principle).</p>
+
+<p>If you find your classes are doing too much then simply create a new class and move the relevant fields and methods over one by one (while running the tests as you go to ensure all code continues working as expected).</p>
+
+<p>Doing so you&rsquo;ll end up with two small, focused and clean classes which are easier to manage.</p>
+
+<h3 id="hide-delegate">Hide Delegate</h3>
+
+<p>This technique focuses on the principle of object encapsulation. Specifically decoupling two or more objects by reducing the context the objects have of each other.</p>
+
+<p>The following code demonstrates the idea&hellip;</p>
+
+<pre><code>module Bar
+  def display
+    puts &quot;Bar Stuff&quot;
+  end
+end
+
+module Baz
+  def display
+    puts &quot;Baz Stuff&quot;
+  end
+end
+
+class Foo
+  include Bar
+
+  def do_something
+    display
+  end
+end
+
+foo = Foo.new
+foo.do_something
+</code></pre>
+
+<p>&hellip;as you can see, the user only needs to rely on the interface having a <code>do_something</code> method.</p>
+
+<p>The implementation details of <code>do_somthing</code> (in this case the delegation off to another method) are hidden.</p>
+
+<p>If we changed <code>include Bar</code> for <code>include Baz</code>, or maybe we don&rsquo;t mixin a module at all and just write some code inside of <code>do_something</code>, it doesn&rsquo;t matter because the public interface is set as far as the user is concerned.</p>
+
+<h3 id="replace-array-with-object">Replace Array with Object</h3>
+
+<p>The motivation for this technique is to convert a simple data container which holds multiple data types into an object with clear and descriptive identifiers.</p>
+
+<p>This principle helps to present your complex data into a more sensible format (I demonstrated this in a previous post on <a href="/posts/design-ood/#direct-references">object-oriented design</a>). This technique also makes the data interaction more maintainable by providing an easier and understandable interface to the data.</p>
+
+<p>Here is an example where we&rsquo;re violating the principle of a clean data interaction&hellip;</p>
+
+<pre><code>class Foo 
+  attr_reader :data 
+
+  def initialize(data) 
+    @data = data 
+  end 
+
+  def do_something 
+    data.each do |item| 
+      puts item[0] 
+      puts item[1] 
+      puts '---' 
+    end 
+  end 
+end 
+
+obj = Foo.new([[10, 25],[3, 9],[41, 7]]) 
+obj.do_something 
+</code></pre>
+
+<p>Notice in the first example how our code has far too much knowledge (context) about the object it&rsquo;s interacting with. It knows that the Array index zero holds an X coordinate and the Array index one holds a Y coordinate.</p>
+
+<p>If that format was to change (let&rsquo;s say the X and Y swap places) then that would cause our code to break in unexpected ways.</p>
+
+<p>But now take a look at the following example which works around this issue by converting our complex data structure into a cleaner data format&hellip;</p>
+
+<pre><code>class Foo 
+  attr_reader :new_data 
+
+  def initialize(data) 
+    @new_data = transform(data) 
+  end 
+
+  def do_something 
+    new_data.each do |item| 
+      # now we are able to reference easily understandable 
+      # property names (rather than item[0], item[1]) 
+      puts item.coord_x 
+      puts item.coord_y 
+      puts '---' 
+    end 
+  end 
+
+  Transform = Struct.new(:coord_x, :coord_y) 
+
+  def transform(data) 
+    data.collect { |item| Transform.new(item[0], item[1]) } 
+  end 
+end 
+
+obj = Foo.new([[10, 25],[3, 9],[41, 7]]) 
+obj.do_something 
+</code></pre>
+
+<p>&hellip;here we convert the Array into an object and instead can more easily and safely reference the data we&rsquo;re interested in via recognisable property identifiers. This doesn&rsquo;t mean if the data source changes that we&rsquo;ll totally avoid all problems but it&rsquo;ll be clearer where the problem is arising.</p>
+
+<h3 id="replace-conditional-with-polymorphism">Replace Conditional with Polymorphism</h3>
+
+<p>This is one of the most useful refactoring techniques available to you, and there are two ways it can help:</p>
+
+<ol>
+<li>It removes the code smell of conditional logic</li>
+<li>It demonstrates perfectly the principle of object-oriented design</li>
+</ol>
+
+<p>The following example shows the typical procedural attempt to handle different scenarios based on the data object type being passed&hellip;</p>
+
+<pre><code>class Foo
+  def initialize(data)
+    @data = data
+  end
+
+  def do_something
+    if @data.class == Bar
+      puts &quot;Bar!&quot;
+    elsif @data.class == Baz
+      puts &quot;Baz!&quot;
+    elsif @data.class == Qux
+      puts &quot;Qux!&quot;
+    end
+  end
+end
+
+class Bar; end
+class Baz; end
+class Qux; end
+
+foo_bar = Foo.new(Bar.new)
+foo_bar.do_something
+
+foo_baz = Foo.new(Baz.new)
+foo_baz.do_something
+
+foo_qux = Foo.new(Qux.new)
+foo_qux.do_something
+</code></pre>
+
+<p>&hellip;as you can see, if we have a new Class type we need to go back and to modify the <code>Foo</code> base class. This violates the OCP (Open/Closed Principle) which states a file should be open for extension but closed for modification.</p>
+
+<p>For us to abide by OCP we can use polymorphism and a trusted interface/duck typing to solve the problem&hellip;</p>
+
+<pre><code>class Foo
+  def initialize(data)
+    @data = data
+  end
+
+  def do_something
+    @data.identifier
+  end
+end
+
+class Bar
+  def identifier
+    puts &quot;#{self.class}!&quot;
+  end
+end
+
+class Baz
+  def identifier
+    puts &quot;#{self.class}!&quot;
+  end
+end
+
+class Qux
+  def identifier
+    puts &quot;#{self.class}!&quot;
+  end
+end
+
+foo_bar = Foo.new(Bar.new)
+foo_bar.do_something
+
+foo_baz = Foo.new(Baz.new)
+foo_baz.do_something
+
+foo_qux = Foo.new(Qux.new)
+foo_qux.do_something
+</code></pre>
+
+<p>Notice we have removed the need for a conditional and just sent the message to the relevant object to be handled. Much cleaner and easier to maintain and scale.</p>
+
+<h3 id="decompose-conditional">Decompose Conditional</h3>
+
+<p>Not all conditional statements can be avoided through the use of polymorphism. In those cases you can simplify the conditional logic (and the subsequent statements) by <a href="/posts/refactoring-techniques/#extract-method">extracting them into external methods</a>.</p>
+
+<p>Here is a simple example&hellip;</p>
+
+<pre><code>if date &lt; SUMMER_START || date &gt; SUMMER_END 
+  charge = # some complex calculation if it's winter 
+else 
+  charge = # some other complex calculation if it's summer 
+end 
+</code></pre>
+
+<p>&hellip;which we can refactor like so&hellip;</p>
+
+<pre><code>if not_summer(date) 
+  charge = winter_charge 
+else 
+  charge = summer_charge 
+end 
+</code></pre>
+
+<p>&hellip;much better.</p>
+
+<h3 id="introduce-null-object">Introduce Null Object</h3>
+
+<p>The motivation behind this technique is to avoid using a conditional whose purpose is to check whether a property exists or not before using it.</p>
+
+<p>Here is a simple example of what we want to avoid&hellip;</p>
+
+<pre><code>class Post
+  attr_reader :id
+
+  def initialize id
+    @id        = id
+    @published = false
+  end
+
+  def self.find_and_publish id
+    # Simulated database operation
+    post = Posts.find { |post| post.id == id }
+    post.publish unless post.nil?
+  end
+
+  def publish
+    puts @published = true
+  end
+end
+
+Posts = [Post.new(1), Post.new(2)]
+
+Post.find_and_publish(0) # displays nothing
+Post.find_and_publish(1) # displays true
+</code></pre>
+
+<p>&hellip;in the above example we check whether <code>post</code> is <code>nil</code> or not. If it isn&rsquo;t <code>nil</code> then we call the <code>publish</code> method, otherwise we don&rsquo;t do anything.</p>
+
+<p>This is kind of ugly.</p>
+
+<p>The following code demonstrates how we can avoid that problem by introducing the concept of having an object to handle null scenarios (it&rsquo;s the same principle of using duck typing/trusted interfaces/polymorphism)&hellip;</p>
+
+<pre><code>class Post
+  attr_reader :id
+
+  def initialize id
+    @id        = id
+    @published = false
+  end
+
+  def self.find_and_publish id
+    # Simulated database operation
+    post = Posts.find { |post| post.id == id } || NullPost.new
+    post.publish
+  end
+
+  def publish
+    puts @published = true
+  end
+end
+
+class NullPost
+  def publish
+    # noop
+  end
+end
+
+Posts = [Post.new(1), Post.new(2)]
+
+Post.find_and_publish(0) # displays nothing
+Post.find_and_publish(1) # displays true
+</code></pre>
+
+<p>&hellip;as you can see, effectively we have the same code with the exception that we no longer check for <code>nil?</code> in the second example and instead we rely on another object <code>NullPost</code> implementing the same interface but returns a null related value.</p>
+
+<p>This way we&rsquo;re using objects to handle our logic. Yes, we end up with more code (one extra Class) but ultimately this is more maintainable and understandable than lots of inline logic.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There are still many different refactoring techniques that I&rsquo;ve not included. But hopefully you&rsquo;ve found this quick reference useful so far.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

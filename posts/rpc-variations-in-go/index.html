@@ -1,0 +1,948 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#rpc-variations-in-go">RPC Variations in Go</a>
+<ul>
+<li><a href="#introduction">Introduction</a>
+<ul>
+<li><a href="#outline">Outline</a></li>
+
+<li><a href="#variations">Variations</a></li>
+
+<li><a href="#requirements">Requirements</a></li>
+</ul></li>
+
+<li><a href="#rpc-over-http">RPC over HTTP</a>
+<ul>
+<li><a href="#rpc-html-backend-go">rpc-html-backend.go</a></li>
+
+<li><a href="#rpc-html-service-go">rpc-html-service.go</a></li>
+
+<li><a href="#rpc-html-client-go">rpc-html-client.go</a></li>
+</ul></li>
+
+<li><a href="#rpc-over-tcp">RPC over TCP</a>
+<ul>
+<li><a href="#rpc-tcp-backend-go">rpc-tcp-backend.go</a></li>
+
+<li><a href="#rpc-tcp-service-go">rpc-tcp-service.go</a></li>
+
+<li><a href="#rpc-tcp-client-go">rpc-tcp-client.go</a></li>
+</ul></li>
+
+<li><a href="#json">JSON</a></li>
+
+<li><a href="#calling-from-ruby">Calling from Ruby</a></li>
+
+<li><a href="#grpc">gRPC</a>
+<ul>
+<li><a href="#update">Update</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="rpc-variations-in-go">RPC Variations in Go</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Let&rsquo;s begin by understanding what an RPC (Remote Procedure Call) actually is:</p>
+
+<blockquote>
+<p>RPC is a way of connecting two separate services via a raw TCP socket</p>
+</blockquote>
+
+<h3 id="outline">Outline</h3>
+
+<p>The fundamental principle behind RPC is to create a service that exposes a function behind that service.</p>
+
+<p>The steps typically look something like:</p>
+
+<ul>
+<li>Write a function</li>
+<li>Add some RPC configuration</li>
+<li>Register our function as part of our RPC service</li>
+<li>Start the service and have it listen for messages on a specific port</li>
+</ul>
+
+<p>From here we would need to have a client that calls the RPC service:</p>
+
+<ul>
+<li>Write code which calls RPC function</li>
+<li>Call the function via a TCP socket with a specific ip/port</li>
+<li>The resulting &lsquo;message&rsquo; can be passed back in different formats (e.g. JSON)</li>
+</ul>
+
+<h3 id="variations">Variations</h3>
+
+<p>With this understanding we can now start to look at the <a href="https://golang.org/" target="_blank">Go</a> programming language and the different variations of its RPC package(s) that it offers. Effectively they consist of behaviour such as:</p>
+
+<ul>
+<li>RPC over HTTP</li>
+<li>RPC over TCP</li>
+</ul>
+
+<p>The latter variation allows the use of either the standard <code>net/rpc</code> package or a JSON formatted version found under <code>net/rpc/jsonrpc</code>. In this post we&rsquo;ll take a look at code examples for each of these packages.</p>
+
+<p>When utilising RPC you&rsquo;ll typically find there are three &lsquo;<em>parts</em>&rsquo;:</p>
+
+<ol>
+<li>Backend (the RPC function)</li>
+<li>Service (exposes the RPC)</li>
+<li>Client (calls the RPC)</li>
+</ol>
+
+<p>In most cases the backend will be unaffected. By this I mean, it&rsquo;s just a package with a set of behaviours/functionality which are being remotely exposed. The actual use of the <code>net/rpc</code> and <code>net/rpc/jsonrpc</code> packages are typically used within the Service and Client packages †</p>
+
+<blockquote>
+<p>† unless the client is implemented in another language,<br>
+then you&rsquo;ll use whatever is best suited to that language</p>
+</blockquote>
+
+<h3 id="requirements">Requirements</h3>
+
+<p>Only methods that satisfy the following criteria will be made available for remote access, all other methods will be ignored (so if you hit a problem in the below code, chances are you&rsquo;re not exporting the expected items):</p>
+
+<ul>
+<li>the method&rsquo;s type is exported</li>
+<li>the method is exported</li>
+<li>the method has two arguments, both exported</li>
+<li>the method&rsquo;s second argument is a pointer</li>
+<li>the method has return type error</li>
+</ul>
+
+<h2 id="rpc-over-http">RPC over HTTP</h2>
+
+<p>I&rsquo;ve yet to find a justification for using HTTP over TCP, but <em>you</em> may have your reasons. If that&rsquo;s the case, then here is an example of how to achieve this in Go.</p>
+
+<p>First, here&rsquo;s the directory structure I&rsquo;m using:</p>
+
+<pre><code>├── remote
+│   ├── rpc-html-backend.go
+├── rpc-html-client.go
+├── rpc-html-service.go
+</code></pre>
+
+<h3 id="rpc-html-backend-go">rpc-html-backend.go</h3>
+
+<p>As mentioned earlier, the backends responsibility is to <em>define</em> a specific function or behaviour (see the code comments for additional information):</p>
+
+<pre><code>package remote
+
+import &quot;fmt&quot;
+
+// Args is a data structure for the incoming arguments
+// This needs to be exported for the RPC to be valid/work
+type Args struct {
+  A, B int
+}
+
+// Arith is our functions return type
+// This also needs to be exported
+type Arith int
+
+// Multiply does simply multiplication on provided arguments
+// This also needs to be exported
+func (t *Arith) Multiply(args *Args, reply *int) error {
+  fmt.Printf(&quot;Args received: %+v\n&quot;, args)
+  *reply = args.A * args.B
+  return nil
+}
+</code></pre>
+
+<h3 id="rpc-html-service-go">rpc-html-service.go</h3>
+
+<p>The service&rsquo;s responsibility is to <em>expose</em> the specific function. Below we do this using RPC over HTTP, so you&rsquo;ll notice the use of <code>rpc.HandleHTTP</code> for setting up a HTTP based handler and <code>http.Serve</code> for serving back a response to the client:</p>
+
+<pre><code>package main
+
+import (
+  &quot;log&quot;
+  &quot;net&quot;
+  &quot;net/http&quot;
+  &quot;net/rpc&quot;
+
+  &quot;github.com/integralist/rpc/remote&quot;
+)
+
+func main() {
+  arith := new(remote.Arith)
+
+  rpc.Register(arith)
+  rpc.HandleHTTP()
+
+  l, e := net.Listen(&quot;tcp&quot;, &quot;:1234&quot;)
+  if e != nil {
+    log.Fatal(&quot;listen error:&quot;, e)
+  }
+
+  for {
+    http.Serve(l, nil)
+  }
+}
+</code></pre>
+
+<blockquote>
+<p>Note: I was a little confused originally about having to manually open a TCP socket. I just assumed that in using HTTP, that step would&rsquo;ve been abstracted away for me. But it&rsquo;s not, oh well</p>
+</blockquote>
+
+<h3 id="rpc-html-client-go">rpc-html-client.go</h3>
+
+<p>The client&rsquo;s responsibility is to connect to the remote service and call its exposed function. As our service is using RPC over HTTP you&rsquo;ll notice our client uses <code>rpc.DialHTTP</code> to create the TCP socket connection, just before calling the remote function via the returned client instance:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/rpc&quot;
+)
+
+type args struct {
+  A, B int
+}
+
+func main() {
+  client, err := rpc.DialHTTP(&quot;tcp&quot;, &quot;localhost:1234&quot;)
+  if err != nil {
+    log.Fatal(&quot;dialing:&quot;, err)
+  }
+
+  var reply int
+
+  e := client.Call(&quot;Arith.Multiply&quot;, &amp;args{4, 2}, &amp;reply)
+  if e != nil {
+    log.Fatalf(&quot;Something went wrong: %s&quot;, err.Error())
+  }
+
+  fmt.Printf(&quot;The reply pointer value has been changed to: %d&quot;, reply)
+}
+</code></pre>
+
+<p>The output of the following program is as follows:</p>
+
+<pre><code>Args received: &amp;{A:4 B:2}
+The reply pointer value has been changed to: 8
+</code></pre>
+
+<h2 id="rpc-over-tcp">RPC over TCP</h2>
+
+<p>Most of the time when you&rsquo;re exposing functionality and behaviour remotely, you&rsquo;ll want to have the least amount of overhead as possible and so you&rsquo;ll resort to stripping out the HTTP application layer and moving down to using just the TCP layer.</p>
+
+<p>First, here&rsquo;s the directory structure I&rsquo;m using:</p>
+
+<pre><code>├── remote
+│   ├── rpc-tcp-backend.go
+├── rpc-tcp-client.go
+├── rpc-tcp-service.go
+</code></pre>
+
+<h3 id="rpc-tcp-backend-go">rpc-tcp-backend.go</h3>
+
+<p>As before, the backend&rsquo;s repsonsibility is to define a set of behaviours and functions (as mentioned above in the HTTP example, we need to export certain items in order for the RPC to be valid and work):</p>
+
+<pre><code>package remote
+
+import &quot;fmt&quot;
+
+// TCPArgs is structured around the client's provided parameters
+// The struct's fields need to be exported too!
+type TCPArgs struct {
+  Foo string
+  Bar string
+}
+
+// Compose is our RPC functions return type
+type Compose string
+
+// Details is our exposed RPC function
+func (c *Compose) Details(args *TCPArgs, reply *string) error {
+  fmt.Printf(&quot;Args received: %+v\n&quot;, args)
+  *c = &quot;some value&quot;
+  *reply = &quot;Blah!&quot;
+  return nil
+}
+</code></pre>
+
+<h3 id="rpc-tcp-service-go">rpc-tcp-service.go</h3>
+
+<p>Our service will now expose the above behaviour by using <code>rpc.Register</code> along with <code>rpc.Accept</code>. This is the simplest implementation possible. The call to <code>rpc.Accept</code> is just a helper for directly accepting and serving an incoming request:</p>
+
+<pre><code>package main
+
+import (
+  &quot;net&quot;
+  &quot;net/rpc&quot;
+
+  &quot;github.com/integralist/rpc/remote&quot;
+)
+
+func main() {
+  compose := new(remote.Compose)
+
+  rpc.Register(compose)
+
+  listener, err := net.Listen(&quot;tcp&quot;, &quot;:8080&quot;)
+  if err != nil {
+    // handle error
+  }
+
+  rpc.Accept(listener)
+}
+</code></pre>
+
+<p>If on the other hand you wish to interrogate the request (or at the very least, execute some other behaviour in-between the request being accepted and it being served) you can change the code as follows to swap out <code>rpc.Accept</code> for a <code>for</code> loop which calls <code>Accept</code> on the listener instance instead and then manually execute <code>rpc.ServeConn</code> (but remember to do this via a goroutine because it&rsquo;s a blocking call):</p>
+
+<pre><code>package main
+
+import (
+  &quot;net&quot;
+  &quot;net/rpc&quot;
+
+  &quot;github.com/integralist/rpc/remote&quot;
+)
+
+func main() {
+  compose := new(remote.Compose)
+
+  rpc.Register(compose)
+
+  listener, err := net.Listen(&quot;tcp&quot;, &quot;:8080&quot;)
+  if err != nil {
+    // handle error
+  }
+
+  for {
+    conn, err := listener.Accept()
+    if err != nil {
+      // handle error
+    }
+
+    go rpc.ServeConn(conn)
+  }
+}
+</code></pre>
+
+<h3 id="rpc-tcp-client-go">rpc-tcp-client.go</h3>
+
+<p>Lastly, as we already know, the client&rsquo;s responsibility is to call the exposed function. This time we use the <code>rpc.Dial</code> function instead of <code>rpc.DialHTTP</code>:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/rpc&quot;
+)
+
+type args struct {
+  Foo, Bar string
+}
+
+func main() {
+  client, err := rpc.Dial(&quot;tcp&quot;, &quot;localhost:8080&quot;)
+  if err != nil {
+    log.Fatal(&quot;dialing:&quot;, err)
+  }
+
+  var reply string
+
+  e := client.Call(&quot;Compose.Details&quot;, &amp;args{&quot;Foo!&quot;, &quot;Bar!&quot;}, &amp;reply)
+  if e != nil {
+    log.Fatalf(&quot;Something went wrong: %v&quot;, e.Error())
+  }
+
+  fmt.Printf(&quot;The 'reply' pointer value has been changed to: %s&quot;, reply)
+}
+</code></pre>
+
+<p>But if you want to implement a timeout (to prevent a call from taking too long), then you&rsquo;ll want to change <code>rpc.Dial</code> for <code>net.DialTimeout</code> (notice they&rsquo;re separate packages: <code>rpc</code> vs <code>net</code>). Also be aware that the returned type isn&rsquo;t a client any more (as it is in the previous example); instead it is a &lsquo;connection&rsquo;.</p>
+
+<p>Once you have the connection you can then pass that to <code>rpc.NewClient</code>. Once you have your &lsquo;client&rsquo; you&rsquo;ll notice that the rest of the code is the same as before (i.e. the calling of the exposed function via the client):</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net&quot;
+  &quot;net/rpc&quot;
+  &quot;time&quot;
+)
+
+type args struct {
+  Foo, Bar string
+}
+
+func main() {
+  conn, err := net.DialTimeout(&quot;tcp&quot;, &quot;localhost:8080&quot;, time.Minute)
+  if err != nil {
+    log.Fatal(&quot;dialing:&quot;, err)
+  }
+
+  client := rpc.NewClient(conn)
+
+  var reply string
+
+  e := client.Call(&quot;Compose.Details&quot;, &amp;args{&quot;Foo!&quot;, &quot;Bar!&quot;}, &amp;reply)
+  if e != nil {
+    log.Fatalf(&quot;Something went wrong: %v&quot;, e.Error())
+  }
+
+  fmt.Printf(&quot;The 'reply' pointer value has been changed to: %s&quot;, reply)
+}
+</code></pre>
+
+<p>The output of the following program is as follows:</p>
+
+<pre><code>Args received: &amp;{Foo:Foo! Bar:Bar!}
+The 'reply' pointer value has been changed to: Blah!
+</code></pre>
+
+<h2 id="json">JSON</h2>
+
+<p>There is another option available when creating an RPC and that is to expose a JSON formatted variation (which is <em>required</em>† if you&rsquo;re planning on using a different programming language to communicate with your Go RPC service - as we&rsquo;ll see below when we write a client using the Ruby programming language).</p>
+
+<blockquote>
+<p>† The standard net/rpc package uses <a href="https://golang.org/pkg/encoding/gob/" target="_blank">https://golang.org/pkg/encoding/gob/</a>
+Which is a Go specific streaming binary format<br>
+If your client isn&rsquo;t Go then it&rsquo;ll have a hard time communicating</p>
+</blockquote>
+
+<p>If we look back at our TCP example from earlier (the one which utilised <code>rpc.ServeConn</code>), we can switch that over to being JSON formatted by just using the same code but making some minor changes:</p>
+
+<ul>
+<li>In both the service and the client: swap <code>net/rpc</code> to <code>net/rpc/jsonrpc</code></li>
+<li>In the service: swap <code>rpc.ServeConn</code> to <code>jsonrpc.ServeConn</code></li>
+<li>In the client: swap <code>rpc.Dial</code> to <code>jsonrpc.Dial</code></li>
+</ul>
+
+<h2 id="calling-from-ruby">Calling from Ruby</h2>
+
+<p>If you want to utilise a client written in another programming language (such as Ruby), you&rsquo;ll need to have the Go service setup to use <code>net/rpc/jsonrpc</code>. Once that&rsquo;s done, your client can connect via a raw TCP socket and pass over JSON data, as shown in the below example:</p>
+
+<pre><code>require &quot;socket&quot;
+require &quot;json&quot;
+
+socket = TCPSocket.new &quot;localhost&quot;, &quot;8080&quot;
+
+# Details of JSON structure can be found here:
+# https://golang.org/src/net/rpc/jsonrpc/client.go#L45
+# Thanks to Albert Hafvenström (@albhaf) for his help
+b = {
+  :method =&gt; &quot;Compose.Details&quot;,
+  :params =&gt; [{ :Foo =&gt; &quot;Foo!&quot;, :Bar =&gt; &quot;Bar!&quot; }],
+  :id     =&gt; &quot;0&quot; # id is just echo'ed back to the client
+}
+
+socket.write(JSON.dump(b))
+
+p JSON.load(socket.readline)
+</code></pre>
+
+<p>The output from this program would be:</p>
+
+<pre><code>{&quot;id&quot;=&gt;&quot;0&quot;, &quot;result&quot;=&gt;&quot;Blah!&quot;, &quot;error&quot;=&gt;nil}
+</code></pre>
+
+<h2 id="grpc">gRPC</h2>
+
+<p>Google has started work on a new package called gRPC which, as per the site: <a href="http://www.grpc.io/" target="_blank">grpc.io</a>, states&hellip;</p>
+
+<blockquote>
+<p>is a high performance, open source, general RPC framework that puts mobile and HTTP/2 first</p>
+</blockquote>
+
+<p>They currently support C++, Java, Objective-C, Python, Ruby, Go, C#, Node.js, and PHP. You can either go to the main GitHub repo (<a href="https://github.com/grpc" target="_blank">github.com/grpc</a>) or if you&rsquo;re only interested in the Go version, then you can find it here: <a href="https://github.com/grpc/grpc-go" target="_blank">github.com/grpc/grpc-go</a></p>
+
+<p>I&rsquo;ve not tried it yet, but it looks interesting.</p>
+
+<h3 id="update">Update</h3>
+
+<p>I&rsquo;ve setup gRPC now. You can find a beginners guide I&rsquo;ve written <a href="http://www.integralist.co.uk/posts/grpc-for-beginners/" target="_blank">here</a></p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

@@ -1,0 +1,981 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#go-reverse-proxy">Go Reverse Proxy</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#example-python-origin-code">Example Python Origin Code</a></li>
+
+<li><a href="#example-golang-proxy-code">Example Golang Proxy Code</a>
+<ul>
+<li><a href="#simple">Simple</a></li>
+
+<li><a href="#advanced">Advanced</a></li>
+</ul></li>
+
+<li><a href="#demonstration">Demonstration</a></li>
+
+<li><a href="#explanation">Explanation</a></li>
+
+<li><a href="#handling-errors">Handling Errors</a></li>
+
+<li><a href="#nginx-lite-not-really">NGINX-Lite (not-really)</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="go-reverse-proxy">Go Reverse Proxy</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>I was struggling to find a good (or just simple) reverse proxy solution written in <a href="https://golang.org/" target="_blank">Go</a>, so I decided to take what I had learnt from a work colleague of mine and put together a simple example for others to build upon if they needed a quick reference point.</p>
+
+<p>In this example I have an origin server written in Python (for no other reason than to have a clearer distinction between the proxy and the origin) and which supports the endpoints <code>/</code>, <code>/foo</code> and <code>/bar/*</code> (where the wildcard glob means we support multiple variants of that, such as <code>/bar/baz</code>).</p>
+
+<p>Each origin handler will print the http request headers, followed by sending a response body that correlates to the handler name (so for example, the <code>FooHandler</code> class will respond with <code>FOO!</code>, while the <code>BarHandler</code> class will response with <code>BAR!</code>).</p>
+
+<h2 id="example-python-origin-code">Example Python Origin Code</h2>
+
+<p>Here is our Python code using the <a href="http://www.tornadoweb.org/" target="_blank">Tornado</a> web framework.</p>
+
+<pre><code>import tornado.ioloop
+import tornado.web
+
+
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        print(&quot;MAIN HEADERS:\n\n&quot;, self.request.headers)
+        self.write(&quot;MAIN!&quot;)
+
+
+class FooHandler(tornado.web.RequestHandler):
+    def get(self):
+        print(&quot;FOO HEADERS:\n\n&quot;, self.request.headers)
+        self.write(&quot;FOO!&quot;)
+
+
+class BarHandler(tornado.web.RequestHandler):
+    def get(self):
+        print(&quot;BAR HEADERS:\n\n&quot;, self.request.headers)
+        self.write(&quot;BAR!&quot;)
+
+
+def make_app():
+    return tornado.web.Application([
+        (r&quot;/&quot;, MainHandler),
+        (r&quot;/foo&quot;, FooHandler),
+        (r&quot;/bar.*&quot;, BarHandler),
+    ])
+
+
+if __name__ == &quot;__main__&quot;:
+    app = make_app()
+    app.listen(9000)
+    tornado.ioloop.IOLoop.current().start()
+</code></pre>
+
+<h2 id="example-golang-proxy-code">Example Golang Proxy Code</h2>
+
+<p>There are two versions of the code, a simple version and a more advanced version that aims to handle more specific use cases.</p>
+
+<p>The simple version uses just the Go standard library, whereas the advanced version uses the standard library as well as a few a few external packages such as <a href="https://github.com/julienschmidt/httprouter" target="_blank">httprouter</a> and <a href="https://github.com/Sirupsen/logrus" target="_blank">logrus</a> for routing and logging respectively.</p>
+
+<p>One difference between them that&rsquo;s worth mentioning is that in the simple version we use the <code>httputil.ReverseProxy</code> http handler directly, whereas in the advanced version we use <code>httputil.NewSingleHostReverseProxy</code> to construct this for us. The advanced version also tries to normalise the paths by stripping trailing slashes and joining them up with the base path (if there was one, although ironically I don&rsquo;t define one in the advanced example).</p>
+
+<h3 id="simple">Simple</h3>
+
+<pre><code>package main
+
+import (
+	&quot;log&quot;
+	&quot;net/http&quot;
+	&quot;net/http/httputil&quot;
+	&quot;net/url&quot;
+)
+
+func main() {
+	origin, _ := url.Parse(&quot;http://localhost:9000/&quot;)
+
+	director := func(req *http.Request) {
+		req.Header.Add(&quot;X-Forwarded-Host&quot;, req.Host)
+		req.Header.Add(&quot;X-Origin-Host&quot;, origin.Host)
+		req.URL.Scheme = &quot;http&quot;
+		req.URL.Host = origin.Host
+	}
+
+	proxy := &amp;httputil.ReverseProxy{Director: director}
+
+	http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+		proxy.ServeHTTP(w, r)
+	})
+
+	log.Fatal(http.ListenAndServe(&quot;:9001&quot;, nil))
+}
+</code></pre>
+
+<h3 id="advanced">Advanced</h3>
+
+<pre><code>package main
+
+import (
+	&quot;net/http&quot;
+	&quot;net/http/httputil&quot;
+	&quot;net/url&quot;
+	&quot;os&quot;
+	&quot;strings&quot;
+
+	&quot;github.com/Sirupsen/logrus&quot;
+	&quot;github.com/julienschmidt/httprouter&quot;
+)
+
+func singleJoiningSlash(a, b string) string {
+	aslash := strings.HasSuffix(a, &quot;/&quot;)
+	bslash := strings.HasPrefix(b, &quot;/&quot;)
+	switch {
+	case aslash &amp;&amp; bslash:
+		return a + b[1:]
+	case !aslash &amp;&amp; !bslash:
+		return a + &quot;/&quot; + b
+	}
+	return a + b
+}
+
+func main() {
+	logrus.SetFormatter(&amp;logrus.TextFormatter{})
+	logrus.SetOutput(os.Stdout)
+	logrus.SetLevel(logrus.InfoLevel)
+	logger := logrus.WithFields(logrus.Fields{
+		&quot;service&quot;: &quot;go-reverse-proxy&quot;,
+	})
+
+	router := httprouter.New()
+	origin, _ := url.Parse(&quot;http://localhost:9000/&quot;)
+	path := &quot;/*catchall&quot;
+
+	reverseProxy := httputil.NewSingleHostReverseProxy(origin)
+
+	reverseProxy.Director = func(req *http.Request) {
+		req.Header.Add(&quot;X-Forwarded-Host&quot;, req.Host)
+		req.Header.Add(&quot;X-Origin-Host&quot;, origin.Host)
+		req.URL.Scheme = origin.Scheme
+		req.URL.Host = origin.Host
+
+		wildcardIndex := strings.IndexAny(path, &quot;*&quot;)
+		proxyPath := singleJoiningSlash(origin.Path, req.URL.Path[wildcardIndex:])
+		if strings.HasSuffix(proxyPath, &quot;/&quot;) &amp;&amp; len(proxyPath) &gt; 1 {
+			proxyPath = proxyPath[:len(proxyPath)-1]
+		}
+		req.URL.Path = proxyPath
+	}
+
+	router.Handle(&quot;GET&quot;, path, func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		reverseProxy.ServeHTTP(w, r)
+	})
+
+	logger.Fatal(http.ListenAndServe(&quot;:9001&quot;, router))
+}
+</code></pre>
+
+<h2 id="demonstration">Demonstration</h2>
+
+<p>In order to run this example you should follow these instructions:</p>
+
+<ol>
+<li>run the tornado application (e.g. <code>python tornado-origin.py</code>)</li>
+<li>run the go application (e.g. <code>go run main.go</code>)</li>
+<li>make http requests (shown below)</li>
+</ol>
+
+<pre><code>curl -v http://localhost:9001/
+curl -v http://localhost:9001/foo
+curl -v http://localhost:9001/foo/
+curl -v http://localhost:9001/bar/baz
+</code></pre>
+
+<p>You should see output from the Python server that looks something like this:</p>
+
+<pre><code>FOO HEADERS:
+
+Host: localhost:9001
+User-Agent: curl/7.54.0
+Accept: */*
+X-Forwarded-Host: localhost:9001
+X-Origin-Host: localhost:9000
+</code></pre>
+
+<h2 id="explanation">Explanation</h2>
+
+<p>OK, so let&rsquo;s step through the <code>main</code> function of the advanced example code to see what&rsquo;s going on.</p>
+
+<blockquote>
+<p>The core reverse proxy code and its concepts are effectively the same between the advanced and simple versions.</p>
+</blockquote>
+
+<p>First we set up our basic logging configuration:</p>
+
+<pre><code>logrus.SetFormatter(&amp;logrus.TextFormatter{})
+logrus.SetOutput(os.Stdout)
+logrus.SetLevel(logrus.InfoLevel)
+logger := logrus.WithFields(logrus.Fields{
+  &quot;service&quot;: &quot;go-reverse-proxy&quot;,
+})
+</code></pre>
+
+<p>Next we create a new httprouter instance, we define the origin host (<code>http://localhost:9000/</code>) and the &lsquo;pattern&rsquo; we want httprouter to look out for (<code>/*catchall</code>, which is a special syntax that represents a catchall wildcard/glob):</p>
+
+<pre><code>router := httprouter.New()
+origin, _ := url.Parse(&quot;http://localhost:9000/&quot;)
+path := &quot;/*catchall&quot;
+</code></pre>
+
+<p>Next we create a new reverse proxy instance, passing it the origin host (<code>http://localhost:9000/</code>):</p>
+
+<pre><code>reverseProxy := httputil.NewSingleHostReverseProxy(origin)
+</code></pre>
+
+<p>Followed by configuring the &lsquo;director&rsquo; for the reverse proxy. The director is simply a function that modifies the received incoming request, while the response from the origin is copied back to the original client.</p>
+
+<p>In this example, we attach a few common proxy related headers to the incoming request and then modify its Scheme/Host to reflect the origin we wish to proxy it onto.</p>
+
+<p>Next, we change the request path to the origin. What we do is ensure the path we request from the origin is whatever the base origin path is + the requested path (i.e. not just directing the request to the root/entrypoint of the origin).</p>
+
+<p>In our example, our origin&rsquo;s path is just <code>/</code> whereas the client will be requesting things like <code>/foo</code> and <code>/bar/baz</code>, so these would be appended to the origin&rsquo;s defined <code>/</code>. But we also make sure that when joining the origin&rsquo;s path with the incoming request path, that we avoid double slashes in the middle.</p>
+
+<p>Lastly, we ensure that any trailing slash is removed as well:</p>
+
+<pre><code>reverseProxy.Director = func(req *http.Request) {
+  req.Header.Add(&quot;X-Forwarded-Host&quot;, req.Host)
+  req.Header.Add(&quot;X-Origin-Host&quot;, origin.Host)
+  req.URL.Scheme = origin.Scheme
+  req.URL.Host = origin.Host
+
+  wildcardIndex := strings.IndexAny(path, &quot;*&quot;)
+  proxyPath := singleJoiningSlash(origin.Path, req.URL.Path[wildcardIndex:])
+  if strings.HasSuffix(proxyPath, &quot;/&quot;) &amp;&amp; len(proxyPath) &gt; 1 {
+    proxyPath = proxyPath[:len(proxyPath)-1]
+  }
+  req.URL.Path = proxyPath
+}
+</code></pre>
+
+<p>Finally, we setup the handler for the <code>/*catchall</code> httprouter path. In this case we don&rsquo;t do anything other than call the reverse proxy&rsquo;s <code>ServeHTTP</code> method and pass it the original <code>ResponseWriter</code> and http <code>Request</code>. We then kick start the httprouter using <code>ListenAndServe</code>:</p>
+
+<pre><code>router.Handle(&quot;GET&quot;, path, func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+  reverseProxy.ServeHTTP(w, r)
+})
+
+logger.Fatal(http.ListenAndServe(&quot;:9001&quot;, router))
+</code></pre>
+
+<h2 id="handling-errors">Handling Errors</h2>
+
+<p>In order to handle errors the reverse proxy needs to construct a <em>new</em> response object, which means if you wanted the error response you generate to have all the same response headers as were provided by the upstream service, then you&rsquo;d have to programmatically add those to the new response object.</p>
+
+<p>Let&rsquo;s see how we can handle errors in the basic sense, just to get an idea for how the code looks. Now we don&rsquo;t need to use another programming language to do this, we can do it all in Go (we could have done this earlier instead of using Python, but I wanted to highlight how you <em>could</em> use another language if you wanted).</p>
+
+<pre><code>package main
+
+import (
+	&quot;errors&quot;
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+	&quot;net&quot;
+	&quot;net/http&quot;
+	&quot;net/http/httptest&quot;
+	&quot;net/http/httputil&quot;
+	&quot;net/url&quot;
+	&quot;strings&quot;
+	&quot;time&quot;
+)
+
+// copied from https://golang.org/src/net/http/httputil/reverseproxy.go?s=3330:3391#L98
+func singleJoiningSlash(a, b string) string {
+	aslash := strings.HasSuffix(a, &quot;/&quot;)
+	bslash := strings.HasPrefix(b, &quot;/&quot;)
+	switch {
+	case aslash &amp;&amp; bslash:
+		return a + b[1:]
+	case !aslash &amp;&amp; !bslash:
+		return a + &quot;/&quot; + b
+	}
+	return a + b
+}
+
+func main() {
+	backendServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, &quot;backend server handled the request!&quot;)
+	}))
+	defer backendServer.Close()
+
+	backendServerURL, err := url.Parse(backendServer.URL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	proxy := &amp;httputil.ReverseProxy{
+		Director: func(r *http.Request) {
+			r.URL.Scheme = backendServerURL.Scheme
+			r.URL.Host = backendServerURL.Host
+			r.URL.Path = singleJoiningSlash(backendServerURL.Path, r.URL.Path)
+		},
+		Transport: &amp;http.Transport{
+			Dial: (&amp;net.Dialer{
+				Timeout: 10 * time.Second,
+			}).Dial,
+		},
+		ModifyResponse: func(r *http.Response) error {
+			// return nil
+			//
+			// purposefully return an error so ErrorHandler gets called
+			return errors.New(&quot;uh-oh&quot;)
+		},
+		ErrorHandler: func(rw http.ResponseWriter, r *http.Request, err error) {
+			fmt.Printf(&quot;error was: %+v&quot;, err)
+			rw.WriteHeader(http.StatusInternalServerError)
+			rw.Write([]byte(err.Error()))
+		},
+	}
+
+	frontendServer := httptest.NewServer(proxy)
+	defer frontendServer.Close()
+
+	resp, err := http.Get(frontendServer.URL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(&quot;\n\nbody: \n%s\n\n&quot;, b)
+}
+</code></pre>
+
+<p>Here we can see that our <code>httputil.ReverseProxy#ModifyResponse</code> function is hardcoded to return an error type, which then causes the <code>httputil.ReverseProxy#ErrorHandler</code> function to be called.</p>
+
+<p>From there we use the <code>http.ResponseWriter</code> to create a <em>new</em> response. In this case we do nothing other than print the original error, but you could do pretty much anything you like at this point.</p>
+
+<p>If you needed the original response object that came from the upstream then you&rsquo;d need to make sure the error you returned from <code>ModifyResponse</code> was a custom error type so that you attach a field such as <code>OriginalResponse</code> to it and thus assign it the original <code>http.Response</code> that was available to you within <code>ModifyResponse</code>.</p>
+
+<h2 id="nginx-lite-not-really">NGINX-Lite (not-really)</h2>
+
+<p>Below is an example that demonstrates using <a href="https://httpbin.org/" target="_blank">httpbin</a> as our origin.</p>
+
+<p>Specifically we use its <code>/anything</code> endpoint, which allows you to provide any value as the final path segment. So for example, <code>/anything/foo</code> or <code>/anything/beep</code>, both work with the <code>httpbin.org</code> service.</p>
+
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;log&quot;
+	&quot;net/http&quot;
+	&quot;net/http/httputil&quot;
+)
+
+func main() {
+	proxy := &amp;httputil.ReverseProxy{Director: func(req *http.Request) {
+		originHost := &quot;httpbin.org&quot;
+		originPathPrefix := &quot;/anything&quot;
+
+		req.Header.Add(&quot;X-Forwarded-Host&quot;, req.Host)
+		req.Header.Add(&quot;X-Origin-Host&quot;, originHost)
+		req.Host = originHost
+		req.URL.Scheme = &quot;https&quot;
+		req.URL.Host = originHost
+		req.URL.Path = originPathPrefix + req.URL.Path
+
+		fmt.Printf(&quot;final request\n\n %+v \n\n&quot;, req)
+	}}
+
+	http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+		proxy.ServeHTTP(w, r)
+	})
+
+	log.Fatal(http.ListenAndServe(&quot;:9001&quot;, nil))
+}
+</code></pre>
+
+<p>Now let&rsquo;s elaborate on this example a little bit and ensure that our reverse proxy has a client timeout specified (see <a href="https://medium.com/@nate510/don-t-use-go-s-default-http-client-4804cb19f779" target="_blank">this article</a> for details as to why you would want to do this).</p>
+
+<p>We also use <code>gorilla/mux</code> as it supports utilising regular expression path matching (we could do this ourselves, but using a library in this case helps to keep the code we have to write down).</p>
+
+<p>One last thing you&rsquo;ll notice is that we&rsquo;re using a configuration object that allows us to configure <em>override</em> behaviour. For example, if our request includes a HTTP header of <code>X-BF-Testing</code> and its value is <code>integralist</code>, then we&rsquo;ll proxy the request to a different endpoint.</p>
+
+<p>You can do more complex things if necessary, but this gives you a good idea of how to replicate something like NGINX with very little code (obviously to replicate something like NGINX is <em>waaay</em> beyond the scope of this post) 😉</p>
+
+<pre><code>package main
+
+import (
+	&quot;log&quot;
+	&quot;net&quot;
+	&quot;net/http&quot;
+	&quot;net/http/httputil&quot;
+	&quot;time&quot;
+
+	&quot;github.com/gorilla/mux&quot;
+)
+
+type override struct {
+	Header string
+	Match  string
+	Host   string
+	Path   string
+}
+
+type config struct {
+	Path     string
+	Host     string
+	Override override
+}
+
+func generateProxy(conf config) http.Handler {
+	proxy := &amp;httputil.ReverseProxy{Director: func(req *http.Request) {
+		originHost := conf.Host
+		req.Header.Add(&quot;X-Forwarded-Host&quot;, req.Host)
+		req.Header.Add(&quot;X-Origin-Host&quot;, originHost)
+		req.Host = originHost
+		req.URL.Host = originHost
+		req.URL.Scheme = &quot;https&quot;
+
+		if conf.Override.Header != &quot;&quot; &amp;&amp; conf.Override.Match != &quot;&quot; {
+			if req.Header.Get(conf.Override.Header) == conf.Override.Match {
+				req.URL.Path = conf.Override.Path
+			}
+		}
+	}, Transport: &amp;http.Transport{
+		Dial: (&amp;net.Dialer{
+			Timeout: 5 * time.Second,
+		}).Dial,
+	}}
+
+	return proxy
+}
+
+func main() {
+	r := mux.NewRouter()
+
+	configuration := []config{
+		config{
+			Path: &quot;/{path:anything/(?:foo|bar)}&quot;,
+			Host: &quot;httpbin.org&quot;,
+		},
+		config{
+			Path: &quot;/anything/foobar&quot;,
+			Host: &quot;httpbin.org&quot;,
+			Override: override{
+				Header: &quot;X-BF-Testing&quot;,
+				Match:  &quot;integralist&quot;,
+				Path:   &quot;/anything/newthing&quot;,
+			},
+		},
+	}
+
+	for _, conf := range configuration {
+		proxy := generateProxy(conf)
+
+		r.HandleFunc(conf.Path, func(w http.ResponseWriter, r *http.Request) {
+			proxy.ServeHTTP(w, r)
+		})
+	}
+
+	log.Fatal(http.ListenAndServe(&quot;:9001&quot;, r))
+}
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s all there is to it.</p>
+
+<p>You could also wrap the function passed to <code>router.Handle</code> in a middleware function so that you&rsquo;re able to do extra processing. A common example of this is to authenticate the incoming request <em>before</em> it is proxied to the origin (meaning you can reject the request if necessary).</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

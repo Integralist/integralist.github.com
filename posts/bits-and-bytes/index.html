@@ -1,0 +1,1018 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#bits-and-bytes">Bits and Bytes</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#bit">Bit</a></li>
+
+<li><a href="#byte">Byte</a></li>
+
+<li><a href="#ram">RAM</a></li>
+
+<li><a href="#bit-and-ram-visualisation">Bit and RAM Visualisation</a>
+<ul>
+<li><a href="#basic-bit-operators">Basic Bit Operators</a></li>
+</ul></li>
+
+<li><a href="#bits-and-ascii">Bits and ASCII</a></li>
+
+<li><a href="#bits-and-numbers">Bits and Numbers</a></li>
+
+<li><a href="#ips">IPs</a></li>
+
+<li><a href="#base-numbers">Base Numbers</a>
+<ul>
+<li><a href="#convert-base-10-into-base-2-8">Convert Base-10 into Base-<sup>2</sup>&frasl;<sub>8</sub></a></li>
+
+<li><a href="#convert-base-10-into-base-16">Convert Base-10 into Base-16</a></li>
+
+<li><a href="#convert-any-base-to-base-10">Convert Any Base to Base-10</a></li>
+</ul></li>
+
+<li><a href="#cidr">CIDR</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="bits-and-bytes">Bits and Bytes</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>So this is a bit of a random journey through some different computer based subjects. Things that I felt I should try to better understand. Some of it will be very basic, but hopefully it&rsquo;ll be useful to those who are new to tech, and are interested in learning these things (or old dogs like me who should know better).</p>
+
+<h2 id="bit">Bit</h2>
+
+<p>The word <em>bit</em> is short for <em>binary digit</em>.</p>
+
+<p>A bit is either a <code>1</code> (true) or a <code>0</code> (false).</p>
+
+<p>Computers only understand the binary format (i.e. base-2)</p>
+
+<blockquote>
+<p>We discuss &lsquo;base&rsquo; numbers <a href="#8">below</a></p>
+</blockquote>
+
+<h2 id="byte">Byte</h2>
+
+<p>A grouping of eight <em>bits</em> is called a <em>byte</em>.</p>
+
+<blockquote>
+<p>Read the next section to realise why I mention this tidbit of information</p>
+</blockquote>
+
+<h2 id="ram">RAM</h2>
+
+<p>The word <em>ram</em> is an acronym for <em>random access memory</em>.</p>
+
+<p>It&rsquo;s non-persistent memory.</p>
+
+<p>Meaning it is lost when your machine is restarted, and persists only for the lifetime of the program using it.</p>
+
+<p>RAM consists of bits, but each <em>segment</em> of memory is actually a grouping of eight bits (which we already know is called a <em>byte</em>).</p>
+
+<p>So in short we would say RAM is made up of bytes.</p>
+
+<p>Bytes are uniquely numbered to allow easy lookup of their contents.</p>
+
+<p>A byte&rsquo;s unique number is also referred to as its <em>address</em>.</p>
+
+<h2 id="bit-and-ram-visualisation">Bit and RAM Visualisation</h2>
+
+<p><a href="../../assets/images/bits-visualised.png">
+<img src="../../assets/images/bits-visualised.png">
+</a></p>
+
+<p>We can see that each bit has an associated value which is calculated using the power of base-2 (we&rsquo;ll cover <a href="#8">base numbers</a> shortly).</p>
+
+<p>So:</p>
+
+<ul>
+<li>2<sup>0</sup> = 1</li>
+<li>2<sup>1</sup> = 2</li>
+<li>2<sup>2</sup> = 4 (i.e. <code>2 * 2</code>)</li>
+<li>2<sup>3</sup> = 8 (i.e. <code>2 * 2 * 2</code>)</li>
+<li>2<sup>4</sup> = 16 (i.e. <code>2 * 2 * 2 * 2</code>)</li>
+<li>2<sup>5</sup> = 32 (i.e. <code>2 * 2 * 2 * 2 * 2</code>)</li>
+<li>2<sup>6</sup> = 64 (i.e. <code>2 * 2 * 2 * 2 * 2 * 2</code>)</li>
+<li>2<sup>7</sup> = 128 (i.e. <code>2 * 2 * 2 * 2 * 2 * 2 * 2</code>)</li>
+</ul>
+
+<p>With this information we can identify the value assigned by adding up the numbers associated with the ones and zeros.</p>
+
+<p>So in the image we can see four of the bits are given <code>1</code> (on) and the rest are <code>0</code> (off), meaning if we add up all the associated values of the bits that are &lsquo;on&rsquo; we get <code>99</code> (e.g. <code>64 + 32 + 2 + 1</code>).</p>
+
+<h3 id="basic-bit-operators">Basic Bit Operators</h3>
+
+<p>You may have seen bit operators like <code>&lt;&lt;</code> or <code>&gt;&gt;</code> and wondered what they mean (generally referred to as &lsquo;bitwise operators&rsquo;). Essentially they manipulate bits.</p>
+
+<p>Here are some examples:</p>
+
+<pre><code>64 &gt;&gt; 1 = 32
+1 &lt;&lt; 3 = 8
+1 &lt;&lt; 7 = 128
+1 &lt;&lt; 15 = 32768
+</code></pre>
+
+<p>So if we keep in mind the earlier image of our 8 bits in a byte memory representation, and that each bit had its own value (as described above), we can see (for example) that if we started at <code>64</code> and moved to the right by <code>1</code> bit, the next bit would be the one assigned the value <code>32</code>. Hence, <code>64 &gt;&gt; 1</code> results in the value <code>32</code>.</p>
+
+<p>Similarly, if we start with the bit value <code>1</code> and move to the left by <code>15</code> bits we&rsquo;ll get back the result of <code>32768</code> because although we&rsquo;ve only shown eight bit spaces above, you can just keep moving to the left (<code>64 * 2 = 128</code>, <code>128 * 2 = 256</code>, now keep going seven more places until you reach the fifteenth bit&hellip; <code>256 * 2 = 512</code>, <code>512 * 2 = 1024</code>, <code>1024 * 2 = 2048</code>, <code>2048 * 2 = 4096</code>, <code>4096 * 2 = 8192</code>, <code>8192 * 2 = 16384</code>, <code>16384 * 2 = 32768</code>).</p>
+
+<p>For more bitwise operators, refer to these posts: <a href="https://wiki.python.org/moin/BitwiseOperators" target="_blank">https://wiki.python.org/moin/BitwiseOperators</a> and <a href="https://medium.com/learning-the-go-programming-language/bit-hacking-with-go-e0acee258827" target="_blank">https://medium.com/learning-the-go-programming-language/bit-hacking-with-go-e0acee258827</a></p>
+
+<h2 id="bits-and-ascii">Bits and ASCII</h2>
+
+<p>ASCII is a set of codes where each &lsquo;code point&rsquo; represents a textual character such as a <code>1</code>, <code>a</code>, <code>z</code>, <code>!</code>, <code>?</code> etc.</p>
+
+<p>Each code point has an associated binary number. For example, <code>a</code> has the binary number <code>0110 0001</code> which if we add up the values associated with those specific bits we&rsquo;ll find it&rsquo;ll yield the code point number <code>97</code>. In ASCII the character <code>a</code> is code point <code>97</code>.</p>
+
+<h2 id="bits-and-numbers">Bits and Numbers</h2>
+
+<p>1 kilobyte (or 1KB) is 1,024 bytes.</p>
+
+<p>1,024 bytes is 8192 bits (<code>8192/8</code> or <code>8*1024</code>, whichever you prefer)</p>
+
+<p>The following explanation is taken from &ldquo;Beginning C&rdquo; by Apress Publishing&hellip;</p>
+
+<blockquote>
+<p>You might be wondering why we don’t work with simpler, more rounded numbers, such as a thousand, or a million, or a billion. The reason is this: there are 1,024 numbers from 0 to 1,023, and 1,023 happens to be 10 bits that are all 1 in binary: 11 1111 1111, which is a very convenient binary value. So while 1,000 is a very convenient decimal value, it’s actually rather inconvenient in a binary machine—it’s 11 1110 1000, which is not exactly neat and tidy. The kilobyte (1,024 bytes) is therefore defined in a manner that’s convenient for your computer, rather than for you.</p>
+</blockquote>
+
+<p>So if we add up <code>512+256+128+64+32+16+8+4+2+1</code> (notice this takes the existing 8 bit calculation from the above image and continues it for another two bits) we get <code>1023</code>.</p>
+
+<h2 id="ips">IPs</h2>
+
+<p>Here is an example IPv4 IP:</p>
+
+<pre><code>216.27.61.137
+</code></pre>
+
+<p>IPv4 IPs are expressed in decimal format.</p>
+
+<blockquote>
+<p>Note: IPv6 IPs are eight 4-character hexadecimal numbers,<br>
+which represent 16 bits each (for a total of 128 bits)<br>
+e.g. <code>2001:0db8:0a0b:12f0:0000:0000:0000:0001</code></p>
+</blockquote>
+
+<p>To translate the above IP into binary form (for the sake of a computer to process it), we could use the above visualisation image to help us. The end result of which would look like this:</p>
+
+<pre><code>11011000.00011011.00111101.10001001
+</code></pre>
+
+<p>Which breaks down into:</p>
+
+<ul>
+<li><code>11011000</code>: 128 + 64 + 16 + 8 = 216</li>
+<li><code>00011011</code>: 16 + 8 + 2 + 1 = 27</li>
+<li><code>00111101</code>: 32 + 16 + 8 + 4 + 1 = 61</li>
+<li><code>10001001</code>: 128 + 8 + 1 = 137</li>
+</ul>
+
+<p>This explains why each of the four numbers within the decimal formatted version (i.e. <code>216.27.61.137</code>) are called octets, as they represent eight bits (or a &lsquo;byte&rsquo; as we learned earlier) when viewed in binary form.</p>
+
+<p>This also explains why IPv4 IPs are considered 32-bit numbers, because if you add each of the bits together (i.e. the number of total bits, not the value assigned to each bit) you&rsquo;ll find there are a total of 32 bits that make up the IP.</p>
+
+<p>Each bit can have two different states (1 or zero), meaning the total number of potential combinations per octet can be either 28 or 256. Meaning each octet can contain a potential value between zero and 255. Meaning if we were to combine the four octets, we could potentially have 4,294,967,296 variations.</p>
+
+<p>We can see the decimal represenation of an IPv4 IP is made up of four base-10 numbers (216, 27, 61, 137). Where each of those four numbers represent the binary equivalent (216=11011000, 27=00011011, 61=00111101, 137=10001001), which is a base-2 representation of a byte (or octet).</p>
+
+<blockquote>
+<p>If you&rsquo;re unsure of what base numbers are and how they work, then read on&hellip;</p>
+</blockquote>
+
+<h2 id="base-numbers">Base Numbers</h2>
+
+<p>It&rsquo;s worth quickly covering what base numbers are as they help us understand the other different protocols we use on a regular basis, such as binary and things like IPs.</p>
+
+<p>Any number can be represented in multiple ways using a different base numbering system.</p>
+
+<p>There are many numbering systems, but the typical ones we&rsquo;re used to are:</p>
+
+<ul>
+<li>Base 10 (Decimal)</li>
+<li>Base 2 (Binary)</li>
+<li>Base 8 (Octal)</li>
+<li>Base 16 (Hexadecimal)</li>
+</ul>
+
+<p>The standard number system we (as humans) are most familiar with is called base-10 and it consists of the following numbers:</p>
+
+<pre><code>0,1,2,3,4,5,6,7,8,9
+</code></pre>
+
+<blockquote>
+<p>Notice there are ten numbers, hence it is called the base-10 system</p>
+</blockquote>
+
+<p>If we were to look at a number like <code>66</code>, then this would tell us the number is made up of 6 tens and six units.</p>
+
+<p>These numbers (0-9) represent &lsquo;whole numbers&rsquo;, while in the base-10 system we can also use a decimal point to represent decimal fractions of a number (e.g. <code>1.2</code>).</p>
+
+<p>Below is an image, credit to Jenny Eather, that helps us visualise this model:</p>
+
+<p><a href="../../assets/images/base-10-system.png">
+<img src="../../assets/images/base-10-system.png">
+</a></p>
+
+<p>The &lsquo;base number&rsquo; is the number of numbers within the system. So base-10 has 10 numbers (0,1,2,3,4,5,6,7,8,9) whereas binary is base-2 because it uses two numbers only (0, 1).</p>
+
+<p>If you want to know the unit each number in a system represents (we&rsquo;ll use base-10 as the example, thanks to the following visualisation credited to Jenny Eather), then you calculate this using the power of the base number.</p>
+
+<p><a href="../../assets/images/base-10.png">
+<img src="../../assets/images/base-10.png">
+</a></p>
+
+<p>So, as per the above visualisation, we can see:</p>
+
+<ul>
+<li>10<sup>3</sup>: <code>10*10*10</code>: 1000 (thousands)</li>
+<li>10<sup>2</sup>: <code>10*10</code>: 100 (hundreds)</li>
+<li>10<sup>1</sup>: <code>10</code>: 10 (tens)</li>
+<li>10<sup>0</sup>: <code>1</code>: 1 (unit)</li>
+</ul>
+
+<p>So in practical terms, if you have a number like <code>75</code> and want to represent it as base-10:</p>
+
+<ul>
+<li>5 (10<sup>0</sup>: 5 units)</li>
+<li>7 (10<sup>1</sup>: 7 tens)</li>
+</ul>
+
+<p>Similarly, if we had a number like <code>675</code> and want to represent it as base-10:</p>
+
+<ul>
+<li>5 (10<sup>0</sup>: 5 units)</li>
+<li>7 (10<sup>1</sup>: 7 tens)</li>
+<li>6 (10<sup>2</sup>: 6 hundreds)</li>
+</ul>
+
+<p>You can indicate what base you wish to represent a number like so:</p>
+
+<p>n<sub>b</sub></p>
+
+<p>Where <code>n</code> is the number and <code>b</code> is the base you wish to state it is in.</p>
+
+<p>For example:</p>
+
+<p>75<sub>10</sub></p>
+
+<p>This is the number <code>75</code> and we&rsquo;re stating the base it represents is <code>10</code>.</p>
+
+<p>This is useful when you&rsquo;ve converted a number like <code>75</code> into a different base (let&rsquo;s say base-8, which would be <code>113</code>) and you want to give that number in the proper context to someone else. You could write it as 113<sub>8</sub>.</p>
+
+<h3 id="convert-base-10-into-base-2-8">Convert Base-10 into Base-<sup>2</sup>&frasl;<sub>8</sub></h3>
+
+<blockquote>
+<p>Note: the steps are the same for converting to base-2 and base-8</p>
+</blockquote>
+
+<p>Now let&rsquo;s consider how to convert the number <code>75</code> into another base, like base-8. To do so, follow these steps</p>
+
+<ol>
+<li>divide the number (75) by the desired base (8) (take note of the remainder: 3)</li>
+<li>take the result (9) and do the same (i.e. divide by the base and take note of the remainder)</li>
+<li>keep doing this until the result of dividing the previous answer by the base is zero</li>
+<li>now write out the remainders bottom to top, and that&rsquo;s the number in base-8</li>
+</ol>
+
+<p>In long form this looks like this:</p>
+
+<ul>
+<li>75 (number) / 8 (base) = 9 (rounded) with a remainder of 3</li>
+<li>9 (previous answer) / 8 (base) = 1 (rounded) with a remainder of 1</li>
+<li>1 (previous answer) / 8 (base) = 0 (rounded) with a remainder of 1</li>
+</ul>
+
+<p>Meaning 75 evaluated in base-8 would be <code>113</code> (all the remainders concatenated together, &lsquo;bottom up&rsquo;)</p>
+
+<h3 id="convert-base-10-into-base-16">Convert Base-10 into Base-16</h3>
+
+<p>The algorithm for converting from base-10 into base-2 and base-8 works basically the same for converting into base-16. But there is one caveat whereby a remainder can be in the double digits, and apparently (for reasons I don&rsquo;t completely understand) we don&rsquo;t want that, and so the number system was designed to replace the six instances where this can occur (the remainders being: 10, 11, 12, 13, 14, 15) with a alpha-numeric equivalent:</p>
+
+<ul>
+<li>10-A</li>
+<li>11-B</li>
+<li>12-C</li>
+<li>13-D</li>
+<li>14-E</li>
+<li>15-F</li>
+</ul>
+
+<p>So if we want to convert 110<sub>10</sub> into a hexadecimal, the outcome of the algorithm would be:</p>
+
+<ul>
+<li>110 (number) / 16 (base) = 6 (rounded) with a remainder of 14</li>
+<li>6 (previous answer) / 16 (base) = 0 (rounded) with a remainder of 6</li>
+</ul>
+
+<p>We know that we need to replace <code>14</code> (a double digit remainder) with the letter <code>E</code> (see above mapping).</p>
+
+<p>Meaning 110 evaluated in base-16 would be <code>6E</code></p>
+
+<p>Let&rsquo;s try it again, but with the number 411<sub>10</sub>:</p>
+
+<ul>
+<li>411 (number) / 16 (base) = 25 (rounded) with a remainder of 11</li>
+<li>25 (previous answer) / 16 (base) = 1 (rounded) with a remainder of 9</li>
+<li>1 (previous answer) / 16 (base) = 0 (rounded) with a remainder of 1</li>
+</ul>
+
+<p>We know that we need to replace <code>11</code> with the letter <code>B</code>.</p>
+
+<p>Meaning 411 evaluated in base-16 would be <code>19B</code></p>
+
+<h3 id="convert-any-base-to-base-10">Convert Any Base to Base-10</h3>
+
+<p>What if you want to convert a base-8 number (let&rsquo;s say <code>113</code>, why not) into base-10? The algorithm is to multiple the individual numbers by their associated power of the base and then add the numbers together.</p>
+
+<p>So here are the base-8 powers:</p>
+
+<ul>
+<li>3: 8<sup>0</sup></li>
+<li>1: 8<sup>1</sup></li>
+<li>1: 8<sup>2</sup></li>
+</ul>
+
+<p>And here is the algorithm:</p>
+
+<ul>
+<li>3 x 8<sup>0</sup> = 3</li>
+<li>1 x 8<sup>1</sup> = 8 (i.e. <code>1*8</code>)</li>
+<li>1 x 8<sup>2</sup> = 64 (i.e. <code>1*(8 * 8)</code>)</li>
+<li>3 + 8 + 64 = 75</li>
+</ul>
+
+<p>If you&rsquo;re dealing with base-16, then again it&rsquo;s the same but the difference is you&rsquo;re translating the letter back into the corresponding number.</p>
+
+<p>Let&rsquo;s convert <code>19B</code> from base-16 back into base-10:</p>
+
+<ul>
+<li>B x 16<sup>0</sup> (11 x 16<sup>0</sup>) = 11</li>
+<li>9 x 16<sup>1</sup> = 144</li>
+<li>1 x 16<sup>2</sup> = 256</li>
+<li>11 + 144 + 256 = 411</li>
+</ul>
+
+<p>Let&rsquo;s try one more conversion between base-16 to base-10. The number is <code>1A4</code>:</p>
+
+<ul>
+<li>4 x 16<sup>0</sup> = 4</li>
+<li>A x 16<sup>1</sup> (10 x 16<sup>1</sup>) = 160</li>
+<li>1 x 16<sup>2</sup> = 256</li>
+<li>4 + 160 + 256 = 420</li>
+</ul>
+
+<h2 id="cidr">CIDR</h2>
+
+<p>A CIDR is a range of IP addresses. We can use our understanding of bits, bytes and octets to understand the format of a CIDR.</p>
+
+<p>A CIDR typically resembles something like:</p>
+
+<pre><code>10.0.0.0/n
+</code></pre>
+
+<p>Where <code>n</code> is given the value 8, 16, 24, or 32 and these represent each of the 8-bit blocks that make up the IP.</p>
+
+<p>If we want an IP range between <code>10.0.0.0</code> and <code>10.255.255.255</code>, we&rsquo;d specify the CIDR as <code>10.0.0.0/8</code>.</p>
+
+<p>What <code>8</code> states is that the last 8 bits of the 32-bit number is accounted for (this being the <code>10</code> we&rsquo;ve specified in our example). Meaning the rest of the 8-bit segments can be added up to their max of 255 (meaning the last IP in this CIDR range would be <code>10.255.255.255</code>).</p>
+
+<p>Similarly if we want an IP range between <code>10.0.0.0</code> and <code>10.0.255.255</code>, we&rsquo;d specify the CIDR as <code>10.0.0.0/16</code>.</p>
+
+<p>Again, <code>16</code> states that the next 8-bits segment of the 32-bit number is now accounted for (this being the <code>0</code> we&rsquo;ve specified in our example <code>10.0</code>). Meaning the rest of the 8-bit segments can be added up to their max of 255 (meaning the last IP in this CIDR range would be <code>10.0.255.255</code>).</p>
+
+<p>And so on&hellip;</p>
+
+<p>So <code>10.0.0.0/24</code> gives us an ip range of <code>10.0.0.0</code> to <code>10.0.0.255</code> (256 IPs).</p>
+
+<p>Whereas <code>10.0.0.0/32</code> gives us an ip range of 1 ip (<code>10.0.0.0</code> to <code>10.0.0.0</code>).</p>
+
+<blockquote>
+<p>Note: you can use a tool such as <a href="http://www.ipaddressguide.com/cidr" target="_blank">http://www.ipaddressguide.com/cidr</a> to help you generate CIDRs</p>
+</blockquote>
+
+<p>We can use the earlier <a href="#visualisation">byte visualisation</a> table matrix to help us manually calculate a CIDR range.</p>
+
+<p>I&rsquo;ve reproduced it below with a HTML table:</p>
+
+<blockquote>
+<p>Note: you&rsquo;ll likely need to scroll to the right to see the start of the 32-bit</p>
+</blockquote>
+
+<table border="1" id="table10" bordercolor="#000080" style="text-align: center; font-family: Verdana; font-size: 8pt; color: #000000">
+  <tbody>
+  <tr>
+      <th width="15%">IP</th>
+      <td colspan="8">10</td>
+      <td colspan="8">0</td>
+      <td colspan="8">0</td>
+      <td colspan="8">1</td>
+    </tr>
+    <tr>
+      <th>8 Bit Blocks</th>
+      <td colspan="8">8 bits [24-31]</td>
+      <td colspan="8">8 bits [16-23]</td>
+      <td colspan="8">8 bits [08-15]</td>
+      <td colspan="8">8 bits [00-07]</td>
+    </tr>
+    <tr>
+      <th>32 Bit #</th>
+      <td>31</td>
+      <td>30</td>
+      <td>29</td>
+      <td>28</td>
+      <td>27</td>
+      <td>26</td>
+      <td>25</td>
+      <td>24</td>
+      <td>23</td>
+      <td>22</td>
+      <td>21</td>
+      <td>20</td>
+      <td>19</td>
+      <td>18</td>
+      <td>17</td>
+      <td>16</td>
+      <td>15</td>
+      <td>14</td>
+      <td>13</td>
+      <td>12</td>
+      <td>11</td>
+      <td>10</td>
+      <td>09</td>
+      <td>08</td>
+      <td>07</td>
+      <td>06</td>
+      <td>05</td>
+      <td>04</td>
+      <td>03</td>
+      <td>02</td>
+      <td>01</td>
+      <td>00</td>
+    </tr>
+    <tr>
+      <th>Decimal</th>
+      <td>128</td>
+      <td>64</td>
+      <td>32</td>
+      <td>16</td>
+      <td>8</td>
+      <td>4</td>
+      <td>2</td>
+      <td>1</td>
+      <td>128</td>
+      <td>64</td>
+      <td>32</td>
+      <td>16</td>
+      <td>8</td>
+      <td>4</td>
+      <td>2</td>
+      <td>1</td>
+      <td>128</td>
+      <td>64</td>
+      <td>32</td>
+      <td>16</td>
+      <td>8</td>
+      <td>4</td>
+      <td>2</td>
+      <td>1</td>
+      <td>128</td>
+      <td>64</td>
+      <td>32</td>
+      <td>16</td>
+      <td>8</td>
+      <td>4</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Binary</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td><font color="#DC143C">1</font></td>
+      <td>0</td>
+      <td><font color="#DC143C">1</font></td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td><font color="#DC143C">1</font></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There you go. A whirlwind ride through different basic computer tech topics. As always, if I&rsquo;ve gotten anything wrong then just let me know on twitter.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

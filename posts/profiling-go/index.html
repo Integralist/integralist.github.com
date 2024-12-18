@@ -1,0 +1,1287 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#profiling-go">Profiling Go</a>
+<ul>
+<li><a href="#memory-management">Memory Management</a></li>
+
+<li><a href="#types-of-profiling">Types of Profiling</a></li>
+
+<li><a href="#tools-matrix">Tools Matrix</a></li>
+
+<li><a href="#analysis-steps">Analysis Steps</a></li>
+
+<li><a href="#base-example">Base Example</a></li>
+
+<li><a href="#readmemstats">ReadMemStats</a></li>
+
+<li><a href="#pprof">Pprof</a>
+<ul>
+<li><a href="#generate-profile-for-analysis-during-development">Generate .profile for analysis during development</a>
+<ul>
+<li><a href="#cpu-analysis">CPU Analysis</a></li>
+
+<li><a href="#memory-analysis">Memory Analysis</a></li>
+</ul></li>
+
+<li><a href="#remotely-analyse-via-web-server">Remotely analyse via web server</a></li>
+
+<li><a href="#image-generation">Image Generation</a></li>
+
+<li><a href="#web-ui">Web UI</a></li>
+</ul></li>
+
+<li><a href="#trace">Trace</a>
+<ul>
+<li><a href="#goroutines">Goroutines</a></li>
+
+<li><a href="#threads">Threads</a></li>
+
+<li><a href="#heap">Heap</a></li>
+
+<li><a href="#procs">Procs</a></li>
+</ul></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="profiling-go">Profiling Go</h1>
+
+<blockquote>
+<p>Note: I highly recommend also reading <a href="https://golang.org/doc/diagnostics.html" target="_blank">this</a> official diagnostics documentation.</p>
+</blockquote>
+
+<h2 id="memory-management">Memory Management</h2>
+
+<p>Before we dive into the techniques and tools available for profiling Go applications, we should first understand a little bit about its memory model as this can help us to understand what it is we’re seeing in relation to memory consumption.</p>
+
+<p>Go’s implementation is a <em>parallel</em> <a href="http://wiki.c2.com/?MarkAndSweep" target="_blank">mark-and-sweep garbage collector</a>. In the <em>traditional</em> mark-and-sweep model, the garbage collector would stop the program from running (i.e. “stop the world”) while it detects unreachable objects and again while it clears them (i.e. deallocates the memory). This is to prevent complications where the running program could end up moving references around during the identification/clean-up phase. This would also cause latency and other issues for users of the program while the GC ran. With Go the <a href="https://blog.golang.org/go15gc" target="_blank">GC is executed concurrently</a>, so users don’t notice pauses or delays even though the GC is running.</p>
+
+<h2 id="types-of-profiling">Types of Profiling</h2>
+
+<p>There are a couple of approaches available to us for monitoring performance&hellip;</p>
+
+<ul>
+<li><strong>Timers</strong>: useful for benchmarking, as well as comparing <em>before</em> and <em>after</em> fixes.</li>
+<li><strong>Profilers</strong>: useful for high-level verification.</li>
+</ul>
+
+<h2 id="tools-matrix">Tools Matrix</h2>
+
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><a href="#5">ReadMemStats</a></td>
+<td>- Simple, quick and easy.<br>- Only details memory usage.</td>
+<td>- Requires code change.</td>
+</tr>
+
+<tr>
+<td><a href="#6">pprof</a></td>
+<td>- Details CPU and Memory.<br>- Remote analysis possible.<br>- Image generation.</td>
+<td>- Requires code change.<br>- More complicated API.</td>
+</tr>
+
+<tr>
+<td><a href="#7">trace</a></td>
+<td>- Helps analyse data over time.<br>- Powerful debugging UI.<br>- Visualise problem area easily.</td>
+<td>- Requires code change.<br>- UI is complex.<br>- Takes time to understand.</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="analysis-steps">Analysis Steps</h2>
+
+<p>Regardless of the tool you use for analysis, a general rule of thumb is to:</p>
+
+<ol>
+<li><strong>Identify a bottleneck at a high-level</strong></li>
+</ol>
+
+<ul>
+<li>For example, you might notice a long running function call.</li>
+</ul>
+
+<ol>
+<li><strong>Reduce the operations</strong></li>
+</ol>
+
+<ul>
+<li>Look at time spent, or number of calls, and figure out an alternative approach.</li>
+<li>Look at the number of memory allocations, figure out an alternative approach.</li>
+</ul>
+
+<ol>
+<li><strong>Drill down</strong></li>
+</ol>
+
+<ul>
+<li>Use a tool that gives you data at a lower-level.</li>
+</ul>
+
+<p>Think about more performant algorithms or data structures.<br>
+There may also be simpler solutions.<br>
+Take a pragmatic look at your code.</p>
+
+<h2 id="base-example">Base Example</h2>
+
+<p>Let’s begin with a simple program written using Go 1.9.2…</p>
+
+<pre><code class="language-go">package main
+
+import (
+    &quot;log&quot;
+)
+
+// bigBytes allocates 100 megabytes
+func bigBytes() *[]byte {
+    s := make([]byte, 100000000)
+    return &amp;s
+}
+
+func main() {
+    for i := 0; i &lt; 10; i++ {
+        s := bigBytes()
+        if s == nil {
+            log.Println(&quot;oh noes&quot;)
+        }
+    }
+}
+</code></pre>
+
+<p>Running this program can take ~0.2 seconds to execute.</p>
+
+<p>So this isn’t a slow program, we’re just using it as a base to measure memory consumption.</p>
+
+<h2 id="readmemstats">ReadMemStats</h2>
+
+<p>The easiest way to look what our application is doing with regards to memory allocation is by utilising the <code>MemStats</code> from the <code>runtime</code> package.</p>
+
+<p>In the following snippet we modify the <code>main</code> function to print out specific memory statistics.</p>
+
+<pre><code class="language-go">func main() {
+    var mem runtime.MemStats
+
+    fmt.Println(&quot;memory baseline...&quot;)
+
+    runtime.ReadMemStats(&amp;mem)
+    log.Println(mem.Alloc)
+    log.Println(mem.TotalAlloc)
+    log.Println(mem.HeapAlloc)
+    log.Println(mem.HeapSys)
+
+    for i := 0; i &lt; 10; i++ {
+        s := bigBytes()
+        if s == nil {
+            log.Println(&quot;oh noes&quot;)
+        }
+    }
+
+    fmt.Println(&quot;memory comparison...&quot;)
+
+    runtime.ReadMemStats(&amp;mem)
+    log.Println(mem.Alloc)
+    log.Println(mem.TotalAlloc)
+    log.Println(mem.HeapAlloc)
+    log.Println(mem.HeapSys)
+}
+</code></pre>
+
+<p>If I run this program I’ll see the following output:</p>
+
+<pre><code>memory baseline…
+
+2017/10/29 08:51:56 56480
+2017/10/29 08:51:56 56480
+2017/10/29 08:51:56 56480
+2017/10/29 08:51:56 786432
+
+memory comparison...
+
+2017/10/29 08:51:56 200074312
+2017/10/29 08:51:56 1000144520
+2017/10/29 08:51:56 200074312
+2017/10/29 08:51:56 200704000
+</code></pre>
+
+<p>So we can see the difference between what the go application was using at the point in time that the <code>main</code> function started and when it finished (after allocating a lot of memory via the <code>bigBytes</code> function). The two items we’re most interested in are <code>TotalAlloc</code> and <code>HeapAlloc</code>.</p>
+
+<p>The total allocations shows us the total amount of memory accumulated (this value <em>doesn’t</em> decrease as memory is freed). Whereas the heap allocations indicate the amount of memory at the point in time when the snapshot was taken, and it can include <em>both</em> reachable and unreachable objects (e.g. objects the garbage collector hasn’t freed yet). So it’s important to realise that the amount of memory ‘in use’ could have dropped after the snapshot was taken.</p>
+
+<p>Take a look at the <a href="https://golang.org/pkg/runtime/#MemStats" target="_blank">MemStats docs</a> for more properties (inc. <code>Mallocs</code> or <code>Frees</code>).</p>
+
+<h2 id="pprof">Pprof</h2>
+
+<p><a href="https://github.com/google/pprof" target="_blank">Pprof</a> is a tool for visualization and analysis of profiling data.<br>
+It’s useful for identifying where your application is spending its time (CPU and memory).</p>
+
+<p>You can install it using:<br>
+<code>go get github.com/google/pprof</code></p>
+
+<p>To begin with, let’s understand what a “profile” is:</p>
+
+<blockquote>
+<p>A Profile is a collection of stack traces showing the call sequences that led to instances of a particular event, such as allocation. Packages can create and maintain their own profiles; the most common use is for tracking resources that must be explicitly closed, such as files or network connections. &ndash; <a href="https://golang.org/pkg/runtime/pprof/#Profile" target="_blank">pkg/runtime/pprof</a></p>
+</blockquote>
+
+<p>Now there are a couple of ways to use this tool:</p>
+
+<ol>
+<li>Instrument code within binary to generate a <code>.profile</code> for analysis <em>during</em> development.</li>
+<li>Remotely analyse binary via a web server (no <code>.profile</code> is explicitly generated).</li>
+</ol>
+
+<blockquote>
+<p>Note: the profile file doesn’t have to use a <code>.profile</code> extension (it can be whatever you like)</p>
+</blockquote>
+
+<h3 id="generate-profile-for-analysis-during-development">Generate .profile for analysis during development</h3>
+
+<p>In this section we’ll look at profiling both CPU and Memory allocation.<br>
+We’ll start with CPU profiling.</p>
+
+<h4 id="cpu-analysis">CPU Analysis</h4>
+
+<p>In the following example we’ve modified the application to import <code>&quot;runtime/pprof&quot;</code> and added the relevant API calls in order to record CPU data:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;log&quot;
+	&quot;os&quot;
+	&quot;runtime/pprof&quot;
+)
+
+// bigBytes allocates 10 sets of 100 megabytes
+func bigBytes() *[]byte {
+	s := make([]byte, 100000000)
+	return &amp;s
+}
+
+func main() {
+	pprof.StartCPUProfile(os.Stdout)
+	defer pprof.StopCPUProfile()
+
+	for i := 0; i &lt; 10; i++ {
+		s := bigBytes()
+		if s == nil {
+			log.Println(&quot;oh noes&quot;)
+		}
+	}
+}
+</code></pre>
+
+<blockquote>
+<p>Note: we use <code>os.Stdout</code> to make the example easier (i.e. no need to create a file)
+We’ll just use the shell’s ability to redirect output to create the profile file instead.</p>
+</blockquote>
+
+<p>We can then build and run the application and save the profile data to a file:<br>
+<code>go build -o app &amp;&amp; time ./app &gt; cpu.profile</code></p>
+
+<p>Finally we can inspect the data interactively using go tool like so:<br>
+<code>go tool pprof cpu.profile</code></p>
+
+<p>From here you’ll see an interactive prompt has started up.<br>
+So let’s execute the <code>top</code> command and see what output we get:</p>
+
+<pre><code>(pprof) top
+Showing nodes accounting for 180ms, 100% of 180ms total
+      flat  flat%   sum%        cum   cum%
+     180ms   100%   100%      180ms   100%  runtime.memclrNoHeapPointers /.../src/runtime/memclr_amd64.s
+         0     0%   100%      180ms   100%  main.bigBytes /.../code/go/profiling/main.go (inline)
+         0     0%   100%      180ms   100%  main.main /.../code/go/profiling/main.go
+         0     0%   100%      180ms   100%  runtime.(*mheap).alloc /.../src/runtime/mheap.go
+         0     0%   100%      180ms   100%  runtime.largeAlloc /.../src/runtime/malloc.go
+         0     0%   100%      180ms   100%  runtime.main /.../src/runtime/proc.go
+         0     0%   100%      180ms   100%  runtime.makeslice /.../src/runtime/slice.go
+         0     0%   100%      180ms   100%  runtime.mallocgc /.../src/runtime/malloc.go
+         0     0%   100%      180ms   100%  runtime.mallocgc.func1 /.../src/runtime/malloc.go
+         0     0%   100%      180ms   100%  runtime.systemstack /.../src/runtime/asm_amd64.s
+</code></pre>
+
+<p>So this suggests the biggest CPU consumer is <code>runtime.memclrNoHeapPointers</code>.</p>
+
+<p>Let’s now view a “line by line” breakdown to see if we can pinpoint the CPU usage further.</p>
+
+<p>We’ll do this by using the <code>list &lt;function regex&gt;</code> command.<br>
+We can see from the <code>top</code> command that our <code>main</code> function is available via <code>main.main</code>.</p>
+
+<p>So let’s list any functions within the <code>main</code> namespace:</p>
+
+<pre><code>(pprof) list main\.
+Total: 180ms
+ROUTINE ======================== main.bigBytes in /.../go/profiling/main.go
+         0      180ms (flat, cum)   100% of Total
+         .          .      6:   &quot;runtime/pprof&quot;
+         .          .      7:)
+         .          .      8:
+         .          .      9:// bigBytes allocates 10 sets of 100 megabytes
+         .          .     10:func bigBytes() *[]byte {
+         .      180ms     11:   s := make([]byte, 100000000)
+         .          .     12:   return &amp;s
+         .          .     13:}
+         .          .     14:
+         .          .     15:func main() {
+         .          .     16:   pprof.StartCPUProfile(os.Stdout)
+ROUTINE ======================== main.main in /.../code/go/profiling/main.go
+         0      180ms (flat, cum)   100% of Total
+         .          .     15:func main() {
+         .          .     16:   pprof.StartCPUProfile(os.Stdout)
+         .          .     17:   defer pprof.StopCPUProfile()
+         .          .     18:
+         .          .     19:   for i := 0; i &lt; 10; i++ {
+         .      180ms     20:           s := bigBytes()
+         .          .     21:           if s == nil {
+         .          .     22:                   log.Println(&quot;oh noes&quot;)
+         .          .     23:           }
+         .          .     24:   }
+         .          .     25:}
+</code></pre>
+
+<p>OK, so yes we can see that 180ms is spent in the <code>bigBytes</code> function and pretty much all of <em>that</em> function’s time is spent allocating memory via <code>make([]byte, 100000000)</code>.</p>
+
+<h4 id="memory-analysis">Memory Analysis</h4>
+
+<p>Before we move on, let’s look at how to profile our memory consumption.</p>
+
+<p>To do this we’ll change our application slightly so that <code>StartCPUProfile</code> becomes <code>WriteHeapProfile</code> (we’ll also move this call to the bottom of our <code>main</code> function otherwise if we keep it at the top of the function no memory has been allocated at that point). We’ll also remove the <code>StopCPUProfile</code> call altogether (as recording the heap is done as a <em>snapshot</em> rather than an ongoing process like with the CPU profiling):</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;log&quot;
+	&quot;os&quot;
+	&quot;runtime/pprof&quot;
+)
+
+// bigBytes allocates 10 sets of 100 megabytes
+func bigBytes() *[]byte {
+	s := make([]byte, 100000000)
+	return &amp;s
+}
+
+func main() {
+	for i := 0; i &lt; 10; i++ {
+		s := bigBytes()
+		if s == nil {
+			log.Println(&quot;oh noes&quot;)
+		}
+	}
+
+	pprof.WriteHeapProfile(os.Stdout)
+}
+</code></pre>
+
+<p>Again, we’ll build and execute the application and redirect the stdout to a file (for simplicity), but you could have created the file dynamically within your application if you so choose:<br>
+<code>go build -o app &amp;&amp; time ./app &gt; memory.profile</code></p>
+
+<p>At this point we can now run pprof to interactively inspect the memory profile data:<br>
+<code>go tool pprof memory.profile</code></p>
+
+<p>Let’s run the top command and see what the output is:</p>
+
+<pre><code>(pprof) top
+Showing nodes accounting for 95.38MB, 100% of 95.38MB total
+      flat  flat%   sum%        cum   cum%
+   95.38MB   100%   100%    95.38MB   100%  main.bigBytes /...ain.go (inline)
+         0     0%   100%    95.38MB   100%  main.main /.../profiling/main.go
+         0     0%   100%    95.38MB   100%  runtime.main /.../runtime/proc.go
+</code></pre>
+
+<p>For a simple example application like we’re using, this is fine as it indicates pretty clearly which function is responsible for the majority of the memory allocation (<code>main.bigBytes</code>).</p>
+
+<p>But if I wanted a more specific breakdown of the data I would execute <code>list main.</code>:</p>
+
+<pre><code>(pprof) list main.
+Total: 95.38MB
+ROUTINE ======================== main.bigBytes in /.../go/profiling/main.go
+   95.38MB    95.38MB (flat, cum)   100% of Total
+         .          .      6:   &quot;runtime/pprof&quot;
+         .          .      7:)
+         .          .      8:
+         .          .      9:// bigBytes allocates 10 sets of 100 megabytes
+         .          .     10:func bigBytes() *[]byte {
+   95.38MB    95.38MB     11:   s := make([]byte, 100000000)
+         .          .     12:   return &amp;s
+         .          .     13:}
+         .          .     14:
+         .          .     15:func main() {
+         .          .     16:   for i := 0; i &lt; 10; i++ {
+ROUTINE ======================== main.main in /.../code/go/profiling/main.go
+         0    95.38MB (flat, cum)   100% of Total
+         .          .     12:   return &amp;s
+         .          .     13:}
+         .          .     14:
+         .          .     15:func main() {
+         .          .     16:   for i := 0; i &lt; 10; i++ {
+         .    95.38MB     17:           s := bigBytes()
+         .          .     18:           if s == nil {
+         .          .     19:                   log.Println(&quot;oh noes&quot;)
+         .          .     20:           }
+         .          .     21:   }
+         .          .     22:
+</code></pre>
+
+<p>This indicates where all our memory is allocated on a “line-by-line” basis.</p>
+
+<h3 id="remotely-analyse-via-web-server">Remotely analyse via web server</h3>
+
+<p>In the following example we’ve modified the application to start up a web server and we’ve imported the <code>&quot;net/http/pprof&quot;</code> <a href="https://golang.org/pkg/net/http/pprof/" target="_blank">package</a> which automatically profiles what’s happening.</p>
+
+<blockquote>
+<p>Note: if your application already uses a web server, then you don’t need to start another. The pprof package will hook into your web server’s multiplexer.</p>
+</blockquote>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;log&quot;
+	&quot;net/http&quot;
+	_ &quot;net/http/pprof&quot;
+	&quot;sync&quot;
+)
+
+// bigBytes allocates 10 sets of 100 megabytes
+func bigBytes() *[]byte {
+	s := make([]byte, 100000000)
+	return &amp;s
+}
+
+func main() {
+	var wg sync.WaitGroup
+
+	go func() {
+		log.Println(http.ListenAndServe(&quot;localhost:6060&quot;, nil))
+	}()
+
+	for i := 0; i &lt; 10; i++ {
+		s := bigBytes()
+		if s == nil {
+			log.Println(&quot;oh noes&quot;)
+		}
+	}
+
+	wg.Add(1)
+	wg.Wait() // this is for the benefit of the pprof server analysis
+}
+</code></pre>
+
+<p>When you build and run this binary, first visit the web server the code is running.<br>
+You’ll find that the pprof data is accessible via the path <code>/debug/pprof/</code>:<br>
+<code>http://localhost:6060/debug/pprof/</code></p>
+
+<p>You should see something like:</p>
+
+<pre><code>profiles:
+0	block
+4	goroutine
+5	heap
+0	mutex
+7	threadcreate
+
+full goroutine stack dump
+
+/debug/pprof/
+</code></pre>
+
+<p>Where block, goroutine, heap, mutex and threadcreate are all links off to the recorded data; and by ‘recorded data’ I mean they each link through to a different <code>.profile</code>. This isn’t particularly useful though. A tool is needed to process these <code>.profile</code> data files.</p>
+
+<p>We’ll come back to that in a moment, first let’s understand what these five profiles represent:</p>
+
+<ul>
+<li><strong>block</strong>: stack traces that led to blocking on synchronization primitives</li>
+<li><strong>goroutine</strong>: stack traces of all current goroutines</li>
+<li><strong>heap</strong>: a sampling of all heap allocations</li>
+<li><strong>mutex</strong>: stack traces of holders of contended mutexes</li>
+<li><strong>threadcreate</strong>: stack traces that led to the creation of new OS threads</li>
+</ul>
+
+<p>The web server can also generate a 30 second CPU profile, which you can access via <a href="http://localhost:6060/debug/pprof/profile" target="_blank">http://localhost:6060/debug/pprof/profile</a> (it won’t be viewable in the browser, instead it’ll be downloaded to your file system).</p>
+
+<p>The CPU profile endpoint is not listed when viewing <code>/debug/pprof/</code> simply because the CPU profile has a special API, the <code>StartCPUProfile</code> and <code>StopCPUProfile</code> functions that stream output to a writer during profiling, hence this hidden endpoint will ultimately download the results to your file system (we looked at how to use this API in the previous section).</p>
+
+<p>The web server can also generate a “trace” file, which you can access via <a href="http://localhost:6060/debug/pprof/trace?seconds=5" target="_blank">http://localhost:6060/debug/pprof/trace?seconds=5</a> (again, it’s not listed for similar reasons as the CPU profile - in that it generates file output that is downloaded to your file system). This trace file out requires the use of <code>go tool trace</code> (which we’ll cover in the next section).</p>
+
+<blockquote>
+<p>Note: more info on pprof options can be found here: <a href="https://golang.org/pkg/net/http/pprof/" target="_blank">golang.org/pkg/net/http/pprof/</a></p>
+</blockquote>
+
+<hr>
+
+<p>If you&rsquo;re using a custom URL router, you&rsquo;ll need to register the individual <code>pprof</code> endpoints:</p>
+
+<pre><code class="language-go">package main
+
+import (
+    &quot;net/http&quot;
+    &quot;net/http/pprof&quot;
+)
+
+func message(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte(&quot;Hello World&quot;))
+}
+
+func main() {
+    r := http.NewServeMux()
+    r.HandleFunc(&quot;/&quot;, message)
+
+    r.HandleFunc(&quot;/debug/pprof/&quot;, pprof.Index)
+    r.HandleFunc(&quot;/debug/pprof/cmdline&quot;, pprof.Cmdline)
+    r.HandleFunc(&quot;/debug/pprof/profile&quot;, pprof.Profile)
+    r.HandleFunc(&quot;/debug/pprof/symbol&quot;, pprof.Symbol)
+    r.HandleFunc(&quot;/debug/pprof/trace&quot;, pprof.Trace)
+
+    http.ListenAndServe(&quot;:8080&quot;, r)
+}
+</code></pre>
+
+<hr>
+
+<p>So ideally you would use <code>go tool pprof</code> on the command line.<br>
+As this allows you to more easily interpret and interrogate the data interactively.</p>
+
+<p>To do this, you have to run your binary as before and then, in a <em>separate</em> shell, execute:<br>
+<code>go tool pprof http://localhost:6060/debug/pprof/&lt;.profile&gt;</code></p>
+
+<p>For example, let’s look at the memory heap profile data:<br>
+<code>go tool pprof http://localhost:6060/debug/pprof/heap</code></p>
+
+<p>From here you’ll see an interactive prompt has started up:</p>
+
+<pre><code>Fetching profile over HTTP from http://localhost:6060/debug/pprof/heap
+Saved profile in /.../pprof.alloc_objects.alloc_space.inuse_objects.inuse_space.005.pb.gz
+Type: inuse_space
+Time: Oct 27, 2017 at 10:01am (BST)
+Entering interactive mode (type &quot;help&quot; for commands, &quot;o&quot; for options)
+(pprof)
+</code></pre>
+
+<blockquote>
+<p>Note: you’ll see the “type” is set to <code>inuse_space</code> (meaning how much memory is still in use)</p>
+</blockquote>
+
+<p>As shown, you can type either <code>help</code> or <code>o</code> to see what’s available to use.</p>
+
+<p>Here are a couple of useful commands:</p>
+
+<ul>
+<li><code>top</code>: outputs top entries in text form</li>
+<li><code>topK</code>: where K is a number (e.g. top2 would show top two entries)</li>
+<li><code>list &lt;function regex&gt;</code>: outputs top entries in text form</li>
+</ul>
+
+<p>For example, if I execute <code>top</code> then we’d see the following output:</p>
+
+<pre><code>Showing nodes accounting for 95.38MB, 100% of 95.38MB total
+      flat  flat%   sum%        cum   cum%
+   95.38MB   100%   100%    95.38MB   100%  main.bigBytes /...ain.go (inline)
+         0     0%   100%    95.38MB   100%  main.main /.../profiling/main.go
+         0     0%   100%    95.38MB   100%  runtime.main /.../runtime/proc.go
+</code></pre>
+
+<p>For a simple example application like we’re using, this is fine as it indicates pretty clearly which function is responsible for the majority of the memory allocation (<code>main.bigBytes</code>).</p>
+
+<p>But if I wanted a more specific breakdown of the data I would execute list <code>main.main</code>:</p>
+
+<pre><code>Total: 95.38MB
+ROUTINE ======================== main.main in /.../profiling/main.go
+   95.38MB    95.38MB (flat, cum)   100% of Total
+         .          .      8:   &quot;sync&quot;
+         .          .      9:)
+         .          .     10:
+         .          .     11:// bigBytes allocates 10 sets of 100 megabytes
+         .          .     12:func bigBytes() *[]byte {
+   95.38MB    95.38MB     13:   s := make([]byte, 100000000)
+         .          .     14:   return &amp;s
+         .          .     15:}
+         .          .     16:
+         .          .     17:func main() {
+         .          .     18:   fmt.Println(&quot;starting...&quot;)
+</code></pre>
+
+<p>This indicates where all our memory is allocated on a “line-by-line” basis.</p>
+
+<p>I noted earlier that the default “type” for the heap analysis was “memory still in use”. But there is an alternative type which indicates the amount of memory that was allocated in total throughout the lifetime of the program. You can switch to that mode using the <code>-alloc_space</code> flag like so:</p>
+
+<pre><code class="language-bash">go tool pprof -alloc_space http://localhost:6060/debug/pprof/heap
+</code></pre>
+
+<p>Let’s see the difference in the output by executing the <code>list</code> command:</p>
+
+<pre><code>(pprof) list main.bigBytes
+
+Total: 954.63MB
+ROUTINE ======================== main.bigBytes in /.../go/profiling/main.go
+  953.75MB   953.75MB (flat, cum) 99.91% of Total
+         .          .      7:   &quot;sync&quot;
+         .          .      8:)
+         .          .      9:
+         .          .     10:// bigBytes allocates 10 sets of 100 megabytes
+         .          .     11:func bigBytes() *[]byte {
+  953.75MB   953.75MB     12:   s := make([]byte, 100000000)
+         .          .     13:   return &amp;s
+         .          .     14:}
+         .          .     15:
+         .          .     16:func main() {
+         .          .     17:   var wg sync.WaitGroup
+</code></pre>
+
+<blockquote>
+<p>Note: if you wanted to be explicit you could have used the “in use” type like so:<br>
+<code>go tool pprof -inuse_space http://localhost:6060/debug/pprof/heap</code></p>
+</blockquote>
+
+<p>The reason to choose either <code>-inuse_space</code> or <code>-alloc_space</code> will depend on where your specific concerns are focused. For example, if you’re concerned about garbage collection performance then you’ll want to look at the “allocated” memory (i.e. <code>-alloc_space</code>).</p>
+
+<blockquote>
+<p>Note: you can also inspect the number of objects (not just their space) with <code>-inuse_objects</code> and <code>-alloc_objects</code>.</p>
+</blockquote>
+
+<h3 id="image-generation">Image Generation</h3>
+
+<p>You can also generate an image of your analysis data using either the flag <code>-png</code>, <code>-gif</code> or <code>-svg</code> and then redirecting stdout to a filename like so:</p>
+
+<pre><code class="language-bash">go tool pprof -png http://localhost:6060/debug/pprof/heap &gt; data.png
+</code></pre>
+
+<p>This generates an image that looks like the following (notice how the bigger the box, the more resources it’s consuming - this helps you ‘at a glance’ to identify a potential problem zone):</p>
+
+<p><a href="../../assets/images/profiling_go.png">
+<img src="../../assets/images/profiling_go.png">
+</a></p>
+
+<blockquote>
+<p>Note: you can also output as a PDF with <code>-pdf</code>.</p>
+</blockquote>
+
+<h3 id="web-ui">Web UI</h3>
+
+<p>Finally, there is a interactive web ui coming for pprof in the near future (as of November 2017).</p>
+
+<p>See <a href="https://rakyll.org/pprof-ui/" target="_blank">this post</a> for more details.</p>
+
+<p>But in short you can get the updated pprof tool from GitHub and then execute it with the new flag <code>-http</code> (e.g. <code>-http=:8080</code>).</p>
+
+<h2 id="trace">Trace</h2>
+
+<p><a href="https://golang.org/cmd/trace/" target="_blank">Trace</a> is a tool for visualization and analysis of trace data.<br>
+It’s suited at finding out what your program is doing over time, not in aggregate.</p>
+
+<blockquote>
+<p>Note: if you want to track down slow functions, or generally find where your program is spending most of its CPU time, then you should consider using <code>go tool pprof</code> instead.</p>
+</blockquote>
+
+<p>Let’s first modify our application to utilise tracing…</p>
+
+<pre><code class="language-go">func main() {
+	trace.Start(os.Stdout)
+	defer trace.Stop()
+
+	for i := 0; i &lt; 10; i++ {
+		s := bigBytes()
+		if s == nil {
+			log.Println(&quot;oh noes&quot;)
+		}
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	var result []byte
+	go func() {
+		result = make([]byte, 500000000)
+		log.Println(&quot;done here&quot;)
+		wg.Done()
+	}()
+
+	wg.Wait()
+	log.Printf(&quot;%T&quot;, result)
+}
+</code></pre>
+
+<p>So, as far as utilising tracing, all we’ve done is import <code>&quot;runtime/trace&quot;</code> and then added calls to the <code>trace.Start</code> and <code>trace.Stop</code> functions (we <code>defer</code> the <code>trace.Stop</code> in order to ensure we trace everything our application is doing).</p>
+
+<p>Additionally we create a goroutine and allocate a large 500mb slice of bytes. We wait for the goroutine to complete and then we log the type of the result. We’re doing this just so we have some additional spike data to visualise.</p>
+
+<p>Now let’s re-compile our application, generate the trace data and open it with the trace tool…</p>
+
+<pre><code class="language-bash">$ go build -o app
+$ time ./app &gt; app.trace
+$ go tool trace app.trace
+</code></pre>
+
+<blockquote>
+<p>Note: you can also generate a pprof compatible file from a trace by using the <code>-pprof</code> flag (if you decided you wanted to dynamically inspect the data that way). See the <a href="https://golang.org/cmd/trace/" target="_blank">go documentation</a> for more details.</p>
+</blockquote>
+
+<p>Here’s the output from running <code>go tool trace app.trace</code>:</p>
+
+<pre><code>2017/10/29 09:30:40 Parsing trace...
+2017/10/29 09:30:40 Serializing trace...
+2017/10/29 09:30:40 Splitting trace...
+2017/10/29 09:30:40 Opening browser
+</code></pre>
+
+<p>You’ll now see your default web browser should have automatically opened to:<br>
+<a href="http://127.0.0.1:60331/" target="_blank">http://127.0.0.1:60331</a></p>
+
+<blockquote>
+<p>Note: it’s best to use Chrome, as <code>go tool trace</code> is designed to work best with it.</p>
+</blockquote>
+
+<p>The page that is loaded will show the following list of links:</p>
+
+<ul>
+<li>View trace</li>
+<li>Goroutine analysis</li>
+<li>Network blocking profile</li>
+<li>Synchronization blocking profile</li>
+<li>Syscall blocking profile</li>
+<li>Scheduler latency profile</li>
+</ul>
+
+<p>Each of these items can give a good insight as to what your application is doing, but we’re most interested in the first one “view trace”. Click it and it’ll give you a complete overview of what your application is doing in an interactive graph.</p>
+
+<p><a href="../../assets/images/profiling_go_2.png">
+<img src="../../assets/images/profiling_go_2.png">
+</a></p>
+
+<blockquote>
+<p>Note: press <code>&lt;Shift-?&gt;</code> to show shortcut keys, like <code>w</code> and <code>s</code> for zooming in/out.</p>
+</blockquote>
+
+<h3 id="goroutines">Goroutines</h3>
+
+<p>If you zoom in enough on the graph you’ll see the “goroutines” segment is made up of two colours: a light green (runnable goroutines) and a dark green (running goroutines). If you click on that part of the graph you’ll see the details of that sample in the bottom preview of the screen. It’s interesting to see how, at any given moment, there can be multiple goroutines but not all of them are necessarily running all at once.</p>
+
+<p>So in our example you see the program moves between having one goroutine ready to run, but not actually running (e.g. it’s “runnable”) and then we move towards two goroutines running (e.g. they’re both “running” and so there are no goroutines left marked as “runnable”).</p>
+
+<p>It’s also interesting to see the correlation between the number of goroutines running and the number of <em>actual</em> underlying OS threads being utilised (i.e. the number of threads the goroutines are being scheduled on to).</p>
+
+<h3 id="threads">Threads</h3>
+
+<p>Again, if you zoom in enough on the graph you’ll see the “threads” segment is made up of two colours: a light purple (syscalls) and a dark purple (running threads).</p>
+
+<p>What’s interesting about the “heap” segment of the UI is that we can see for a short while we never allocate more (total) than 100mb to the heap because the go garbage collection is running concurrently (we can see it running on various processes/threads) and is clearing up after us.</p>
+
+<p>This makes sense because in our code we allocate 100mb of memory and then assign it to a variable <code>s</code> which is scoped to exist only within the <code>for</code> loop block. Once that loop iteration ends the <code>s</code> value isn’t referenced anywhere else so the GC knows it can clean up that memory.</p>
+
+<h3 id="heap">Heap</h3>
+
+<p>We can see as the program moves on that we eventually start seeing some contention and so the total allocated heap becomes 200mb then back and forth between 100mb and 200mb (this is because the GC isn’t running all the time). Then near the end we see the 500mb spike that I added to our code as the total allocated amount of memory in the heap shoots to 600mb.</p>
+
+<p>But at that point, if we click on the spike in heap allocation, we can see in the bottom preview window the “NextGC” run indicates that the total allocated should be zero (which makes sense as that’s the end of the program).</p>
+
+<h3 id="procs">Procs</h3>
+
+<p>In the “procs” section of the UI we can see during our large 500mb allocation that Proc 3 has a new goroutine running <code>main.main.func1</code> (which is our go function that’s doing the allocating).</p>
+
+<p>If you were to “View Options” and then tick “Flow events” you’ll see an arrow from the <code>main.main</code> function going towards the <code>main.main.func1</code> function running on a separate process/thread (probably a bit difficult to see in the below image, but it’s definitely there).</p>
+
+<p><a href="../../assets/images/profiling_go_3.png">
+<img src="../../assets/images/profiling_go_3.png">
+</a></p>
+
+<p>So it’s good to be able to visually see the correlation between first of all the <code>main.main.func1</code> goroutine running and the memory allocation occurring at that time, but also being able to see the cause and effect (i.e. the <em>flow</em>) of the program (i.e. knowing <em>what</em> exactly triggered the new goroutine to be spun up).</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s our tour of various tools for profiling your Go code. Take a look at my earlier article on profiling Python for more of the same.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

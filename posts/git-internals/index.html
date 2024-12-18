@@ -1,0 +1,1084 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#git-internals">Git Internals</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#general-concept">General Concept</a></li>
+
+<li><a href="#subcommands-porcelain-and-plumbing">Subcommands: Porcelain and Plumbing</a>
+<ul>
+<li><a href="#git-subcommands">Git Subcommands</a></li>
+</ul></li>
+
+<li><a href="#the-git-directory">The <code>.git</code> directory</a></li>
+
+<li><a href="#references-and-objects">References and Objects</a>
+<ul>
+<li><a href="#references">References</a></li>
+
+<li><a href="#the-head-reference">The HEAD reference</a></li>
+
+<li><a href="#subcommands-and-references">Subcommands and References</a></li>
+
+<li><a href="#detached-head">Detached HEAD</a></li>
+</ul></li>
+
+<li><a href="#object-types">Object Types</a>
+<ul>
+<li><a href="#snapshots-not-differences">Snapshots, Not Differences</a></li>
+</ul></li>
+
+<li><a href="#tags">Tags</a></li>
+
+<li><a href="#remotes">Remotes</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="git-internals">Git Internals</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>There are many version control systems, but <a href="https://git-scm.com/" target="_blank">git</a> is undoubtedly the most popular, and regularly used, thanks to online social platforms such as <a href="https://www.github.com/" target="_blank">GitHub</a> and <a href="https://gitlab.com/" target="_blank">GitLab</a>.</p>
+
+<p>Yet, it is a tool that is still vastly misunderstood and feared. In this post I aim to take a look at some of the internal moving parts of git, primarily what&rsquo;s inside the <code>.git</code> directory (inc the various subdirectories and files).</p>
+
+<p>My hope is that by better understanding how git works, and the concepts it is built upon, readers will feel more empowered and confident when working with git (especially when they have issues and would normally be unsure of what to do).</p>
+
+<blockquote>
+<p>Note: this article isn&rsquo;t an introduction to git, and does presume that the reader is familiar with (i.e. a user of) git.</p>
+</blockquote>
+
+<h2 id="general-concept">General Concept</h2>
+
+<p>I wanted to take a quick moment just to clarify the terminology associated with the general concepts of how git works (so we&rsquo;re all on the same page):</p>
+
+<ul>
+<li><strong>Working Directory</strong>: your project files.</li>
+<li><strong>Staging Area</strong>: a file that tracks the changes to your project files.</li>
+<li><strong>Repository</strong>: the location where your project files are stored.</li>
+</ul>
+
+<blockquote>
+<p>Note: these bullet points are just summarizations, but I would like to extend upon it slightly in that: your &lsquo;working directory&rsquo; can <em>change</em> depending on what &lsquo;version&rsquo; of the project you have &lsquo;checked out&rsquo; from the git repository (i.e. this is what happens when you change your &lsquo;branch&rsquo; with <code>git checkout &lt;branch_name&gt;</code>).</p>
+</blockquote>
+
+<p>So for example, commands like <code>git add</code> will copy objects from the working directory into the staging area (aka the &lsquo;index&rsquo;), while <code>git reset</code> will <em>remove</em> objects from the staging area.</p>
+
+<p>A command such as <code>git diff</code> compares your working directory to your staging area, while using the <code>--staged</code> flag will change this behaviour such that git will compare your staging area to your actual repository state.</p>
+
+<h2 id="subcommands-porcelain-and-plumbing">Subcommands: Porcelain and Plumbing</h2>
+
+<p>The git version control system wasn&rsquo;t initially designed to be a user-friendly interface, and so alongside the more commonly used subcommands are commands that can carry out very low-level operations.</p>
+
+<p>This has resulted in much confusion around what commands are intended for use by general users and which commands exist for the purpose of internal use.</p>
+
+<blockquote>
+<p>Note: although used internally, the low-level subcommands are also typically used by systems that require such granular operational control.</p>
+</blockquote>
+
+<p>The <code>git</code> subcommands are generally split into one of two groups:</p>
+
+<ul>
+<li><em>Porcelain</em>: the user-friendly interface (e.g. <code>git checkout</code>, <code>git pull</code> etc.)</li>
+<li><em>Plumbing</em>: low-level interface (e.g. <code>git cat-file</code>, <code>git rev-parse</code> etc.)</li>
+</ul>
+
+<h3 id="git-subcommands">Git Subcommands</h3>
+
+<p>Below is a list of the <code>git</code> subcommands (as of git version <code>2.22.0</code>), and knowing which are meant to be &lsquo;porcelain&rsquo; and which are meant to be &lsquo;plumbing&rsquo; can be difficult.</p>
+
+<pre><code class="language-txt">$ man git-&lt;tab&gt;
+
+git-add                       git-commit-tree               git-fsck                      
+git-am                        git-config                    git-fsck-objects              
+git-annotate                  git-count-objects             git-gc                        
+git-apply                     git-credential                git-get-tar-commit-id         
+git-archimport                git-credential-cache          git-grep                      
+git-archive                   git-credential-cache--daemon  git-gui                       
+git-bisect                    git-credential-store          git-hash-object               
+git-blame                     git-cvsexportcommit           git-help                      
+git-branch                    git-cvsimport                 git-http-backend              
+git-bundle                    git-cvsserver                 git-http-fetch                
+git-cat-file                  git-daemon                    git-http-push                 
+git-check-attr                git-describe                  git-imap-send                 
+git-check-ignore              git-diff                      git-index-pack                
+git-check-mailmap             git-diff-files                git-init                      
+git-check-ref-format          git-diff-index                git-init-db                   
+git-checkout                  git-diff-tree                 git-instaweb                  
+git-checkout-index            git-difftool                  git-interpret-trailers        
+git-cherry                    git-fast-export               git-log                       
+git-cherry-pick               git-fast-import               git-ls-files                  
+git-citool                    git-fetch                     git-ls-remote                 
+git-clean                     git-fetch-pack                git-ls-tree                   
+git-clone                     git-filter-branch             git-mailinfo                  
+git-column                    git-fmt-merge-msg             git-mailsplit                 
+git-commit                    git-for-each-ref              git-merge                     
+git-commit-graph              git-format-patch              git-merge-base                
+git-merge-file                git-rebase                    git-show-index
+git-merge-index               git-receive-pack              git-show-ref
+git-merge-one-file            git-reflog                    git-stage
+git-merge-tree                git-remote                    git-stash
+git-mergetool                 git-remote-ext                git-status
+git-mergetool--lib            git-remote-fd                 git-stripspace
+git-mktag                     git-remote-testgit            git-submodule
+git-mktree                    git-repack                    git-svn
+git-multi-pack-index          git-replace                   git-symbolic-ref
+git-mv                        git-request-pull              git-tag
+git-name-rev                  git-rerere                    git-unpack-file
+git-notes                     git-reset                     git-unpack-objects
+git-p4                        git-rev-list                  git-update-index
+git-pack-objects              git-rev-parse                 git-update-ref
+git-pack-redundant            git-revert                    git-update-server-info
+git-pack-refs                 git-rm                        git-upload-archive
+git-parse-remote              git-send-email                git-upload-pack
+git-patch-id                  git-send-pack                 git-var
+git-prune                     git-sh-i18n                   git-verify-commit
+git-prune-packed              git-sh-i18n--envsubst         git-verify-pack
+git-pull                      git-sh-setup                  git-verify-tag
+git-push                      git-shell                     git-web--browse
+git-quiltimport               git-shortlog                  git-whatchanged
+git-range-diff                git-show                      git-worktree
+git-read-tree                 git-show-branch               git-write-tree
+</code></pre>
+
+<p>But there <em>is</em> a way to find out! Currently the <code>man git</code> page describes which commands are intended as porcelain and which are plumbing. Simple search for <code>GIT COMMANDS</code> and you&rsquo;ll find the two groupings.</p>
+
+<p>My own generalized way of making a distinction is to consider the day-to-day subcommands I use (e.g. <code>git add</code>, <code>git diff</code>) as being porcelain, while the more esoteric subcommands (e.g. <code>git fsck</code>, <code>git multi-pack-index</code>) as being more plumbing orientated.</p>
+
+<p>In practice it doesn&rsquo;t <em>really</em> matter which subcommands are porcelain and which are plumbing. If there&rsquo;s a subcommand you feel you need to use, then go ahead and use it. My personal perspective on this is: if you&rsquo;re ever unsure of what it is you&rsquo;re doing you&rsquo;re unlikely to use a subcommand.</p>
+
+<p>Most users do not diverge from the well trodden path of: <code>git add</code>, <code>git commit</code>, <code>git pull</code>, <code>git push</code>, <code>git diff</code> (with an occasional <code>git rebase</code>).</p>
+
+<p>What&rsquo;s interesting about the plumbing subcommands is that some of them are used internally by git when you&rsquo;re calling the porcelain subcommands (e.g. <code>git read-tree</code>, <code>git update-index</code>, <code>git update-ref</code> will be called by other porcelain commands such as <code>git add</code> or <code>git commit</code>).</p>
+
+<blockquote>
+<p>Note: although we&rsquo;ll be looking at a couple of plumbing commands in this article, I&rsquo;ll refer you to the <a href="https://git-scm.com/book/en/v2/Git-Internals-Git-Objects" target="_blank">git book</a> for a look at the different plumbing commands available and how they&rsquo;re used.</p>
+</blockquote>
+
+<h2 id="the-git-directory">The <code>.git</code> directory</h2>
+
+<p>When you start a new project that you want to use version control for, you&rsquo;ll typically run the <code>git init</code> subcommand:</p>
+
+<pre><code>git init [dir]
+</code></pre>
+
+<p>Most people will know that there is now a <code>.git</code> directory created in the root of your project directory, but that&rsquo;s about where their understanding of things stop.</p>
+
+<p>Let&rsquo;s see what&rsquo;s initially inside the <code>.git</code> directory of a new project&hellip;</p>
+
+<pre><code>$ tree .git/
+
+.git/
+├── HEAD
+├── config
+├── description
+├── hooks
+│   ├── applypatch-msg.sample
+│   ├── commit-msg.sample
+│   ├── fsmonitor-watchman.sample
+│   ├── post-update.sample
+│   ├── pre-applypatch.sample
+│   ├── pre-commit.sample
+│   ├── pre-push.sample
+│   ├── pre-rebase.sample
+│   ├── pre-receive.sample
+│   ├── prepare-commit-msg.sample
+│   └── update.sample
+├── info
+│   └── exclude
+├── objects
+│   ├── info
+│   └── pack
+└── refs
+    ├── heads
+    └── tags
+
+8 directories, 15 files
+</code></pre>
+
+<p>OK, so there&rsquo;s some important directories and files here that we need to learn a bit about in order to appreciate how git works.</p>
+
+<blockquote>
+<p>Note: I&rsquo;m not going to explain <em>every</em> file and directory, only those necessary to understand the fundamentals.</p>
+</blockquote>
+
+<p>Here are some interesting ones:</p>
+
+<ul>
+<li><code>HEAD</code>: contains a pointer to the tip of the <em>current</em> branch.</li>
+<li><code>config</code>: contains project-specific configuration options.</li>
+<li><code>info</code>: contains a <em>global</em> exclude file †</li>
+<li><code>objects</code>: contains four types of &lsquo;objects&rsquo; (commit, tree, blob, tag).</li>
+<li><code>refs</code>: contains pointers to &lsquo;commit&rsquo; objects.</li>
+</ul>
+
+<blockquote>
+<p>† this is separate from a local user&rsquo;s <code>.gitignore</code>.</p>
+</blockquote>
+
+<h2 id="references-and-objects">References and Objects</h2>
+
+<p>The two most important concepts in git are: <strong>references</strong> and <strong>objects</strong>.</p>
+
+<p>For example, your branches, tags and remotes are all references to commits. While your commits are objects, your files are objects, your directories are objects.</p>
+
+<h3 id="references">References</h3>
+
+<p>Git is built upon the simple premise of using &lsquo;pointers&rsquo; to data, and these pointers are typically referred to as &lsquo;references&rsquo; (or &lsquo;refs&rsquo; for short).</p>
+
+<p>This is what the <code>.git/refs</code> directory stores: references.</p>
+
+<p>As I mentioned earlier, these references all point to a &lsquo;commit&rsquo; object&hellip;</p>
+
+<pre><code>remote    branch     tag
+  |          |        |
+  |          |        |
+  |          V        |
+  ------&gt; commit &lt;-----
+             |
+             |
+             V
+           tree
+             |
+             |
+             V
+           blob
+</code></pre>
+
+<blockquote>
+<p>Note: you can see from the above ascii graph that the &lsquo;commit&rsquo; object itself points to a &lsquo;tree&rsquo; object, and that tree object points to a &lsquo;blob&rsquo; object.  We&rsquo;ll dig into these reference &lsquo;object&rsquo; types in more detail in the &ldquo;<a href="#object-types">Object Types</a>&rdquo; section.</p>
+</blockquote>
+
+<p>It&rsquo;s worth clarifying now that although we conceptually talk in terms of &lsquo;branches&rsquo; in git, the internal directory structure (where references to branches are stored) uses the term &lsquo;heads&rsquo; instead. It&rsquo;s a terrible name (like most things in git&rsquo;s lexicon), but it&rsquo;s best to just accept it and move on.</p>
+
+<p>The reason git uses &lsquo;references&rsquo; is it enables users to be able to refer to a specific commit without having to remember the full SHA1 hash.</p>
+
+<p>Imagine wanting to checkout your master branch but instead of just executing <code>git checkout master</code> you had to remember the specific hash.</p>
+
+<pre><code>git checkout b5d34b608ce697f0d20d011ee569529bca3feee8
+</code></pre>
+
+<p>Not very practical heh.</p>
+
+<h3 id="the-head-reference">The HEAD reference</h3>
+
+<p>If you recall from earlier, we said the <code>HEAD</code> file contains a pointer to the tip of the <em>current</em> branch.</p>
+
+<p>If we were to look at the <code>.git/HEAD</code> file we would find that by default it has the following content:</p>
+
+<pre><code>ref: refs/heads/master
+</code></pre>
+
+<p>You can see it&rsquo;s a pointer to another location (the reference <code>.git/refs/heads/master</code>), which means it&rsquo;s a pointer to a pointer!</p>
+
+<p>Remember that <code>refs/heads/master</code> is a reference file (which refers to our master branch), and the contents of that file is a pointer to a commit hash. So this is telling us that ultimately <code>HEAD</code> is pointing to our <code>master</code> branch.</p>
+
+<p>But at this point in time I&rsquo;ve only executed <code>git init</code>, and so I&rsquo;ve not actually <em>committed</em> anything into git. This means that there isn&rsquo;t actually a <code>master</code> file inside of the <code>.git/refs/heads</code> subdirectory.</p>
+
+<p>If we look back at the earlier directory tree (which we printed after running <code>git init</code>), we&rsquo;ll notice that although there is a <code>.git/refs/heads</code> directory, there is no <code>master</code> file. A file called <code>master</code> won&rsquo;t exist in that subdirectory <em>until</em> I make my first commit.</p>
+
+<blockquote>
+<p>Note: if you recall from earlier I said that the <code>refs/heads</code> subdirectory was essentially a synonym for &lsquo;branches&rsquo; created locally for this project. Hence, the default file referenced by the <code>HEAD</code> file is <code>master</code> (because it&rsquo;s referencing the <code>master</code> branch).</p>
+</blockquote>
+
+<p>Let&rsquo;s now create a commit so that we can see a <code>refs/heads/master</code> file and what it points to&hellip;</p>
+
+<pre><code>$ echo foo &gt; foo.txt
+$ git add foo.txt
+$ git commit -m &quot;foo&quot;
+
+[master (root-commit) b5d34b6] foo
+ 1 file changed, 1 insertion(+)
+ create mode 100644 foo.txt
+</code></pre>
+
+<p>Once we do this we&rsquo;ll find git has created a <code>master</code> file inside of <code>.git/refs/heads</code> and the contents of that file is the hash of my first commit (which indicates that the <code>master</code> reference file, or &lsquo;branch&rsquo;, is pointing at a specific commit snapshot):</p>
+
+<pre><code>b5d34b608ce697f0d20d011ee569529bca3feee8
+</code></pre>
+
+<p>When you execute a command (such as) <code>git checkout master</code>, internally git will resolve <code>master</code> into <code>refs/heads/master</code> and that is what tells git which commit object to now point to.</p>
+
+<h3 id="subcommands-and-references">Subcommands and References</h3>
+
+<p>Although a reference is a pointer to a commit hash, it doesn&rsquo;t mean you can use a reference within a git subcommand.</p>
+
+<p>Here is an example subcommand that works fine with a reference: <code>git log</code>. We can use <code>git log origin/master</code>, and git will know to internally resolve that reference to the fully qualified path <code>.git/refs/remotes/origin/master</code>.</p>
+
+<p>Knowing that, we would also know that it is possible to use a partial reference path such as <code>git log refs/remotes/origin/master</code> or maybe <code>git log remotes/origin/master</code>.</p>
+
+<p>All these variations work fine, but we typically use <code>git log origin/master</code> for convenience (because it&rsquo;s less typing).</p>
+
+<p>But using a shorted &lsquo;reference&rsquo; isn&rsquo;t possible with commands like <code>git checkout</code> and <code>git pull</code> for different reasons. With <code>git pull</code> if we look at <code>man git-pull</code> we see we need to provide a <code>&lt;repository&gt; &lt;refspec&gt;</code> and that means the refspec we provide will be scoped to <code>.git/refs/remote/</code>.</p>
+
+<p>If I look at <code>.git/refs/remote/</code> I&rsquo;ll see only a single directory <code>origin</code>, and inside of that are all the branches (i.e. refspecs) for the <code>origin</code> remote. So if I attempted to do something like <code>git pull origin HEAD</code> this wouldn&rsquo;t work because there&rsquo;s a <code>HEAD</code> file inside of that <code>origin</code> directory (and it points to a different commit from our local <code>HEAD</code> in <code>.git/HEAD</code>)!</p>
+
+<p>This means we&rsquo;d end up trying to pull the changes from the remote <code>master</code>!! Which happens because <code>HEAD</code> on the remote is setup to track the <code>master</code> branch&hellip;</p>
+
+<pre><code>$ git remote show origin
+
+* remote origin
+  Fetch URL: git@github.com:example/repo.git
+  Push  URL: git@github.com:example/repo.git
+  HEAD branch: master
+  Remote branches:
+    ...
+</code></pre>
+
+<p>So subsequently doing <code>git pull origin HEAD</code> would bring in <em>lots</em> of unexpected changes to your local branch 😬</p>
+
+<blockquote>
+<p>Note: using <code>HEAD</code> isn&rsquo;t a problem when doing something like <code>git push origin HEAD</code> because it&rsquo;s a fundamentally different operation and so git knows to reference the local <code>HEAD</code> file to get the commit range before <em>pushing</em> to the remote.</p>
+</blockquote>
+
+<p>Similarly, using a shortened &lsquo;reference&rsquo; isn&rsquo;t possible with a command like <code>git checkout</code> as its internal logic will cause a <code>detached HEAD</code> state (e.g. if you were to do something like <code>git checkout refs/heads/master</code> instead of <code>git checkout master</code>).</p>
+
+<p>Let&rsquo;s now understand what a &lsquo;detacted HEAD&rsquo; means, and why it is a <code>git checkout</code> would cause that when using a refspec&hellip;</p>
+
+<h3 id="detached-head">Detached HEAD</h3>
+
+<p>Internally git does recognize the reference and can resolve it to the appropriate <code>.git/refs</code> directory, but the <em>behaviour</em> of the checkout command changes when checking out a reference that is a qualified path such as <code>refs/heads/master</code>. What you would discover is you don&rsquo;t checkout the branch but are placed into a &lsquo;detached HEAD&rsquo; at the relevant commit.</p>
+
+<p>Why is that? Well, if we look at the documentation for the checkout subcommand (<code>man git-checkout</code>) we would discover&hellip;</p>
+
+<blockquote>
+<p>if it (the given branch name) refers to a branch (i.e., a name that, when prepended with &ldquo;refs/heads/&rdquo;, is a valid ref), then that branch is checked out. Otherwise, if it refers to a valid commit, your HEAD becomes &ldquo;detached&rdquo; and you are no longer on any branch.</p>
+</blockquote>
+
+<p>Running <code>git checkout master</code> means you&rsquo;ve given an identifier (i.e. <code>master</code>) that git can internally resolve to <code>refs/heads/master</code> and thus git will happily checkout that branch, while <code>git checkout refs/heads/master</code> is a <em>direct</em> reference that git first resolves to a commit.</p>
+
+<p>Hence it&rsquo;s like you had actually run the subcommand <code>git checkout &lt;commit-hash&gt;</code>, and so git puts you into a detached HEAD state.</p>
+
+<p>If you&rsquo;re unfamiliar with what a &lsquo;detached HEAD&rsquo; state is, then it simply means the <code>HEAD</code> file no longer is pointing at a reference such as <code>.git/refs/heads/master</code> but <em>directly</em> to a commit hash. The purpose of a detached HEAD is to allow you to do work <em>off</em> a branch.</p>
+
+<p>I&rsquo;ve never had a need to work &lsquo;off&rsquo; a branch (<code>:shrugs:</code>) and so I can only presume there are situations where you would want to do that.</p>
+
+<p>OK, now that we have our first commit let&rsquo;s dig a little deeping into the &lsquo;objects&rsquo; git defines, and how the <code>.git</code> directory structure has changed&hellip;</p>
+
+<h2 id="object-types">Object Types</h2>
+
+<p>There are four main types of objects in git:</p>
+
+<ol>
+<li>commit</li>
+<li>tree</li>
+<li>blob</li>
+<li>tag</li>
+</ol>
+
+<blockquote>
+<p>Note: we&rsquo;ll primarily be covering the first three object types.</p>
+</blockquote>
+
+<p>Since we committed a single file into git there has been a few new files and directories created:</p>
+
+<ul>
+<li><p><code>index</code>: a binary file containing a sorted list of path names.</p></li>
+
+<li><p><code>COMMIT_EDITMSG</code>: temporary file used to store latest commit message.</p></li>
+
+<li><p><code>objects/25/7cc5642cb1a054f08cc83f2d943e56fd3ebe99</code>: the <code>foo.txt</code> file (type: blob)</p></li>
+
+<li><p><code>objects/b5/d34b608ce697f0d20d011ee569529bca3feee8</code>: commit message data (type: commit)</p></li>
+
+<li><p><code>objects/fc/f0be4d7e45f0ef9592682ad68e42270b0366b4</code>: directory tree (type: tree)</p></li>
+</ul>
+
+<p>You&rsquo;ll notice that the new objects are stored in a subdirectory which uses the first two characters from the hash of the object&rsquo;s contents.</p>
+
+<p>For example, the <code>foo.txt</code> blob object&rsquo;s content was hashed into <code>257cc5642cb1a054f08cc83f2d943e56fd3ebe99</code>. Next git took the first two characters <code>25</code> and made a subdirectory, and then moved the object into that directory while naming the object file using the remaining characters (i.e. <code>7cc5642cb1a054f08cc83f2d943e56fd3ebe99</code>).</p>
+
+<p>In order to look at these files you&rsquo;ll need a couple different plumbing commands: <code>git ls-files</code> and <code>git cat-files</code>.</p>
+
+<p>Let&rsquo;s start with the <code>index</code> file.</p>
+
+<p>The <code>index</code> is a binary file which tracks our working directory and our staging area (use <code>--stage</code> flag to see staging area). The index enables fast comparisons between the tree object it defines and the working tree.</p>
+
+<p>We&rsquo;ll need to use <code>git ls-files</code> in order to read the contents:</p>
+
+<pre><code>$ git ls-files
+
+foo.txt
+</code></pre>
+
+<p>It only has <code>foo.txt</code> tracked, which is correct. There are no other files or directories at this point in time (we&rsquo;ll add more as we go).</p>
+
+<p>To look at the different &lsquo;objects&rsquo; we&rsquo;ll use the <code>git cat-files</code> command which decompresses the file and displays the file contents (we&rsquo;ll use the <code>-t</code> flag to return the &lsquo;type&rsquo; and the <code>-p</code> flag to &lsquo;print&rsquo; the contents).</p>
+
+<blockquote>
+<p>Note: we don&rsquo;t provide the path (e.g. <code>objects/../...</code>) as the argument, but the sha itself (shortened sha is acceptable too).</p>
+</blockquote>
+
+<pre><code>$ git cat-file -t 257cc5642cb1a054f08cc83f2d943e56fd3ebe99
+blob
+
+$ git cat-file -p 257cc5642cb1a054f08cc83f2d943e56fd3ebe99
+foo
+
+$ git cat-file -t b5d34b608ce697f0d20d011ee569529bca3feee8
+commit
+
+$ git cat-file -p b5d34b608ce697f0d20d011ee569529bca3feee8
+tree fcf0be4d7e45f0ef9592682ad68e42270b0366b4
+author Integralist &lt;example@gmail.com&gt; 1585480397 +0100
+committer Integralist &lt;example@gmail.com&gt; 1585480397 +0100
+
+foo
+
+$ git cat-file -t fcf0be4d7e45f0ef9592682ad68e42270b0366b4
+tree
+
+$ git cat-file -p fcf0be4d7e45f0ef9592682ad68e42270b0366b4
+100644 blob 257cc5642cb1a054f08cc83f2d943e56fd3ebe99    foo.txt
+</code></pre>
+
+<p>What&rsquo;s also interesting is that when you execute command such as <code>git add</code>, git will &lsquo;conceptually&rsquo; copy the file to your staging area, but internally it has created a &lsquo;blob&rsquo; object. While a command such as <code>git commit</code> then creates the &lsquo;commit&rsquo; and &lsquo;tree&rsquo; objects to reference the already existing &lsquo;blob&rsquo; object. I mention this because I wanted to be clear that these three objects don&rsquo;t all get created at the same time.</p>
+
+<h3 id="snapshots-not-differences">Snapshots, Not Differences</h3>
+
+<p>We saw earlier an ascii graph that indicated the hierarchy of these objects. It showed that git reference types (e.g. remotes, branches and tags) all point to a &lsquo;commit&rsquo; object. This commit object will include a pointer to a &lsquo;tree&rsquo; object, and the tree object is a list of files (i.e. blobs) and directories (i.e. more trees).</p>
+
+<p>It&rsquo;s this graph that builds up the entire snapshot of the repository. This is why you shouldn&rsquo;t think of a git commit as being a patch or set of changes to a bunch of files, but instead should see each commit as a complete snapshot of your entire project at a singular point in time.</p>
+
+<p><strong>If any files or directories change, then their commit hash will change and thus the HEAD commit will consist of different <code>tree</code> and <code>blob</code> objects (resulting in a different hash-tree graph).</strong></p>
+
+<p>With that in mind, let&rsquo;s start by looking at the commit object we have (<code>git cat-file -p b5d34b6</code>). We can see the first line says <code>tree</code> followed by a hash (all other information is the typical commit information you&rsquo;re used to seeing when you run <code>git status</code>).</p>
+
+<p>If we look at the tree object <code>git cat-file -p fcf0be4</code> (which the commit object linked to), then we can see it consists of a single line: a blob object with its hash and its filename <code>foo.txt</code> (this makes sense as our project only contains this single file).</p>
+
+<p>Lastly, let&rsquo;s look at the blob object <code>git cat-file -p 257cc56</code> (which the tree object linked to), then we can see the contents of that blob object is the contents of the <code>foo.txt</code> file itself.</p>
+
+<p>OK, so what happens if I add a new file <code>bar.txt</code> and a new subdirectory <code>baz</code> with another file <code>qux.txt</code> within that subdirectory&hellip;</p>
+
+<pre><code>$ tree
+.
+├── bar.txt
+├── baz
+│   └── qux.txt
+└── foo.txt
+
+1 directory, 3 files
+</code></pre>
+
+<p>Once I add <code>baz/qux.txt</code> and commit it I then inspect the new objects in my <code>.git/objects</code> folder. From there I locate the commit object (I do that by looking at the <code>.git/refs/heads/master</code> and seeing what commit hash it has) and once I <code>cat-file -p</code> that hash, I follow its <code>tree</code> pointer&hellip;</p>
+
+<pre><code>$ git cat-file -p edc6771b338b472d901358e530db7cede202c1c7
+
+100644 blob 5716ca5987cbf97d6bb54920bea6adde242d87e6    bar.txt
+040000 tree 3d15e426c95bac2548d7255af9c5e240df786e03    baz
+100644 blob 257cc5642cb1a054f08cc83f2d943e56fd3ebe99    foo.txt
+
+$ git cat-file -p 3d15e426c95bac2548d7255af9c5e240df786e03
+
+100644 blob 100b0dec8c53a40e4de7714b2c612dad5fad9985    qux.txt
+</code></pre>
+
+<p>We can see from the above output that the tree object not only includes my project files, but now a <code>baz</code> directory (itself a tree object). Looking at that tree object shows there is one file inside of it (a blob object for <code>qux.txt</code>).</p>
+
+<p>If we review the <code>index</code> file again we&rsquo;ll see our new set of files/directories:</p>
+
+<pre><code>$ git ls-files
+
+bar.txt
+baz/qux.txt
+foo.txt
+</code></pre>
+
+<h2 id="tags">Tags</h2>
+
+<p>Along the way I&rsquo;ve been tagging my commits. A tag (as far as git internals are concerned) is another &lsquo;object&rsquo; type. Let&rsquo;s look at my tags:</p>
+
+<pre><code>$ git tag -n
+
+v1  foo
+v2  an anotated tag
+</code></pre>
+
+<p>So we can see I have two separate tags, and each one points at a different commit (the v1 tag was a lightweight tag and so the associated <code>foo</code> comes from the commit message, while the v2 tag was an annotated tag and so the message I gave at that point was displayed).</p>
+
+<p>In order to see the commit that a tag is associated with, we&rsquo;ll need another plumbing subcommand <code>rev-list</code>:</p>
+
+<pre><code>$ git rev-list -n 1 v1
+
+b5d34b608ce697f0d20d011ee569529bca3feee8
+
+$ git rev-list -n 1 v2
+
+0b56156eba23ae9bee8c32137605397cf7c9e88e
+</code></pre>
+
+<p>But for us to see what the &lsquo;tag&rsquo; object type looks like internally, we need to get the hash that the tag reference file is set to:</p>
+
+<pre><code>$ cat .git/refs/tags/v1
+
+b5d34b608ce697f0d20d011ee569529bca3feee8
+
+$ cat .git/refs/tags/v2
+
+75d37b7c37173def7a0a8cd43d674edc8e9ce614
+</code></pre>
+
+<p>Once we have that hash we can use <code>cat-file</code> to see the &lsquo;tag&rsquo; object:</p>
+
+<pre><code>$ git cat-file -t 75d37b7c37173def7a0a8cd43d674edc8e9ce614
+
+tag
+
+$ git cat-file -p 75d37b7c37173def7a0a8cd43d674edc8e9ce614
+
+object 0b56156eba23ae9bee8c32137605397cf7c9e88e
+type commit
+tag v2
+tagger Integralist &lt;example@gmail.com&gt; 1585592962 +0100
+
+an anotated tag
+</code></pre>
+
+<p>OK, so you may have noticed I used <code>cat-file</code> on the v2 (annotated) tag, but not on the v1 (lightweight) tag. That was not an accidental omission.</p>
+
+<p>A lightweight tag is just a reference to a commit hash, but an annotated tag is more complex and so a &lsquo;tag object&rsquo; is created, and we can see that when we inspect the hash inside the v2 tag reference.</p>
+
+<p>We can see the tag object includes a pointer to the &lsquo;commit&rsquo; object (<code>0b56156eba23ae9bee8c32137605397cf7c9e88e</code>) as well as information about the &lsquo;tagger&rsquo; (in this case <em>me</em>!)</p>
+
+<h2 id="remotes">Remotes</h2>
+
+<p>When you add a remote like so:</p>
+
+<pre><code>git remote add origin git@github.com:Integralist/dotfiles.git
+</code></pre>
+
+<p>We can now look at the configuration of our remote:</p>
+
+<pre><code>$ git remote show origin
+
+* remote origin
+  Fetch URL: git@github.com:Integralist/dotfiles.git
+  Push  URL: git@github.com:Integralist/dotfiles.git
+  HEAD branch: master
+  Remote branches:
+    linux                                new (next fetch will store in remotes/origin)
+    master                               new (next fetch will store in remotes/origin)
+    minimal-mac-version-of-linux-version new (next fetch will store in remotes/origin)
+  Local ref configured for 'git push':
+    master pushes to master (local out of date)
+</code></pre>
+
+<p>You might be confused though if you were to look at <code>.git/refs</code> and don&rsquo;t see a <code>remotes</code> subdirectory. This happens automatically if you <em>clone</em> an existing repository, but it&rsquo;ll also be created when executing <code>git fetch</code> after manually adding a new remote to an <em>existing</em> repository.</p>
+
+<p>I added my new <code>origin</code> remote (see above), but it was only once I had executed a <code>git fetch</code> was I then able to see a &lsquo;remote&rsquo; reference:</p>
+
+<pre><code>refs/
+| remotes/
+| | origin/
+| | | master
+</code></pre>
+
+<p>If I inspect the <code>.git/refs/remotes/origin/master</code> file, then I&rsquo;ll see the latest commit my remote <code>master</code> branch is on. It&rsquo;s also interesting to remember what we mentioned earlier about references that point to commits being interchangeable with commit hashes in various subcommands.</p>
+
+<p>For example, <code>git diff</code> allows you to specify two branches to compare against each other (remember a branch is just a reference file that points to a commit hash), and so you might want to compare your local <code>master</code> against your remote <code>master</code> branch:</p>
+
+<pre><code>git diff master..origin/master
+</code></pre>
+
+<p>This is just a shortened way of doing:</p>
+
+<pre><code>git diff master..refs/remotes/origin/master
+</code></pre>
+
+<p>Which itself is just a shortened way of doing:</p>
+
+<pre><code>git diff master..c3865b72b019ced930cfc601b09b874685c29e72
+</code></pre>
+
+<blockquote>
+<p>Note: one last thing I wanted to mention (and there was no other place really to mention this) is that git comes with a UI! you can execute the command <code>gitk</code> to use it.</p>
+</blockquote>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

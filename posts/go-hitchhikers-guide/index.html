@@ -1,0 +1,3969 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#hitchhikers-guide-to-go">Hitchhikers Guide to Go</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#private-repo-access">Private Repo Access</a></li>
+
+<li><a href="#build-and-compilation">Build and Compilation</a>
+<ul>
+<li><a href="#gox">Gox</a></li>
+
+<li><a href="#other-information">Other information</a></li>
+</ul></li>
+
+<li><a href="#build-time-dynamic-variables">Build Time Dynamic Variables</a></li>
+
+<li><a href="#package-naming">Package Naming</a></li>
+
+<li><a href="#dependency-information">Dependency Information</a></li>
+
+<li><a href="#dependency-management">Dependency Management</a>
+<ul>
+<li><a href="#godeps">Godeps</a></li>
+
+<li><a href="#gb">Gb</a></li>
+
+<li><a href="#glide">Glide</a></li>
+</ul></li>
+
+<li><a href="#documentation">Documentation</a>
+<ul>
+<li><a href="#godoc-encoding-json-encoder"><code>godoc encoding/json Encoder</code></a></li>
+
+<li><a href="#go-doc-encoding-json-encoder"><code>go doc encoding/json Encoder</code></a></li>
+
+<li><a href="#full-browser-documentation">Full Browser Documentation</a></li>
+</ul></li>
+
+<li><a href="#testing">Testing</a>
+<ul>
+<li><a href="#more-test-examples">More Test Examples</a></li>
+</ul></li>
+
+<li><a href="#logging">Logging</a></li>
+
+<li><a href="#godo">Godo</a></li>
+
+<li><a href="#import-race-conditions">Import Race Conditions</a></li>
+
+<li><a href="#new-vs-make">New vs Make</a></li>
+
+<li><a href="#custom-types">Custom Types</a></li>
+
+<li><a href="#custom-errors">Custom Errors</a></li>
+
+<li><a href="#function-types">Function Types</a></li>
+
+<li><a href="#enumerator-iota">Enumerator IOTA</a></li>
+
+<li><a href="#struct-var-vs-type">Struct: Var vs Type</a></li>
+
+<li><a href="#embedded-structs">Embedded Structs</a></li>
+
+<li><a href="#reference-vs-value">Reference vs Value</a></li>
+
+<li><a href="#see-all-methods-on-type">See all methods on <code>&lt;Type&gt;</code></a></li>
+
+<li><a href="#convert-struct-into-json">Convert Struct into JSON</a></li>
+
+<li><a href="#pretty-printing-json-string">Pretty Printing JSON String</a></li>
+
+<li><a href="#convert-struct-into-yaml">Convert Struct into YAML</a>
+<ul>
+<li><a href="#unknown-yaml-structure">Unknown YAML Structure</a></li>
+</ul></li>
+
+<li><a href="#sorting-structs">Sorting Structs</a></li>
+
+<li><a href="#read-users-input">Read Users Input</a></li>
+
+<li><a href="#http-middleware">HTTP Middleware</a></li>
+
+<li><a href="#sessions">Sessions</a></li>
+
+<li><a href="#https-tls-request">HTTPS TLS Request</a></li>
+
+<li><a href="#http-get-web-page">HTTP GET Web Page</a></li>
+
+<li><a href="#custom-http-request-methods">Custom HTTP Request Methods</a></li>
+
+<li><a href="#pointers">Pointers</a>
+<ul>
+<li><a href="#array-pointer">Array Pointer</a></li>
+
+<li><a href="#mutating-values">Mutating Values</a></li>
+</ul></li>
+
+<li><a href="#type-assertion">Type Assertion</a></li>
+
+<li><a href="#line-counting">Line Counting</a></li>
+
+<li><a href="#reading-file-in-chunks">Reading File in Chunks</a></li>
+
+<li><a href="#time">Time</a></li>
+
+<li><a href="#starting-and-stopping-things-with-channels">Starting and Stopping things with Channels</a></li>
+
+<li><a href="#channel-pipelines">Channel Pipelines</a></li>
+
+<li><a href="#templating">Templating</a></li>
+
+<li><a href="#error-handling">Error handling</a></li>
+
+<li><a href="#socket-programming">Socket Programming</a></li>
+
+<li><a href="#comparing-maps">Comparing Maps</a></li>
+
+<li><a href="#zip-file-contents">Zip File Contents</a></li>
+
+<li><a href="#shell-commands">Shell Commands</a></li>
+
+<li><a href="#new-instance-idiom">New Instance Idiom</a></li>
+
+<li><a href="#json-connection-draining">JSON Connection Draining</a></li>
+
+<li><a href="#writing-your-own-marshal-unmarshal-functions">Writing your own Marshal/Unmarshal functions</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="hitchhikers-guide-to-go">Hitchhikers Guide to Go</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>A few years ago when I was learning the <a href="https://golang.org/" target="_blank">Go programming language</a> I created a gist and updated it on a regular basis as a sort of cheat sheet. I stumbled across this gist recently and decided I&rsquo;d try and port it over to some form of semi-coherent blog post.</p>
+
+<blockquote>
+<p>Note: the code will not be updated in any way so <a href="http://dictionary.cambridge.org/dictionary/english/ymmv" target="_blank">YMMV</a></p>
+</blockquote>
+
+<p>What this isn&rsquo;t, is a walk-through of how to write Go code. I&rsquo;d suggest trying the official <a href="https://tour.golang.org/welcome/1" target="_blank">Go Tour</a> which is really good and covers a lot of ground. Instead I&rsquo;m going to provide lots of example code in the vein of a resource like <a href="https://gobyexample.com/" target="_blank">Go by Example</a>.</p>
+
+<p>What this <em>is</em>, is a barren wasteland of old code. Passers by are forewarned to tread carefully.</p>
+
+<blockquote>
+<p>Note: there&rsquo;s also not much in the way of code explanation, to the extent that some of the testing examples are long and very context specific - you&rsquo;ve been warned</p>
+</blockquote>
+
+<p>Most of this Go code is old, so you may find some packages or information possibly out of date (as in not the latest awesome thing) or maybe not that great quality either.</p>
+
+<p>Take this as what it is, a sharing exercise. Take what you need and leave the rest. I wont be offended.</p>
+
+<h2 id="private-repo-access">Private Repo Access</h2>
+
+<p><code>go get</code> uses HTTPS so to be able to pull dependencies from a private repository, you&rsquo;ll need to force it to use SSH so it can access your keys and authorise the connection:</p>
+
+<pre><code>git config --global url.&quot;git@github.com:&quot;.insteadOf &quot;https://github.com/&quot;
+</code></pre>
+
+<p>You can also restrict this to a single specific organisation if you prefer:</p>
+
+<pre><code>git config --global url.&quot;git@github.com:foo/&quot;.insteadOf &quot;https://github.com/foo/&quot;`
+</code></pre>
+
+<p>So when you want a private dependency like: <code>git@github.com:foo/private.git</code>:</p>
+
+<pre><code>go get github.com/foo/private
+</code></pre>
+
+<h2 id="build-and-compilation">Build and Compilation</h2>
+
+<p>As of Go 1.5 you can use:</p>
+
+<pre><code>GOOS=darwin GOARCH=386 go build foo.go
+</code></pre>
+
+<p>Here&rsquo;s a quick reference of the values you can specify:</p>
+
+<pre><code>$GOOS     $GOARCH
+darwin    386      -- 32 bit MacOSX
+darwin    amd64    -- 64 bit MacOSX
+freebsd   386
+freebsd   amd64
+linux     386      -- 32 bit Linux
+linux     amd64    -- 64 bit Linux
+linux     arm      -- RISC Linux
+netbsd    386
+netbsd    amd64
+openbsd   386
+openbsd   amd64
+plan9     386
+windows   386      -- 32 bit Windows
+windows   amd64    -- 64 bit Windows
+</code></pre>
+
+<p>You can get a full list with:</p>
+
+<pre><code>go tool dist list
+</code></pre>
+
+<h3 id="gox">Gox</h3>
+
+<p>Gox is an alternative build tool.</p>
+
+<p>One time only commands for purpose of download/setup:</p>
+
+<ul>
+<li><code>go get github.com/mitchellh/gox</code></li>
+<li><code>gox -build-toolchain</code> (only necessary for Go <code>1.4.x</code> and lower)</li>
+</ul>
+
+<p>Compilation example:</p>
+
+<pre><code>gox -osarch=&quot;linux/amd64&quot; -osarch=&quot;darwin/amd64&quot; -osarch=&quot;windows/amd64&quot; -output=&quot;foobar.{{.OS}}&quot;
+</code></pre>
+
+<p>This will generate three files:</p>
+
+<ol>
+<li><code>foobar.darwin</code></li>
+<li><code>foobar.linux</code></li>
+<li><code>foobar.windows.exe</code></li>
+</ol>
+
+<h3 id="other-information">Other information</h3>
+
+<p>Use the <code>-a</code> flag when running <code>go build</code>.</p>
+
+<p>In short, if you dont&rsquo; use <code>go build -a -v .</code> then Go won&rsquo;t know if any packages are missing (you can find the gory details <a href="https://medium.com/@felixge/why-you-should-use-go-build-a-or-gb-c469157d5c1b#.jf5orcwrj" target="_blank">here</a>)</p>
+
+<h2 id="build-time-dynamic-variables">Build Time Dynamic Variables</h2>
+
+<p>Imagine you have a global variable called <code>version</code> in your <code>main</code> package and you want to update that value at build time:</p>
+
+<pre><code>go build -ldflags &quot;-X main.version=foobar&quot;
+</code></pre>
+
+<p>A more realistic example would be to use some form of revision number of commit hash:</p>
+
+<pre><code>go build -ldflags &quot;-X main.version=$(git rev-parse HEAD)&quot;
+</code></pre>
+
+<p>Another approach would be to have separate files for different &lsquo;environments&rsquo; (all under the <code>main</code> package). You would then use a code comment to indicate what the environment was, and at build time you would tell the compiler which version of the file to compile.</p>
+
+<pre><code>// +build prod
+
+package main
+
+func init() {
+    version = 123
+}
+</code></pre>
+
+<p>You would compile the above <code>version</code> variable using:</p>
+
+<pre><code>go build -tags prod
+</code></pre>
+
+<h2 id="package-naming">Package Naming</h2>
+
+<p>In Go, the name of the package is used to refer to the exported item: <code>fmt.Println</code>, <code>http.RegisterFunc</code> etc. Because the package name is so visible, the package name should describe what the exported items are. Meaning, we shouldn&rsquo;t have packages named <code>util</code> (as a common example of bad package naming) because <code>util.JSONMarshal</code> isn&rsquo;t as efficient and effective as <code>json.Marshal</code>.</p>
+
+<p>Another example of this that I found in my own code was <code>utils.CreateUser</code>. Later on during the project I had added <code>utils.CreateLegacyUser</code>. When I discovered what I had done I went back and made two separate packages <code>legacy</code> and <code>aws</code> so that I could have a consistent <code>CreateUser</code> function within both (e.g. <code>aws.CreateUser</code> and <code>legacy.CreateUser</code>).</p>
+
+<h2 id="dependency-information">Dependency Information</h2>
+
+<p>To see a list of dependencies for a given Go package you can utilise the <code>go list</code> command:</p>
+
+<pre><code>go list -json strconv 
+</code></pre>
+
+<p>Which returns:</p>
+
+<pre><code>{
+  &quot;Dir&quot;: &quot;/usr/local/Cellar/go/1.5.2/libexec/src/strconv&quot;,
+  &quot;ImportPath&quot;: &quot;strconv&quot;,
+  &quot;Name&quot;: &quot;strconv&quot;,
+  &quot;Doc&quot;: &quot;Package strconv implements conversions to and from string representations of basic data types.&quot;,
+  &quot;Target&quot;: &quot;/usr/local/Cellar/go/1.5.2/libexec/pkg/darwin_amd64/strconv.a&quot;,
+  &quot;Goroot&quot;: true,
+  &quot;Standard&quot;: true,
+  &quot;Root&quot;: &quot;/usr/local/Cellar/go/1.5.2/libexec&quot;,
+  &quot;GoFiles&quot;: [
+    &quot;atob.go&quot;,
+    &quot;atof.go&quot;,
+    &quot;atoi.go&quot;,
+    &quot;decimal.go&quot;,
+    &quot;doc.go&quot;,
+    &quot;extfloat.go&quot;,
+    &quot;ftoa.go&quot;,
+    &quot;isprint.go&quot;,
+    &quot;itoa.go&quot;,
+    &quot;quote.go&quot;
+  ],
+  &quot;IgnoredGoFiles&quot;: [
+    &quot;makeisprint.go&quot;
+  ],
+  &quot;Imports&quot;: [
+    &quot;errors&quot;,
+    &quot;math&quot;,
+    &quot;unicode/utf8&quot;
+  ],
+  &quot;Deps&quot;: [
+    &quot;errors&quot;,
+    &quot;math&quot;,
+    &quot;runtime&quot;,
+    &quot;unicode/utf8&quot;,
+    &quot;unsafe&quot;
+  ],
+  &quot;TestGoFiles&quot;: [
+    &quot;internal_test.go&quot;
+  ],
+  &quot;XTestGoFiles&quot;: [
+    &quot;atob_test.go&quot;,
+    &quot;atof_test.go&quot;,
+    &quot;atoi_test.go&quot;,
+    &quot;decimal_test.go&quot;,
+    &quot;example_test.go&quot;,
+    &quot;fp_test.go&quot;,
+    &quot;ftoa_test.go&quot;,
+    &quot;itoa_test.go&quot;,
+    &quot;quote_test.go&quot;,
+    &quot;strconv_test.go&quot;
+  ],
+  &quot;XTestImports&quot;: [
+    &quot;bufio&quot;,
+    &quot;bytes&quot;,
+    &quot;errors&quot;,
+    &quot;fmt&quot;,
+    &quot;log&quot;,
+    &quot;math&quot;,
+    &quot;math/rand&quot;,
+    &quot;os&quot;,
+    &quot;reflect&quot;,
+    &quot;runtime&quot;,
+    &quot;strconv&quot;,
+    &quot;strings&quot;,
+    &quot;testing&quot;,
+    &quot;time&quot;,
+    &quot;unicode&quot;
+  ]
+}
+</code></pre>
+
+<p>If you don&rsquo;t specify the <code>-json</code> flag then the default behaviour is to filter out the <code>ImportPath</code> field from the above JSON output. For example:</p>
+
+<pre><code>go list strconv
+</code></pre>
+
+<p>Will return just the import path <code>strconv</code>.</p>
+
+<blockquote>
+<p>Documentation: <code>go help list | less</code></p>
+</blockquote>
+
+<p>You can also utilise Go&rsquo;s templating functionality on the returned JSON object by adding the <code>-f</code> flag:</p>
+
+<pre><code>go list -f '{{join .Deps &quot; &quot;}}' strconv
+</code></pre>
+
+<p>Which filters out the <code>Deps</code> field, joins up all items it contains using whitespace and subsequently returns:</p>
+
+<pre><code>errors math runtime unicode/utf8 unsafe
+</code></pre>
+
+<p>You can do more complex things such as:</p>
+
+<pre><code>go list -f '{{.ImportPath}} -&gt; {{join .Imports &quot; &quot;}}' compress/...
+</code></pre>
+
+<p>Which will return something like:</p>
+
+<pre><code>compress/bzip2 -&gt; bufio io sort
+compress/flate -&gt; bufio fmt io math sort strconv
+compress/gzip -&gt; bufio compress/flate errors fmt hash hash/crc32 io time
+compress/lzw -&gt; bufio errors fmt io
+compress/zlib -&gt; bufio compress/flate errors fmt hash hash/adler32 io
+</code></pre>
+
+<h2 id="dependency-management">Dependency Management</h2>
+
+<blockquote>
+<p>Update (August 2017): there is an official tool now called <a href="https://github.com/golang/dep" target="_blank">dep</a>.</p>
+</blockquote>
+
+<p>There are many dependency management tools, these are the few that I&rsquo;ve tried (in this order): godeps, gb, glide. Let&rsquo;s review each of them to see how they work:</p>
+
+<h3 id="godeps">Godeps</h3>
+
+<p>When running <code>go get &lt;dependency&gt;</code> locally, Go will stick the dependency in the folder defined by your <code>$GOPATH</code> variable. So when you build your code into a binary using <code>go build &lt;script&gt;</code> it&rsquo;ll bake the dependencies into the binary (i.e. the binary is statically linked).</p>
+
+<p>But if someone pulls down your repo and tries to do a build from your code, then they&rsquo;ll need to have a network connection to pull down the dependencies as their <code>$GOPATH</code> might not have those dependencies yet (unless the user manually executes <code>go get</code> for each dependency required). Also the dependencies they subsequently pull down could be a more recent (and untested version) of each dependency.</p>
+
+<p>So to make this situation better we can use <a href="https://github.com/tools/godep" target="_blank">Godep</a> to stick all your dependencies within a <code>Godeps</code> folder inside your project directory. You can then use <code>godep save -r ./...</code> to automatically update all your references to point to that local folder.</p>
+
+<blockquote>
+<p>Note: you might need to remove the <code>Godeps</code> folder and run <code>go get</code> if you get strange conflicts. The <code>./...</code> means to target all <code>.go</code> files</p>
+</blockquote>
+
+<p>This way users who clone your repo don&rsquo;t need an internet connection to pull the dependencies, as they already have them. But also they&rsquo;ll have the correct versions of the dependencies. This acts like a <code>Gemfile.lock</code> as you would typically find in the Ruby world.</p>
+
+<h3 id="gb">Gb</h3>
+
+<pre><code>go get -u github.com/constabulary/gb/...
+gb vendor fetch &lt;pkg&gt;
+gb build all
+</code></pre>
+
+<p>You&rsquo;ll need the following structure:</p>
+
+<pre><code>├── src
+│   ├── foo
+│   │   └── main.go
+└── vendor
+    ├── manifest
+    └── src
+</code></pre>
+
+<p>The <code>vendor</code> directory is auto-generated by the <code>gb vendor fetch &lt;pkg&gt;</code> command.</p>
+
+<h3 id="glide">Glide</h3>
+
+<p>This is now my preferred dependency management tool, as it works just like existing tools in other languages (e.g. Ruby&rsquo;s Bundler or Node&rsquo;s NPM) and so consistency is a plus.</p>
+
+<p>It also provides the ability (like gb) to not commit dependencies but have specific versions vendored when running a simple command.</p>
+
+<pre><code>go get github.com/Masterminds/glide
+export GO15VENDOREXPERIMENT=1       # or use 1.6
+glide init                          # generates glide.yaml
+glide install                       # installs from lock file (creates it if not found)
+glide update                        # updates dependencies and updates lock file
+glide list                          # shows vendored deps
+go test $(glide novendor)           # test only your package (not vendored packages)
+</code></pre>
+
+<blockquote>
+<p>Note: to add a new dependency <code>glide get &lt;pkg_name&gt;</code></p>
+</blockquote>
+
+<h2 id="documentation">Documentation</h2>
+
+<p><code>Godoc</code> is the original implementation for viewing documentation. Previous to <code>Godoc</code> there was <code>go doc</code>, but that was removed and then added <em>back</em> with totally different functionality.</p>
+
+<p>The syntax structure for <code>go doc</code> is as follows:</p>
+
+<pre><code>go doc &lt;pkg&gt;
+go doc &lt;sym&gt;[.&lt;method&gt;]
+go doc [&lt;pkg&gt;].&lt;sym&gt;[.&lt;method&gt;]
+</code></pre>
+
+<p>Here are some examples of using <code>go doc</code>:</p>
+
+<pre><code>go doc json # same as go doc encoding/json
+go doc json.Number
+go doc json.Number.Float64
+</code></pre>
+
+<p>Here is the same thing but using <code>godoc</code> (where the syntax structure is <code>godoc &lt;pkg&gt; &lt;symbol&gt;</code>):</p>
+
+<pre><code>godoc encoding/json # unlike &quot;go doc json&quot;, &quot;godoc json&quot; doesn't work as it's not a fully qualified path
+godoc encoding/json Number
+godoc -src builtin make | less
+</code></pre>
+
+<blockquote>
+<p>Unlike with <code>go doc</code>, <code>godoc</code> doesn&rsquo;t allow filtering by <code>&lt;method&gt;</code><br>
+It only goes as far as <code>&lt;pkg&gt; &lt;symbol&gt;</code></p>
+
+<p>You can use <code>&lt;pkg&gt; &lt;symbol&gt; &lt;method&gt;</code><br>
+and the method will be included in the results<br>
+but you&rsquo;ll need to search for the method manually<br>
+<code>godoc -src net/http Request ParseForm | less</code><br>
+here is a similar result using <code>go doc</code><br>
+<code>go doc http.Request.ParseForm | less</code></p>
+</blockquote>
+
+<p>The purpose of <code>go doc</code> was to provide a simplistic cli documentation viewer, whereas <code>Godoc</code> has many more features available.</p>
+
+<p>The <code>go doc</code> command also works not only with Go&rsquo;s own library&rsquo;s but your own custom packages as well.</p>
+
+<p>There are some differences in what is returned though between <code>godoc</code> and <code>go doc</code> (mainly the latter is more succinct/compact so you can find the functions/types you&rsquo;re after and then you can expand into those once you&rsquo;ve found them; <code>godoc</code> is harder to sift through on the command line)&hellip;</p>
+
+<h3 id="godoc-encoding-json-encoder"><code>godoc encoding/json Encoder</code></h3>
+
+<pre><code>type Encoder struct {
+    // contains filtered or unexported fields
+}
+    An Encoder writes JSON objects to an output stream.
+
+func NewEncoder(w io.Writer) *Encoder
+    NewEncoder returns a new encoder that writes to w.
+
+func (enc *Encoder) Encode(v interface{}) error
+    Encode writes the JSON encoding of v to the stream, followed by a
+    newline character.
+
+    See the documentation for Marshal for details about the conversion of Go
+    values to JSON.
+</code></pre>
+
+<h3 id="go-doc-encoding-json-encoder"><code>go doc encoding/json Encoder</code></h3>
+
+<pre><code>type Encoder struct {
+        // Has unexported fields.
+}
+
+    An Encoder writes JSON objects to an output stream.
+
+func NewEncoder(w io.Writer) *Encoder
+func (enc *Encoder) Encode(v interface{}) error
+</code></pre>
+
+<blockquote>
+<p>Notice the functions don&rsquo;t have their documentation notes printed with <code>go doc</code></p>
+</blockquote>
+
+<p>One other thing <code>godoc</code> has over <code>go doc</code> is the ability to view the source code using the <code>-src</code> flag:</p>
+
+<pre><code>godoc -src builtin make | less
+</code></pre>
+
+<p>The <code>godoc</code> tool also has a full browser documentation suite available and allows you to generate HTML documentation for your project&hellip;</p>
+
+<h3 id="full-browser-documentation">Full Browser Documentation</h3>
+
+<p>Start a local documentation server and allow indexing (which takes a few minutes; you have to just keep trying the search until it&rsquo;s done)</p>
+
+<pre><code>godoc -http ':6060' -index
+</code></pre>
+
+<p>You can then open a new terminal pane and search via cli if you prefer (rather than open up a browser to <a href="http://localhost:6060/" target="_blank">http://localhost:6060/</a>)</p>
+
+<pre><code>godoc -q tls | less
+</code></pre>
+
+<p>You can also have the playground available if you need it in the browser, but it does require an internet connection to compile:</p>
+
+<pre><code>godoc -http ':6060' -play
+</code></pre>
+
+<h2 id="testing">Testing</h2>
+
+<blockquote>
+<p>Note: see also <a href="https://gist.github.com/Integralist/cf76668bc46d75058ab5f566d96ce74a" target="_blank">examples here</a></p>
+</blockquote>
+
+<p>Test files are placed in the same directory as the file/package being tested. The convention is to use the same file name but suffix it with <code>_test</code>. So <code>foo.go</code> would have another file next to it called <code>foo_test.go</code>.</p>
+
+<p>Run the tests: <code>go test -v ./...</code></p>
+
+<p>You can also run a specific test like so: <code>go test -v command/foo_test.go</code></p>
+
+<blockquote>
+<p>Note: remember that your test file should have the same package name as your code being tested. This means the test file will have access to all the public functions and variables of that package (and so subsequently it&rsquo;ll have access to the code being tested)</p>
+</blockquote>
+
+<p>Here is a simple test example:</p>
+
+<pre><code>package foo
+
+import &quot;testing&quot;
+
+func TestBasics(t *testing.T) {
+  expect := &quot;abc&quot;
+  actual := &quot;def&quot;
+
+  if actual != expect {
+    t.Errorf(&quot;expected %s, actual %s&quot;, expect, actual)
+  }
+}
+</code></pre>
+
+<p>The output from running this test will be:</p>
+
+<pre><code>=== RUN   TestBasics
+--- FAIL: TestBasics (0.00s)
+        foo_test.go:10: expected abc, actual def
+FAIL
+exit status 1
+FAIL    command-line-arguments  0.004s
+</code></pre>
+
+<p>The following example program demonstrates how to mock an io function so that we&rsquo;re not reliant on reading from disk in our test suite.</p>
+
+<p>Here&rsquo;s the program:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;io/ioutil&quot;
+)
+
+type fooIO func(string) ([]byte, error)
+
+func getContents(fio fooIO, path string) (string, error) {
+  f, err := fio(path)
+  if err != nil {
+    return &quot;&quot;, err
+  }
+  return string(f), nil
+}
+
+func main() {
+  contents, err := getContents(ioutil.ReadFile, &quot;example.txt&quot;)
+  if err != nil {
+    fmt.Println(err)
+  }
+  fmt.Println(contents)
+}
+</code></pre>
+
+<p>Here&rsquo;s the test:</p>
+
+<pre><code>package main
+
+import &quot;testing&quot;
+
+var expectation = &quot;pretend to read from disk&quot;
+
+func fakeReadFileSuccess(path string) ([]byte, error) {
+  return []byte(expectation), nil
+}
+
+func TestIO(t *testing.T) {
+  contents, _ := getContents(fakeReadFileSuccess, &quot;dont-exist.txt&quot;)
+
+  if contents != expectation {
+    t.Errorf(&quot;Expected '%s' but got '%s'&quot;, expectation, contents)
+  }
+}
+</code></pre>
+
+<p>You could also probably use an interface there, but we&rsquo;ve gone with a <code>func</code> type.</p>
+
+<p>Here&rsquo;s another program that does something similar where we mock a function that expects a particular interface:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type FooIO interface {
+  Read() string
+}
+
+type Foo struct{}
+
+func (f *Foo) Read() string {
+  return &quot;We READ something from disk&quot;
+}
+
+func Stuff(f FooIO) string {
+  return f.Read()
+}
+
+func main() {
+  foo := &amp;Foo{}
+  contents := Stuff(foo)
+  fmt.Println(contents)
+}
+</code></pre>
+
+<p>Here&rsquo;s our test:</p>
+
+<pre><code>package main
+
+import (
+  &quot;testing&quot;
+
+  &quot;github.com/stretchr/testify/assert&quot;
+)
+
+type FakeFoo struct{}
+
+func (s *FakeFoo) Read() string {
+  return &quot;We 'pretend' to READ something from disk&quot;
+}
+
+func TestSomething(t *testing.T) {
+  assert := assert.New(t)
+
+  foo := &amp;FakeFoo{}
+  contents := Stuff(foo)
+
+  assert.Equal(contents, &quot;We 'pretend' to READ something from disk&quot;)
+}
+</code></pre>
+
+<h3 id="more-test-examples">More Test Examples</h3>
+
+<p>Faking HTTP and WebServers can be a bit tricky:</p>
+
+<pre><code>package requester
+
+import (
+  &quot;bytes&quot;
+  &quot;encoding/json&quot;
+  &quot;fmt&quot;
+  &quot;io/ioutil&quot;
+  &quot;net/http&quot;
+  &quot;net/http/httptest&quot;
+  &quot;os&quot;
+  &quot;strconv&quot;
+  &quot;testing&quot;
+  &quot;time&quot;
+
+  &quot;github.com/bbc/mozart-requester/src/aggregator&quot;
+  &quot;github.com/julienschmidt/httprouter&quot;
+)
+
+func TestSuccessResponse(t *testing.T) {
+  upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    fmt.Fprintln(w, `{&quot;head&quot;:[ &quot;foo&quot; ],&quot;bodyInline&quot;:&quot;bar&quot;,&quot;bodyLast&quot;:[ &quot;baz&quot; ]}`)
+  }))
+  defer upstream.Close()
+
+  router := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    Process(w, r, httprouter.Params{})
+  }))
+  defer router.Close()
+
+  var config = []byte(fmt.Sprintf(`{
+    &quot;components&quot;:[
+      {&quot;id&quot;:&quot;foo&quot;,&quot;endpoint&quot;:&quot;%s&quot;,&quot;must_succeed&quot;:true},
+      {&quot;id&quot;:&quot;bar&quot;,&quot;endpoint&quot;:&quot;%s&quot;,&quot;must_succeed&quot;:true}
+    ]
+  }`, upstream.URL, upstream.URL))
+
+  req, err := http.NewRequest(&quot;POST&quot;, router.URL, bytes.NewBuffer(config))
+
+  client := &amp;http.Client{}
+  resp, err := client.Do(req)
+  if err != nil {
+    panic(err)
+  }
+
+  defer resp.Body.Close()
+  body, _ := ioutil.ReadAll(resp.Body)
+
+  var result aggregator.Result
+  json.Unmarshal(body, &amp;result)
+
+  expectedStatus := &quot;success&quot;
+  if result.Summary != expectedStatus {
+    t.Errorf(&quot;The response:\n '%s'\ndidn't match the expectation:\n '%s'&quot;, result.Summary, expectedStatus)
+  }
+
+  expectedLength := 2
+  if len(result.Components) != expectedLength {
+    t.Errorf(&quot;The response:\n '%d'\ndidn't match the expectation:\n '%d'&quot;, len(result.Components), expectedLength)
+  }
+}
+
+func TestFailureResponse(t *testing.T) {
+  healthyUpstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    fmt.Fprintln(w, `{&quot;head&quot;:[ &quot;foo&quot; ],&quot;bodyInline&quot;:&quot;bar&quot;,&quot;bodyLast&quot;:[ &quot;baz&quot; ]}`)
+  }))
+  defer healthyUpstream.Close()
+
+  failingUpstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set(&quot;Content-Type&quot;, &quot;text/plain; charset=utf-8&quot;)
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintln(w, &quot;404 page not found&quot;)
+  }))
+  defer failingUpstream.Close()
+
+  router := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    Process(w, r, httprouter.Params{})
+  }))
+  defer router.Close()
+
+  var config = []byte(fmt.Sprintf(`{
+    &quot;components&quot;:[
+      {&quot;id&quot;:&quot;foo&quot;,&quot;endpoint&quot;:&quot;%s&quot;,&quot;must_succeed&quot;:true},
+      {&quot;id&quot;:&quot;bar&quot;,&quot;endpoint&quot;:&quot;%s&quot;,&quot;must_succeed&quot;:true}
+    ]
+  }`, healthyUpstream.URL, failingUpstream.URL))
+
+  req, err := http.NewRequest(&quot;POST&quot;, router.URL, bytes.NewBuffer(config))
+
+  client := &amp;http.Client{}
+  resp, err := client.Do(req)
+  if err != nil {
+    panic(err)
+  }
+
+  defer resp.Body.Close()
+  body, _ := ioutil.ReadAll(resp.Body)
+
+  var result aggregator.Result
+  json.Unmarshal(body, &amp;result)
+
+  expectedSummary := &quot;failure&quot;
+  if result.Summary != expectedSummary {
+    t.Errorf(&quot;The response:\n '%s'\ndidn't match the expectation:\n '%s'&quot;, result.Summary, expectedSummary)
+  }
+
+  expectedLength := 2
+  if len(result.Components) != expectedLength {
+    t.Errorf(&quot;The response length:\n '%d'\ndidn't match the expectation:\n '%d'&quot;, len(result.Components), expectedLength)
+  }
+
+  expectedStatus := []int{}
+  for _, value := range result.Components {
+    if value.Status == 404 {
+      expectedStatus = append(expectedStatus, value.Status)
+    }
+  }
+  if len(expectedStatus) &lt; 1 || len(expectedStatus) &gt; 1 {
+    t.Errorf(&quot;The response length:\n '%d'\ndidn't match the expectation:\n '%d'&quot;, len(expectedStatus), 1)
+  }
+}
+
+func TestSlowResponse(t *testing.T) {
+  healthyUpstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    fmt.Fprintln(w, `{&quot;head&quot;:[ &quot;foo&quot; ],&quot;bodyInline&quot;:&quot;bar&quot;,&quot;bodyLast&quot;:[ &quot;baz&quot; ]}`)
+  }))
+  defer healthyUpstream.Close()
+
+  slowUpstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    timeout, err := strconv.Atoi(os.Getenv(&quot;COMPONENT_TIMEOUT&quot;))
+    if err != nil {
+      t.Errorf(&quot;COMPONENT_TIMEOUT: %s&quot;, err.Error())
+    }
+    time.Sleep(time.Duration(timeout) * time.Millisecond)
+    w.Header().Set(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    fmt.Fprintln(w, `{&quot;head&quot;:[ &quot;foo&quot; ],&quot;bodyInline&quot;:&quot;bar&quot;,&quot;bodyLast&quot;:[ &quot;baz&quot; ]}`)
+  }))
+  defer slowUpstream.Close()
+
+  router := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    Process(w, r, httprouter.Params{})
+  }))
+  defer router.Close()
+
+  var config = []byte(fmt.Sprintf(`{
+    &quot;components&quot;:[
+      {&quot;id&quot;:&quot;foo&quot;,&quot;endpoint&quot;:&quot;%s&quot;,&quot;must_succeed&quot;:true},
+      {&quot;id&quot;:&quot;bar&quot;,&quot;endpoint&quot;:&quot;%s&quot;,&quot;must_succeed&quot;:true}
+    ]
+  }`, healthyUpstream.URL, slowUpstream.URL))
+
+  req, err := http.NewRequest(&quot;POST&quot;, router.URL, bytes.NewBuffer(config))
+
+  client := &amp;http.Client{}
+  resp, err := client.Do(req)
+  if err != nil {
+    panic(err)
+  }
+
+  defer resp.Body.Close()
+  body, _ := ioutil.ReadAll(resp.Body)
+
+  var result aggregator.Result
+  json.Unmarshal(body, &amp;result)
+
+  expectedStatus := 408
+  for _, value := range result.Components {
+    if value.ID == &quot;bar&quot; &amp;&amp; value.Status != expectedStatus {
+      t.Errorf(&quot;The response:\n '%d'\ndidn't match the expectation:\n '%d'&quot;, value.Status, expectedStatus)
+    }
+  }
+
+  expectedSummary := &quot;failure&quot;
+  if result.Summary != expectedSummary {
+    t.Errorf(&quot;The response:\n '%s'\ndidn't match the expectation:\n '%s'&quot;, result.Summary, expectedSummary)
+  }
+}
+</code></pre>
+
+<p>I typically run my tests using Make, but it ultimately looks like this:</p>
+
+<pre><code>pushd src &amp;&amp; APP_ENV=test COMPONENT_TIMEOUT=100 go test -v $(glide novendor) &amp;&amp; popd
+</code></pre>
+
+<p>Here&rsquo;s another example of a test needing to fake things:</p>
+
+<pre><code>package retriever
+
+import (
+  &quot;bytes&quot;
+  &quot;io/ioutil&quot;
+  &quot;net/http&quot;
+  &quot;strings&quot;
+  &quot;testing&quot;
+
+  &quot;github.com/PuerkitoBio/goquery&quot;
+)
+
+const href = &quot;http://bar.com/&quot;
+const url = &quot;http://foo.com/&quot;
+
+var body string
+
+func fakeNewDocument(url string) (*goquery.Document, error) {
+  body = strings.Replace(body, &quot;{}&quot;, href, 1)
+
+  resp := &amp;http.Response{
+    Status:        &quot;200 OK&quot;,
+    StatusCode:    200,
+    Proto:         &quot;HTTP/1.0&quot;,
+    ProtoMajor:    1,
+    ProtoMinor:    0,
+    Body:          ioutil.NopCloser(bytes.NewBufferString(body)),
+    ContentLength: int64(len(body)),
+    Request:       &amp;http.Request{},
+  }
+
+  return goquery.NewDocumentFromResponse(resp)
+}
+
+func TestRetrieveReturnValue(t *testing.T) {
+  // {} interpolated with constant's value
+  body = `
+    &lt;html&gt;
+      &lt;body&gt;
+        &lt;div class=&quot;productInfo&quot;&gt;
+          &lt;a href=&quot;{}&quot;&gt;Bar&lt;/a&gt;
+        &lt;/div&gt;
+      &lt;/body&gt;
+    &lt;html&gt;
+  `
+  coll, _ := Retrieve(url, fakeNewDocument)
+
+  if response := coll[0]; response != href {
+    t.Errorf(&quot;The response:\n '%s'\ndidn't match the expectation:\n '%s'&quot;, response, href)
+  }
+}
+
+func TestRetrieveMissingAttributeReturnsEmptySlice(t *testing.T) {
+  // href attribute is missing from anchor element
+  body = `
+    &lt;html&gt;
+      &lt;body&gt;
+        &lt;div class=&quot;productInfo&quot;&gt;
+          &lt;a&gt;Bar&lt;/a&gt;
+        &lt;/div&gt;
+      &lt;/body&gt;
+    &lt;html&gt;
+  `
+  coll, _ := Retrieve(url, fakeNewDocument)
+
+  if response := coll; len(response) &gt; 0 {
+    t.Errorf(&quot;The response:\n '%s'\ndidn't match the expectation:\n '%s'&quot;, response, &quot;[http://bar.com/]&quot;)
+  }
+}
+</code></pre>
+
+<p>And&hellip;</p>
+
+<pre><code>package scraper
+
+import &quot;testing&quot;
+
+func TestScrapeResults(t *testing.T) {
+  getItem = func(url string) {
+    defer wg.Done()
+
+    ch &lt;- Item{
+      &quot;FooTitle&quot;,
+      &quot;FooSize&quot;,
+      &quot;10.00&quot;,
+      &quot;FooDescription&quot;,
+    }
+  }
+
+  urls := []string{
+    &quot;http://foo.com/&quot;,
+    &quot;http://bar.com/&quot;,
+    &quot;http://baz.com/&quot;,
+  }
+
+  result := Scrape(urls)
+  first := result.Items[0]
+
+  var suite = []struct {
+    response string
+    expected string
+  }{
+    {first.Title, &quot;FooTitle&quot;},
+    {first.Size, &quot;FooSize&quot;},
+    {first.UnitPrice, &quot;10.00&quot;},
+    {first.Description, &quot;FooDescription&quot;},
+    {result.Total, &quot;30.00&quot;},
+  }
+
+  for _, v := range suite {
+    if v.response != v.expected {
+      err(v.response, v.expected, t)
+    }
+  }
+}
+
+func err(response, expected string, t *testing.T) {
+  t.Errorf(&quot;The response:\n '%s'\ndidn't match the expectation:\n '%s'&quot;, response, expected)
+}
+</code></pre>
+
+<h2 id="logging">Logging</h2>
+
+<p>Using the standard Logger:</p>
+
+<pre><code>info := log.New(os.Stdout, &quot;STUFF: &quot;, log.Ldate|log.Ltime|log.Lshortfile)
+info.Println(&quot;Starting up!!!&quot;)
+
+f, e := os.Create(&quot;test.log&quot;)
+if e != nil {
+  log.Fatal(&quot;Failed to create log file&quot;)
+}
+
+logfile := log.New(f, &quot;STUFF: &quot;, log.Ldate|log.Ltime|log.Lshortfile)
+logfile.Println(&quot;Starting up!!!&quot;)
+</code></pre>
+
+<p>Using Logrus:</p>
+
+<pre><code>package main
+
+import (
+  &quot;os&quot;
+
+  log &quot;github.com/Sirupsen/logrus&quot;
+)
+
+func main() {
+  // Standard stdout ASCII logging
+  log.WithFields(log.Fields{
+    &quot;animal&quot;: &quot;walrus&quot;,
+  }).Info(&quot;A walrus appears&quot;)
+
+  // JSON style structured logging
+  log.SetFormatter(&amp;log.JSONFormatter{})
+  f, e := os.Create(&quot;logs&quot;)
+  if e != nil {
+    log.Fatal(&quot;Failed to create log file&quot;)
+  }
+  log.SetOutput(f)
+  log.WithFields(log.Fields{
+    &quot;animal&quot;: &quot;walrus&quot;,
+    &quot;size&quot;:   10,
+  }).Info(&quot;A group of walrus emerges from the ocean&quot;)
+  /*
+      {
+        &quot;animal&quot;: &quot;walrus&quot;,
+        &quot;level&quot;: &quot;info&quot;,
+        &quot;msg&quot;: &quot;A group of walrus emerges from the ocean&quot;,
+        &quot;size&quot;: 10,
+        &quot;time&quot;: &quot;2015-12-22T13:58:46Z&quot;
+      }
+  */
+}
+</code></pre>
+
+<h2 id="godo">Godo</h2>
+
+<p>Godo is a build tool in a similar vein to rake or gulp.</p>
+
+<p>The following example is taken from my own project <a href="https://github.com/Integralist/Go-Requester" target="_blank">go-requester</a>:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;os&quot;
+
+  do &quot;gopkg.in/godo.v2&quot;
+)
+
+func tasks(p *do.Project) {
+  if pwd, err := os.Getwd(); err == nil {
+    do.Env = fmt.Sprintf(&quot;GOPATH=%s/vendor::$GOPATH&quot;, pwd)
+  }
+
+  p.Task(&quot;server&quot;, nil, func(c *do.Context) {
+    c.Start(&quot;main.go ./config/page.yaml&quot;, do.M{&quot;$in&quot;: &quot;./&quot;})
+  }).Src(&quot;**/*.go&quot;)
+}
+
+func main() {
+  do.Godo(tasks)
+}
+</code></pre>
+
+<h2 id="import-race-conditions">Import Race Conditions</h2>
+
+<p>When you import a package within a Go script, only the public functions and variables are exposed for the caller to utilise. So if you need a package to execute some bootstrapping code at the point of it being <em>loaded</em>, then you&rsquo;ll need to stick it inside of an <code>init</code> function.</p>
+
+<blockquote>
+<p>Note: you can have multiple <code>init</code> functions inside a package
+e.g. one per file within the package namespace</p>
+</blockquote>
+
+<p>But be careful using <code>init</code> as it can result in a race condition.</p>
+
+<p>I&rsquo;ve hit an issue where I had something like:</p>
+
+<ul>
+<li><code>main.go</code></li>
+<li><code>foo.go</code> (imported by <code>main.go</code>)</li>
+<li><code>bar.go</code> (imported by <code>foo.go</code>)</li>
+</ul>
+
+<p>Each one of these packages had its own <code>init</code> function and ultimately the <code>bar.go</code>&rsquo;s <code>init</code> function was being run first, followed by the <code>foo.go</code>&rsquo;s <code>init</code> function and finally followed by the <code>main.go</code>&rsquo;s <code>init</code> function.</p>
+
+<p>The reason this was an issue was because <code>main.go</code> was loading some environment variables needed by <code>bar.go</code> but those variables weren&rsquo;t available by the time the <code>bar.go</code> was running as that happened <em>before</em> <code>main.go</code>&rsquo;s <code>init</code> function had executed.</p>
+
+<p>The solution was to rename all the <code>init</code> functions to <code>Init</code> and explicitly call them to bootstrap the package when needed (i.e. they didn&rsquo;t automatically bootstrap themselves and so we avoided that race condition).</p>
+
+<h2 id="new-vs-make">New vs Make</h2>
+
+<ul>
+<li><code>func new(Type) *Type</code>: allocate memory for custom-user type</li>
+<li><code>func make(Type, size IntegerType) Type</code>: allocate memory for builtin types (Slice, Map, Chan)</li>
+</ul>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+func main() {
+  foo := make(map[string]string)
+  fmt.Println(foo) // map[]
+  foo[&quot;k1&quot;] = &quot;bar&quot;
+  fmt.Println(foo) // map[k1:bar]
+  fmt.Println(foo[&quot;k1&quot;]) // bar
+  
+  type bar [5]int
+  b := new(bar)
+  fmt.Println(b) // &amp;[0 0 0 0 0]
+  b[0] = 1
+  fmt.Println(b) // &amp;[1 0 0 0 0]
+}
+</code></pre>
+
+<h2 id="custom-types">Custom Types</h2>
+
+<pre><code>package main
+
+import (
+  &quot;bytes&quot;
+  &quot;fmt&quot;
+)
+
+type path []byte // our custom Type
+
+// method attached to our custom Type
+func (p *path) TruncateAtFinalSlash() {
+  i := bytes.LastIndex(*p, []byte(&quot;/&quot;))
+
+  if i &gt;= 0 {
+    *p = (*p)[0:i]
+  }
+}
+
+func main() {
+  pathName := path(&quot;/usr/bin/tso&quot;) // Conversion from string to path.
+
+  pathName.TruncateAtFinalSlash()
+
+  fmt.Printf(&quot;%s\n&quot;, pathName)
+}
+</code></pre>
+
+<p>Alternative example:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type foo [5]int
+
+func main() {
+  f := new(foo)
+  fmt.Println(f) // &amp;[0 0 0 0 0]
+  f[0] = 1
+  fmt.Println(f) // &amp;[1 0 0 0 0]
+  f.Bar()
+  fmt.Println(f) // &amp;[1 2 0 0 0]
+
+  // We can coerce custom types like we can with built-in types
+  b := foo([5]int{9, 9, 9})
+  fmt.Println(b) // [9 9 9 0 0]
+  
+  // Check the types
+  fmt.Printf(&quot;%T\n&quot;, b)               // main.foo
+  fmt.Printf(&quot;%T\n&quot;, [5]int{9, 9, 9}) // [5]int
+}
+
+func (f *foo) Bar() {
+  f[1] = 2
+}
+</code></pre>
+
+<h2 id="custom-errors">Custom Errors</h2>
+
+<pre><code>package main
+
+import (
+	&quot;errors&quot;
+	&quot;fmt&quot;
+)
+
+type CustomErr interface {
+	error
+}
+
+var (
+	CustomError = errors.New(&quot;Some Custom Error&quot;)
+)
+
+// we return an 'error' type specifically
+// CustomError is indeed an error type, so returning that works
+// but also, the interface CustomErr means the CustomError var _is_ a CustomErr type too
+func succeed(b bool) (string, error) {
+	if b {
+		return &quot;success&quot;, nil
+	}
+	return &quot;&quot;, CustomError
+}
+
+func main() {
+	fmt.Println(CustomError) // Some Custom Error
+
+	resp, err := succeed(false)
+	if err != nil {
+		t, ok := err.(CustomErr)
+		if ok {
+			fmt.Printf(&quot;t is a custom error '%+v' (%T)\n&quot;, t, t)
+		}
+		fmt.Println(err) // Some Custom Error
+	}
+	fmt.Println(resp) // success (only if succeed(true) is called)
+}
+</code></pre>
+
+<p>Another form of custom error can be seen using a struct:</p>
+
+<pre><code>type errCustom struct {
+    message string
+    code    int
+}
+
+func (e errCustom) Error() string {
+    return fmt.Sprintf(&quot;error message: %s (code: %d)&quot;, e.message, e.code)
+} 
+</code></pre>
+
+<p>We would then implement the struct with the specific error context information and return it:</p>
+
+<pre><code>return errCustom{
+    message: &quot;whoops&quot;,
+    code:    500
+}
+</code></pre>
+
+<h2 id="function-types">Function Types</h2>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type Foo func(int, string)
+
+func (f Foo) Bar(s string) {
+  fmt.Printf(&quot;s: %s\n&quot;, s)
+}
+
+func FooIt(x int, y string) {
+  fmt.Printf(&quot;x: %d - y: %s\n&quot;, x, y)
+}
+
+// We HAVE to define the incoming type of &quot;fn&quot;
+// Which in this case is a Foo type
+func TestIt(fn Foo) {
+  fn(99, &quot;problems&quot;)
+}
+
+// We could do this without defining a func type
+// But as you can see, this is a bit ugly
+// Plus if we need this function passed around a lot
+// then it means a lot of duplicated effort 
+// typing the signature over and over
+func TestItManually(fn func(int, string)) {
+  fn(100, &quot;problems&quot;)
+}
+
+func main() {
+  // Here we're just demonstrating passing around the FooIt function
+  // It demonstrates first-class function support in Go
+  // But also that we can ensure the function passed around has the expected signature
+  TestIt(FooIt)
+  TestItManually(FooIt)
+  
+  x := Foo(FooIt) // Convert our function into a Foo type
+  x(0, &quot;hai&quot;)     // Now we can execute it as we would FooIt itself
+  
+  FooIt(1, &quot;bye&quot;)
+  
+  // Notice the types are different
+  // FooIt is just a function with a signature (no known type associated with it)
+  // Whereas &quot;x&quot; is of known type &quot;Foo&quot;
+  fmt.Printf(&quot;%T\n&quot;, FooIt) // func(int, string)
+  fmt.Printf(&quot;%T\n&quot;, x)     // main.Foo
+  
+  // But we'll see that the function &quot;x&quot; 
+  // which was converted into a Foo type
+  // now has access to a Bar method
+  // Although FooIt has a matching signature, it's not a Foo type
+  // and so it doesn't have a Bar method available
+  x.Bar(&quot;we have a Bar method&quot;)
+  
+  // We can't even execute:
+  // FooIt.Bar(&quot;we don't have a Bar method&quot;)
+  // Because the compiler will stop us
+}
+</code></pre>
+
+<h2 id="enumerator-iota">Enumerator IOTA</h2>
+
+<p>Within a constant declaration, the predeclared identifier <code>iota</code> represents successive untyped integer constants. It is reset to 0 whenever the reserved word <code>const</code> appears in the source.</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+const (
+  foo = iota // 0
+  bar
+  _ // skip this value
+  baz
+)
+
+const (
+  beep = iota // 0 (reset)
+  boop
+)
+
+func main() {
+  fmt.Println(foo, bar, baz) // 0 1 3
+  fmt.Println(beep, boop)    // 0 1
+}
+</code></pre>
+
+<h2 id="struct-var-vs-type">Struct: Var vs Type</h2>
+
+<p>A variable of Struct type doesn&rsquo;t need to be instantiated like a type struct:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+var data struct {
+  A string
+  B string
+}
+
+type data2 struct {
+  A string
+  B string
+}
+
+func main() {
+  data.A = &quot;Hai&quot;
+  data.B = &quot;Bai&quot;
+  
+  fmt.Printf(
+    &quot;%#v, %+v, %+v&quot;, 
+    data.A, 
+    data.B, 
+    data2{A: &quot;abc&quot;, B: &quot;def&quot;}
+  )
+  // &quot;Hai&quot;, Bai, {A:abc B:def}
+}
+</code></pre>
+
+<h2 id="embedded-structs">Embedded Structs</h2>
+
+<p>The first example demonstrates a &lsquo;named&rsquo; field utilising an embedded Struct:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type Point struct {
+  X, Y int
+}
+
+type Circle struct {
+  Center Point // named embeded field
+  Radius int
+}
+
+type Wheel struct {
+  Circle Circle // named embeded field
+  Spokes int
+}
+
+func main() {
+  var w Wheel
+  w.Circle.Center.X = 8
+  w.Circle.Center.Y = 8
+  w.Circle.Radius = 5
+  w.Spokes = 20
+
+  fmt.Printf(&quot;%+v&quot;, w)
+}
+</code></pre>
+
+<p>Which prints:</p>
+
+<pre><code>{Circle:{Center:{X:8 Y:8} Radius:5} Spokes:20}
+</code></pre>
+
+<p>The second example demonstrates an &lsquo;anonymous&rsquo; field instead:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type Point struct {
+  X, Y int
+}
+
+type Circle struct {
+  Point
+  Radius int
+}
+
+type Wheel struct {
+  Circle
+  Spokes int
+}
+
+func main() {
+  var w Wheel
+  w.X = 8       // w.Circle.Point.X
+  w.Y = 8       // w.Circle.Point.Y
+  w.Radius = 5  // w.Circle.Radius
+  w.Spokes = 20
+
+  fmt.Printf(&quot;%+v&quot;, w)
+}
+</code></pre>
+
+<p>Which prints:</p>
+
+<pre><code>{Circle:{Point:{X:8 Y:8} Radius:5} Spokes:20}
+</code></pre>
+
+<blockquote>
+<p>Note: anonymous fields don&rsquo;t work shorthand literal Struct</p>
+</blockquote>
+
+<p>The following example demonstrates how methods of a composited object can be accessed from the consuming object:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type Point struct {
+  X, Y int
+}
+
+func (p Point) foo() {
+  fmt.Printf(&quot;foo: %+v\n&quot;, p)
+}
+
+type Circle struct {
+  Point
+  Radius int
+}
+
+type Wheel struct {
+  Circle
+  Spokes int
+}
+
+func main() {
+  var w Wheel
+  w.X = 8      // w.Circle.Point.X
+  w.Y = 8      // w.Circle.Point.Y
+  w.foo()      // w.Circle.Point.foo()
+  w.Radius = 5 // w.Circle.Radius
+  w.Spokes = 20
+
+  fmt.Printf(&quot;%+v&quot;, w)
+}
+</code></pre>
+
+<p>Which prints:</p>
+
+<pre><code>foo: {X:8 Y:8}
+{Circle:{Point:{X:8 Y:8} Radius:5} Spokes:20}
+</code></pre>
+
+<p>The following example shows how you can mix and match &lsquo;named&rsquo; and &lsquo;anonymous&rsquo; embeds:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+// Point is ...
+type Point struct {
+	X, Y int
+}
+
+func (p Point) foo() {
+	fmt.Printf(&quot;foo: %+v\n&quot;, p)
+}
+
+// Circle is ...
+type Circle struct {
+	p      Point
+	Radius int
+}
+
+// Wheel is ...
+type Wheel struct {
+	Circle
+	Spokes int
+}
+
+func main() {
+	var w Wheel
+	w.Spokes = 1
+	w.Radius = 2
+	w.p.X = 3 // w.Circle.p.X
+	w.p.Y = 4 // w.Circle.p.X
+	w.p.foo()
+	fmt.Printf(&quot;%+v&quot;, w)
+}
+</code></pre>
+
+<p>Here is a more practical example that demonstrates how embedded functionality can make code more expressive:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;sync&quot;
+)
+
+// Anonymous struct
+var cache = struct {
+  sync.Mutex
+  mapping map[string]string
+}{
+  mapping: make(map[string]string), // initial zero value for map
+}
+
+func setValue() {
+  cache.Lock()
+  cache.mapping[&quot;foo&quot;] = &quot;bar&quot;
+  cache.Unlock()
+}
+
+func main() {
+  setValue()
+
+  cache.Lock()
+  v := cache.mapping[&quot;foo&quot;]
+  cache.Unlock()
+
+  fmt.Printf(&quot;v: %s&quot;, v)
+}
+</code></pre>
+
+<h2 id="reference-vs-value">Reference vs Value</h2>
+
+<p>Summary: limit passing by reference unless the size of the copied value is a problem (i.e. memory allocations).</p>
+
+<p>Map data structures are passed by reference, rather than a copied value.</p>
+
+<p>Consider the following example:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+func main() {
+  m := make(map[string]int)
+  fmt.Println(&quot;main before, m = &quot;, m)
+  foo(m)
+  fmt.Println(&quot;main after, m = &quot;, m)
+}
+
+func foo(m map[string]int) {
+  fmt.Println(&quot;foo before, m = &quot;, m)
+  m[&quot;hai&quot;] = 123
+  fmt.Println(&quot;foo after, m = &quot;, m)
+}
+</code></pre>
+
+<p>The output:</p>
+
+<pre><code>main before, m =  map[]
+foo before, m =  map[]
+foo after, m =  map[hai:123]
+main after, m =  map[hai:123]
+</code></pre>
+
+<p>Notice how the map is mutated even once the <code>foo</code> function has finished. This is because a reference to the underlying struct memory location was passed and so the changes made were effective everywhere.</p>
+
+<p>In fact, anything with <code>make</code> is a reference, as well as any explicit interface.</p>
+
+<p>Now consider the next example, which is a slice of integers:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+func main() {
+	m := []int{1, 2, 3}
+	fmt.Println(&quot;main before, m = &quot;, m)
+	foo(m)
+	fmt.Println(&quot;main after, m = &quot;, m)
+}
+
+func foo(m []int) {
+	fmt.Println(&quot;foo before, m = &quot;, m)
+	m = append(m, 4)
+	fmt.Println(&quot;foo after, m = &quot;, m)
+}
+</code></pre>
+
+<p>The output:</p>
+
+<pre><code>main before, m =  [1 2 3]
+foo before, m =  [1 2 3]
+foo after, m =  [1 2 3 4]
+main after, m =  [1 2 3]
+</code></pre>
+
+<p>Notice how the slice isn&rsquo;t showing as mutated after the <code>foo</code> function has finished. This is because a <em>copy</em> of the slice was passed to the function for mutating.</p>
+
+<p>In the following example we pass a struct by value (i.e. a copy of the <code>person</code> variable is passed):</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type Person struct {
+    firstName string
+    lastName  string
+}
+
+func changeName(p Person) {
+    p.firstName = &quot;Bob&quot;
+}
+
+func main() {
+    person := Person {
+        firstName: &quot;Alice&quot;,
+        lastName: &quot;Dow&quot;,
+    }
+
+    changeName(person)
+
+    fmt.Println(person)
+}
+</code></pre>
+
+<p>In order to have that type of change we would need to pass a pointer reference:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type Person struct {
+    firstName string
+    lastName  string
+}
+
+func changeName(p *Person) {
+    p.firstName = &quot;Bob&quot;
+}
+
+func main() {
+    person := Person {
+        firstName: &quot;Alice&quot;,
+        lastName: &quot;Dow&quot;,
+    }
+
+    changeName(&amp;person)
+
+    fmt.Println(person)
+}
+</code></pre>
+
+<h2 id="see-all-methods-on-type">See all methods on <code>&lt;Type&gt;</code></h2>
+
+<pre><code>errType := reflect.TypeOf(err)
+for i := 0; i &lt; errType.NumMethod(); i++ {
+  method := errType.Method(i)
+  fmt.Println(method.Name)
+}
+</code></pre>
+
+<h2 id="convert-struct-into-json">Convert Struct into JSON</h2>
+
+<pre><code>package main
+
+import (
+  &quot;encoding/json&quot;
+  &quot;fmt&quot;
+  &quot;os&quot;
+  &quot;time&quot;
+)
+
+func main() {
+  type Message struct {
+    Sequence  int    `json:&quot;sequence&quot;`
+    Title     string `json:&quot;title&quot;`
+    Timestamp time.Time   `json:&quot;timestamp&quot;`
+  }
+  msg := Message{1, &quot;Foobar&quot;, time.Now()}
+  b, err := json.Marshal(msg)
+  if err != nil {
+    fmt.Println(&quot;error:&quot;, err)
+  }
+  os.Stdout.Write(b)
+}
+</code></pre>
+
+<h2 id="pretty-printing-json-string">Pretty Printing JSON String</h2>
+
+<pre><code>package main
+
+import (
+  &quot;encoding/json&quot;
+  &quot;fmt&quot;
+  &quot;os&quot;
+)
+
+func main() {
+  type ColorGroup struct {
+    ID     int
+    Name   string
+    Colors []string
+  }
+  group := ColorGroup{
+    ID:     1,
+    Name:   &quot;Reds&quot;,
+    Colors: []string{&quot;Crimson&quot;, &quot;Red&quot;, &quot;Ruby&quot;, &quot;Maroon&quot;},
+  }
+  b, err := json.MarshalIndent(group, &quot;&quot;, &quot;    &quot;)
+  if err != nil {
+    fmt.Println(&quot;error:&quot;, err)
+  }
+  os.Stdout.Write(b)
+}
+</code></pre>
+
+<h2 id="convert-struct-into-yaml">Convert Struct into YAML</h2>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+
+  &quot;gopkg.in/yaml.v2&quot;
+)
+
+type ComponentYaml struct {
+  Id  string `yaml:&quot;id&quot;`
+  Url string `yaml:&quot;url&quot;`
+}
+
+type ComponentsYamlList struct {
+  Components []ComponentYaml `yaml:&quot;components&quot;`
+}
+
+func main() {
+  var y ComponentsYamlList
+
+  yaml.Unmarshal([]byte(&quot;components:\n  - id: google\n    url: http://google.com\n  - id: integralist\n    url: http://integralist.co.uk&quot;), &amp;y)
+
+  fmt.Println(y)
+}
+</code></pre>
+
+<h3 id="unknown-yaml-structure">Unknown YAML Structure</h3>
+
+<pre><code>package main
+
+import (
+  &quot;encoding/json&quot;
+  &quot;fmt&quot;
+  &quot;os&quot;
+
+  &quot;gopkg.in/yaml.v2&quot;
+)
+
+var yml = []byte(`
+- key: foo
+  value: bar
+  secret: false
+- key: beep
+  value: boop
+  secret: true
+`)
+
+type Data struct {
+  Items []map[string]interface{}
+}
+
+func main() {
+  y := []map[string]interface{}{}
+
+  if err := yaml.Unmarshal(yml, &amp;y); err == nil {
+    fmt.Printf(&quot;%#v\n&quot;, y)
+  } else {
+    fmt.Println(err.Error())
+  }
+
+  myYaml := Data{Items: y}
+
+  json.NewEncoder(os.Stdout).Encode(myYaml.Items)
+}
+</code></pre>
+
+<h2 id="sorting-structs">Sorting Structs</h2>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;sort&quot;
+)
+
+type vals []Value
+
+type Value struct {
+  Key string
+  Value string
+  Secure bool
+}
+
+// Satisfy the Sort interface
+func (v vals) Len() int      { return len(v) }
+func (v vals) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
+func (v vals) Less(i, j int) bool { 
+  return v[i].Key &lt; v[j].Key 
+}
+
+func main() {
+  orig := vals{
+    {&quot;CK&quot;, &quot;BV&quot;, false},
+    {&quot;DK&quot;, &quot;AV&quot;, true},
+    {&quot;AK&quot;, &quot;CV&quot;, false},
+    {&quot;BK&quot;, &quot;DV&quot;, true},
+  }
+  
+  fmt.Printf(&quot;%+v\n\n&quot;, orig)
+  sort.Sort(orig)
+  fmt.Printf(&quot;%+v\n\n&quot;, orig)
+}
+</code></pre>
+
+<p>Here is a similar version that sorts by name and age:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;sort&quot;
+)
+
+type person struct {
+  Name string
+  Age  int
+}
+
+type byName []person
+
+func (p byName) Len() int {
+  return len(p)
+}
+func (p byName) Less(i, j int) bool {
+  return p[i].Name &lt; p[j].Name
+}
+func (p byName) Swap(i, j int) {
+  p[i], p[j] = p[j], p[i]
+}
+
+type byAge []person
+
+func (p byAge) Len() int {
+  return len(p)
+}
+func (p byAge) Less(i, j int) bool {
+  return p[i].Age &lt; p[j].Age
+}
+func (p byAge) Swap(i, j int) {
+  p[i], p[j] = p[j], p[i]
+}
+
+func main() {
+  kids := []person{
+    {&quot;Jill&quot;, 9},
+    {&quot;Jack&quot;, 10},
+  }
+
+  sort.Sort(byName(kids))
+  fmt.Println(kids)
+
+  sort.Sort(byAge(kids))
+  fmt.Println(kids)
+}
+</code></pre>
+
+<p>Which results in:</p>
+
+<pre><code>[{Jack 10} {Jill 9}]
+[{Jill 9} {Jack 10}]
+</code></pre>
+
+<h2 id="read-users-input">Read Users Input</h2>
+
+<pre><code>reader := bufio.NewReader(os.Stdin)
+fmt.Print(&quot;Enter text: &quot;)
+text, _ := reader.ReadString('\n')
+fmt.Println(text)
+</code></pre>
+
+<h2 id="http-middleware">HTTP Middleware</h2>
+
+<p>This code was modified from <a href="https://medium.com/@matryer/writing-middleware-in-golang-and-how-go-makes-it-so-much-fun-4375c1246e81" target="_blank">@matryer</a>:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+  &quot;os&quot;
+)
+
+type data struct {
+  Greeting string
+  Punct    string
+  Who      string
+}
+
+func (s data) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprint(w, s.Greeting, s.Punct, s.Who)
+}
+
+type adapter func(http.Handler) http.Handler
+
+func adapt(h http.Handler, adapters ...adapter) http.Handler {
+  // Ideally you'd do this in reverse
+  // to ensure the order of the middleware
+  // matches their specified order
+  for _, adapter := range adapters {
+    h = adapter(h)
+  }
+  return h
+}
+
+func notify(logger *log.Logger) adapter {
+  return func(h http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+      logger.Println(&quot;before&quot;)
+      defer logger.Println(&quot;after&quot;)
+      h.ServeHTTP(w, r)
+    })
+  }
+}
+
+func doSomething() adapter {
+  return func(h http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+      fmt.Println(&quot;before&quot;)
+      defer fmt.Println(&quot;after&quot;)
+      h.ServeHTTP(w, r)
+    })
+  }
+}
+
+func main() {
+  http.Handle(&quot;/hello&quot;, &amp;data{&quot;Hello&quot;, &quot; &quot;, &quot;Gophers!&quot;})
+
+  logger := log.New(os.Stdout, &quot;server: &quot;, log.Lshortfile)
+
+  http.Handle(&quot;/hello-with-middleware&quot;, adapt(
+    &amp;data{&quot;Hello&quot;, &quot; &quot;, &quot;Gophers!&quot;},
+    notify(logger), // runs second
+    doSomething(), // runs first
+  ))
+
+  http.ListenAndServe(&quot;localhost:4000&quot;, nil)
+}
+</code></pre>
+
+<p>This code will run a web server with two valid endpoints:</p>
+
+<ol>
+<li><code>/hello</code></li>
+<li><code>/hello-with-middleware</code></li>
+</ol>
+
+<p>The client sees the same output but the latter endpoint produces the following stdout output:</p>
+
+<pre><code>before
+server: middleware.go:35: before
+server: middleware.go:38: after
+after
+</code></pre>
+
+<h2 id="sessions">Sessions</h2>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;net/http&quot;
+  &quot;time&quot;
+)
+
+const cookiePrefix = &quot;integralist-example-cookie-&quot;
+
+func main() {
+  http.HandleFunc(&quot;/&quot;, login)
+  http.HandleFunc(&quot;/admin&quot;, admin)
+  http.HandleFunc(&quot;/logout&quot;, logout)
+  http.ListenAndServe(&quot;localhost:4000&quot;, nil)
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+  if r.Method == &quot;GET&quot; {
+    fmt.Fprintf(w, `
+&lt;html&gt;
+  &lt;body&gt;
+    &lt;form method=&quot;POST&quot;&gt;
+      Username: &lt;input type=&quot;text&quot; name=&quot;username&quot;&gt;
+      &lt;br /&gt;
+      Password: &lt;input type=&quot;password&quot; name=&quot;password&quot;&gt;
+      &lt;br /&gt;
+      &lt;input type=&quot;submit&quot; value=&quot;Login&quot;&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+`)
+  }
+
+  if r.Method == &quot;POST&quot; {
+    username := r.FormValue(&quot;username&quot;)
+    password := r.FormValue(&quot;password&quot;)
+
+    if username == &quot;admin&quot; &amp;&amp; password == &quot;password&quot; {
+      http.SetCookie(w, &amp;http.Cookie{
+        Name:  cookiePrefix + &quot;user&quot;,
+        Value: username,
+      })
+      http.Redirect(w, r, &quot;/admin&quot;, 302)
+    } else {
+      fmt.Fprintf(w, `
+&lt;html&gt;
+  &lt;body&gt;
+    Login details were incorrect. Sorry, &lt;a href=&quot;/&quot;&gt;try again&lt;/a&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+`)
+    }
+  }
+}
+
+func logout(w http.ResponseWriter, r *http.Request) {
+  http.SetCookie(w, &amp;http.Cookie{
+    Name:    cookiePrefix + &quot;user&quot;,
+    Value:   &quot;&quot;,
+    Expires: time.Now(),
+  })
+
+  http.Redirect(w, r, &quot;/&quot;, 302)
+}
+
+func admin(w http.ResponseWriter, r *http.Request) {
+  cookie, err := r.Cookie(cookiePrefix + &quot;user&quot;)
+  if err != nil {
+    http.Redirect(w, r, &quot;/&quot;, 401) // Unauthorized
+    return
+  }
+
+  fmt.Fprintf(w, `
+&lt;html&gt;
+  &lt;body&gt;
+    Logged into admin area as: %s&lt;br&gt;&lt;br&gt;
+    &lt;a href=&quot;/logout&quot;&gt;Logout&lt;/a&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+`, cookie.Value)
+}
+</code></pre>
+
+<h2 id="https-tls-request">HTTPS TLS Request</h2>
+
+<pre><code>package requester
+
+import (
+  &quot;crypto/tls&quot;
+  &quot;crypto/x509&quot;
+  &quot;flag&quot;
+  &quot;io/ioutil&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+)
+
+var (
+  certFile = flag.String(&quot;cert&quot;, &quot;/etc/pki/tls/certs/client.crt&quot;, &quot;A PEM eoncoded certificate file.&quot;)
+  keyFile  = flag.String(&quot;key&quot;, &quot;/etc/pki/tls/private/client.key&quot;, &quot;A PEM encoded private key file.&quot;)
+  caFile   = flag.String(&quot;CA&quot;, &quot;/etc/ca/cloud-ca.pem&quot;, &quot;A PEM eoncoded CA's certificate file.&quot;)
+)
+
+func SecureClient() *http.Client {
+  // Load client cert
+  cert, err := tls.LoadX509KeyPair(*certFile, *keyFile)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  // Load CA cert
+  caCert, err := ioutil.ReadFile(*caFile)
+  if err != nil {
+    log.Fatal(err)
+  }
+  caCertPool := x509.NewCertPool()
+  caCertPool.AppendCertsFromPEM(caCert)
+
+  // Setup HTTPS client
+  tlsConfig := &amp;tls.Config{
+    Certificates:       []tls.Certificate{cert},
+    RootCAs:            caCertPool,
+    InsecureSkipVerify: true,
+  }
+  tlsConfig.BuildNameToCertificate()
+  transport := &amp;http.Transport{TLSClientConfig: tlsConfig}
+  client := &amp;http.Client{Transport: transport}
+
+  return client
+}
+</code></pre>
+
+<p>And to use it&hellip;</p>
+
+<pre><code>client := requester.SecureClient()
+
+// GET
+resp, err := client.Get(someEndpoint)
+
+// POST
+req, err := http.NewRequest(&quot;POST&quot;, someEndpoint, bytes.NewBuffer(jsonStr))
+req.Header.Set(&quot;Content-Type&quot;, &quot;application/json&quot;)
+resp, err := client.Do(req)
+</code></pre>
+
+<h2 id="http-get-web-page">HTTP GET Web Page</h2>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;io/ioutil&quot;
+  &quot;net/http&quot;
+  &quot;os&quot;
+)
+
+func main() {
+  response, err := http.Get(&quot;http://www.integralist.co.uk/&quot;)
+  if err != nil {
+    fmt.Println(err.Error())
+    os.Exit(1)
+  }
+
+  defer response.Body.Close()
+
+  contents, err := ioutil.ReadAll(response.Body)
+  if err != nil {
+    fmt.Println(err.Error())
+    os.Exit(1)
+  }
+
+  fmt.Println(string(contents))
+}
+</code></pre>
+
+<blockquote>
+<p>Note: don&rsquo;t use this ☝️ as it has timeout set to infinity by default</p>
+</blockquote>
+
+<p>Safer option is to create your own http.Client struct&hellip;</p>
+
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;net&quot;
+	&quot;net/http&quot;
+	&quot;os&quot;
+	&quot;sync&quot;
+	&quot;time&quot;
+)
+
+func defaultClient(wg *sync.WaitGroup) {
+	// http.Get calls http.DefaultClient
+	// https://golang.org/src/net/http/client.go?s=12086:12134#L359
+	// https://golang.org/pkg/net/http/#Client
+	response, err := http.Get(&quot;https://www.integralist.co.uk/&quot;)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	defer response.Body.Close()
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	fmt.Println(&quot;\ndefaultClient...&quot;)
+	fmt.Println(response.Status)
+	fmt.Println(string(contents[0:10]))
+
+	wg.Done()
+}
+
+func customClient(wg *sync.WaitGroup) {
+	var netClient = &amp;http.Client{
+		Timeout: time.Second * 10,
+	}
+	response, err := netClient.Get(&quot;https://www.integralist.co.uk/&quot;)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	defer response.Body.Close()
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	fmt.Println(&quot;\ncustomClient...&quot;)
+	fmt.Println(response.Status)
+	fmt.Println(string(contents[0:10]))
+
+	wg.Done()
+}
+
+func customTransport(wg *sync.WaitGroup) {
+	var netTransport = &amp;http.Transport{
+		Dial: (&amp;net.Dialer{
+			Timeout: 5 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: 5 * time.Second,
+	}
+
+	var netClient = &amp;http.Client{
+		Timeout:   time.Second * 10,
+		Transport: netTransport,
+	}
+
+	response, err := netClient.Get(&quot;https://www.integralist.co.uk/&quot;)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	defer response.Body.Close()
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	fmt.Println(&quot;\ncustomTransport...&quot;)
+	fmt.Println(response.Status)
+	fmt.Println(string(contents[0:10]))
+
+	wg.Done()
+}
+
+func main() {
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go defaultClient(&amp;wg)
+	go customClient(&amp;wg)
+	go customTransport(&amp;wg)
+	wg.Wait()
+}
+</code></pre>
+
+<h2 id="custom-http-request-methods">Custom HTTP Request Methods</h2>
+
+<p>Go doesn&rsquo;t provide abstractions for all the various HTTP request types, so for things like <code>PUT</code> you have to implement it yourself. The following is an example that creates a secure (TLS/HTTPS) <code>PUT</code> abstraction&hellip;</p>
+
+<pre><code>func SecurePut(url, contentType string, configFile io.Reader) (*http.Response, error) {
+  client := &amp;http.Client{Transport: configureTLS()}
+  req, err := http.NewRequest(&quot;PUT&quot;, url, configFile)
+  if err != nil {
+    return nil, err
+  }
+  req.Header.Add(&quot;Content-Type&quot;, contentType)
+  resp, err := client.Do(req)
+
+  return resp, err
+}
+
+func configureTLS() *http.Transport {
+  certFilePath := &quot;path/to/cert&quot;
+  keyFilePath := &quot;path/to/privateKey&quot;
+  caPath := &quot;path/to/ca&quot;
+
+  // Load client cert
+  cert, err := tls.LoadX509KeyPair(certFilePath, keyFilePath)
+  if err != nil {
+    msg := fmt.Sprintf(&quot;Error loading developer cert, path: \&quot;%s\&quot;&quot;, certFilePath)
+    output.Error(msg)
+  }
+
+  // Load CA cert
+  caCert, err := ioutil.ReadFile(caPath)
+  if err != nil {
+    msg := fmt.Sprintf(&quot;Error loading CA cert, path: \&quot;%s\&quot;&quot;, caPath)
+    output.Error(msg)
+  }
+  caCertPool := x509.NewCertPool()
+  caCertPool.AppendCertsFromPEM(caCert)
+
+  // Setup HTTPS client
+  tlsConfig := &amp;tls.Config{
+    Certificates:       []tls.Certificate{cert},
+    RootCAs:            caCertPool,
+    InsecureSkipVerify: true,
+  }
+  tlsConfig.BuildNameToCertificate()
+
+  return &amp;http.Transport{TLSClientConfig: tlsConfig}
+}
+</code></pre>
+
+<h2 id="pointers">Pointers</h2>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+// Point stores co-ordinates
+type Point struct {
+  x int
+  y int
+}
+
+// If receiver (Point) isn't set to a pointer (*Point) 
+// then the struct's field value won't be updated outside the method
+func (p *Point) scaleBy(factor int) {
+  fmt.Printf(&quot;scaleBy (before modification): %+v\n&quot;, p)
+
+  // Don't need to derefence (*) struct fields
+  // Compiler will perform an implicit &amp;p for you
+  // You only need to dereference in standard functions when a argument pointer is required (see below Array Pointer example)
+  p.x *= factor
+  p.y *= factor
+
+  fmt.Printf(&quot;scaleBy (after modification): %+v\n&quot;, p)
+}
+
+func main() {
+  // Doesn't matter if we do or don't get the address space (&amp;) for foo/bar's Point
+  foo := &amp;Point{1, 2}
+  bar := &amp;Point{6, 8}
+
+  fmt.Printf(&quot;Main foo.x: %+v\n&quot;, foo.x)
+  fmt.Printf(&quot;Main bar.x: %+v\n&quot;, bar.x)
+
+  foo.scaleBy(5)
+  bar.scaleBy(5)
+
+  fmt.Printf(&quot;Main foo.x: %+v\n&quot;, foo.x)
+  fmt.Printf(&quot;Main foo.y: %+v\n&quot;, foo.y)
+
+  fmt.Printf(&quot;Main bar.x: %+v\n&quot;, bar.x)
+  fmt.Printf(&quot;Main bar.y: %+v\n&quot;, bar.y)
+}
+</code></pre>
+
+<blockquote>
+<p>Note: compiler can only apply implicit dereference for variables and struct fields. This wouldn&rsquo;t work <code>Point{1, 2}.scaleBy(5)</code></p>
+</blockquote>
+
+<p>Results in the following output:</p>
+
+<pre><code>Main foo.x: 1
+Main bar.x: 6
+scaleBy (before modification): &amp;{x:1 y:2}
+scaleBy (after modification): &amp;{x:5 y:10}
+scaleBy (before modification): &amp;{x:6 y:8}
+scaleBy (after modification): &amp;{x:30 y:40}
+Main foo.x: 5
+Main foo.y: 10
+Main bar.x: 30
+Main bar.y: 40
+</code></pre>
+
+<h3 id="array-pointer">Array Pointer</h3>
+
+<p>Deference an Array pointer so you can mutate the original Array values:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+func main() {  
+    x := [3]int{1,2,3}
+
+    func(arr *[3]int) {
+        (*arr)[0] = 7
+        fmt.Println(arr) //prints &amp;[7 2 3]
+    }(&amp;x)
+
+    fmt.Println(x) //prints [7 2 3]
+}
+</code></pre>
+
+<p>Alternatively you can utilise a Slice instead of an Array, as the slice &lsquo;header&rsquo; already has a &lsquo;pointer&rsquo; to an underlying Array:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+func main() {  
+    x := []int{1,2,3}
+
+    func(arr []int) {
+        arr[0] = 7
+        fmt.Println(arr) //prints [7 2 3]
+    }(x)
+
+    fmt.Println(x) //prints [7 2 3]
+}
+</code></pre>
+
+<h3 id="mutating-values">Mutating Values</h3>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type Compose string
+
+func (c *Compose) Details() string {
+  *c = &quot;beep boop&quot;
+  return fmt.Sprintf(&quot;Here are your details: %v&quot;, *c)
+}
+
+func main() {
+  var c Compose
+  c = &quot;hai&quot;
+  fmt.Printf(&quot;c: %+v\n&quot;, c) // c
+  fmt.Println(c.Details())
+  fmt.Printf(&quot;c: %+v\n&quot;, c) // beep boop
+}
+</code></pre>
+
+<h2 id="type-assertion">Type Assertion</h2>
+
+<pre><code>if e, ok := err.(net.Error); ok &amp;&amp; e.Timeout() {
+  //
+}
+
+type argError struct {
+    arg  int
+    prob string
+}
+
+func (e *argError) Error() string {
+    return fmt.Sprintf(&quot;%d - %s&quot;, e.arg, e.prob)
+}
+
+if ae, ok := e.(*argError); ok {
+  //
+}
+</code></pre>
+
+<h2 id="line-counting">Line Counting</h2>
+
+<p>Demonstrates how to use <code>bufio</code> package to scan a file and read it line by line, and then how to increment a map integer value using the shortcut <code>map[key]++</code>. Finally, demonstrates nested maps and ranging over them:</p>
+
+<pre><code>package main
+
+import (
+  &quot;bufio&quot;
+  &quot;fmt&quot;
+  &quot;os&quot;
+)
+
+func main() {
+  counts := make(map[string]map[string]int)
+  files := os.Args[1:]
+  if len(files) == 0 {
+    countLines(os.Stdin, &quot;n/a&quot;, counts)
+  } else {
+    for _, arg := range files {
+      f, err := os.Open(arg)
+      if err != nil {
+        fmt.Fprintf(os.Stderr, &quot;dup2: %v\n&quot;, err)
+        continue
+      }
+      countLines(f, arg, counts)
+      f.Close()
+    }
+  }
+  for key, nestedMap := range counts {
+    fmt.Printf(&quot;Text: %s\n&quot;, key)
+    for filename, count := range nestedMap {
+      fmt.Printf(&quot;\tFile: %s\n\tCount: %d\n&quot;, filename, count)
+    }
+    fmt.Println(&quot;&quot;)
+  }
+}
+
+func countLines(f *os.File, filename string, counts map[string]map[string]int) {
+  input := bufio.NewScanner(f)
+  for input.Scan() {
+    if val, ok := counts[input.Text()]; ok {
+      val[filename]++
+    } else {
+      inner := make(map[string]int)
+      inner[filename]++
+      counts[input.Text()] = inner
+    }
+  }
+}
+</code></pre>
+
+<h2 id="reading-file-in-chunks">Reading File in Chunks</h2>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;os&quot;
+)
+
+func main() {
+  // Create file (truncates file if it already exists)
+  file, err := os.Create(&quot;created.txt&quot;)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  // Populate byte slice with some content
+  b := make([]byte, 0)
+  for i := 0; i &lt; 5; i++ {
+    b = append(b, '!')
+    b = append(b, '\n')
+    // notice single quotes for Rune rather than double quote for String
+  }
+  for i := 0; i &lt; 5; i++ {
+    b = append(b, '?')
+    b = append(b, '\n')
+    // notice single quotes for Rune rather than double quote for String
+  }
+  for i := 0; i &lt; 5; i++ {
+    b = append(b, '%')
+    b = append(b, '\n')
+    // notice single quotes for Rune rather than double quote for String
+  }
+
+  // Write file contents
+  bytesWritten, err := file.Write(b)
+  if err != nil {
+    log.Fatal(err)
+  }
+  fmt.Printf(&quot;Bytes written: %+v\n&quot;, bytesWritten)
+
+  // Although getting the bytes written was useful for us
+  // in this example, you might need to get total bytes
+  // which can be done by copying file contents into dev/null
+    // io.Copy(ioutil.Discard, resp.Body)
+
+  // Get current offset
+  // 1st arg is how much to seek forward/backwards by
+  // 2nd arg is relative to different settings
+  // 		0 == relative to start of file
+  // 		1 == current offset
+  // 		2 == relative to end of file
+  currentOffset, err := file.Seek(0, 1)
+  if err != nil {
+    log.Fatal(err)
+  }
+  fmt.Printf(&quot;Current offset: %d\n&quot;, currentOffset)
+  file.Seek(-currentOffset, 1) // Return to start of file for next Read
+
+  // Read buffered view of file
+  data := make([]byte, 10, bytesWritten) // create slice with underlying Array capacity set to total file bytes size
+  eof := false
+  for !eof {
+    count, err := file.Read(data)
+    if err != nil {
+      eof = true
+    }
+    fmt.Printf(&quot;read %d bytes: %q\n&quot;, count, data[:count])
+  }
+}
+</code></pre>
+
+<h2 id="time">Time</h2>
+
+<pre><code>now := time.Now()
+fmt.Println(now)
+expiration := now.Add(time.Hour * 24 * 30)
+fmt.Println(&quot;Thirty days from now will be : &quot;, expiration)
+</code></pre>
+
+<p>Here we measure time:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;time&quot;
+)
+
+// Sleep requires a Duration
+// time has set of constants we can use (lowest is 1 Duration)
+// Second constant is an abstraction over the other constants
+func main() {
+  start := time.Now()
+  time.Sleep(time.Duration(5) * time.Second) // sleep 5 seconds
+  secs := time.Since(start).Seconds()
+
+  fmt.Printf(&quot;Time spent: %f seconds&quot;, secs)
+}
+</code></pre>
+
+<p>Here is a basic example that pauses execution of a channel until the timer has expired (you would use this over a <code>timer.Sleep</code> because you can cancel a timer before it has expired):</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;time&quot;
+)
+
+func main() {
+  timer := time.NewTimer(time.Second * 2)
+
+  &lt;-timer.C // pauses for two seconds
+
+  fmt.Println(&quot;Timer expired&quot;)
+}
+</code></pre>
+
+<p>Example of cancelling the timer:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;time&quot;
+)
+
+func main() {
+  timer := time.NewTimer(time.Second * 2)
+
+  // Expensive process run in a separate thread
+  go func() {
+    &lt;-timer.C
+    fmt.Println(&quot;Timer expired&quot;)
+  }()
+
+  stop := timer.Stop() // cancel the timer
+  fmt.Println(stop)    // true
+}
+</code></pre>
+
+<p>We can do a similar thing with Timers but in a different way:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;time&quot;
+)
+
+func main() {
+  ticker := time.NewTicker(time.Millisecond * 500)
+
+  // Repetitive process
+  go func() {
+    // Range over the channel rather than pull from it
+    for t := range ticker.C {
+      fmt.Println(&quot;Tick:&quot;, t)
+    }
+  }()
+
+  // Stop ticker after three ticks/intervals
+  time.Sleep(time.Millisecond * 1500)
+  ticker.Stop()
+}
+</code></pre>
+
+<p>We can combine all these items together with a <code>select</code> statement like so:</p>
+
+<pre><code>package main
+
+import &quot;time&quot;
+import &quot;fmt&quot;
+
+func main() {
+  timeChan := time.NewTimer(time.Second).C
+  tickChan := time.NewTicker(time.Millisecond * 400).C
+
+  // Used to signify we're done with this program
+  doneChan := make(chan bool)
+
+  // Sleep for two seconds, then notify the channel we're done
+  go func() {
+    time.Sleep(time.Second * 2)
+    doneChan &lt;- true
+  }()
+
+  for {
+    select {
+    case &lt;-timeChan:
+      fmt.Println(&quot;Timer expired&quot;)
+    case &lt;-tickChan:
+      fmt.Println(&quot;Ticker ticked&quot;)
+    case &lt;-doneChan:
+      fmt.Println(&quot;Done&quot;)
+      return
+    }
+  }
+}
+</code></pre>
+
+<p>The output of this program would be something like:</p>
+
+<pre><code>Ticker ticked
+Ticker ticked
+Timer expired
+Ticker ticked
+Ticker ticked
+Done
+</code></pre>
+
+<h2 id="starting-and-stopping-things-with-channels">Starting and Stopping things with Channels</h2>
+
+<p>I would imagine that for most cases you&rsquo;ll want to use a <code>time.NewTimer</code> as seen in previous examples if you want to stop a goroutine that&rsquo;s processing a long running program. The following example is more for stopping a goroutine that&rsquo;s running code at a set interval (although using <code>time.NewTicker</code> would probably be more appropriate):</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;time&quot;
+)
+
+func main() {
+  quit := make(chan bool)
+
+  // Run a piece of code at a set interval
+  go func() {
+    for {
+      select {
+      case &lt;-quit:
+        return
+      default:
+        fmt.Println(&quot;Not ready to stop this goroutine&quot;)
+        time.Sleep(time.Millisecond * 100)
+      }
+    }
+  }()
+
+  // Do other stuff for two seconds
+  time.Sleep(time.Second * 2)
+
+  // Quit goroutine
+  quit &lt;- true
+
+  fmt.Println(&quot;Goroutine was stopped&quot;)
+}
+</code></pre>
+
+<p>Starting a goroutine:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;time&quot;
+)
+
+func main() {
+  // Use a struct type channel as it clarifies your intent
+  // Which is this channel is used for 'signalling'
+  start := make(chan struct{})
+
+  for i := 0; i &lt; 10000; i++ {
+    go func() {
+      &lt;-start // wait for the start channel to be closed
+      fmt.Println(&quot;do stuff&quot;)
+    }()
+  }
+
+  // at this point, all goroutines are ready to go
+  // we just need to tell them to start by
+  // closing the start channel
+  close(start)
+
+  fmt.Println(&quot;Let's pause briefly to give goroutines time to execute&quot;)
+
+  time.Sleep(time.Millisecond * 10)
+}
+</code></pre>
+
+<p>Stopping a goroutine:</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;time&quot;
+)
+
+func main() {
+  // Use a struct type channel as it clarifies your intent
+  // Which is this channel is used for 'signalling'
+  done := make(chan struct{})
+
+  // Long running process put onto a thread
+  go func() {
+    fmt.Println(&quot;Inside thread doing expensive processing&quot;)
+    time.Sleep(time.Second * 5)
+    close(done)
+  }()
+
+  fmt.Println(&quot;Do other things&quot;)
+
+  // Wait for long running process to finish
+  &lt;-done
+
+  fmt.Println(&quot;Do more things&quot;)
+}
+</code></pre>
+
+<h2 id="channel-pipelines">Channel Pipelines</h2>
+
+<p>The principle of a pipeline, is to take data from one function and pass it into another function, that receiving function will process the received data and then that result is returned and subsequently passed onto another function&hellip; rinse and repeat for however long your pipeline needs to be.</p>
+
+<p>In the below example (copied from <a href="https://blog.gopheracademy.com/advent-2015/automi-stream-processing-over-go-channels/" target="_blank">here</a>) demonstrates how a set of functions accept a channel and return a channel and so channels is the &lsquo;data&rsquo; that is passed around the pipeline functions:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+import &quot;sync&quot;
+
+func ingest() &lt;-chan []string {
+  out := make(chan []string)
+  go func() {
+    out &lt;- []string{&quot;aaaa&quot;, &quot;bbb&quot;}
+    out &lt;- []string{&quot;cccccc&quot;, &quot;dddddd&quot;}
+    out &lt;- []string{&quot;e&quot;, &quot;fffff&quot;, &quot;g&quot;}
+    close(out)
+  }()
+  return out
+}
+
+func process(concurrency int, in &lt;-chan []string) &lt;-chan int {
+  var wg sync.WaitGroup
+  wg.Add(concurrency)
+
+  out := make(chan int)
+
+  work := func() {
+    for data := range in {
+      for _, word := range data {
+        out &lt;- len(word)
+      }
+    }
+    wg.Done()
+
+  }
+
+  go func() {
+    for i := 0; i &lt; concurrency; i++ {
+      go work()
+    }
+
+  }()
+
+  go func() {
+    wg.Wait()
+    close(out)
+  }()
+  return out
+}
+
+func store(in &lt;-chan int) &lt;-chan struct{} {
+  done := make(chan struct{})
+  go func() {
+    defer close(done)
+    for data := range in {
+      fmt.Println(data)
+    }
+  }()
+  return done
+}
+
+func main() {
+  // stage 1 ingest data from source
+  in := ingest()
+
+  // stage 2 - process data
+  reduced := process(4, in)
+
+  // stage 3 - store
+  &lt;-store(reduced)
+}
+</code></pre>
+
+<h2 id="templating">Templating</h2>
+
+<p>Here is a basic program that uses a Struct for its data source:</p>
+
+<pre><code>package main
+
+import (
+  &quot;log&quot;
+  &quot;os&quot;
+  &quot;text/template&quot;
+)
+
+type dataSource struct {
+  Baz int
+}
+
+func (ds dataSource) Foo() string {
+  return &quot;I am foo&quot;
+}
+
+func (ds dataSource) Bar() string {
+  return &quot;I am bar&quot;
+}
+
+const templ = `
+  Foo: {{.Foo}}
+  Piping: {{.Bar | printf &quot;Bar: %s&quot;}}
+  Function: {{.Baz | qux}}
+`
+
+func qux(baz int) int {
+  return baz * 2
+}
+
+// template.Must handles parsing errors better
+var setupTemplate = template.Must(
+  template.New(&quot;whatever&quot;).
+    Funcs(template.FuncMap{&quot;qux&quot;: qux}).
+    Parse(templ),
+)
+
+func main() {
+  ds := dataSource{5}
+
+  if err := setupTemplate.Execute(os.Stdout, ds); err != nil {
+    log.Fatal(err)
+  }
+}
+</code></pre>
+
+<blockquote>
+<p>Note: <code>printf</code> is a built-in function for templating and is functionally equivalent to <code>fmt.Sprintf</code></p>
+</blockquote>
+
+<p>Program output:</p>
+
+<pre><code>Foo: I am foo
+Piping: Bar: I am bar
+Function: 10
+</code></pre>
+
+<p>Here is a HTML templating version:</p>
+
+<pre><code>package main
+
+import (
+  &quot;html/template&quot;
+  &quot;log&quot;
+  &quot;os&quot;
+)
+
+var data struct {
+  A string        // untrusted plain text
+  B template.HTML // trusted HTML
+}
+
+const templ = `&lt;p&gt;A: {{.A}}&lt;/p&gt;&lt;p&gt;B: {{.B}}&lt;/p&gt;`
+
+func main() {
+  t := template.Must(template.New(&quot;escape&quot;).Parse(templ))
+
+  data.A = &quot;&lt;b&gt;Hello&lt;/b&gt;&quot;
+  data.B = &quot;&lt;b&gt;Hello&lt;/b&gt;&quot;
+
+  if err := t.Execute(os.Stdout, data); err != nil {
+    log.Fatal(err)
+  }
+}
+</code></pre>
+
+<p>The output would be:</p>
+
+<pre><code>&lt;p&gt;A: &amp;lt;b&amp;gt;Hello&amp;lt;/b&amp;gt;&lt;/p&gt;
+&lt;p&gt;B: &lt;b&gt;Hello&lt;/b&gt;&lt;/p&gt;
+</code></pre>
+
+<h2 id="error-handling">Error handling</h2>
+
+<p>The following code outputs:</p>
+
+<pre><code>This is our custom error with some more context prefixed: oh noes!
+</code></pre>
+
+<p>Here&rsquo;s the code:</p>
+
+<pre><code>package main
+
+import (
+  &quot;errors&quot;
+  &quot;fmt&quot;
+)
+
+type errWithContext struct {
+  err error
+  msg string
+}
+
+func (e errWithContext) Error() string {
+  return e.msg + &quot;: &quot; + e.err.Error()
+}
+
+func triggerError() (bool, error) {
+  return false, errors.New(&quot;oh noes!&quot;)
+}
+
+func main() {
+  var e *errWithContext
+
+  _, err := triggerError()
+  if err != nil {
+    e = &amp;errWithContext{
+      err,
+      &quot;This is our custom error with some more context prefixed&quot;,
+    }
+  }
+
+  fmt.Print(e.Error())
+}
+</code></pre>
+
+<h2 id="socket-programming">Socket Programming</h2>
+
+<p>There are two main types of sockets:</p>
+
+<ol>
+<li>STREAM sockets (e.g. TCP)</li>
+<li>DATAGRAM sockets (e.g. UDP)</li>
+</ol>
+
+<blockquote>
+<p>Note: a &ldquo;unix domain socket&rdquo; is actually a physical file<br>
+it&rsquo;s useful for local (same host) data communication</p>
+</blockquote>
+
+<p>The principle steps behind a socket is:</p>
+
+<ul>
+<li>Create the socket</li>
+<li>Bind the socket to an address (e.g. <code>127.0.0.1:80</code>)</li>
+<li>Listen for socket connections</li>
+<li>Accept the socket connection</li>
+</ul>
+
+<p>There are two main packages in our below example: <code>server.go</code> and <code>client.go</code>.</p>
+
+<p>Run both of them in separate terminals (e.g. <code>go run ...</code>)</p>
+
+<p>Then for the <code>client.go</code> type your message followed by a new line, for example:</p>
+
+<pre><code>Hello World
+Message from server: HELLO WORLD
+</code></pre>
+
+<p>Whilst in the <code>server.go</code> terminal you should see:</p>
+
+<pre><code>Starting TCP server...
+Message Received: Hello World
+</code></pre>
+
+<p>The code for this program is as follows:</p>
+
+<p>server.go</p>
+
+<pre><code>package main
+
+import (
+  &quot;bufio&quot;
+  &quot;fmt&quot;
+  &quot;net&quot;
+  &quot;strings&quot;
+)
+
+func main() {
+  fmt.Println(&quot;Starting TCP server...&quot;)
+
+  // Listen on all network interfaces (e.g. 0.0.0.0)
+  // Documentation: godoc net Listener | less
+  listener, _ := net.Listen(&quot;tcp&quot;, &quot;:8081&quot;)
+
+  // Accept connection on the port we specified (see above)
+  connection, _ := listener.Accept()
+
+  // Handle incoming connections forever
+  for {
+    // Listen for message to process ending in newline (\n)
+    // Note: single quotes needed for type byte (double quotes is a string)
+    message, _ := bufio.NewReader(connection).ReadString('\n')
+
+    // Output message received
+    fmt.Println(&quot;Message Received:&quot;, string(message))
+
+    // Do something with the message (e.g. uppercase it)
+    newmessage := strings.ToUpper(message)
+
+    // Send new string back to client
+    connection.Write([]byte(newmessage + &quot;\n&quot;))
+  }
+}
+</code></pre>
+
+<p>client.go</p>
+
+<pre><code>package main
+
+import (
+  &quot;bufio&quot;
+  &quot;fmt&quot;
+  &quot;net&quot;
+  &quot;os&quot;
+)
+
+func main() {
+  // Open socket connection to a locally runnning TCP server
+  connection, _ := net.Dial(&quot;tcp&quot;, &quot;127.0.0.1:8081&quot;)
+
+  // Handle incoming responses
+  for {
+    // Read the input
+    reader := bufio.NewReader(os.Stdin)
+
+    // Message to be sent
+    // Note: single quotes needed for type byte (double quotes is a string)
+    // Documentation: godoc bufio ReadString | less
+    // ReadString reads until the first occurrence of the delimiter \n in the input
+    text, _ := reader.ReadString('\n')
+
+    // Send message to open Socket
+    fmt.Fprintf(connection, text+&quot;\n&quot;)
+
+    // Listen for response
+    // Note: single quotes needed for type byte (double quotes is a string)
+    message, _ := bufio.NewReader(connection).ReadString('\n')
+
+    fmt.Println(&quot;Message from server: &quot; + message)
+  }
+}
+</code></pre>
+
+<h2 id="comparing-maps">Comparing Maps</h2>
+
+<p>This code demonstrates how to be careful about false positives!</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+func equal(x, y map[string]int) bool {
+  if len(x) != len(y) {
+    // fail fast
+    return false
+  }
+
+  for k, xv := range x {
+    // Verify &quot;missing&quot; key and &quot;present but zero&quot; key value
+    if yv, ok := y[k]; !ok || yv != xv {
+      return false
+    }
+    
+    /*
+    // The following condition would incorrectly return &quot;true&quot; for the below example comparison!
+    // This is because the empty value for an int type is a zero, while the actual value of x's key is zero
+    if xv != y[k] {
+      return false
+    }
+    */
+  }
+
+  return true
+}
+
+func main() {
+  fmt.Println(
+    equal(map[string]int{&quot;A&quot;: 0}, map[string]int{&quot;B&quot;: 42}),
+  )
+}
+</code></pre>
+
+<h2 id="zip-file-contents">Zip File Contents</h2>
+
+<pre><code>package main
+
+import (
+  &quot;compress/zlib&quot;
+  &quot;io&quot;
+  &quot;log&quot;
+  &quot;os&quot;
+)
+
+func main() {
+  var err error
+
+  // This defends against an error preventing `defer` from being called
+  // As log.Fatal otherwise calls `os.Exit`
+  defer func() {
+    if err != nil {
+      log.Fatalln(&quot;\nDeferred log: \n&quot;, err)
+    }
+  }()
+
+  src, err := os.Create(&quot;source.txt&quot;)
+  if err != nil {
+    return
+  }
+  src.WriteString(&quot;source content&quot;)
+  src.Close()
+
+  dest, err := os.Create(&quot;new.txt&quot;)
+  if err != nil {
+    return
+  }
+
+  openSrc, err := os.Open(&quot;source.txt&quot;)
+  if err != nil {
+    return
+  }
+
+  zdest := zlib.NewWriter(dest)
+  if _, err := io.Copy(zdest, openSrc); err != nil {
+    return
+  }
+
+  // Close these explicitly
+  zdest.Close()
+  dest.Close()
+
+  n, err := os.Open(&quot;new.txt&quot;)
+  if err != nil {
+    return
+  }
+
+  r, err := zlib.NewReader(n)
+  if err != nil {
+    return
+  }
+  defer r.Close()
+  io.Copy(os.Stdout, r)
+
+  err = os.Remove(&quot;source.txt&quot;)
+  if err != nil {
+    return
+  }
+
+  err = os.Remove(&quot;new.txt&quot;)
+  if err != nil {
+    return
+  }
+}
+</code></pre>
+
+<h2 id="shell-commands">Shell Commands</h2>
+
+<p>Here is a simple example that writes the output of a command to a file:</p>
+
+<pre><code>package main
+
+import (
+  &quot;os&quot;
+  &quot;os/exec&quot;
+)
+
+func main() {
+  cmd := exec.Command(&quot;ls&quot;)
+
+  outfile, err := os.Create(&quot;./out.txt&quot;)
+  if err != nil {
+    panic(err)
+  }
+  defer outfile.Close()
+
+  cmd.Stdout = outfile
+  cmd.Stderr = outfile
+
+  err = cmd.Start()
+  if err != nil {
+    panic(err)
+  }
+
+  cmd.Wait()
+}
+</code></pre>
+
+<p>Here is an older example that printed the results of a command:</p>
+
+<pre><code>var (
+  cmdOut []byte
+  err    error
+)
+cmdName := &quot;spurious&quot;
+cmdArgs := []string{&quot;ports&quot;, &quot;--json&quot;}
+if cmdOut, err = exec.Command(cmdName, cmdArgs...).Output(); err != nil {
+  fmt.Fprintln(os.Stderr, &quot;There was an error running 'spurious ports --json' command: &quot;, err)
+  os.Exit(1)
+}
+fmt.Println(string(cmdOut))
+</code></pre>
+
+<h2 id="new-instance-idiom">New Instance Idiom</h2>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+type Sqs struct {
+  foo string
+}
+
+func (s *Sqs) create() {
+  fmt.Println(&quot;I'll create stuff&quot;)
+}
+
+func NewSqs() *Sqs {
+  return &amp;Sqs{&quot;bop&quot;}
+}
+
+func main() {
+  s := NewSqs()
+  fmt.Println(s.foo)
+  s.create()
+}
+</code></pre>
+
+<h2 id="json-connection-draining">JSON Connection Draining</h2>
+
+<p>When using <code>json.NewDecoder</code>:</p>
+
+<pre><code>func main() {
+    http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+        var u User
+        if r.Body == nil {
+            http.Error(w, &quot;Please send a request body&quot;, 400)
+            return
+        }
+        err := json.NewDecoder(r.Body).Decode(&amp;u)
+        if err != nil {
+            http.Error(w, err.Error(), 400)
+            return
+        }
+        fmt.Println(u.Id)
+    })
+    log.Fatal(http.ListenAndServe(&quot;:8080&quot;, nil))
+}
+</code></pre>
+
+<p>&hellip;it doesn&rsquo;t read the response Body completely. So when closing the response you might get an error as a stray <code>\n</code> could be present later on. You&rsquo;ll need to drain the response instead:</p>
+
+<pre><code>defer func() {
+  io.CopyN(ioutil.Discard, r.Body, 512)
+  r.Body.Close()
+}()
+</code></pre>
+
+<blockquote>
+<p>Note: <a href="https://github.com/google/go-github/pull/317" target="_blank">https://github.com/google/go-github/pull/317</a></p>
+</blockquote>
+
+<h2 id="writing-your-own-marshal-unmarshal-functions">Writing your own Marshal/Unmarshal functions</h2>
+
+<pre><code>package main
+
+import (
+	&quot;bytes&quot;
+	&quot;encoding/json&quot;
+	&quot;fmt&quot;
+	&quot;strconv&quot;
+)
+
+func main() {
+	a := make(Stuff)
+	a[1] = &quot;asdf&quot;
+	a[-1] = &quot;qwer&quot;
+	fmt.Println(&quot;Initial:     &quot;, a)
+
+	stuff, _ := json.Marshal(a)
+	fmt.Println(&quot;Serialized:  &quot;, string(stuff))
+
+	b := make(Stuff)
+	_ = json.Unmarshal(stuff, &amp;b)
+	fmt.Println(&quot;Deserialized:&quot;, b)
+}
+
+type Stuff map[int]string
+
+// MarshalJSON works the same as the underlying json.Marshal would
+func (this Stuff) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString(&quot;{&quot;)
+	length := len(this)
+	count := 0
+	for key, value := range this {
+		jsonValue, err := json.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+		buffer.WriteString(fmt.Sprintf(&quot;\&quot;%d\&quot;:%s&quot;, key, string(jsonValue)))
+		count++
+		if count &lt; length {
+			buffer.WriteString(&quot;,&quot;)
+		}
+	}
+	buffer.WriteString(&quot;}&quot;)
+	return buffer.Bytes(), nil
+
+  // for example you could totally change the behaviour...
+  /*
+	buffer := bytes.NewBufferString(&quot;{&quot;)
+	buffer.WriteString(&quot;}&quot;)
+	return buffer.Bytes(), nil
+	*/
+}
+
+// UnmarshalJSON works the same as the underlying json.Unmarshal would
+func (this Stuff) UnmarshalJSON(b []byte) error {
+	var stuff map[string]string
+	err := json.Unmarshal(b, &amp;stuff)
+	if err != nil {
+		return err
+	}
+	for key, value := range stuff {
+		numericKey, err := strconv.Atoi(key)
+		if err != nil {
+			return err
+		}
+		this[numericKey] = value
+	}
+	return nil
+}
+</code></pre>
+
+<p>This means you can also leverage custom type checking:</p>
+
+<p>See: <a href="http://blog.tamizhvendan.in/blog/2017/06/24/leveraging-interfaces-in-golang-part-1/" target="_blank">leveraging interfaces in golang</a></p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

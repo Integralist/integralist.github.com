@@ -1,0 +1,1121 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#thread-safe-concurrency">Thread Safe Concurrency</a>
+<ul>
+<li><a href="#introduction">Introduction</a>
+<ul>
+<li><a href="#shared-memory">Shared Memory</a></li>
+
+<li><a href="#message-passing">Message Passing</a></li>
+</ul></li>
+
+<li><a href="#various-options">Various options</a></li>
+
+<li><a href="#mutexes-semaphores">Mutexes/Semaphores</a>
+<ul>
+<li><a href="#mutex-vs-semaphore">Mutex vs Semaphore?</a></li>
+
+<li><a href="#atomic-operations">Atomic operations</a></li>
+</ul></li>
+
+<li><a href="#stm">STM</a>
+<ul>
+<li><a href="#clojure-example">Clojure example</a>
+<ul>
+<li><a href="#quick-clojure-concurrency-detour">Quick Clojure Concurrency Detour</a></li>
+</ul></li>
+
+<li><a href="#jruby-example">JRuby example</a></li>
+</ul></li>
+
+<li><a href="#actors">Actors</a>
+<ul>
+<li><a href="#transactions-and-actors">Transactions and Actors?</a></li>
+
+<li><a href="#actors-in-clojure">Actors in Clojure</a></li>
+
+<li><a href="#differences-between-agents-and-erlang-actors">Differences between Agents and Erlang Actors</a></li>
+
+<li><a href="#limitations">Limitations</a></li>
+</ul></li>
+
+<li><a href="#csp">CSP</a></li>
+
+<li><a href="#threads">Threads</a>
+<ul>
+<li><a href="#what-is-cpu-bound-vs-i-o-bound">What is CPU bound vs I/O bound?</a></li>
+
+<li><a href="#calculating-the-number-of-threads">Calculating the number of Threads</a></li>
+
+<li><a href="#even-workload-distribution">Even workload distribution</a></li>
+</ul></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="thread-safe-concurrency">Thread Safe Concurrency</h1>
+
+<blockquote>
+<p><strong>2020.02.25 UPDATE</strong>: this post was written a long time ago and I realize now (upon reflection) that it dips hazardously in-and-out between various programming languages without really warning the user properly ahead of time.</p>
+
+<p>The reason for using different languages was to highlight the fact that the various concurrency tools and mechanisms weren&rsquo;t fully supported across languages.</p>
+
+<p>Feel free to skip over these code examples if you like. The explanations that precede the examples should hopefully suffice.</p>
+</blockquote>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Concurrency is a difficult concept. Regardless of programming language or idiom that you use, the practice of programming a &ldquo;thread-safe&rdquo; application can be harder than you think.</p>
+
+<p>There are two fundamental models of concurrency:</p>
+
+<ol>
+<li>Shared Memory</li>
+<li>Message Passing</li>
+</ol>
+
+<p>In the first, we have concepts such as Threads, Locks and Mutexes. In the latter we have patterns such as Actors and CSP, which rely on the mantra of&hellip;</p>
+
+<blockquote>
+<p>&ldquo;don&rsquo;t communicate by sharing memory; share memory by communicating&rdquo;</p>
+</blockquote>
+
+<h3 id="shared-memory">Shared Memory</h3>
+
+<p>The following diagram is an extremely simplistic view of how CPUs, Processes and Threads interact but should help us to better understand why code can become <strong>NON</strong> thread-safe (as far as the &ldquo;Shared Memory&rdquo; model is concerned; we&rsquo;ll see shortly that the &ldquo;message passing&rdquo; model side steps this issue):</p>
+
+<p><a href="../../assets/images/cpu-processes-and-threads.png">
+    <img src="../../assets/images/cpu-processes-and-threads.png">
+</a></p>
+
+<p>&hellip;for those of you who cannot see the image, effectively a process can spawn multiple threads and each thread belonging to a specific process shares the memory related to the process.</p>
+
+<p>Meaning if your software process creates two threads, then both threads have access to the same memory space and thus can manipulate the same chunk of memory (and by memory, I&rsquo;m specifically referring to data the application creates/has access to).</p>
+
+<p>This means, if your software creates some mutable data (e.g. in Ruby this could look something like <code>foo = &quot;bar&quot;</code> - a <code>foo</code> variable that holds the String value <code>bar</code>) and you want to modify the value of the variable, then multiple threads could manipulate the value in an unexpected order and subsequently cause a difficult to locate bug.</p>
+
+<p>Any time you create a new Thread and within that Thread you modify a mutable piece of data you should be concerned about how &ldquo;thread-safe&rdquo; that data is.</p>
+
+<blockquote>
+<p>Note: if you&rsquo;re also utilising immutable data structures (as found in more functional languages, but also languages such as Go where they &ldquo;pass by value&rdquo; rather than &ldquo;pass by reference&rdquo;) then this also makes code less prone to thread-safety concerns (but that&rsquo;s a discussion for another day)</p>
+</blockquote>
+
+<h3 id="message-passing">Message Passing</h3>
+
+<p>The message passing model relies on no data being shared, but rather communication between processes happening via either a message bus or by piping messages down a channel (depending on which style is implemented in your programming language of choice).</p>
+
+<p>As well as avoiding the issue of data being shared, it also avoids the issue of trying to recover from failures (which thread/process is the correct one); which is a hard problem to reason about.</p>
+
+<h2 id="various-options">Various options</h2>
+
+<p>There are four main types of solutions to the problem of thread-safe concurrency:</p>
+
+<ol>
+<li>Mutexes/Semaphores</li>
+<li>Software Transactional Memory (STM)</li>
+<li>The &ldquo;Actors&rdquo; pattern</li>
+<li>Communicating Sequential Processes (CSP)</li>
+</ol>
+
+<p>Let&rsquo;s investigate each of these in turn:</p>
+
+<h2 id="mutexes-semaphores">Mutexes/Semaphores</h2>
+
+<p>We&rsquo;ll be discussing specifically &ldquo;mutexes&rdquo; rather than &ldquo;semaphores&rdquo; (they have very similar purposes - in that they control access to specific data - although a mutex offers some additional guarantees).</p>
+
+<p>When using a mutex, you can &ldquo;lock&rdquo; a piece of data so only that specific Thread has access to the data. When done manipulating the data you can &ldquo;unlock&rdquo; it, thus allowing another Thread to use a mutex to &ldquo;lock&rdquo; the data so it can make its own changes.</p>
+
+<p>Let&rsquo;s take a look at an example (in Ruby):</p>
+
+<pre><code># imagine `data` is some shared state
+
+def update
+  mutex = Mutex.new
+
+  Thread.new { mutex.synchronize { data += 1} }.join
+end
+</code></pre>
+
+<blockquote>
+<p>Note: for the full Mutex API see <a href="http://www.ruby-doc.org/core-2.1.5/Mutex.html" target="_blank">http://www.ruby-doc.org/core-2.1.5/Mutex.html</a></p>
+</blockquote>
+
+<p>This particular solution is the simplest of the three. BUT it doesn&rsquo;t take into account any logic for handling unexpected changes to data (we&rsquo;ll see what that means later on in the <a href="#6">STM</a> section).</p>
+
+<h3 id="mutex-vs-semaphore">Mutex vs Semaphore?</h3>
+
+<p>A semaphore is a construct which can be used to <em>constrain</em> or <em>control</em> access to a shared resource (typically this means access across multiple threads). Think of a semaphore as a more &lsquo;generalized&rsquo; version of a mutex.</p>
+
+<p>A mutex ensures a single thread only ever has access to a segment of your code (e.g. it guards the &lsquo;critical section&rsquo; of a piece of code), where as a semaphore is concerned with ensuring that at <em>most</em> N threads can access your code.</p>
+
+<p>Below is an example in golang:</p>
+
+<pre><code>// Package middleware provides wrapper functions around the http.Handler
+// interface, allowing for an incoming HTTP request to be modified or analysed.
+package middleware
+
+import (
+	&quot;net/http&quot;
+
+	&quot;github.com/example/internal/pkg/settings&quot;
+	&quot;golang.org/x/sync/semaphore&quot;
+)
+
+// LimitConcurrency will reject any new connections that exceed the service's
+// ability to continue functioning.
+func LimitConcurrency(handler http.Handler, config *settings.Config) http.Handler {
+  	s := semaphore.NewWeighted(int64(config.ConcurrencyLimit))
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !s.TryAcquire(1) {
+			http.Error(w, &quot;TOO_MANY_CONCURRENT_CONNECTIONS&quot;, http.StatusServiceUnavailable)
+			return
+		}
+		defer func() {
+			s.Release(1)
+		}()
+
+		handler.ServeHTTP(w, r)
+	})
+}
+</code></pre>
+
+<p>Notice how we have a similar API to a mutex (e.g. with a mutex you have to acquire a &lsquo;lock&rsquo; where as with a semaphore you have a number of &lsquo;spaces&rsquo; the code is allowed to acquire). We attempt to &lsquo;acquire&rsquo; one of the available semaphore spaces (e.g. when we created the semaphore we passed in a threshold of <code>config.ConcurrencyLimit</code> which could be set to a value of <code>100</code>). In the case of the threshold being <code>100</code> it means we have <code>100</code> semaphore &lsquo;spaces&rsquo; available before our code starts to reject incoming connections.</p>
+
+<h3 id="atomic-operations">Atomic operations</h3>
+
+<p>Locks and mutexes allow operations to become <em>atomic</em>, meaning that the change happens &ldquo;as a whole&rdquo;. Meaning it becomes thread safe because another thread can&rsquo;t accidentally read a piece of data/state/memory that is half done (e.g. <code>+=</code> in the above Ruby example would not be thread safe without the Mutex because a thread could read the value of <code>data</code> inbetween the read and the assignment that <code>+=</code> carries out).</p>
+
+<h2 id="stm">STM</h2>
+
+<p>Software Transactional Memory is known as being an &ldquo;optimistic&rdquo; process. Compare this to the lock-synchronisation mechanism of a Mutex, which implies the onus of whether a write action will succeed, should be on the &ldquo;writer&rdquo; (i.e. the &ldquo;writer&rdquo; locks the data, writes the data, then releases the lock).</p>
+
+<p>The STM on the other hand doesn&rsquo;t care what happens in another Thread, it instead records all the changes in a log file and then just before it confirms the write (referred to as a &ldquo;commit&rdquo; in STM terminology) it verifies the data we&rsquo;re modifying hasn&rsquo;t changed, and if it hasn&rsquo;t we go ahead and commit the change made by our Thread.</p>
+
+<p>If a change has been made to the shared data source, then the transation will start over; but this time using the latest copy of the data we&rsquo;re modifying (this can in some cases cause a deadlock to occur).</p>
+
+<p>Because the STM retries transactions when they fail, we should ensure that code within a transaction is idempotent and side effect free. Otherwise if the code isn&rsquo;t idempotent, then that code will be run again and might mean data is changed or recorded in ways you didn&rsquo;t expect (e.g. a call to log some data within a transaction could be called multiple times!)</p>
+
+<blockquote>
+<p>Note: the STM is best used for applications that have frequent reads and can allow for low to medium write collisions. If you expect lots of write collisions then it may be best to opt for another pattern, such as the <a href="#7">Actors</a> pattern discussed in the following section.</p>
+</blockquote>
+
+<p>In the Clojure programming language you&rsquo;ll also find that the STM facilitates &ldquo;embedded transactions&rdquo;, which allows for greater atomicity. What this means in pratice, is that if there is a transaction that contains a sub-transaction, then in some implementations of the STM a failed transaction won&rsquo;t necessarily cause the sub-transaction to fail. But in Clojure it will. Meaning that it&rsquo;s definitely an atomic operation (all or nothing).</p>
+
+<h3 id="clojure-example">Clojure example</h3>
+
+<p>The following example uses the Clojure programming language to implement a thead-safe modification via the STM (specifically the <code>ensure</code> function allows us to tell the STM what shared memory to watch for changes while our transaction is ongoing).</p>
+
+<hr>
+
+<h4 id="quick-clojure-concurrency-detour">Quick Clojure Concurrency Detour</h4>
+
+<p>A quick detour before continuing onto the example code&hellip;</p>
+
+<p>Clojure provides quite a few different mechanisms and functions for handling concurrency.</p>
+
+<p>The three core mechanisms are:</p>
+
+<ul>
+<li><code>atom</code></li>
+<li><code>agent</code></li>
+<li><code>ref</code></li>
+</ul>
+
+<p>A <code>ref</code> provides synchronised access to shared mutable state in a <em>coordinated</em> fashion (i.e. it uses the STM to ensure multiple references are coordinated before applying changes). Whereas an <code>atom</code> is similiar, but differs in that it works like a straight forward CAS (compare and swap) operation. So an <code>atom</code> is considered <em>un-coordinated</em>. An <code>agent</code> is the same as an <code>atom</code> with the exception that it can be run asynchronously.</p>
+
+<p>Clojure&rsquo;s atom provides a validator function (pass <code>:validator</code> argument followed by a validating function), which prevents invalid values being set; similar to a function&rsquo;s pre/post assertion conditions. You are also able to &ldquo;watch&rdquo; atoms for state changes via <code>add-watch</code>.</p>
+
+<blockquote>
+<p>Note: there is also <code>Var</code> type which is a mutable variable and is created via the <code>def</code> form. A variable is &ldquo;thread-local&rdquo; meaning it isn&rsquo;t shared across threads (whereas <code>atom</code>, <code>agent</code> and <code>ref</code> are all accessible across threads)</p>
+</blockquote>
+
+<p>Now let&rsquo;s consider the following functions:</p>
+
+<ul>
+<li><code>ref-set</code></li>
+<li><code>alter</code></li>
+<li><code>ensure</code></li>
+<li><code>commute</code></li>
+</ul>
+
+<p>All of these functions <em>must</em> be called from within a transaction (e.g. this is achieved by calling them from within a <code>dosync</code> block).</p>
+
+<p>The first function <code>ref-set</code> allows you to change the value of a reference directly (i.e. specifying a value rather than using a function).</p>
+
+<p>The second function <code>alter</code> applies a user specified function to the reference. The transaction itself will be retried if any reference written to within the transaction has changed outside of that transaction.</p>
+
+<p>The third function <code>ensure</code> helps to resolve a problem that arises when using <code>alter</code>. The <code>alter</code> function only retries the transaction when references are written to; this means it doesn&rsquo;t check references that are used within the transaction and <em>haven&rsquo;t</em> been written to. We can work around this issue and ensure (no pun intended) that any reference used within the transaction - written to or just read - would cause the transaction to restart.</p>
+
+<p>The fourth function <code>commute</code> increases concurrency for references that you want to monitor for changes but don&rsquo;t really care for their consistency; when you&rsquo;re really only interested in getting the latest value. It helps to increase the concurrency by running the function applied to <code>commute</code> at least twice (maybe more). This means if you have multiple threads running transactions then whichever transaction changes the value at the point of a commit wins (i.e. last-one-in-wins behavior).</p>
+
+<p>OK, with that out of the way let&rsquo;s now review the example code&hellip;</p>
+
+<hr>
+
+<p>The requirement in the code is that the two bank accounts must have at least 1000 in total between them. If we try to remove an amount from either account which results in the total amount falling below 1000 then we should not complete that transaction:</p>
+
+<pre><code>(def current-account (ref 500))
+(def savings-account (ref 600))
+
+(defn withdraw [from constraint amount]
+  (dosync
+    (let [total (+ @from (ensure constraint))]
+      (Thread/sleep 1000) ; allows for a more visible context switch
+      (if (&gt;= (- total amount) 1000)
+        (alter from - amount)
+        (println &quot;Sorry, can't withdraw due to constraint violation&quot;)))))
+
+(println &quot;STATE BEFORE MODIFYING&quot;)
+(println &quot;Current Account balance is&quot; @current-account)
+(println &quot;Savings Account balance is&quot; @savings-account)
+(println &quot;Total balance is&quot; (+ @current-account @savings-account))
+
+(future (withdraw current-account savings-account 100))
+(future (withdraw savings-account current-account 100))
+
+(Thread/sleep 4000)
+
+(println &quot;STATE AFTER MODIFYING&quot;)
+(println &quot;Current Account balance is&quot; @current-account)
+(println &quot;Savings Account balance is&quot; @savings-account)
+(println &quot;Total balance is&quot; (+ @current-account @savings-account))
+</code></pre>
+
+<p>The output of the above code could look like the following (but refer to the below note which explains why in some instances, because the transaction can fail and automatically retry, you could possibly see the failure message informing the user that the transaction failed even when it was successful):</p>
+
+<pre><code>STATE BEFORE MODIFYING
+Current Account balance is 500
+Savings Account balance is 600
+Total balance is 1100
+
+STATE AFTER MODIFYING
+Current Account balance is 500
+Savings Account balance is 500
+Total balance is 1000
+</code></pre>
+
+<blockquote>
+<p>Note: <code>println</code> is sending data to <em>stdout</em> (defined as a thread-local dynamic variable). This variable is binded to the current Thread by default (meaning values don&rsquo;t cross over into other Threads).</p>
+
+<p>A <code>future</code> creates a new Thread, but the binding of <em>stdout</em> is inherited by the <code>future</code>&rsquo;s parent process (i.e. any <code>println</code> calls within the <code>withdraw</code> function - which runs in the parent process - can appear in the <code>future</code>&rsquo;s thread); meaning the output sent by <code>println</code> doesn&rsquo;t necessarily reflect the correct state.</p>
+
+<p>For example, even when the transaction completes successfully, you might see the failure message printed - at some point in <em>stdout</em> - because the failing message is coming from an earlier transaction that indeed failed. But after a retry the transaction passed and so the message you see in <em>stdout</em> doesn&rsquo;t reflect the latest status of the application.</p>
+
+<p>I would suggest that the <code>println</code> message be moved outside of the transaction and that you add additional logic after the transaction code (this means after the transaction has completed; inc. retries) as a way to work around this issue with printing messages to <em>stdout</em> prematurely after a failed transaction.</p>
+
+<p>I didn&rsquo;t bother implementing this within my example, as it wasn&rsquo;t essential to understanding the code.</p>
+</blockquote>
+
+<h3 id="jruby-example">JRuby example</h3>
+
+<p>If Clojure is a bit too much of a head spin (Lisp based languages can be quite confusing if you&rsquo;re new to the syntax/concepts) then let&rsquo;s see a similar example written in JRuby.</p>
+
+<blockquote>
+<p>Note: because JRuby runs on the JVM, like Clojure, we take advantage of that fact and import Clojure&rsquo;s STM functionality for us to utilise within our Ruby code</p>
+</blockquote>
+
+<p>In the following example we have downloaded the Clojure runtime as a jar (from <a href="http://clojure.org/downloads" target="_blank">http://clojure.org/downloads</a>) and are adding its location to the Java <code>$CLASSPATH</code> environment variable so when we try to <code>java_import</code> the relevant libraries, Java will be able to locate them.</p>
+
+<p>Within our code you&rsquo;ll see we&rsquo;re using methods that correlate to what would be recognisable to Clojure&rsquo;s environment: <code>LockingTransaction.run_in_transaction</code>, <code>@balance.set</code> and <code>@balance.deref</code>.</p>
+
+<pre><code>$CLASSPATH &lt;&lt; &quot;clojure-1.6.0/clojure-1.6.0.jar&quot;
+
+require &quot;java&quot;
+java_import &quot;clojure.lang.Ref&quot;
+java_import &quot;clojure.lang.LockingTransaction&quot;
+
+class Account
+  attr_reader :name
+
+  def initialize(name, initial_balance)
+    @name    = name
+    @balance = Ref.new initial_balance
+  end
+
+  def balance
+    @balance.deref
+  end
+
+  def deposit(amount)
+    LockingTransaction.run_in_transaction do
+      if amount &gt; 0
+        @balance.set @balance.deref + amount
+        p &quot;Deposited $#{amount} into account #{@name}&quot;
+      else
+        raise &quot;The amount must be greater than zero&quot;
+      end
+    end
+  end
+
+  def withdraw(amount)
+    LockingTransaction.run_in_transaction do
+      if amount &gt; 0 &amp;&amp; @balance.deref &gt;= amount
+        @balance.set @balance.deref - amount
+      else
+        raise &quot;Can't withdraw $#{amount}; balance is $#{@balance.deref}&quot;
+      end
+    end
+  end
+end
+
+def transfer(from, to, amount)
+  LockingTransaction.run_in_transaction do
+    to.deposit amount
+    from.withdraw amount
+  end
+end
+
+def transfer_and_print(from, to, amount)
+  begin
+    transfer from, to, amount
+  rescue StandardError =&gt; e
+    p &quot;Transfer failed: #{e}&quot;
+  end
+
+  p &quot;Balance of 'from' account (#{from.name}) is $#{from.balance}&quot;
+  p &quot;Balance of 'to' account (#{to.name}) is $#{to.balance}&quot;
+end
+
+account1 = Account.new 1, 2000
+account2 = Account.new 2, 100
+
+p &quot;account1 balance is $#{account1.balance}&quot;
+p &quot;account2 balance is $#{account2.balance}&quot;
+p &quot;---&quot;
+
+transfer_and_print account1, account2, 500
+p &quot;---&quot;
+transfer_and_print account1, account2, 5000
+</code></pre>
+
+<p>The output of the above program is as follows… (notice that we see the deposit succeeds, but the transaction as a whole fails - i.e. the deposit is revoked - as we can&rsquo;t withdraw the requested amount)</p>
+
+<pre><code>&quot;account1 balance is $2000&quot;
+&quot;account2 balance is $100&quot;
+&quot;---&quot;
+&quot;Deposited $500 into account 2&quot;
+&quot;Balance of 'from' account (1) is $1500&quot;
+&quot;Balance of 'to' account (2) is $600&quot;
+&quot;---&quot;
+&quot;Deposited $5000 into account 2&quot;
+&quot;Transfer failed: Can't withdraw $5000; balance is $1500&quot;
+&quot;Balance of 'from' account (1) is $1500&quot;
+&quot;Balance of 'to' account (2) is $600&quot;
+</code></pre>
+
+<h2 id="actors">Actors</h2>
+
+<p>The basic premise of the Actors pattern is built upon it being a form of &ldquo;message bus&rdquo;. The philosophy of the pattern is that <em>everything is an Actor</em>. An Actor receives messages and based on its state can determine whether it wants to handle the task defined in the message it has received, or to delegate the task off to other subordinates. An Actor can also create more Actors dynamically.</p>
+
+<p>Each Actor is typically run in their own thread (using a Thread Pool implementation to allow for better resource management/allocation). This also helps to facilitate &ldquo;isolated mutability&rdquo;; i.e. mutable state is contained within the Actor but only that actor can modify the state (and as the Actor sits inside it&rsquo;s own thread its mutable state is safe from other Actors).</p>
+
+<blockquote>
+<p>Note: be very careful using the Actor pattern with languages that do not have native support for immutable data structures as you could open yourself up to hard to debug problems if your language allows mutability (e.g. Clojure supports immutability, but Ruby does not; Ruby does allow you to <code>freeze</code> an object, but that doesn&rsquo;t include any nested structures). Much like how we&rsquo;ve utilised Clojure&rsquo;s STM in the above JRuby example, you can also import its immutable data structures. Although this won&rsquo;t help you if you&rsquo;re forced to use a non-JVM language such as MRI (which is the main Ruby interpreter written in C).</p>
+</blockquote>
+
+<p>The use of messages allows communication to become asynchronous and loosely coupled from the rest of the system. But this can result in non-sequential message order (unless you have an Actor whose role is to ensure ordering via some form of Queue).</p>
+
+<p>The Actor pattern has been made popular via Erlang and Scala (in the form of the <a href="http://akka.io/" target="_blank">Akka</a> framework)</p>
+
+<blockquote>
+<p>Note: Akka has bindings for other JVM based languages (Clojure, JRuby, Groovy): <a href="http://doc.akka.io/docs/akka/2.3.4/additional/language-bindings.html" target="_blank">http://doc.akka.io/docs/akka/2.3.4/additional/language-bindings.html</a></p>
+</blockquote>
+
+<p>I&rsquo;ve yet to get around to writing any Scala code and so because Scala is the defacto example of the Akka framework I&rsquo;ve decided to borrow an example from the official Akka site:</p>
+
+<pre><code>case class Greeting(who: String)
+ 
+class GreetingActor extends Actor with ActorLogging {
+  def receive = {
+    case Greeting(who) ⇒ log.info(&quot;Hello &quot; + who)
+  }
+}
+ 
+val system = ActorSystem(&quot;MySystem&quot;)
+val greeter = system.actorOf(Props[GreetingActor], name = &quot;greeter&quot;)
+greeter ! Greeting(&quot;Charlie Parker&quot;)
+</code></pre>
+
+<h3 id="transactions-and-actors">Transactions and Actors?</h3>
+
+<p>Actors can also coordinate more safely by combining themselves via STM transactions. These are typically referred to as &ldquo;transactors&rdquo;. The benefits of wrapping messages within a transaction is that we eliminate synchronisation concerns (i.e. as changes within a transaction are purposely <em>atomic</em>).</p>
+
+<blockquote>
+<p>Note: in Clojure, when sending an action to an agent from inside a transaction, the call is still non-blocking and yet it also still abides by the STM rules (i.e. the action is <em>held</em> until the transaction commits)</p>
+</blockquote>
+
+<h3 id="actors-in-clojure">Actors in Clojure</h3>
+
+<p>Clojure does not support Actors, although it does have a mechanism known as &ldquo;<a href="http://clojure.org/agents" target="_blank">agents</a>&rdquo;. An agent provides access to shared mutable state, but does so asynchronously (much like an Actor). Where an Actor receives a &ldquo;message&rdquo;, an agent accepts an <code>action</code>.</p>
+
+<blockquote>
+<p>Note: Actors and Agents have some surface similarities, but ultimately are different beasts. Actors &ldquo;encapsulates&rdquo; state and provides no means to access it from the outside. Whereas Agents contain a single value that can be retrieved and manipulated (via <code>send</code> or <code>send-off</code> - see below for details). Actors also encapsulate behaviour, whereas an Agent is provided the function that affects its value. Actors can be distributed, whereas Agents cannot</p>
+</blockquote>
+
+<p>Whereas the STM provides coordinated access to data (i.e. atomic - it verifies that there are no changes to shared data that has been written to; otherwise it&rsquo;ll cause the entire transaction to fail). Agents are independent; meaning that actions run concurrently (the call to <code>action</code> returns immediately), but the actions are executed sequentially via a separate thread. So where a transaction is a synchronous operation, an action handled by an agent is <em>asynchronous</em>.</p>
+
+<p>In Clojure, agents are transaction aware (whereas atoms are not) and the <code>!</code> at end of function name is an indicator of this: <code>swap!</code> (not coordinated) vs <code>send</code>.</p>
+
+<blockquote>
+<p>Note: the agent API in Clojure provides two methods: <code>send-off</code> and <code>send</code>. The former creates a new thread specifically for that agent; whereas the latter selects a thread from a pre-defined thread pool. The problem with <code>send</code> is that agents fight for an available thread and so if your action does blocking I/O then you&rsquo;ll delay other agents from working (and thus reducing the extra concurrency benefits of using a thread pool)</p>
+</blockquote>
+
+<p>Once the agent&rsquo;s state is changed, the next action is applied to the agent (now using the latest state it points to).</p>
+
+<h3 id="differences-between-agents-and-erlang-actors">Differences between Agents and Erlang Actors</h3>
+
+<p>There is one distinctive difference between Erlang&rsquo;s Actor and Clojure&rsquo;s Agent, which is that an Agents &ldquo;action&rdquo; doesn&rsquo;t block additional value request calls like an Erlang &ldquo;message&rdquo;. This is demonstrated in the following image, but in summary: requests to an Actor are blocked until a response to the previous message can be provided; whereas Clojure Agents allow multiple <code>@deref</code> calls to be made and processed:</p>
+
+<p><a href="../../assets/images/actors-vs-agents.png">
+<img src="../../assets/images/actors-vs-agents.png">
+</a></p>
+
+<blockquote>
+<p>Note: in the above image we have two simultaneous requests to &ldquo;increment&rdquo; the value held by the Actor/Agent. One can succeed, the other goes onto a queue and is applied after the first call finishes.</p>
+</blockquote>
+
+<h3 id="limitations">Limitations</h3>
+
+<p>The Actor pattern does have some limitations:</p>
+
+<ul>
+<li>Languages that do not enforce immutability are more prone to thread safety bugs</li>
+<li>Actors can be left starving if a dependant Actor fails (they&rsquo;ll be left waiting for a message that will never arrive)
+
+<ul>
+<li>This means we should program defensively and raise exceptions to the waiting Actors</li>
+</ul></li>
+<li>The Actors pattern does not prevent a dead/livelock scenario (two Actors waiting on each other for messages)
+
+<ul>
+<li>Again, we should program defensively by using timeouts to break a livelock</li>
+</ul></li>
+<li>Actors can only handle one message at a time, meaning we should be careful to not cause delays for messages that are only trying to &ldquo;read&rdquo; a value from inside the Actor</li>
+<li>The Actor pattern works best when problems can be divided into sections that do not rely on each other
+
+<ul>
+<li>i.e. communication can be sporadic. If frequent interaction is needed or each section has a dependency on each other to coordinate the task then choose an alternative combination of concurrency models</li>
+</ul></li>
+</ul>
+
+<h2 id="csp">CSP</h2>
+
+<p>Communicating Sequential Processes is an alternative mechanism for expressing concurrency, which has been popularized by recent languages <a href="http://clojure.org/" target="_blank">Clojure</a> and <a href="http://golang.org/" target="_blank">Go</a>. It also is based on the idea of message passing, similar to the Actor pattern.</p>
+
+<p>Some of the fundamental differences between this and the Actor pattern are:</p>
+
+<ul>
+<li>Messages are sequential</li>
+<li>Communication is synchronous</li>
+<li>Communication happens via defined &ldquo;channels&rdquo;</li>
+<li>Processes are anonymous
+
+<ul>
+<li>i.e. Actors know who to communicate with</li>
+<li>Whereas Channels are pipes with messages going in and listeners the other end</li>
+</ul></li>
+</ul>
+
+<p>You also have the option of applying other patterns such as multiplexing multiple channels down into one, think &ldquo;fan-in&rdquo;, which can help in certain scenarios where you want to accept lots of messages comming in (the reverse is also possible, i.e. &ldquo;fan-out&rdquo;).</p>
+
+<p>Picking one model over another (Actor vs CSP) will be determined by the level of complexity you feel is inherently added by either solution and/or model your language of choice supports.</p>
+
+<p>The following is an extremely simple demonstration of the CSP/channel model written in Go (there is a channel which accepts an infinite number of messages; and our <code>main</code> function will take the messages from the channel as they become available):</p>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;math/rand&quot;
+    &quot;time&quot;
+)
+
+func main() {
+    c := createChannel(&quot;hello&quot;, 5)
+
+    for i := range c {
+        fmt.Printf(&quot;You say: %q\n&quot;, i)
+    }
+
+    fmt.Println(&quot;I'm done.&quot;)
+}
+
+func createChannel(msg string, size int) &lt;-chan string {
+    c := make(chan string, size)
+
+    go func() {
+        for i := 1; i &lt;= size; i++ {
+            c &lt;- fmt.Sprintf(&quot;%s %d&quot;, msg, i)
+            time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)
+        }
+        close(c)
+    }()
+
+    return c
+}
+</code></pre>
+
+<p>Again, it&rsquo;s important to realise that Channels are synchronous and can block/cause deadlocks. In Go you can implement a timeout as a way of avoiding deadlocks. I&rsquo;m not currently sure if Clojure has a similar work-around built into the language or whether you have to manually implement that yourself.</p>
+
+<h2 id="threads">Threads</h2>
+
+<p>Threads are prevalent across both the &ldquo;shared memory&rdquo; and &ldquo;message passing&rdquo; models. The discussion of how many threads to create is an important one and depends on the type of tasks your application is expected to handle: CPU bound or I/O bound. In the following sections we&rsquo;ll cover this topic, as well as describing an algorithm for calculating this.</p>
+
+<h3 id="what-is-cpu-bound-vs-i-o-bound">What is CPU bound vs I/O bound?</h3>
+
+<blockquote>
+<p>Note: the following is credited to <a href="http://yaoyao.codes/os/2017/03/20/cpu-bound-vs-io-bound" target="_blank">yaoyao.codes</a>.</p>
+</blockquote>
+
+<ul>
+<li><strong>CPU bound</strong>: the rate at which a process progresses is limited by the speed of the CPU.</li>
+<li><strong>I/O bound</strong>: the rate at which a process progresses is limited by the speed of the I/O subsystem.</li>
+</ul>
+
+<p>This means a task that performs calculations on a small set of numbers, for example multiplying small matrices, is likely to be CPU bound. While a task that processes data from disk, for example, counting the number of lines in a file is likely to be I/O bound.</p>
+
+<p>A program is CPU bound if it would go faster if the CPU were faster.</p>
+
+<p>A program is I/O bound if it would go faster if the I/O subsystem was faster.</p>
+
+<p>The following is an explanation from &ldquo;Essentials of Computer Organization and Architecture&rdquo;&hellip;</p>
+
+<blockquote>
+<p>Input and output (I/O) devices allow us to communicate with the computer system. I/O is the transfer of data between primary memory and various I/O peripherals. These devices are not connected directly to the CPU. Instead, there is an interface that handles the data transfers. This interface converts the system bus signals to and from a format that is acceptable to the given device. The CPU communicates to these external devices via I/O registers.</p>
+</blockquote>
+
+<p>See also the following image that demonstrates how a CPU will allow interruptions for I/O based signals (<a href="https://www.cs.uic.edu/~jbell/CourseNotes/OperatingSystems/13_IOSystems.html" target="_blank">source</a>):</p>
+
+<p><a href="../../assets/images/cpu-io.jpg">
+   <img src="../../assets/images/cpu-io.jpg">
+</a></p>
+
+<p>A CPU/Processor can contain one or more cores. For example, a quad core processor that runs at speed of 3GHz will have 4 cores running at that speed.</p>
+
+<p>I/O, whether a file system interaction or a network request - e.g. HTTP, TCP or Socket based - can block other processes; and so if the application is designed to work concurrently (e.g. there are other threads the CPU can jump to in the mean time) then the current thread will be left to finish and another thread will be picked up instead (this is how concurrency works - the CPU interleaves between threads - this should also clarify how concurrency <em>is not</em> the same thing as paralleism).</p>
+
+<p>For computational intensive operations you&rsquo;ll want the number of threads to be equal to the number of cores available.</p>
+
+<p>For I/O intensive operations you&rsquo;ll want more threads than available cores. This is because (as explained above) the CPU/Processor will &ldquo;context switch&rdquo; to another thread when the current thread is blocked (hence it is better to have more threads than cores for I/O).</p>
+
+<h3 id="calculating-the-number-of-threads">Calculating the number of Threads</h3>
+
+<p>To calculate how many more threads than cores you&rsquo;ll need for an intensive set of I/O operations, use the following algorithm:</p>
+
+<pre><code>Number of Threads = Number of Available Cores / (1 - Blocking Coefficient)
+</code></pre>
+
+<blockquote>
+<p>Note: the blocking coefficient (coefficient being a fancy word that means: a value used as a multiplier) is different depending on the operation. For a computational operation it is 0, whereas a fully blocking operation it is 1.</p>
+</blockquote>
+
+<p>An example of a blocking coefficient would be: <code>0.9</code> - which means a task blocks 90% (<code>0.9</code>) of the time &amp; works only 10% (<code>0.1</code>) of the time. Meaning, if you had 2 cores then you&rsquo;d want 20 threads.</p>
+
+<pre><code>2 / (1 - 0.9) = 20
+</code></pre>
+
+<h3 id="even-workload-distribution">Even workload distribution</h3>
+
+<p>If you have two cores and a very large queue of messages to process, then your initial thought would maybe be to split the queue (i.e. the tasks) into two. This would mean you could have two threads running (i.e. utilising both cores); the first thread processing the first queue data and the second thread handling the other half of the queue data.</p>
+
+<p>The problem with this solution is that is doesn&rsquo;t necessarily guarantee even distribution of the tasks across your available cores. If our queue data consisted of a computational task such as calculating prime numbers then the first half of the queue would take a lot less time to process because the smaller prime numbers would take less time to calculate than the other queue (which if evenly split in two would mean the other queue would have the much larger prime numbers to calculate).</p>
+
+<p>This means one core will be sitting idle while the other core is still processing data.</p>
+
+<p>What would be better is to have more <em>parts</em> than threads/cores. So if one &ldquo;part&rdquo; finishes more quickly than expected, then another part can be picked up. Simply diving our tasks into two parts means one core will likely be sitting idle for longer than the other core. But if we divide our tasks into more granular parts, then we can aim to utilise as much of each core as possible.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>As mentioned at the start of this post: solving the problem of thread-safe concurrency isn&rsquo;t necessarily as straight forward as you would have hoped (if you&rsquo;re new to the concepts). Throw in distributed systems and the problem is conflated even further.</p>
+
+<p>But with that being said, we can clearly see there are quite a few different options available to us already - albeit with differing levels of complexity depending on the problem we&rsquo;re trying to solve. This is a good thing because you shouldn&rsquo;t always reach for a more complex solution if it&rsquo;s not necessary. If the problem is a small one and a simple mutex resolves it then maybe that&rsquo;s OK. Don&rsquo;t over engineer your system.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

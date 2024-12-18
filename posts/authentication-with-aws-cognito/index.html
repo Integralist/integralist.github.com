@@ -1,0 +1,2172 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#authentication-with-aws-cognito">Authentication with AWS Cognito</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#what-is-cognito">What is Cognito?</a></li>
+
+<li><a href="#authentication-vs-authorization">Authentication vs Authorization</a></li>
+
+<li><a href="#user-pools-vs-identity-pools">User Pools vs Identity Pools</a></li>
+
+<li><a href="#implementation-options">Implementation Options</a>
+<ul>
+<li><a href="#client-sdk">Client SDK</a></li>
+
+<li><a href="#server-sdk">Server SDK</a></li>
+
+<li><a href="#aws-hosted-ui">AWS Hosted UI</a></li>
+</ul></li>
+
+<li><a href="#stateless-authentication">Stateless Authentication</a></li>
+
+<li><a href="#logic-processing-with-aws-lambda">Logic Processing with AWS Lambda</a></li>
+
+<li><a href="#beware-the-lambdas">Beware the Lambdas</a></li>
+
+<li><a href="#useful-lambdas">Useful Lambdas</a></li>
+
+<li><a href="#social-logins">Social Logins</a>
+<ul>
+<li><a href="#overloading-the-state-parameter">Overloading the State Parameter</a></li>
+
+<li><a href="#scope">Scope</a></li>
+</ul></li>
+
+<li><a href="#jwts">JWTs</a></li>
+
+<li><a href="#api-limits">API Limits</a></li>
+
+<li><a href="#logout-issues">Logout Issues</a></li>
+
+<li><a href="#other-concerns">Other Concerns?</a></li>
+
+<li><a href="#which-is-the-right-solution">Which is the right solution?</a></li>
+
+<li><a href="#updated-architecture">Updated Architecture</a></li>
+
+<li><a href="#native-mobile-social-sign-ins">Native Mobile Social Sign-ins</a></li>
+
+<li><a href="#user-pool-configuration">User Pool Configuration</a></li>
+
+<li><a href="#iam-user">IAM User</a></li>
+
+<li><a href="#lambda-iam-role">Lambda IAM Role</a></li>
+
+<li><a href="#example-python-api-code">Example Python API code</a></li>
+
+<li><a href="#example-cognito-app-settings">Example Cognito App Settings</a></li>
+
+<li><a href="#example-cognito-user-pool-federation-identity-providers">Example Cognito User Pool &ldquo;Federation: Identity Providers&rdquo;</a>
+<ul>
+<li><a href="#facebook-attribute-mappings">Facebook Attribute Mappings</a></li>
+
+<li><a href="#google-attribute-mappings">Google Attribute Mappings</a></li>
+</ul></li>
+
+<li><a href="#example-facebook-app-configuration">Example Facebook App Configuration</a>
+<ul>
+<li><a href="#product-added-facebook-login">Product Added: &ldquo;Facebook Login&rdquo;</a></li>
+</ul></li>
+
+<li><a href="#example-google-app-configuration">Example Google App Configuration</a></li>
+
+<li><a href="#terraform-example">Terraform Example</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="authentication-with-aws-cognito">Authentication with AWS Cognito</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>In this post I would like to introduce you to the <a href="https://aws.amazon.com/cognito/" target="_blank">AWS Cognito</a> service, and to explain its various moving pieces and how they fit together.</p>
+
+<p>If you&rsquo;re interested in a very high-level view of what I was working on, then <a href="#updated-architecture">this architecture diagram</a> should give you the basic idea.</p>
+
+<p>Effectively I co-designed and implemented a new authentication system (using AWS Cognito) for BuzzFeed&rsquo;s existing community users to utilize and which opened the doors for new BuzzFeed services to also be able to offer additional features built upon authentication to their users.</p>
+
+<p>Cognito is tricky to get up and running with (for a variety of reasons which I&rsquo;ll explain as we go), and to make things worse there aren&rsquo;t many reference points outside of the official documentation to help you. Hence this blog post now exists for those weary travellers looking for answers.</p>
+
+<blockquote>
+<p>Note: this post was written approximately five months into a year long project and so a lot has changed in the design of the system and the implementation. But this post is still very relevant and useful for those looking to understand Cognito. This post also was fed back to various internal AWS teams and has resulted in work being carried out to improve various aspects of their services mentioned here.</p>
+</blockquote>
+
+<p>Let&rsquo;s start at the beginning&hellip;</p>
+
+<h2 id="what-is-cognito">What is Cognito?</h2>
+
+<p>According to <a href="https://aws.amazon.com/cognito/" target="_blank">the official blurb</a>&hellip;</p>
+
+<blockquote>
+<p>Amazon Cognito lets you add user sign-up, sign-in, and access control to your web and mobile apps quickly and easily.</p>
+</blockquote>
+
+<p>In essence, Cognito provides features that let you <em>authenticate</em> access to your services, while also providing features to let you <em>authorize</em> access to your AWS resources.</p>
+
+<h2 id="authentication-vs-authorization">Authentication vs Authorization</h2>
+
+<p>It&rsquo;s important to clarify that in this blog post we&rsquo;re only really discussing authentication, and not <em>authorization</em>. They are two different concepts.</p>
+
+<ul>
+<li><p><strong>Authentication</strong> is the process of verification that an individual, entity or website is who it claims to be.</p></li>
+
+<li><p><strong>Authorization</strong> is the function of specifying access rights to resources, which is different to (and commonly confused with) the process of authentication.</p></li>
+</ul>
+
+<blockquote>
+<p>Note: if you&rsquo;re new to these types of security concepts, then take a look at <a href="https://docs.google.com/document/d/1qs3jEIQvocdVhSxCSPLF1BoLnp91aLnuUIasvl-maYo/edit#" target="_blank">this glossary document</a> I put together which covers the various terminology.</p>
+</blockquote>
+
+<h2 id="user-pools-vs-identity-pools">User Pools vs Identity Pools</h2>
+
+<p>In order for you to be able to <em>authenticate</em> and <em>authorize</em> access, Cognito provides two separate services:</p>
+
+<ol>
+<li>User Pools</li>
+<li>Identity Pools</li>
+</ol>
+
+<p>User Pools deal with &lsquo;authentication&rsquo;, whereas Identity Pools deal with &lsquo;authorization&rsquo; (and specifically that means AWS based resources only).</p>
+
+<p>For the purposes of this post I&rsquo;ll only be focusing in on User Pools, as our project requirements did not involve authorizing access for AWS resources to an authenticated user (which is where Identity Pools would typically come into play).</p>
+
+<p>Now, with <em>that</em> said (and what makes this oh the more confusing, due to the design of the mobile SDKs), mobile applications do utilize Identity Pools for authentication, but the Identity Pool would be configured with a &lsquo;provider&rsquo; which happened to be our User Pool.</p>
+
+<blockquote>
+<p>If you&rsquo;re interested in the various Identity Pool concepts, then please refer to <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/authentication-flow.html" target="_blank">the official documentation</a>.</p>
+</blockquote>
+
+<h2 id="implementation-options">Implementation Options</h2>
+
+<p>There are fundamentally three options available for implementing User Pools:</p>
+
+<ol>
+<li>Client SDK</li>
+<li>Server SDK</li>
+<li>AWS Hosted UI</li>
+</ol>
+
+<h3 id="client-sdk">Client SDK</h3>
+
+<p>The client SDK has a bit of a jagged history, which makes reading the AWS docs a bit confusing at times (or indeed when Googling for help), as you may notice references to &lsquo;<a href="https://github.com/amazon-archives/amazon-cognito-identity-js" target="_blank">Amazon Cognito Identity SDK for JavaScript</a>&rsquo; which is now a deprecated library.</p>
+
+<p>What you&rsquo;ll want to use instead is their new &lsquo;<a href="https://aws.github.io/aws-amplify/" target="_blank">Amplify</a>&rsquo; SDK, which you&rsquo;ll also find AWS has a strong bias towards (or at least their &lsquo;solution architects&rsquo; push it <em>really</em> hard).</p>
+
+<blockquote>
+<p>Note: I get the feeling AWS put a lot more time into Amplify and having it be able to abstract away a lot of the Cognito complexity, that they&rsquo;re keen for consumers to utilise it.</p>
+</blockquote>
+
+<p>Based on this I decided I would trust their opinion and just try and spin up something that works using Amplify, which unfortunately took a long time and ultimately I ended up dropping the work in favour of a server-side solution.</p>
+
+<p>I don&rsquo;t keep up with the constant changes to the JavaScript landscape, and so I&rsquo;m not familiar with React (or Angular) which were the two examples the AWS docs (and most example repos) used the majority of the time. So using Amplify required me to first do some reading up on React, Babel, WebPack and a whole host of other tools. It was painful.</p>
+
+<p>In the end we just had too much trouble trying to deal with Node and the various build systems that we decided to drop the work we had done and pivot to a new solution (see next section).</p>
+
+<h3 id="server-sdk">Server SDK</h3>
+
+<p>The server-side solution we chose was to use the <a href="https://boto3.readthedocs.io/en/latest/" target="_blank">Python SDK</a>.</p>
+
+<p>This ended up being a bit of a double edged sword. We were happier with the move to Python, but we really struggled with both the AWS documentation and also the boto3 library documentation that the Python SDK is built upon.</p>
+
+<p>In order to get up and running we initially opted to use a 3rd party abstraction library called &lsquo;<a href="https://github.com/capless/warrant" target="_blank">Warrant</a>&rsquo;, which also incidentally helped us to understand the AWS documentation because we were able to reverse-engineer the Warrant code to better understand the boto3 API calls that needed to be made.</p>
+
+<blockquote>
+<p>Note: I think that says a lot about AWS documentation. If people need to read through how an abstraction library is using your API, then your documentation must be pretty bad. I would be the first to suggest maybe I&rsquo;m just too dumb to understand Cognito, but a <em>lot</em> of people across the internet were having the same problems.</p>
+</blockquote>
+
+<p>Ultimately, Warrant didn&rsquo;t provide all the functionality we needed and so we eventually refactored out Warrant and were back to using the underlying boto3 Python SDK.</p>
+
+<p>It&rsquo;s worth me taking a moment to also explain that some APIs require you to define a specific type of &lsquo;authentication flow&rsquo; which is a security feature, and as far as I understand it, is supposed to help you to more safely access data provided by these APIs.</p>
+
+<p>What I didn&rsquo;t know originally, and was one of the reasons we decided to use a library such as Warrant, was that the code involved with some of these auth flows can be quite complex (I still now struggle to follow exactly what the code does within Warrant when it uses one of these &lsquo;flows&rsquo;).</p>
+
+<p>Just to give you an example of the type of code AWS Cognito would expect you to write, take a look at the <a href="https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_InitiateAuth.html" target="_blank"><code>InitiateAuth</code></a> API call with the <code>USER_SRP_AUTH</code> auth flow.</p>
+
+<p>First of all I don&rsquo;t think it&rsquo;s very clear what is expected to be provided in that documentation alone, but also, take a look at <a href="https://github.com/capless/warrant/blob/master/warrant/aws_srp.py" target="_blank">Warrant&rsquo;s implementation</a> and specifically how to generate an <code>SRP_A</code>, which also doesn&rsquo;t appear to be explained anywhere (no where obvious at least).</p>
+
+<blockquote>
+<p>Note: it wasn&rsquo;t until much later, we discovered that we could (in the case of <code>InitiateAuth</code> at least) have avoided writing all the SRP generation code and instead used the <em>admin</em> version of that API, called <a href="https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminInitiateAuth.html" target="_blank"><code>AdminInitiateAuth</code></a> which allows you to skip SRP in favour of implicitly trusting the caller &ndash; which was fine for our use case as we were building a centralized authentication API service.</p>
+</blockquote>
+
+<h3 id="aws-hosted-ui">AWS Hosted UI</h3>
+
+<p>AWS Cognito offers a &lsquo;hosted ui&rsquo;, where by you redirect a user to an endpoint such as:</p>
+
+<p><code>https://{...}.auth.us-east-1.amazoncognito.com/login?response_type={...}&amp;client_id={...}&amp;redirect_uri={...}&amp;state={...}</code></p>
+
+<blockquote>
+<p>Note: a custom domain can also be configured, but it requires you use <a href="https://aws.amazon.com/certificate-manager/" target="_blank">AWS Certificate Manager</a> for the TLS cert.</p>
+</blockquote>
+
+<p>The hosted ui option gives you all the interactions in a fully functioning interface, which includes: sign-in, sign-up, forgotten username, forgotten password, social logins.</p>
+
+<p>But there are some caveats:</p>
+
+<ul>
+<li>Very limited controls over the ui (<em>very</em> basic font colors and css).</li>
+<li>Custom domains only work with TLS certificates via <a href="https://aws.amazon.com/certificate-manager/" target="_blank">ACM</a>.</li>
+<li>State parameter overloading</li>
+<li>Can&rsquo;t access new signup passwords †</li>
+</ul>
+
+<blockquote>
+<p>† this was necessary for my use case as I needed to co-support a legacy system that wasn&rsquo;t ready to migrate over to Cognito</p>
+</blockquote>
+
+<p>There are other issues still that I have with the hosted ui, but in a lot of cases it does the job well enough to put up with them.</p>
+
+<p>The &lsquo;state&rsquo; parameter overloading is an interesting issue and I&rsquo;ll come back to that later on when I discuss a little bit about sign-ins with social providers.</p>
+
+<h2 id="stateless-authentication">Stateless Authentication</h2>
+
+<p>The thing we liked about Cognito was that it would allow us to build a &lsquo;stateless&rsquo; authentication system. Due to the use of <a href="https://jwt.io/" target="_blank">JWT</a>s we could pass these tokens around (†) and know that if the user had these tokens that they would be valid and untampered with (because when decoding the tokens we could verifiy this using the public signing key AWS uses to sign the tokens at point of generation).</p>
+
+<blockquote>
+<p>† we only ever pass tokens around &lsquo;server-side&rsquo;, using secure cookies (with HttpOnly and Secure attributes set) to avoid replay attacks that might occur if we exposed the tokens to the client.</p>
+</blockquote>
+
+<p>The problem we then stumbled across was: what happens if a user authenticates on a public computer but doesn&rsquo;t log out (or they authenticate on their laptop but have no password to prevent someone from stealing it and thus their existing authenticated session tokens)?</p>
+
+<p>Well, we would still decode the ID JWT we got back from Cognito (to ensure there was no tampering of the token), but we would then make a simple API call to AWS (specifically the <a href="https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_GetUser.html" target="_blank"><code>GetUser</code></a>) as it required us to provide the ACCESS JWT we get back from Cognito.</p>
+
+<p>The reason I mention this is because, we needed a way to invalidate a session, and the only way to do that was to call the <a href="https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_GlobalSignOut.html" target="_blank"><code>GlobalSignOut</code></a> API.</p>
+
+<p>We originally though that would invalidate all tokens ID/Access/Refresh, but we were wrong. Only the Access and Refresh tokens are invalidated. But that was fine as our system was already being passed the Access token and so once we invalidated the session, if that user tried to reuse the tokens at one of our protected endpoints, we could be sure that it would now fail to give them access as we not only verified the ID token but attempted to use the Access token to call an AWS API to see if it suceeded or not.</p>
+
+<p>Our use case is probably quite unconventional, but otherwise the whole point of having a stateless system was in danger of being made redundant by the fact that <em>if</em> (for <em>whatever</em> reason) we had a set of compromised users we&rsquo;d otherwise have no way to invalidate their sessions (and we didn&rsquo;t want to have to build our own session state datastore to track all this).</p>
+
+<h2 id="logic-processing-with-aws-lambda">Logic Processing with AWS Lambda</h2>
+
+<p>With the hosted ui option you&rsquo;ll likely also need to utilise <a href="https://aws.amazon.com/lambda/" target="_blank">AWS Lambda</a> in order to do some logic processing. The following diagram demonstrates how we were initially using the hosted ui:</p>
+
+<p><a href="../../assets/images/cognito-high-level.png">
+  <img src="../../assets/images/cognito-high-level.png">
+</a></p>
+
+<ol>
+<li>We redirect an unauthenticated user to Cognito.</li>
+<li>Once the user attempts to sign-in we trigger some additional &lsquo;<a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html" target="_blank">hooks</a>&rsquo;.</li>
+<li>Cognito redirects the authenticated user to our API service †</li>
+<li>Our API service redirects the user back to the CMS (with user tokens).</li>
+<li>The CMS asks the API service to validate the tokens.</li>
+</ol>
+
+<blockquote>
+<p>† this service exchanges the given Cognito auth code for the user&rsquo;s Cognito User Pool tokens.</p>
+</blockquote>
+
+<p>Once the tokens are validated, the CMS will allow the user to view the relevant page.</p>
+
+<h2 id="beware-the-lambdas">Beware the Lambdas</h2>
+
+<p>It&rsquo;s worth noting the second half of the above diagram (the section <em>after</em> the lambda is triggered). What we have there are two separate lambda&rsquo;s, and which one is triggered depends on the scenario.</p>
+
+<p>If the user has tried to authenticate using a username/password set of credentials, and those don&rsquo;t match an existing user within the Cognito User Pool, then the &ldquo;User Migration&rdquo; lambda is triggered. In that lambda we attempt to authenticate the user within our legacy system (that is the call over to the &ldquo;WebApp&rdquo; in the diagram).</p>
+
+<p>If the authentication with the legacy system is successful, then we&rsquo;ll modify the user&rsquo;s User Pool record (which hasn&rsquo;t actually been created yet) to include auth related details we&rsquo;ve pulled from their legacy account. We then return the &lsquo;event&rsquo; object provided to Lambda, which let&rsquo;s Cognito know it can now create the user within its User Pool (not returning the lambda event object indicates an error occurred and the whole request flow fails).</p>
+
+<blockquote>
+<p>Note: with the &lsquo;user migration&rsquo; for users from our legacy system over to Cognito, before we return the event in the lambda, we make sure to mark the new Cognito user as &lsquo;verified/confirmed&rsquo; &ndash; that way they don&rsquo;t need to enter a verification code that gets emailed or sent via SMS (that&rsquo;s because the user would&rsquo;ve already verified themselves originally in our legacy system).</p>
+</blockquote>
+
+<p>The reason I say &ldquo;beware the lambdas&rdquo; is because yes, code errors can cause it to bomb out, but more importantly they don&rsquo;t always fire when you think they will (this is a user error thing, not an AWS bug).</p>
+
+<p>To clarify, let me explain what we saw when testing the migration path of a legacy user account to Cognito, when the user was signing into Cognito using their social provider details.</p>
+
+<p>We had hoped the &lsquo;User Migration&rsquo; lambda hook would have been triggered by both a Cognito User Pool account login and also a Social Provider account login, but it doesn&rsquo;t.</p>
+
+<blockquote>
+<p>Note: when a user signs-in with a social account, they have an account created within the Cognito User Pool, but they are also added to a specific group (such as a Facebook group or a Google group).</p>
+</blockquote>
+
+<p>We <em>eventually</em> discovered that the &lsquo;Post Confirmation&rsquo; hook would fire at the right interval for us to do the processing we needed for users signing in with a Social Account. But that wasn&rsquo;t immediately obvious.</p>
+
+<p>Before settling on the &lsquo;Post Confirmation&rsquo; hook, we originally started using &lsquo;Post Authentication&rsquo; for handling first time social logins (the hook sounded reasonable enough), but when we were testing this hook we already had the social account stored in our User Pool (this was from earlier testing, before we decided to do some &lsquo;post-login&rsquo; processing).</p>
+
+<p>The reason I mention this is because a week later we decided to clear out our User Pool and start testing our various scenarios again from scratch, and we noticed the &lsquo;post authentication&rsquo; hook was no longer firing 🤔</p>
+
+<p>Turns out social accounts only trigger &lsquo;post migration&rsquo; hooks when they already exist in the User Pool. In order to do the &lsquo;first time login&rsquo; modification we were looking for, we needed the &lsquo;post confirmation&rsquo; hook.</p>
+
+<p>Using this hook wasn&rsquo;t <em>obvious</em> to us because &lsquo;post confirmation&rsquo; makes it sounds like an event that happens once a username/password user has entered their &lsquo;verification code&rsquo; for the first time (and thus become marked as &lsquo;confirmed&rsquo; within the User Pool). Well, turns out social provider logins are automatically considered <em>confirmed</em> once they authenticate for the first time (hence why that event would trigger when we needed it to).</p>
+
+<h2 id="useful-lambdas">Useful Lambdas</h2>
+
+<p>There are some useful lambda&rsquo;s though, for example, the <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-custom-message.html" target="_blank">Custom Message Lambda Trigger</a> is great for intercepting the emails (or SMS) messages that are sent to your users, and allowing you to configure them however you like.</p>
+
+<p>Take a look at the following code for an example&hellip;</p>
+
+<pre><code>def lambda_handler(event, context):
+
+    domain = 'https://your.domain.com'
+    username = event.get('userName', '')
+    code = event['request'].get('codeParameter', '')
+
+    print(event)
+
+    if event['triggerSource'] == &quot;CustomMessage_SignUp&quot;:
+        event['response']['emailSubject'] = &quot;Validate your account&quot;
+        event['response']['emailMessage'] = &quot;Hi &lt;b&gt;&quot; + username + &quot;&lt;/b&gt;!&lt;br&gt;&quot; \
+                                            &quot;Thank you for signing up.&lt;br&gt;&quot; \
+                                            &quot;Click &lt;a href='&quot; + domain + &quot;confirm-account-signup-validation?&quot; \
+                                            &quot;username=&quot; + username + &quot;&amp;code=&quot; + code + &quot;'&gt;here&lt;/a&gt; &quot; \
+                                            &quot;to validate your account.&quot;
+
+    elif event['triggerSource'] == &quot;CustomMessage_ForgotPassword&quot;:
+        event['response']['emailSubject'] = &quot;Reset your password&quot;
+        event['response']['emailMessage'] = &quot;Hi &lt;b&gt;&quot; + username + &quot;&lt;/b&gt;!&lt;br&gt;&quot; \
+                                            &quot;Click &lt;a href='&quot; + domain + &quot;confirm-password-reset?&quot; \
+                                            &quot;identifier=&quot; + username + &quot;&amp;code=&quot; + code + &quot;'&gt;here&lt;/a&gt; &quot; \
+                                            &quot;to reset your password.&quot;
+
+    elif event['triggerSource'] == &quot;CustomMessage_UpdateUserAttribute&quot;:
+        event['response']['emailSubject'] = &quot;Validate your new email&quot;
+        event['response']['emailMessage'] = &quot;Hi &lt;b&gt;&quot; + username + &quot;&lt;/b&gt;!&lt;br&gt;&quot; \
+                                            &quot;Click &lt;a href='&quot; + domain + &quot;/confirm-email-change?&quot; \
+                                            &quot;code=&quot; + code + &quot;'&gt;here&lt;/a&gt; &quot; \
+                                            &quot;to validate your new email.&quot;
+
+    if event['triggerSource'] == &quot;CustomMessage_AdminCreateUser&quot;:
+        user_attr = event['request'].get('userAttributes', {})
+        user_status = user_attr.get('cognito:user_status')
+        if user_status == 'FORCE_CHANGE_PASSWORD':
+            event['response']['emailSubject'] = &quot;Validate your account&quot;
+            event['response']['emailMessage'] = &quot;Hi &lt;b&gt;&quot; + username + &quot;&lt;/b&gt;!&lt;br&gt;&lt;br&gt;&quot; \
+                                                &quot;You recently attempted to signin, but your account is still 'unverified'.&lt;br&gt;&lt;br&gt;&quot; \
+                                                &quot;Your temporary password is &lt;b&gt;&quot; + code + &quot;&lt;/b&gt;.&lt;br&gt;&lt;br&gt;&quot; \
+                                                &quot;Click &lt;a href='&quot; + domain + &quot;/confirm-account'&gt;here&lt;/a&gt; to complete account validation.&quot;
+
+    return event
+</code></pre>
+
+<p>What&rsquo;s good about this lambda is that we&rsquo;re able to improve the user&rsquo;s flow a little bit. Otherwise if we relied on AWS to generate the email/SMS we&rsquo;d have to create a separate UI that allowed (for example, when verifying an account using a code) the user to copy paste their code into the UI and then submit that code to our server to process.</p>
+
+<p>By controlling the email content ourselves we can construct an endpoint that has the verification code as a query param and make a GET request to an endpoint that will process that code for the user (saving them from having to manually enter anything).</p>
+
+<p>Just something to consider when using Cognito: can I use lambda triggers to <em>improve</em> the user flow?</p>
+
+<h2 id="social-logins">Social Logins</h2>
+
+<p>One thing that might not be clear when opting for a server-side solution is how to handle social logins (e.g. users signing in/up using facebook or google).</p>
+
+<p>It might sound a bit strange, but in order to implement social logins you&rsquo;ll need to make a call to the hosted ui endpoint (mentioned earlier):</p>
+
+<p><code>https://{...}.auth.us-east-1.amazoncognito.com/login?response_type={...}&amp;client_id={...}&amp;redirect_uri={...}&amp;state={...}</code></p>
+
+<p>The specific endpoint you call will be based upon those supported in Cognito&rsquo;s <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html" target="_blank">User Pools Auth API</a>.</p>
+
+<p>For example, to attempt to sign-in a user with facebook you would provide a button that links to:</p>
+
+<p><code>https://{...}.auth.us-east-1.amazoncognito.com/oauth2/authorize?response_type={...}&amp;client_id={...}&amp;redirect_uri={...}&amp;state={...}&amp;identity_provider={...}</code></p>
+
+<p>The value we use for the <code>response_type</code> parameter is <code>code</code>. What this does, once the user has authenticated with their social provider (defined by the <code>identity_provider</code> param), is redirect the user back to your service (specified via the <code>redirect_uri</code> param) and then your service is responsible for exchanging the code for the user&rsquo;s User Pool Tokens (see the following section on <a href="#jwts">JWTs</a>).</p>
+
+<p>The values you can assign to <code>identity_provider</code> are:</p>
+
+<ul>
+<li><code>Facebook</code></li>
+<li><code>Google</code></li>
+<li><code>LoginWithAmazon</code></li>
+</ul>
+
+<blockquote>
+<p>Note: if you were planning on handling authentication at a very low level (instead of an SDK), then for a User Pool login you would provide the value <code>COGNITO</code>.</p>
+</blockquote>
+
+<h3 id="overloading-the-state-parameter">Overloading the State Parameter</h3>
+
+<p>The <code>state</code> param is used for <a href="https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)" target="_blank">CSRF</a> protection, and is the only parameter that is persisted when the user is redirected to <code>redirect_uri</code>.</p>
+
+<p>A common problem for people using Cognito is that they need more than one redirect. In my case (see the earlier &lsquo;hosted ui&rsquo; architecture diagram) I need to redirect the signed-in user to an API service so we can handle the exchanging of the AWS &lsquo;code&rsquo; for the Cognito User Pool tokens before needing to then redirect the user back to our actual origin service.</p>
+
+<p>The only way we can do this is to overload the <code>state</code> param so it has a value like:</p>
+
+<p><code>state=123_redirect=https://www.example.com</code></p>
+
+<p>The value <code>123</code> is the nonce (for CSRF) and the <code>_</code> gives us a way to split the query param server-side to extract the secondary redirect endpoint.</p>
+
+<blockquote>
+<p>Note: it&rsquo;s recommended you do validation on that input (e.g. a whitelist of accepted URIs) so hackers can&rsquo;t manipulate the endpoint a user is sent to once they&rsquo;ve authenticated.</p>
+</blockquote>
+
+<h3 id="scope">Scope</h3>
+
+<p>One thing I stumbled across, and which took a while to figure out, was when I tried to call the <a href="https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_GlobalSignOut.html" target="_blank">GlobalSignOut</a> API operation.</p>
+
+<p>It worked fine for users authenticated against the Cognito User Pool, but not for users authenticated via their social provider.</p>
+
+<p>Turns out I needed to enable the right scope within the Cognito User Pool UI console (within &ldquo;App Integration -&gt; App Client Settings&rdquo;, and under &ldquo;Allowed OAuth Scopes&rdquo;): <code>aws.cognito.signin.user.admin</code> needed to be ticked.</p>
+
+<p>But also, when making the request to the Auth API endpoint (e.g. <code>/oauth2/authorize</code>), I needed to append a <code>scope</code> query parameter: <code>&amp;scope=scope=openid+aws.cognito.signin.user.admin</code>.</p>
+
+<blockquote>
+<p>See <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/authorization-endpoint.html" target="_blank">the API docs</a> and the <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-app-idp-settings.html" target="_blank">UI docs</a> for more information on the reasoning.</p>
+</blockquote>
+
+<h2 id="jwts">JWTs</h2>
+
+<p>When you exchange the cognito &lsquo;code&rsquo; for a user pool &lsquo;token&rsquo;, you&rsquo;ll actually be returned <em>three</em> tokens:</p>
+
+<ol>
+<li>ID token</li>
+<li>Access token</li>
+<li>Refresh token</li>
+</ol>
+
+<blockquote>
+<p>Note: see documentation for more details on <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-with-identity-providers.html" target="_blank">these three tokens</a>.</p>
+</blockquote>
+
+<p>The ID token provides details about the user, and the access token indicates the access allowed to that user&rsquo;s attributes stored within the Cognito User Pool.</p>
+
+<p>Both the ID token and access token will expire after one hour. To use them after that you&rsquo;ll need the refresh token to refresh the access/id tokens for another hour. The refresh token expires after 30 days.</p>
+
+<p>We use the ID token for verifying the user is authenticated, and we do this by passing the token to an internal service that verifies the token hasn&rsquo;t been manipulated by checking it against the AWS <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-with-identity-providers.html#amazon-cognito-identity-user-pools-using-id-and-access-tokens-in-web-api" target="_blank">JWK</a> that cryptographically signed the token.</p>
+
+<p>The JWK is a set of keys that are the public equivalent of the private keys used by AWS to digitally sign the tokens. We acquire these via a standard format endpoint:</p>
+
+<p><code>https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json.</code></p>
+
+<blockquote>
+<p>Note: the JWK&rsquo;s are rotated every 24hrs (approx), and so you need to ensure (if you&rsquo;re caching the response) your code gets a fresh copy of the JWK. You can check this by inspecting the <code>Cache-Control</code> header set on the JWK response.</p>
+</blockquote>
+
+<h2 id="api-limits">API Limits</h2>
+
+<p>One issue we stumbled across recently was the API limits, which meant we couldn&rsquo;t make any further API requests (and for an indeterminate amount of time) 🤔</p>
+
+<p>Seems there is a <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/limits.html" target="_blank">Cognito API limits</a> reference page, but it&rsquo;s still unclear how long you have to wait before you can start making requests again.</p>
+
+<h2 id="logout-issues">Logout Issues</h2>
+
+<p>AWS provides a <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/logout-endpoint.html" target="_blank"><code>/logout</code></a> endpoint that when visited allows a user to clear any session tracking AWS might have on their browser.</p>
+
+<p>This is different to the &lsquo;signout&rsquo; API functionality in that the user can call the <code>/logout</code> endpoint without any special tokens †</p>
+
+<blockquote>
+<p>Note: you have to provide quite specific query params (e.g. <code>client_id</code> and <code>logout_uri</code> &ndash; so AWS can redirect back to a pre-configured logout page that you host) and so it&rsquo;s likely you&rsquo;ll want to wrap that long and ugly URL within an <code>&lt;a href=''&gt;click to logout&lt;/a&gt;</code> link.</p>
+</blockquote>
+
+<p>This endpoint is useful because if you have a social user in your user pool, and you delete that user (something we would do regularly while we were testing in our stage environment), you would find that AWS is tracking your browser via session and so if you tried to sign-up or sign-in again using that same social user you would get an <code>invalid grant</code> exception back from AWS (this was <em>super</em> confusing behaviour and took a long time to figure out).</p>
+
+<p>So for our use case, we would have a social user (e.g. facebook or google) sign-in for the first time, Cognito would (once the user had authenticated with their social provider) automatically create a social user account in our user pool &hellip;BUT we have other post-processing steps and if any of those fail we want to delete the social user and tell the user what went wrong.</p>
+
+<p>But again, we <em>need</em> to now call the <code>/logout</code> endpoint so if that user decides they want to try and sign-up again they don&rsquo;t get a more confusing <code>invalid_grant</code> error message thrown at them (and we don&rsquo;t have to translate that message into something that shouldn&rsquo;t even be a concern for them in the first place).</p>
+
+<p>This brings us to the problem we have with the <code>/logout</code> endpoint&hellip;</p>
+
+<p>Our intention, for when we were getting an error from an AWS API operation, would be to catch the error, then make a request to <code>/logout</code> and have it redirect to a failure page we host (the redirection is a built-in feature that AWS provides via a <code>logout_uri</code> query param).</p>
+
+<p>Our <code>logout_uri</code> value (a URL) would itself have a query param specified of <code>err_msg=&lt;SOME_ERROR&gt;</code> so that our failure page could use that param to indicate the original error to the user. Problem was in Cognito you can only specify a logout url that matches what&rsquo;s predefined in your user pool.</p>
+
+<p>Meaning if we wanted to redirect to <code>https://example.com/failure?err_msg=foo</code> then that&rsquo;s exactly what needs to be defined in Cognito (even down to the query param). We didn&rsquo;t realise this and we only had <code>https://example.com/failure</code> defined as a valid <code>logout_uri</code>.</p>
+
+<p>To solve this issue we could have explicitly specified the <code>err_msg</code> param but we have lots of error types to handle and so it wasn&rsquo;t practical to list each and every variant URL.</p>
+
+<p>So to work around the fact that we can&rsquo;t specify a query param (because there are too many value variants to be practical for us to explicitly list all of them in the UI) we now catch the original API error and redirect the user to our failure page with the <code>err_msg</code> param passed so we can indicate the error back to the user.</p>
+
+<p>At this point we still need to call the AWS <code>/logout</code> endpoint so we can clear any session tracking. So along with the error message we display to the user, we also show a message to say we will redirect them automatically (via JavaScript) back to another part of our site in N seconds time (enough time for the user to read the error we&rsquo;re displaying).</p>
+
+<p>Before we redirect the user to that page we first redirect them to the AWS <code>/logout</code> endpoint, this time specifying our failure page as the value for the <code>logout_uri</code> query param but just without an <code>err_msg</code> query param provided.</p>
+
+<p>Our failure page is configured with a conditional check that says &ldquo;if an <code>err_msg</code> param is passed then show error page with the JS redirect to <code>/logout</code>, otherwise if no <code>err_msg</code> provided just immediately redirect to our <code>/signin</code> page&rdquo;.</p>
+
+<p>So that&rsquo;s how we&rsquo;re resolving this issue currently. It&rsquo;s not elegant for sure but it works.</p>
+
+<h2 id="other-concerns">Other Concerns?</h2>
+
+<p>It&rsquo;s worth me mentioning a few other concerns we had, the first of which wasn&rsquo;t directly related to Cognito but was specific to the system we were designing, and that was &lsquo;atomic operations&rsquo;.</p>
+
+<p>We had to make changes to Cognito and then sync some behaviours back to our legacy system. If there was a network (or other) fault then we needed both systems to be tolerant and to undo any data modifcations in case of failure.</p>
+
+<p>Other than that we would be storing off the JWT tokens we received from AWS into secure cookies (+Secure +HttpOnly attributes), and this caused us issues because our cookies needed to be scoped to the right domains to prevent overloading the HTTP request header limit.</p>
+
+<p>Due to the JWTs being large in size, and the fact that BuzzFeed has many services/properties for users to interact with, we noticed that some users would end up seeing a <code>400 Bad Request</code> caused by the large cookies. The routing services in front of these upstreams are generally nginx instances and so we would use <code>large_client_header_buffers</code> to allow an increased size until such a time we could figure out an appropriate solution.</p>
+
+<h2 id="which-is-the-right-solution">Which is the right solution?</h2>
+
+<p>The answer: it depends.</p>
+
+<p>For me the server-side solution made the most sense, and although difficult in the beginning (primarily due to documentation and general mis-understandings about the difference between User Pools and Identity Pools) we found it worked the best for our requirements, and gave us the most flexibility.</p>
+
+<h2 id="updated-architecture">Updated Architecture</h2>
+
+<p>If you&rsquo;re interested the updated architecture looked something like this&hellip;</p>
+
+<p><a href="../../assets/images/cognito-high-level-new-arch.png">
+  <img src="../../assets/images/cognito-high-level-new-arch.png">
+</a></p>
+
+<p>None of the listed services are public, they&rsquo;re all internal. The &ldquo;API Gateway&rdquo; is an internal tool that allows upstreams (such as the <code>buzzfeed_auth_api</code> to control concurrency and rate limiting) of downstream consumers (such as <code>buzzfeed_auth_ui</code> and <code>user_settings</code>).</p>
+
+<p>The reason we migrated certain &lsquo;user settings&rsquo; functionality out of our monolithic webapp and not other user features is because we only wanted to move behaviours that interacted with fields that needed sync&rsquo;ing between Cognito and our legacy datastore. As times goes on, we&rsquo;ll start to migrate more and more functionality out into separate services.</p>
+
+<h2 id="native-mobile-social-sign-ins">Native Mobile Social Sign-ins</h2>
+
+<p>We discovered that the social sign-in for native mobile apps doesn&rsquo;t work as well as the web SDK&rsquo;s. Mobile apps need to instead do things differently as their SDK&rsquo;s aren&rsquo;t as &lsquo;integrated&rsquo; like web.</p>
+
+<p><a href="../../assets/images/mobile-app-authentication-flow.png">
+  <img src="../../assets/images/mobile-app-authentication-flow.png">
+</a></p>
+
+<h2 id="user-pool-configuration">User Pool Configuration</h2>
+
+<p>As far as the User Pool is concerned you&rsquo;ll need a few things:</p>
+
+<blockquote>
+<p>Note: this is based on a server-side solution.</p>
+</blockquote>
+
+<ul>
+<li><p><strong>Application Client</strong>: this will generate a client &lsquo;id&rsquo; and &lsquo;secret&rsquo;, which your application(s) will need to use when making certain API calls †</p></li>
+
+<li><p><strong>Federated Identity Providers</strong>: this is where you tell Cognito about your social providers (facebook, google etc).</p></li>
+
+<li><p><strong>IAM User</strong>: some API calls require AWS credentials (access/secret key), so you&rsquo;ll need to create an IAM user and define the various Cognito APIs you want it to have access to.</p></li>
+</ul>
+
+<blockquote>
+<p>† even if you opt for the &lsquo;hosted ui&rsquo; solution, you&rsquo;ll still need an application client (for two reasons). Firstly you&rsquo;ll configure which &lsquo;providers&rsquo; you want your client app to support, and this will affect what the hosted ui will display to your users. Secondly, the client app id is used as part of the hosted ui uri; meaning you can have <em>different</em> hosted ui&rsquo;s (all configured slightly differently).</p>
+</blockquote>
+
+<h2 id="iam-user">IAM User</h2>
+
+<p>The IAM <em>user</em> is necessary as we have to provide some credentials to the <a href="https://boto3.readthedocs.io/en/latest/reference/services/cognito-idp.html" target="_blank">boto client</a> (<a href="https://boto3.readthedocs.io/en/latest/reference/core/boto3.html" target="_blank">boto</a> is the Python SDK) in order for it to make certain API calls. Below is an example of the code to instantiate a client:</p>
+
+<pre><code>client = boto3.client('cognito-idp', **{'aws_access_key_id': access_key,
+                                        'aws_secret_access_key': secret_key,
+                                        'region_name': region})
+</code></pre>
+
+<p>Notice the service name is <code>cognito-idp</code> and not <code>cognito-identity</code>. I mention this as the docs specify two different services &ldquo;CognitoIdentity&rdquo; and &ldquo;CognitoIdentityProvider&rdquo;, which when we were first learning about Cognito we presumed the latter &ldquo;CognitoIdentityProvider&rdquo; was something associated with Cognito Identity Pools.</p>
+
+<p>As we were only interested in the User Pool functionality, we found it strange that the small number of examples we found online all referenced <code>cognito-idp</code>.</p>
+
+<p>So we struggled for a bit to understand the difference, and although we used the &ldquo;CognitoIdentityProvider&rdquo; service (i.e. <code>cognito-idp</code>), we were confused for a long time as to why that was the case.</p>
+
+<p>Turns out that Cognito&rsquo;s &ldquo;User Pool&rdquo; is itself fundamentally a <em>identity provider</em> (idp), and because of that you can configure a &ldquo;Identity Pool&rdquo; to have a &ldquo;User Pool&rdquo; associated within it (along with more common external identity providers such as Facebook and Google).</p>
+
+<p>So with that understanding firmly in place, the fact the SDK uses <code>cognito-idp</code> for interacting with a User Pool makes total sense (because the User Pool <em>is</em> an &ldquo;idp&rdquo;), and the Identity Pool is just a tool for handling &ldquo;identities&rdquo; via many different providers (whether that be a User Pool or a social &lsquo;provider&rsquo; such as Facebook or Google), and so the SDK using <code>cognito-identity</code> for interating with AWS Identity Pools also makes perfect sense.</p>
+
+<p>It&rsquo;s the little details that can really make a difference to even the simplest aspects of using an SDK/API, and why Amazon&rsquo;s atrocious documentation is a real detriment to its users.</p>
+
+<h2 id="lambda-iam-role">Lambda IAM Role</h2>
+
+<p>Below is an example IAM role policy you can use for AWS Lambda (if you&rsquo;re using the hosted ui option and need lambda for logic processing):</p>
+
+<pre><code>{
+    &quot;Version&quot;: &quot;2012-10-17&quot;,
+    &quot;Statement&quot;: [
+        {
+            &quot;Effect&quot;: &quot;Allow&quot;,
+            &quot;Action&quot;: [
+                &quot;logs:CreateLogGroup&quot;,
+                &quot;logs:CreateLogStream&quot;,
+                &quot;logs:PutLogEvents&quot;
+            ],
+            &quot;Resource&quot;: &quot;arn:aws:logs:*:*:*&quot;
+        },
+        {
+            &quot;Effect&quot;: &quot;Allow&quot;,
+            &quot;Action&quot;: [
+                &quot;cognito-idp:AdminUpdateUserAttributes&quot;
+            ],
+            &quot;Resource&quot;: &quot;arn:aws:cognito-idp:us-east-1:{aws_account_id}:userpool/{user_pool_id}&quot;
+        }
+    ]
+}
+</code></pre>
+
+<p>It simply sets up CloudWatch logs access, and allows us (as an &lsquo;admin&rsquo;) to update user attributes within our User Pool.</p>
+
+<blockquote>
+<p>Note: if you&rsquo;re &lsquo;copying and pasting&rsquo;, don&rsquo;t forget to update <code>aws_account_id</code> and <code>user_pool_id</code> in the code snippet.</p>
+</blockquote>
+
+<h2 id="example-python-api-code">Example Python API code</h2>
+
+<p>This is a small slice of some Python code I wrote for abstracting away the API interactions with Cognito. Some readers might find it useful for understanding parts of Cognito (apologies if it&rsquo;s a bit ambiguous, as it&rsquo;s taken out of context).</p>
+
+<pre><code># standard library modules
+
+import json
+import re
+from functools import reduce
+from typing import Dict, List, Optional, Tuple
+
+# application modules
+
+import app.exceptions as exceptions
+import app.network
+import app.security
+
+# external modules
+
+from bf_auth.utility import extract_status_code, instr_exc
+
+import boto3
+from botocore.exceptions import ClientError
+
+# configuration
+
+aws_access_key = config.get('aws_application_access_key')
+aws_region = config.get('cognito_region')
+aws_secret_key = config.get('aws_application_secret_key')
+client_id = config.get('app_client_id')
+client_secret = config.get('app_secret_key')
+cognito_domain = config.get('cognito_domain')
+default_redirect = config.get('default_redirect')
+credentials = {'aws_access_key_id': aws_access_key, 'aws_secret_access_key': aws_secret_key, 'region_name': aws_region}
+sdk = boto3.client('cognito-idp', **credentials)
+user_pool_id = config.get('cognito_user_pool_id')
+user_pool_jwk = f'https://cognito-idp.{aws_region}.amazonaws.com/{user_pool_id}/.well-known/jwks.json'
+
+
+def attr_adapter(attributes: dict) -&gt; List[Dict[str, str]]:
+    &quot;&quot;&quot;Convert dictionary into a Cognito compatible structure.&quot;&quot;&quot;
+    return [{'Name': key, 'Value': value} for key, value in attributes.items()]
+
+
+def create_user(username: str,
+                password: str,
+                verified: bool,
+                email: str,
+                user_info_id: str) -&gt; Optional[dict]:
+    &quot;&quot;&quot;Create the user, then authenticate them to acquire their tokens.
+
+    If the record is created successfully, we'll return user tokens.
+
+    We use the 'Server Side Authentication Flow' for authenticating and
+    migrating users with Cognito (this means no need for generating an SRP)
+
+    Documentation:
+    https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminCreateUser.html
+    https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminInitiateAuth.html
+    https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminRespondToAuthChallenge.html
+    &quot;&quot;&quot;
+
+    # default to forcing user to validate
+    message_action = {}  # type: ignore
+    cognito_password = app.security.random()
+    user_verified = False
+
+    if verified:
+        message_action = {'MessageAction': 'SUPPRESS'}
+        cognito_password = password
+        user_verified = True
+
+    attributes = {'email': email,
+                  'email_verified': str(verified).lower(),
+                  'custom:user_info_id': str(user_info_id)}
+
+    cognito_attributes = attr_adapter(attributes)
+
+    # we use admin_create_user so that we can choose to either suppress or
+    # trigger the sending of a 'verify your account' email.
+    #
+    # but in using this api call, cognito requires us to set a temporary
+    # password for the user.
+    #
+    # so in the case of a verified user we set their password to their actual
+    # password (so they notice no difference), where as with an unverified user
+    # we will generate them a random password as they'll then reset that
+    # password when cognito sends them the account verification email.
+    try:
+        sdk.admin_create_user(**{'UserPoolId': user_pool_id,
+                                 'UserAttributes': cognito_attributes,
+                                 'Username': username,
+                                 'TemporaryPassword': cognito_password,
+                                 **message_action})
+
+    except Exception as exc:
+        msg = 'USER_CREATE_FAILED'
+        instr_exc(exc, msg,
+                  metric_name='create.user',
+                  context='normal',
+                  scope='cognito',
+                  state='failed',
+                  verified=user_verified,
+                  user_info_id=user_info_id)
+        raise exceptions.CognitoException(msg, code=extract_status_code(exc))
+
+    # also for a verified user we'll try to authenticate and acquire their user
+    # pool tokens, which will be returned to the caller of this function.
+    if user_verified:
+        auth_params = {'USERNAME': username,
+                       'PASSWORD': password,
+                       'SECRET_HASH': app.security.hash(username)}
+
+        challenge_responses = {'USERNAME': username,
+                               'NEW_PASSWORD': password,
+                               'SECRET_HASH': auth_params['SECRET_HASH']}
+
+        try:
+            auth_response = sdk.admin_initiate_auth(UserPoolId=user_pool_id,
+                                                    ClientId=client_id,
+                                                    AuthFlow='ADMIN_NO_SRP_AUTH',
+                                                    AuthParameters=auth_params)
+
+            challenge_name = auth_response.get('ChallengeName')
+            session = auth_response.get('Session')
+
+            response = sdk.admin_respond_to_auth_challenge(UserPoolId=user_pool_id,
+                                                           ClientId=client_id,
+                                                           ChallengeName=challenge_name,
+                                                           ChallengeResponses=challenge_responses,
+                                                           Session=session)
+
+            result = response.get('AuthenticationResult', {})
+            tokens = {'id_token': result.get('IdToken'),
+                      'access_token': result.get('AccessToken'),
+                      'refresh_token': result.get('RefreshToken'),
+                      'token_type': result.get('TokenType')}
+
+            return tokens
+        except Exception as exc:
+            msg = 'USER_AUTH_FAILED'
+            instr_exc(exc, msg,
+                      metric_name='create.user',
+                      context='normal',
+                      scope='cognito',
+                      state='failed',
+                      verified=user_verified,
+                      user_info_id=user_info_id)
+            raise exceptions.CognitoException(msg, code=extract_status_code(exc))
+
+    # if we haven't returned some tokens already, then that means we
+    # successfully created a cognito account for an unverified user, and now we
+    # can raise the relevant exception that will be served back to the
+    # application JS to handle (i.e. display a message to the user)
+    msg = 'USER_MIGRATE_UNVERIFIED'
+    gen_exc = exceptions.CognitoException(msg, code=201)
+    raise gen_exc
+
+
+def delete_user(username) -&gt; bool:
+    &quot;&quot;&quot;Delete user record associated with the given username.
+
+    If the record is deleted successfully, we'll return True.
+
+    Documentation:
+    https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminDeleteUser.html
+    &quot;&quot;&quot;
+
+    try:
+        sdk.admin_delete_user(**{'UserPoolId': user_pool_id,
+                                 'Username': username})
+
+    except ClientError as exc:
+        error = exc.response.get('Error', {})
+        error_code = error.get('Code')
+
+        msg = 'USER_DELETE_FAILED'
+        exc_tags = {'metric_name': 'user.delete',
+                    'state': 'failed',
+                    'scope': 'cognito'}
+
+        if error_code == 'UserNotFoundException':
+            instr_exc(exc, msg, **exc_tags)
+            raise exceptions.CognitoException(msg, code=404)
+        else:
+            instr_exc(exc, msg, **exc_tags)
+            raise exceptions.CognitoException(msg, code=extract_status_code(exc))
+
+    except Exception as exc:
+        msg = 'USER_DELETE_FAILED'
+        exc_tags = {'metric_name': 'user.delete',
+                    'state': 'failed',
+                    'scope': 'cognito'}
+        instr_exc(exc, msg, **exc_tags)
+        raise exceptions.CognitoException(msg, code=extract_status_code(exc))
+
+    return True
+
+
+@app.network.cache
+async def get_keys(endpoint=user_pool_jwk) -&gt; dict:
+    &quot;&quot;&quot;Retrieve JWK (for verifying tokens).
+
+    If successful we return a dict consisting of the cache-control response
+    header value and the actual list of JWKs.
+
+    If unsuccessful we return the standard dictionary error format.
+    &quot;&quot;&quot;
+
+    response = await app.network.http_client.fetch(endpoint)
+    cache_control = response.headers.get('Cache-Control')
+
+    match = re.search(r'max-age=(\d+)', cache_control)
+
+    if not match or response.code != 200:
+        msg = 'JWK_RESPONSE_INVALID'
+        gen_exc = exceptions.AsyncFetchException(msg, code=response.code)
+        instr_exc(gen_exc, msg, cache_control=cache_control, scope='cognito')
+        raise gen_exc
+
+    try:
+        response_data = json.loads(response.body)
+    except Exception as exc:
+        msg = 'JSON_PARSING_FAILED'
+        instr_exc(exc, msg, endpoint=endpoint, body=response.body, scope='cognito')
+        return {'state': 'error',
+                'code': 500,
+                'message': msg}
+
+    return {'state': 'success',
+            'cache_control': match.group(1),
+            'response_body': response_data.get('keys', [])}
+
+
+async def get_key(kid: str) -&gt; str:
+    &quot;&quot;&quot;Extract signing key from JWK (for verifying tokens).&quot;&quot;&quot;
+
+    response = await get_keys()
+    keys = response.get('response_body')
+    key = list(filter(lambda x: x.get('kid') == kid, keys))
+
+    if len(key) &lt; 1:
+        raise exceptions.NoJWK('JWK_FILTER_FAILED')
+
+    return key[0]
+
+
+def global_signout(access_token) -&gt; bool:
+    &quot;&quot;&quot;Sign out user from all devices.
+
+    If the user is signed out successfully, we'll return True.
+
+    Documentation:
+    https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_GlobalSignOut.html
+    &quot;&quot;&quot;
+
+    try:
+        sdk.global_sign_out(AccessToken=access_token)
+    except Exception as exc:
+        msg = 'USER_GLOBAL_SIGNOUT_FAILED'
+        instr_exc(exc, msg, metric_name='user.global_signout.failed', scope='cognito')
+        raise exceptions.CognitoException(msg, code=extract_status_code(exc))
+
+    return True
+
+
+def admin_signout(username) -&gt; bool:
+    &quot;&quot;&quot;Sign out user from all devices as an administrator.
+
+    If the user is signed out successfully, we'll return True.
+
+    Documentation:
+    https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminUserGlobalSignOut.html
+    &quot;&quot;&quot;
+
+    try:
+        sdk.admin_user_global_sign_out(**{'UserPoolId': user_pool_id,
+                                          'Username': username})
+    except Exception as exc:
+        msg = 'USER_SIGNOUT_FAILED'
+        instr_exc(exc, msg, metric_name='user.signout.failed', scope='cognito')
+        raise exceptions.CognitoException(msg, code=extract_status_code(exc))
+
+    return True
+
+
+def get_attribute(key, user_attrs) -&gt; Optional[str]:
+    &quot;&quot;&quot;Recursively search user attributes for given key.&quot;&quot;&quot;
+
+    return reduce(lambda x, y: x if x.get('Name') == key else y, user_attrs)
+
+
+async def exchange_code_for_tokens(code, redirect_host, code_verifier=None) -&gt; dict:
+    &quot;&quot;&quot;Exchange the Facebook/Google authorization code for user tokens.
+
+    Documentation:
+    https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html
+
+    Example response:
+
+    {
+      &quot;access_token&quot;:&quot;123&quot;,
+      &quot;refresh_token&quot;:&quot;456&quot;,
+      &quot;id_token&quot;:&quot;789&quot;,
+      &quot;token_type&quot;:&quot;Bearer&quot;,
+      &quot;expires_in&quot;:3600
+    }
+    &quot;&quot;&quot;
+
+    # Note: the `redirect_uri` field isn't used for redirecting, but for verification.
+    # the value needs to match what is configured within the allowed cognito
+    # callback endpoints
+    data = {'code': code,
+            'grant_type': 'authorization_code',
+            'client_id': client_id,
+            'redirect_uri': f'{redirect_host}/auth/signin/callback'}
+
+    if code_verifier:
+        data['code_verifier'] = code_verifier
+
+    metric_tags = {'metric_tags': {'scope': 'cognito', 'context': 'social', 'name': 'token_exchange'}}
+    endpoint = f'{cognito_domain}/oauth2/token'
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+    response = await app.network.fetch(endpoint, post_data=data,
+                                       headers=headers,
+                                       auth_username=client_id,
+                                       auth_password=client_secret,
+                                       **metric_tags)
+
+    if response.get('state') == 'error':
+        gen_exc = exceptions.AsyncFetchException(response.get('message'),
+                                                 code=response.get('code'))
+        raise gen_exc
+
+    return response
+
+
+async def resend_confirmation_code(username) -&gt; bool:
+    &quot;&quot;&quot;Resend account confirmation email
+
+    Documentation:
+    https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ResendConfirmationCode.html
+    &quot;&quot;&quot;
+
+    try:
+        sdk.resend_confirmation_code(**{'ClientId': client_id,
+                                        'SecretHash': app.security.hash(username),
+                                        'Username': username})
+    except Exception as exc:
+        msg = 'CONFIRMATION_RESEND_FAILED'
+        instr_exc(exc, msg, metric_name='user.confirmation_resend.failed', scope='cognito')
+        return False
+
+    return True
+</code></pre>
+
+<h2 id="example-cognito-app-settings">Example Cognito App Settings</h2>
+
+<p>This isn&rsquo;t meant to be an exhaustive example, but it gives you an idea of some of the configuration you&rsquo;ll need.</p>
+
+<ul>
+<li><p><strong>Callback URL(s)</strong>:<br>
+<a href="https://auth-api.example.com/auth/signin/callback" target="_blank">https://auth-api.example.com/auth/signin/callback</a></p></li>
+
+<li><p><strong>Sign out URL(s)</strong>:<br>
+<a href="https://auth-api.example.com/auth/signout" target="_blank">https://auth-api.example.com/auth/signout</a></p></li>
+
+<li><p><strong>Allowed OAuth Flows</strong>:<br>
+Authorization code grant<br>
+Implicit grant</p></li>
+
+<li><p><strong>Allowed OAuth Scopes</strong>:<br>
+email<br>
+openid<br>
+profile<br>
+aws.cognito.signin.user.admin</p></li>
+</ul>
+
+<h2 id="example-cognito-user-pool-federation-identity-providers">Example Cognito User Pool &ldquo;Federation: Identity Providers&rdquo;</h2>
+
+<p>For each provider there is a &ldquo;Authorize Scope&rdquo; section.</p>
+
+<ul>
+<li><p><strong>Facebook</strong>:<br>
+public_profile,email</p></li>
+
+<li><p><strong>Google</strong>:<br>
+profile email openid</p></li>
+</ul>
+
+<h3 id="facebook-attribute-mappings">Facebook Attribute Mappings</h3>
+
+<ul>
+<li>fb: <code>id</code> &ndash;&gt; user_pool: <code>Username</code></li>
+<li>fb: <code>email</code> &ndash;&gt; user_pool: <code>Email</code></li>
+<li>fb: <code>name</code> &ndash;&gt; user_pool: <code>Name</code></li>
+</ul>
+
+<h3 id="google-attribute-mappings">Google Attribute Mappings</h3>
+
+<ul>
+<li>google: <code>email</code> &ndash;&gt; user_pool: <code>Email</code></li>
+<li>google: <code>name</code> &ndash;&gt; user_pool: <code>Name</code></li>
+<li>google: <code>sub</code> &ndash;&gt; user_pool: <code>Username</code></li>
+</ul>
+
+<h2 id="example-facebook-app-configuration">Example Facebook App Configuration</h2>
+
+<p><a href="https://developers.facebook.com/apps" target="_blank">https://developers.facebook.com/apps</a></p>
+
+<ul>
+<li><p><strong>App Domains</strong>:<br>
+<a href="https://your-organisation.auth.us-east-1.amazoncognito.com" target="_blank">https://your-organisation.auth.us-east-1.amazoncognito.com</a></p></li>
+
+<li><p><strong>Privacy Policy URL</strong>:<br>
+<a href="https://www.example.com/about/privacy" target="_blank">https://www.example.com/about/privacy</a></p></li>
+
+<li><p><strong>Site URL</strong>:<br>
+<a href="https://your-organisation.auth.us-east-1.amazoncognito.com/oauth2/idpresponse" target="_blank">https://your-organisation.auth.us-east-1.amazoncognito.com/oauth2/idpresponse</a></p></li>
+</ul>
+
+<h3 id="product-added-facebook-login">Product Added: &ldquo;Facebook Login&rdquo;</h3>
+
+<ul>
+<li><p><strong>Client OAuth Login</strong>:<br>
+Yes</p></li>
+
+<li><p><strong>Web OAuth Login</strong>:<br>
+Yes</p></li>
+
+<li><p><strong>Enforce HTTPS</strong>:<br>
+Yes</p></li>
+
+<li><p><strong>Valid OAuth Redirect URIs</strong>:<br>
+<a href="https://your-organisation.auth.us-east-1.amazoncognito.com/oauth2/idpresponse" target="_blank">https://your-organisation.auth.us-east-1.amazoncognito.com/oauth2/idpresponse</a>
+<a href="https://auth-api.example.com/auth/signin/callback" target="_blank">https://auth-api.example.com/auth/signin/callback</a></p></li>
+</ul>
+
+<h2 id="example-google-app-configuration">Example Google App Configuration</h2>
+
+<p><a href="https://console.developers.google.com/" target="_blank">https://console.developers.google.com/</a></p>
+
+<ul>
+<li><p><strong>Enabled API(s)</strong>:<br>
+Google+ API</p></li>
+
+<li><p><strong>Credentials Type</strong>:<br>
+OAuth client ID</p></li>
+
+<li><p><strong>Application Type</strong>:<br>
+Web application</p></li>
+
+<li><p><strong>Authorized JavaScript origins</strong>:<br>
+<a href="https://your-organisation.auth.us-east-1.amazoncognito.com" target="_blank">https://your-organisation.auth.us-east-1.amazoncognito.com</a></p></li>
+
+<li><p><strong>Authorized redirect URIs</strong>:<br>
+<a href="https://your-organisation.auth.us-east-1.amazoncognito.com/oauth2/idpresponse" target="_blank">https://your-organisation.auth.us-east-1.amazoncognito.com/oauth2/idpresponse</a>
+<a href="https://auth-api.example.com/auth/signin/callback" target="_blank">https://auth-api.example.com/auth/signin/callback</a></p></li>
+</ul>
+
+<h2 id="terraform-example">Terraform Example</h2>
+
+<pre><code># Examples for Cognito User Pools can be found here:
+# https://github.com/terraform-providers/terraform-provider-aws/blob/master/examples/cognito-user-pool/main.tf
+
+####################################################
+# main.tf
+####################################################
+
+# TODO: split this file up into separate modules
+# e.g.
+#
+# user_pool/
+# identity_pool/
+
+provider &quot;aws&quot; {
+  region = &quot;${var.aws_region}&quot;
+
+  assume_role {
+    role_arn = &quot;${var.aws_role_arn}&quot;
+  }
+}
+
+resource &quot;aws_cognito_user_pool&quot; &quot;pool&quot; {
+  name = &quot;${var.environment}_${var.name}_user_pool&quot;
+
+  alias_attributes         = [&quot;email&quot;, &quot;preferred_username&quot;, &quot;phone_number&quot;]
+  auto_verified_attributes = [&quot;email&quot;, &quot;phone_number&quot;]
+
+  admin_create_user_config {
+    allow_admin_create_user_only = false
+  }
+
+  # container for the AWS Lambda triggers associated with the user pool.
+  # https://www.terraform.io/docs/providers/aws/r/cognito_user_pool.html#lambda-configuration
+  lambda_config {
+    custom_message = &quot;${aws_lambda_function.custom_message_lambda.arn}&quot;
+  }
+
+  mfa_configuration = &quot;OPTIONAL&quot;
+
+  sms_configuration {
+    external_id    = &quot;${var.environment}_${var.name}_sns_external_id&quot;
+    sns_caller_arn = &quot;${aws_iam_role.cognito_sns_role.arn}&quot;
+  }
+
+  password_policy {
+    minimum_length    = 6
+    require_lowercase = false
+    require_numbers   = false
+    require_symbols   = false
+    require_uppercase = false
+  }
+
+  /*
+  # email was a required field, but it ended up causing issues for any social
+  # users whose identity is actually their mobile number. So to avoid problems
+  # authenticating those users, we no longer require an email to be provided.
+  schema {
+    name                     = &quot;email&quot;
+    attribute_data_type      = &quot;String&quot;
+    developer_only_attribute = false
+    mutable                  = true
+    required                 = true
+
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 2048
+    }
+  }
+  */
+
+  schema {
+    name                     = &quot;some_custom_attribute&quot;
+    attribute_data_type      = &quot;Number&quot;
+    developer_only_attribute = false
+    mutable                  = true
+    required                 = false
+
+    number_attribute_constraints {
+      min_value = 1
+      max_value = 50000000
+    }
+  }
+  tags {
+    &quot;environment&quot; = &quot;${var.environment}&quot;
+    &quot;service&quot;     = &quot;${var.name}&quot;
+  }
+  depends_on = [
+    &quot;aws_iam_role.cognito_sns_role&quot;,
+  ]
+}
+
+resource &quot;aws_cognito_user_pool_client&quot; &quot;pool_client&quot; {
+  # Federation &gt; Identity providers
+  depends_on = [
+    &quot;aws_cognito_identity_provider.facebook_provider&quot;,
+    &quot;aws_cognito_identity_provider.google_provider&quot;,
+  ]
+
+  # General settings &gt; App clients
+  user_pool_id           = &quot;${aws_cognito_user_pool.pool.id}&quot;
+  name                   = &quot;${var.environment}_${var.name}_user_pool_client&quot;
+  generate_secret        = true
+  refresh_token_validity = 30
+  explicit_auth_flows    = [&quot;ADMIN_NO_SRP_AUTH&quot;, &quot;USER_PASSWORD_AUTH&quot;]
+
+  # this flag is automatically set to true when creating the user pool using the AWS console.
+  # however, when creating the user pool using Terraform, this flag needs to be set explicitly.
+  allowed_oauth_flows_user_pool_client = true
+
+  # issue: https://github.com/terraform-providers/terraform-provider-aws/issues/4476
+  read_attributes  = [&quot;email&quot;, &quot;preferred_username&quot;, &quot;profile&quot;, &quot;custom:some_custom_attribute&quot;]
+  write_attributes = [&quot;email&quot;, &quot;preferred_username&quot;, &quot;profile&quot;, &quot;custom:some_custom_attribute&quot;]
+
+  # App integration &gt; App client settings
+  supported_identity_providers = [&quot;COGNITO&quot;, &quot;Facebook&quot;, &quot;Google&quot;]
+  callback_urls                = &quot;${var.callback_urls}&quot;
+  logout_urls                  = &quot;${var.logout_urls}&quot;
+  allowed_oauth_flows          = [&quot;code&quot;]
+
+  allowed_oauth_scopes = [
+    &quot;aws.cognito.signin.user.admin&quot;,
+    &quot;email&quot;,
+    &quot;openid&quot;,
+    &quot;profile&quot;,
+  ]
+}
+
+# aws cert configured in certs.tf
+resource &quot;aws_cognito_user_pool_domain&quot; &quot;pool_domain&quot; {
+  domain          = &quot;${var.domain}.${var.root_domain}&quot;
+  certificate_arn = &quot;${aws_acm_certificate.certificate.arn}&quot;
+  user_pool_id    = &quot;${aws_cognito_user_pool.pool.id}&quot;
+}
+
+# bug in https://github.com/terraform-providers/terraform-provider-aws/issues/4807 that keep showing changes in plan
+resource &quot;aws_cognito_identity_provider&quot; &quot;google_provider&quot; {
+  user_pool_id  = &quot;${aws_cognito_user_pool.pool.id}&quot;
+  provider_name = &quot;Google&quot;
+  provider_type = &quot;Google&quot;
+
+  provider_details {
+    authorize_scopes = &quot;profile email openid&quot;
+    client_id        = &quot;${var.google_provider_client_id}&quot;
+    client_secret    = &quot;${var.google_provider_client_secret}&quot;
+  }
+
+  attribute_mapping {
+    username = &quot;sub&quot;
+    email    = &quot;email&quot;
+  }
+}
+
+# bug in https://github.com/terraform-providers/terraform-provider-aws/issues/4807 that keep showing changes in plan
+resource &quot;aws_cognito_identity_provider&quot; &quot;facebook_provider&quot; {
+  user_pool_id  = &quot;${aws_cognito_user_pool.pool.id}&quot;
+  provider_name = &quot;Facebook&quot;
+  provider_type = &quot;Facebook&quot;
+
+  provider_details {
+    authorize_scopes = &quot;public_profile,email&quot;
+    client_id        = &quot;${var.facebook_provider_client_id}&quot;
+    client_secret    = &quot;${var.facebook_provider_client_secret}&quot;
+  }
+
+  attribute_mapping {
+    username = &quot;id&quot;
+    email    = &quot;email&quot;
+  }
+}
+
+# The identity pool(s) are used by our mobile apps, and allows them to authenticate
+# their users via our Cognito 'user pool'.
+#
+# Note: we're not sure if we need to configure anything else in facebook/google ui's?
+#       we're also not sure what `server_side_token_check` (set below) really means.
+resource &quot;aws_cognito_identity_pool&quot; &quot;apps_identity_pool&quot; {
+  identity_pool_name               = &quot;${var.environment}_${var.name}_identity_pool&quot;
+  allow_unauthenticated_identities = false
+
+  cognito_identity_providers {
+    client_id               = &quot;${aws_cognito_user_pool_client.pool_client.id}&quot;
+    provider_name           = &quot;cognito-idp.us-east-1.amazonaws.com/${aws_cognito_user_pool.pool.id}&quot;
+    server_side_token_check = false
+  }
+
+  supported_login_providers {
+    &quot;graph.facebook.com&quot;  = &quot;${var.facebook_provider_client_id}&quot;
+    &quot;accounts.google.com&quot; = &quot;${var.google_provider_client_id}&quot;
+  }
+
+  depends_on = [
+    &quot;aws_cognito_user_pool.pool&quot;,
+  ]
+}
+
+# an identity pool (used by mobile apps) requires a role to be assigned to both
+# authenticated and unauthenticated access (even if the identity pool is configured
+# to not allow unauthenticated access, it still requires a role to be assigned)
+#
+# https://www.terraform.io/docs/providers/aws/r/cognito_identity_pool_roles_attachment.html
+resource &quot;aws_iam_role&quot; &quot;apps_identity_pool_authenticated&quot; {
+  name = &quot;${var.environment}_${var.name}_identitypool_authenticated&quot;
+
+  assume_role_policy = &lt;&lt;EOF
+{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: {
+        &quot;Federated&quot;: &quot;cognito-identity.amazonaws.com&quot;
+      },
+      &quot;Action&quot;: &quot;sts:AssumeRoleWithWebIdentity&quot;,
+      &quot;Condition&quot;: {
+        &quot;StringEquals&quot;: {
+          &quot;cognito-identity.amazonaws.com:aud&quot;: &quot;${aws_cognito_identity_pool.apps_identity_pool.id}&quot;
+        },
+        &quot;ForAnyValue:StringLike&quot;: {
+          &quot;cognito-identity.amazonaws.com:amr&quot;: &quot;authenticated&quot;
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource &quot;aws_iam_role&quot; &quot;apps_identity_pool_unauthenticated&quot; {
+  name = &quot;${var.environment}_${var.name}_identitypool_unauthenticated&quot;
+
+  assume_role_policy = &lt;&lt;EOF
+{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: {
+        &quot;AWS&quot;: &quot;arn:aws:iam::000000000000:root&quot;
+      },
+      &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
+      &quot;Condition&quot;: {
+        &quot;Bool&quot;: {
+          &quot;aws:MultiFactorAuthPresent&quot;: &quot;true&quot;
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+# we can then attach additional policies to each identity pool role
+resource &quot;aws_iam_role_policy&quot; &quot;apps_identity_pool_authenticated&quot; {
+  name = &quot;${var.environment}_${var.name}_identitypool_authenticated_policy&quot;
+  role = &quot;${aws_iam_role.apps_identity_pool_authenticated.id}&quot;
+
+  policy = &lt;&lt;EOF
+{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Action&quot;: [
+        &quot;mobileanalytics:PutEvents&quot;,
+        &quot;cognito-sync:*&quot;,
+        &quot;cognito-identity:*&quot;
+      ],
+      &quot;Resource&quot;: [
+        &quot;*&quot;
+      ]
+    }
+  ]
+}
+EOF
+}
+
+# we don't allow unauthenticated access, so just set all actions to be denied
+resource &quot;aws_iam_role_policy&quot; &quot;apps_identity_pool_unauthenticated&quot; {
+  name = &quot;${var.environment}_${var.name}_identitypool_unauthenticated_policy&quot;
+  role = &quot;${aws_iam_role.apps_identity_pool_unauthenticated.id}&quot;
+
+  policy = &lt;&lt;EOF
+{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Deny&quot;,
+      &quot;Action&quot;: [
+        &quot;*&quot;
+      ],
+      &quot;Resource&quot;: [
+        &quot;*&quot;
+      ]
+    }
+  ]
+}
+EOF
+}
+
+# finally, we can attach our roles to our identity pools
+resource &quot;aws_cognito_identity_pool_roles_attachment&quot; &quot;apps_identity_pool_role_attachment&quot; {
+  identity_pool_id = &quot;${aws_cognito_identity_pool.apps_identity_pool.id}&quot;
+
+  roles {
+    &quot;authenticated&quot;   = &quot;${aws_iam_role.apps_identity_pool_authenticated.arn}&quot;
+    &quot;unauthenticated&quot; = &quot;${aws_iam_role.apps_identity_pool_unauthenticated.arn}&quot;
+  }
+}
+
+/*
+We originally had this policy inlined within the the below iam role,
+but then discovered it caused a cyclic reference...
+
+aws_cognito_user_pool -&gt; aws_lambda_function -&gt; aws_iam_role &lt;BOOM!&gt; -&gt; aws_cognito_user_pool
+
+So to avoid that we could have made the policy not depend on that
+specific user pool resource, using: &quot;arn:aws:cognito-idp:*:*:*&quot;
+but we opted to create a separate policy, which we then attach to
+the existing role, and tell the policy it can't be attached until
+the user pool has been created.
+*/
+resource &quot;aws_iam_role_policy&quot; &quot;cognito_lambda_policy&quot; {
+  depends_on = [
+    &quot;aws_cognito_user_pool.pool&quot;,
+  ]
+
+  name = &quot;send_user_email_policy&quot;
+  role = &quot;${aws_iam_role.iam_for_lambda.id}&quot;
+
+  policy = &lt;&lt;EOF
+{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Action&quot;: [
+        &quot;logs:CreateLogGroup&quot;,
+        &quot;logs:CreateLogStream&quot;,
+        &quot;logs:PutLogEvents&quot;
+      ],
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Resource&quot;: &quot;arn:aws:logs:*:*:*&quot;
+    },
+    {
+      &quot;Action&quot;: [
+        &quot;cognito-idp:AdminUpdateUserAttributes&quot;
+      ],
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Resource&quot;: &quot;${aws_cognito_user_pool.pool.arn}&quot;
+    }
+  ]
+}
+EOF
+}
+
+resource &quot;aws_iam_role&quot; &quot;iam_for_lambda&quot; {
+  name = &quot;${var.environment}_${var.name}_sendUserEmailLambdaRole&quot;
+
+  assume_role_policy = &lt;&lt;EOF
+{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
+      &quot;Principal&quot;: {
+        &quot;Service&quot;: &quot;lambda.amazonaws.com&quot;
+      },
+      &quot;Effect&quot;: &quot;Allow&quot;
+    }
+  ]
+}
+EOF
+}
+
+data &quot;archive_file&quot; &quot;generate_custom_message_lambda&quot; {
+  type        = &quot;zip&quot;
+  source_dir  = &quot;${path.module}/source/&quot;
+  output_path = &quot;lambda.zip&quot;
+}
+
+resource &quot;aws_lambda_function&quot; &quot;custom_message_lambda&quot; {
+  filename         = &quot;lambda.zip&quot;
+  function_name    = &quot;${var.environment}_${var.name}_customMessages&quot;
+  role             = &quot;${aws_iam_role.iam_for_lambda.arn}&quot;
+  handler          = &quot;custom_message.lambda_handler&quot;
+  source_code_hash = &quot;${data.archive_file.generate_custom_message_lambda.output_base64sha256}&quot;
+  runtime          = &quot;python3.6&quot;
+}
+
+# this resource allows lambda to be invoked by our user pool and tripped us up initially because
+# it is automatically applied when setting up the lambda trigger in the AWS console.
+# however, when creating the lambda trigger via Terraform, this needs to be set explicitly.
+resource &quot;aws_lambda_permission&quot; &quot;allow_cognito&quot; {
+  statement_id  = &quot;AllowExecutionFromCognito&quot;
+  action        = &quot;lambda:InvokeFunction&quot;
+  function_name = &quot;${aws_lambda_function.custom_message_lambda.function_name}&quot;
+  principal     = &quot;cognito-idp.amazonaws.com&quot;
+  source_arn    = &quot;${aws_cognito_user_pool.pool.arn}&quot;
+}
+
+####################################################
+# certs.tf
+####################################################
+
+resource &quot;aws_acm_certificate&quot; &quot;certificate&quot; {
+  domain_name       = &quot;${var.domain}.${var.root_domain}&quot;
+  validation_method = &quot;DNS&quot;
+
+  tags {
+    &quot;environment&quot; = &quot;${var.environment}&quot;
+    &quot;service&quot;     = &quot;${var.name}&quot;
+  }
+}
+
+####################################################
+# outputs.tf
+####################################################
+
+output &quot;user_pool_id&quot; {
+  value = &quot;${aws_cognito_user_pool.pool.id}&quot;
+}
+
+output &quot;user_pool_arn&quot; {
+  value = &quot;${aws_cognito_user_pool.pool.arn}&quot;
+}
+
+output &quot;user_pool_client_id&quot; {
+  value = &quot;${aws_cognito_user_pool_client.pool_client.id}&quot;
+}
+
+output &quot;user_pool_client_secret&quot; {
+  // this is only shown at creation
+  value = &quot;${aws_cognito_user_pool_client.pool_client.client_secret}&quot;
+}
+
+output &quot;app_user_name&quot; {
+  value = &quot;${aws_iam_user.cognito_app_user.name}&quot;
+}
+
+output &quot;app_user_arn&quot; {
+  value = &quot;${aws_iam_user.cognito_app_user.arn}&quot;
+}
+
+output &quot;acm_certificate_arn&quot; {
+  value = &quot;${aws_acm_certificate.certificate.arn}&quot;
+}
+
+output &quot;acm_certificate_domain_name&quot; {
+  value = &quot;${aws_acm_certificate.certificate.domain_name}&quot;
+}
+
+output &quot;acm_certificate_domain_validation_options&quot; {
+  value = &quot;${aws_acm_certificate.certificate.domain_validation_options}&quot;
+}
+
+####################################################
+# required.tf
+####################################################
+
+terraform {
+  # No value within the terraform block can use interpolations. 
+  # The terraform block is loaded very early in the execution of Terraform and interpolations are not yet available.
+  required_version = &quot;0.10.7&quot;
+}
+
+####################################################
+# service_iam.tf
+####################################################
+
+resource &quot;aws_iam_group&quot; &quot;cognito_app_group&quot; {
+  name = &quot;${var.environment}_${var.name}_group&quot;
+}
+
+resource &quot;aws_iam_user&quot; &quot;cognito_app_user&quot; {
+  name = &quot;${var.environment}_${var.name}_user&quot;
+}
+
+# note:
+# we don't also create an 'aws_iam_access_key' resource
+# because we don't want the access key to be committed
+# 
+# so we manually create access/secret keys via the console
+
+resource &quot;aws_iam_user_group_membership&quot; &quot;cognito_app_user_groups&quot; {
+  user = &quot;${aws_iam_user.cognito_app_user.name}&quot;
+
+  groups = [
+    &quot;${aws_iam_group.cognito_app_group.name}&quot;,
+  ]
+}
+
+data &quot;aws_iam_policy_document&quot; &quot;cognito_app_group_policy&quot; {
+  statement {
+    actions = [
+      &quot;cognito-idp:ListUserPools&quot;,
+      &quot;cognito-idp:ListUsers&quot;,
+    ]
+
+    resources = [
+      &quot;*&quot;,
+    ]
+  }
+
+  statement {
+    actions = [
+      &quot;cognito-idp:AdminAddUserToGroup&quot;,
+      &quot;cognito-idp:AdminConfirmSignUp&quot;,
+      &quot;cognito-idp:AdminCreateUser&quot;,
+      &quot;cognito-idp:AdminDeleteUser&quot;,
+      &quot;cognito-idp:AdminDeleteUserAttributes&quot;,
+      &quot;cognito-idp:AdminDisableProviderForUser&quot;,
+      &quot;cognito-idp:AdminDisableUser&quot;,
+      &quot;cognito-idp:AdminEnableUser&quot;,
+      &quot;cognito-idp:AdminForgetDevice&quot;,
+      &quot;cognito-idp:AdminGetDevice&quot;,
+      &quot;cognito-idp:AdminGetUser&quot;,
+      &quot;cognito-idp:AdminInitiateAuth&quot;,
+      &quot;cognito-idp:AdminLinkProviderForUser&quot;,
+      &quot;cognito-idp:AdminListDevices&quot;,
+      &quot;cognito-idp:AdminListGroupsForUser&quot;,
+      &quot;cognito-idp:AdminListUserAuthEvents&quot;,
+      &quot;cognito-idp:AdminRemoveUserFromGroup&quot;,
+      &quot;cognito-idp:AdminResetUserPassword&quot;,
+      &quot;cognito-idp:AdminRespondToAuthChallenge&quot;,
+      &quot;cognito-idp:AdminSetUserMFAPreference&quot;,
+      &quot;cognito-idp:AdminSetUserSettings&quot;,
+      &quot;cognito-idp:AdminUpdateAuthEventFeedback&quot;,
+      &quot;cognito-idp:AdminUpdateDeviceStatus&quot;,
+      &quot;cognito-idp:AdminUpdateUserAttributes&quot;,
+      &quot;cognito-idp:AdminUserGlobalSignOut&quot;,
+    ]
+
+    resources = [
+      &quot;${aws_cognito_user_pool.pool.arn}&quot;,
+    ]
+  }
+}
+
+resource &quot;aws_iam_policy&quot; &quot;cognito_app_group_policy&quot; {
+  name   = &quot;${var.environment}_${var.name}_group_policy&quot;
+  policy = &quot;${data.aws_iam_policy_document.cognito_app_group_policy.json}&quot;
+}
+
+resource &quot;aws_iam_group_policy_attachment&quot; &quot;cognito_app_group_attachment&quot; {
+  group      = &quot;${aws_iam_group.cognito_app_group.name}&quot;
+  policy_arn = &quot;${aws_iam_policy.cognito_app_group_policy.arn}&quot;
+}
+
+####################################################
+# sns_iam.tf
+####################################################
+
+data &quot;aws_iam_policy_document&quot; &quot;cognito_sns_assume_role_policy&quot; {
+  statement {
+    actions = [&quot;sts:AssumeRole&quot;]
+
+    principals {
+      type        = &quot;Service&quot;
+      identifiers = [&quot;cognito-idp.amazonaws.com&quot;]
+    }
+  }
+}
+
+resource &quot;aws_iam_role&quot; &quot;cognito_sns_role&quot; {
+  name               = &quot;${var.environment}_${var.name}_cognito_sns_role&quot;
+  assume_role_policy = &quot;${data.aws_iam_policy_document.cognito_sns_assume_role_policy.json}&quot;
+}
+
+data &quot;aws_iam_policy_document&quot; &quot;cognito_sns_publish_policy&quot; {
+  statement {
+    actions = [
+      &quot;sns:Publish&quot;,
+    ]
+
+    resources = [
+      &quot;*&quot;,
+    ]
+  }
+}
+
+resource &quot;aws_iam_policy&quot; &quot;cognito_sns_role_policy&quot; {
+  name   = &quot;${var.environment}_${var.name}_cognito_sns_role_policy&quot;
+  policy = &quot;${data.aws_iam_policy_document.cognito_sns_publish_policy.json}&quot;
+}
+
+resource &quot;aws_iam_role_policy_attachment&quot; &quot;cognito_sns_role_policy_attachment&quot; {
+  role       = &quot;${aws_iam_role.cognito_sns_role.name}&quot;
+  policy_arn = &quot;${aws_iam_policy.cognito_sns_role_policy.arn}&quot;
+}
+
+####################################################
+# vars.tf
+####################################################
+
+variable &quot;aws_role_arn&quot; {}
+
+variable &quot;aws_region&quot; {
+  default = &quot;us-east-1&quot;
+}
+
+variable &quot;environment&quot; {}
+
+variable &quot;name&quot; {
+  default = &quot;your_service_name&quot;
+}
+
+variable &quot;callback_urls&quot; {
+  type = &quot;list&quot;
+}
+
+variable &quot;logout_urls&quot; {
+  type = &quot;list&quot;
+}
+
+variable &quot;domain&quot; {}
+
+variable &quot;google_provider_client_id&quot; {}
+variable &quot;google_provider_client_secret&quot; {}
+
+variable &quot;facebook_provider_client_id&quot; {}
+variable &quot;facebook_provider_client_secret&quot; {}
+
+variable &quot;root_domain&quot; {
+  description = &quot;certificate root domain&quot;
+  default     = &quot;your-example-domain.com&quot;
+}
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There&rsquo;s so much more to the story, but I think this post is long enough as it is and I don&rsquo;t want to keep you any longer. If you have any questions, then please reach out to me on twitter.</p>
+
+<p>I personally found the documentation around Cognito (and the various tools) to be both overwhelming and underwhelming. Not to mention confusing in places, as well as just downright frustrating at times.</p>
+
+<p>Hopefully you found this short break down of AWS Cognito useful. There&rsquo;s so much more still to dive into, but this should give you at least a decent starting point.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

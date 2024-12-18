@@ -1,0 +1,809 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#go-arrays-and-slices">Go Arrays and Slices</a>
+<ul>
+<li><a href="#composite-types">Composite Types</a></li>
+
+<li><a href="#arrays">Arrays</a></li>
+
+<li><a href="#slices">Slices</a></li>
+
+<li><a href="#append">Append</a></li>
+
+<li><a href="#caveat-of-appending">Caveat of Appending</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="go-arrays-and-slices">Go Arrays and Slices</h1>
+
+<p>I found myself recently trying to recall specific details of how <a href="https://blog.golang.org/go-slices-usage-and-internals" target="_blank">slices</a> work when needing to do something that meant I wanted to <em>not</em> mutate the underlying array data structure of the slice I was working with.</p>
+
+<p>Now the reason for why I wanted to do that isn&rsquo;t important. What&rsquo;s motivating this write-up is my want for a good reference document (not saying the official go blog isn&rsquo;t a good reference, but I have my own things I like to focus in on in these situations).</p>
+
+<h2 id="composite-types">Composite Types</h2>
+
+<p>Let&rsquo;s recap on what we&rsquo;re talking about when we say &ldquo;array&rdquo; and &ldquo;slice&rdquo;:</p>
+
+<ul>
+<li><strong>Array</strong>: fixed-length data structure, zero-indexed, contains same type</li>
+<li><strong>Slice</strong>: variable-length sequence, contains same type</li>
+</ul>
+
+<h2 id="arrays">Arrays</h2>
+
+<p>An array uses subscript notation to access elements, and is zero-indexed. Here is an example of both those concepts:</p>
+
+<pre><code class="language-go">a := [3]string{&quot;a&quot;, &quot;b&quot;, &quot;c&quot;}
+
+fmt.Println(a[1]) // &quot;b&quot;
+</code></pre>
+
+<p>If you define an array without using the &lsquo;literal&rsquo; syntax (as demonstrated in the above example program), then the values will be initialized with the zero value of the given type, for example:</p>
+
+<pre><code class="language-go">var a [3]string
+
+fmt.Printf(&quot;%#v&quot;, a) // [3]string{&quot;&quot;, &quot;&quot;, &quot;&quot;}
+</code></pre>
+
+<p>The size of the array is actually part of its &lsquo;type&rsquo; definition, for example the following two arrays have unique types:</p>
+
+<pre><code class="language-go">a := [3]string{&quot;a&quot;, &quot;b&quot;, &quot;c&quot;}
+b := [2]string{&quot;a&quot;, &quot;b&quot;}
+
+fmt.Printf(&quot;a: %T, b: %T&quot;, a, b) // a: [3]string, b: [2]string
+</code></pre>
+
+<p>If you don&rsquo;t want to have to count the number of elements you&rsquo;re defining, then you can use an ellipsis <code>...</code> instead:</p>
+
+<pre><code class="language-go">a := [...]int{1, 2, 3}
+
+fmt.Printf(&quot;%T %#v&quot;, a, a) // [3]int [3]int{1, 2, 3}
+</code></pre>
+
+<p>Notice how the output of the above program inserts the calculated length of the array.</p>
+
+<p>As arrays are fixed-length, it means they cannot be resized once full.</p>
+
+<p>Arrays are also &lsquo;copied&rsquo; when being passed into a function. This means if a function modifies a given array, it&rsquo;s actually only modifying a <em>copy</em> of the array and not the original (i.e. go doesnt use &lsquo;pass-by-reference&rsquo; semantics like some other languages).</p>
+
+<p>If dealing we an array data structure, remember you&rsquo;ll need to pass a pointer to it if you require a function to be able to modify the original array in memory.</p>
+
+<h2 id="slices">Slices</h2>
+
+<p>A slice is a lightweight data structure that provides access to a subsequence (or &lsquo;window&rsquo; view) of an underlying array.</p>
+
+<p>The slice data structure consists of the following fields:</p>
+
+<ul>
+<li><strong>ptr</strong>: pointer to array.</li>
+<li><strong>len</strong>: length of slice (number of elements it contains).</li>
+<li><strong>cap</strong>: capacity of slice (number of elements in array, starting from the first element in the slice).</li>
+</ul>
+
+<blockquote>
+<p>Note: a slice cannot grow larger than its capacity, nor can you reslice a slice to attempt to access earlier elements in the array.</p>
+</blockquote>
+
+<p>Here is an example program that creates an array and then makes a slice of a subsequence of the original array:</p>
+
+<pre><code class="language-go">a := [3]int{1, 2, 3}
+fmt.Printf(&quot;array:  %T\n\t%#v\n\n&quot;, a, a)
+
+s := a[1:]
+fmt.Printf(&quot;slice:  %T\n\t%#v\n&quot;, s, s)
+</code></pre>
+
+<p>The output from the above code would be as follows (notice how the slice provides a narrower &lsquo;view&rsquo; of the original array):</p>
+
+<pre><code class="language-go">array: [3]int
+       [3]int{1, 2, 3}
+
+slice: []int
+       []int{2, 3}
+</code></pre>
+
+<blockquote>
+<p>Notice that a slice &lsquo;type&rsquo; looks the same as an array&rsquo;s, but just omits a length (e.g. slice: <code>[]int</code>, array: <code>[3]int</code>).</p>
+</blockquote>
+
+<p>Slices, much like arrays, cannot dynamically grow larger at runtime. When a slice is full we must create a <em>new</em> slice, which requires the use of go&rsquo;s builtin functions.</p>
+
+<p>When modifying a slice you are infact modifying the underlying array, as demonstrated below:</p>
+
+<pre><code class="language-go">a := [3]int{1, 2, 3}
+s := a[1:]
+
+s[0] = 4
+
+fmt.Printf(&quot;array:  %T\n\t%#v\n\n&quot;, a, a)
+fmt.Printf(&quot;slice:  %T\n\t%#v\n&quot;, s, s)
+</code></pre>
+
+<p>The above code results in the following output:</p>
+
+<pre><code class="language-go">array: [3]int
+       [3]int{1, 4, 3}
+
+slice: []int
+       []int{4, 3}
+</code></pre>
+
+<p>Notice <em>both</em> the slice and the underlying array have been updated.</p>
+
+<p>Although a lot of people refer to this as &ldquo;updating a slice&rdquo; when talking about their code, I personally think it&rsquo;s best not to think of these as two distinct pieces of data. The array holds the data and the slice is just a language abstraction that enables us to control how we view that data.</p>
+
+<p>Additionally, it&rsquo;s important to realize that because a slice contains a pointer to an underlying array, it means <em>multiple</em> slices can point to the <em>same</em> array in memory (as demonstrated below).</p>
+
+<pre><code class="language-go">a := [3]int{1, 2, 3}
+s1 := a[:2]
+s2 := a[1:]
+
+fmt.Printf(&quot;array:  %T\n\t%#v\n\n&quot;, a, a)
+fmt.Printf(&quot;slice1: %T\n\t%#v\n\n&quot;, s1, s1)
+fmt.Printf(&quot;slice2: %T\n\t%#v\n\n&quot;, s2, s2)
+
+// make modification via the first slice
+s1[1] = 4
+
+fmt.Print(&quot;---\n\n&quot;)
+fmt.Printf(&quot;array:  %T\n\t%#v\n\n&quot;, a, a)
+fmt.Printf(&quot;slice1: %T\n\t%#v\n\n&quot;, s1, s1)
+fmt.Printf(&quot;slice2: %T\n\t%#v\n\n&quot;, s2, s2)
+</code></pre>
+
+<p>The output of the above program is shown below. Notice how the two slices, <code>s1</code> and <code>s2</code> both point at the <em>same</em> underlying array and so although we make a modification via the first slice we can see that both slices will highlight the changed value:</p>
+
+<pre><code class="language-go">array:  [3]int
+	[3]int{1, 2, 3}
+
+slice1: []int
+	[]int{1, 2}
+
+slice2: []int
+	[]int{2, 3}
+
+---
+
+array:  [3]int
+	[3]int{1, 4, 3}
+
+slice1: []int
+	[]int{1, 4}
+
+slice2: []int
+	[]int{4, 3}
+</code></pre>
+
+<h2 id="append">Append</h2>
+
+<p>You&rsquo;ll find in a lot of situations code that needs to append data to a slice. This results in code that uses the builtin <code>append</code> function, but interestingly will nearly always reassign the returned value back to the slice variable itself:</p>
+
+<pre><code class="language-go">a := [...]int{1, 2, 3, 4, 5}
+s := a[1:]
+
+fmt.Printf(&quot;array:  %T\n\t%#v\n\tlen: %d\n\tcap: %d\n\n&quot;, a, a, len(a), cap(a))
+fmt.Printf(&quot;slice:  %T\n\t%#v\n\tlen: %d\n\tcap: %d\n\n&quot;, s, s, len(s), cap(s))
+
+s = append(s, 6)
+
+fmt.Printf(&quot;array:  %T\n\t%#v\n\tlen: %d\n\tcap: %d\n\n&quot;, a, a, len(a), cap(a))
+fmt.Printf(&quot;slice:  %T\n\t%#v\n\tlen: %d\n\tcap: %d\n\n&quot;, s, s, len(s), cap(s))
+</code></pre>
+
+<p>In the above program we have an array that contains five elements. We take a slice of it which is the last four elements. We then attempt to append a new value (<code>6</code>) to the slice (which should mean appending it to the underlying array). The output of that program is as follows:</p>
+
+<pre><code class="language-go">array:  [5]int
+	[5]int{1, 2, 3, 4, 5}
+	len: 5
+	cap: 5
+
+slice:  []int
+	[]int{2, 3, 4, 5}
+	len: 4
+	cap: 4
+
+array:  [5]int
+	[5]int{1, 2, 3, 4, 5}
+	len: 5
+	cap: 5
+
+slice:  []int
+	[]int{2, 3, 4, 5, 6}
+	len: 5
+	cap: 8
+</code></pre>
+
+<blockquote>
+<p>Note: the <code>append</code> function <em>always</em> returns a new slice.</p>
+</blockquote>
+
+<p>Notice how <code>s</code> is showing an updated &lsquo;view&rsquo; (e.g. <code>2, 3, 4, 5, 6</code>). What&rsquo;s interesting here is the new slice must have also resulted in a new array being allocated (and subsequently the new slice is pointing to it) because the original array (<code>a</code>) isn&rsquo;t showing the appended value (<code>6</code>).</p>
+
+<p>Now we can check this with some overly complicated code that &lsquo;reflects&rsquo; into the internal go code (this will enable us to locate the slice&rsquo;s pointer and to dereference that pointer to access the underlying array):</p>
+
+<pre><code class="language-go">s := []int{1, 2, 3, 4}
+
+hdr := (*reflect.SliceHeader)(unsafe.Pointer(&amp;s))
+data := *(*[4]int)(unsafe.Pointer(hdr.Data))
+
+fmt.Printf(&quot;slice:  %T\n\t%#v\n\tlen: %d\n\tcap: %d\n&quot;, s, s, len(s), cap(s))
+fmt.Printf(&quot;hdr: %#v\n&quot;, hdr)   // &amp;reflect.SliceHeader{Data:0x40e020, Len:4, Cap:4}
+fmt.Printf(&quot;data: %#v\n&quot;, data) // [4]int{1, 2, 3, 4}
+
+s = append(s, 5)
+
+hdr2 := (*reflect.SliceHeader)(unsafe.Pointer(&amp;s))
+data2 := *(*[8]int)(unsafe.Pointer(hdr.Data))
+
+fmt.Printf(&quot;slice:  %T\n\t%#v\n\tlen: %d\n\tcap: %d\n&quot;, s, s, len(s), cap(s))
+fmt.Printf(&quot;hdr2: %#v\n&quot;, hdr2)   // &amp;reflect.SliceHeader{Data:0x45e020, Len:5, Cap:8}
+fmt.Printf(&quot;data2: %#v\n&quot;, data2) // [8]int{1, 2, 3, 4, 5, 0, 0, 0}
+</code></pre>
+
+<blockquote>
+<p>Note: <code>s := []int{1, 2, 3, 4}</code> causes an underlying array to be created and then referened by the slice we defined.</p>
+</blockquote>
+
+<p>The output of the above program is as follows:</p>
+
+<pre><code class="language-go">slice:  []int
+	[]int{1, 2, 3, 4}
+	len: 4
+	cap: 4
+
+hdr: &amp;reflect.SliceHeader{Data:0x40e020, Len:4, Cap:4}
+data: [4]int{1, 2, 3, 4}
+
+slice:  []int
+	[]int{1, 2, 3, 4, 5}
+	len: 5
+	cap: 8
+
+hdr: &amp;reflect.SliceHeader{Data:0x45e020, Len:5, Cap:8}
+data: [8]int{1, 2, 3, 4, 5, 0, 0, 0}
+</code></pre>
+
+<p>We can see the <code>Data</code> field on the <code>SliceHeader</code> is pointing to a different memory address!</p>
+
+<p>We can also see that the capacity of the slice (<code>cap</code>) has increased to double! This demonstrates what&rsquo;s happening &lsquo;behind-the-scenes&rsquo;, and is similar to how resizing an array is done in other languages (i.e. you create a new array at double the size of the old array, then you append the new values until that new array is full and the process repeats).</p>
+
+<p>So what has happened is that <code>append</code> has returned a <em>new</em> slice (which is expected), but that the slice is now pointing to a <em>new</em> underlying array. This is the primary reason why when appending a value to a slice you&rsquo;ll see the slice variable is updated to the return value of <code>append</code>: because we don&rsquo;t know (unless we do some inspection of the returned slice) whether the underlying array has been copied to a new array in memory.</p>
+
+<h2 id="caveat-of-appending">Caveat of Appending</h2>
+
+<p>If the underlying array had enough capacity for the appended value(s), then <code>append</code> would have still returned a new slice (because remember a slice cannot grow beyond its defined capacity) but the underlying array would still be the same array in memory. Let&rsquo;s see an example of that below:</p>
+
+<pre><code class="language-go">a := [6]int{1, 2, 3, 4, 5, 6}
+s := a[1:4]
+x := append(s, 0)
+
+fmt.Printf(&quot;array:    %T\n\t  %#v\n\t  len: %d\n\t  cap: %d\n\n&quot;, a, a, len(a), cap(a))
+fmt.Printf(&quot;slice1 s: %T\n\t  %#v\n\t  len: %d\n\t  cap: %d\n\n&quot;, s, s, len(s), cap(s))
+fmt.Printf(&quot;slice2 x: %T\n\t  %#v\n\t  len: %d\n\t  cap: %d\n\n&quot;, x, x, len(x), cap(x))
+</code></pre>
+
+<p>The output of that program is as follows:</p>
+
+<pre><code class="language-go">array:    [6]int
+	  [6]int{1, 2, 3, 4, 0, 6}
+	  len: 6
+	  cap: 6
+
+slice1 s: []int
+	  []int{2, 3, 4}
+	  len: 3
+	  cap: 5
+
+slice2 x: []int
+	  []int{2, 3, 4, 0}
+	  len: 4
+	  cap: 5
+</code></pre>
+
+<p>Notice how the first slice <code>s</code> has a length of <code>3</code> and a capacity of <code>5</code>. That is because when we created the slice we specified explicitly we wanted only three elements (<code>1:4</code>) and that the slice&rsquo;s capacity is derived from the number of elements in the underlying array <em>starting from</em> the first element referenced within the slice).</p>
+
+<p>Meaning the first element in the slice is <code>2</code> and counting from there within the underlying array would result in a capacity of <code>5</code> (e.g. <code>2, 3, 4, 5, 6</code> is five elements).</p>
+
+<p>Now when we call <code>append</code> on <code>s</code> we know that <code>append</code> will always return a new slice and so we assign that new slice to a different variable <code>x</code>. We can see for <code>x</code> the length is one element longer because of the append (e.g. we appended the value <code>0</code>) but the capacity is still <code>5</code> meaning there is more room in the underlying array and so we don&rsquo;t create a new array nor update the slice pointer to that new array.</p>
+
+<p>What&rsquo;s really interesting here is that the appending of the value <code>0</code> to the first slice has caused the underlying array to be modified in a potentially unexpected way!</p>
+
+<p>By that I mean, we can see the underlying array has now replaced the element value <code>5</code> with <code>0</code> instead of having <code>0</code> appended to the end of it. You might have expected a new array to be created (because <em>really</em> the underlying array has a length of <code>6</code> and so an array with elements <code>1, 2, 3, 4, 5, 6, 0</code> would be a length of <em>seven</em>, thus not enough capacity in the array).</p>
+
+<p>But because of how slices work, and its capacity is determined by the number of elements in the underlying array <em>starting from</em> the first element referenced by the slice, it means when we append to the underlying array, we are doing so from the perspective of the underlying array ending at the element value <code>4</code>.</p>
+
+<p>Yes, this is confusing.</p>
+
+<p>See the <a href="https://tour.golang.org/moretypes/11" target="_blank">go tour for more examples</a>.</p>
+
+<blockquote>
+<p>Note: there&rsquo;s also a <em>gotcha</em> which is worth being aware of, and is related to the fact that slices point to the same underlying array, which occurs when the slice modifications don&rsquo;t change the array&rsquo;s capacity. See <a href="https://yourbasic.org/golang/gotcha-append/" target="_blank">https://yourbasic.org/golang/gotcha-append/</a> for details.</p>
+</blockquote>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

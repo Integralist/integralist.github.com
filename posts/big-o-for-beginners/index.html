@@ -1,0 +1,902 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#big-o-for-beginners">Big O for Beginners</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#understanding-big-o">Understanding Big O</a>
+<ul>
+<li><a href="#logarithms">Logarithms</a></li>
+
+<li><a href="#logarithm-example">Logarithm Example</a></li>
+
+<li><a href="#factorials">Factorials</a></li>
+</ul></li>
+
+<li><a href="#back-to-big-o">Back to Big O</a></li>
+
+<li><a href="#simple-search">Simple Search</a>
+<ul>
+<li><a href="#what-does-big-o-tell-us">What does Big O tell us?</a></li>
+</ul></li>
+
+<li><a href="#binary-search">Binary Search</a>
+<ul>
+<li><a href="#what-does-big-o-tell-us-1">What does Big O tell us?</a></li>
+</ul></li>
+
+<li><a href="#the-travelling-salesperson">The Travelling Salesperson</a>
+<ul>
+<li><a href="#what-does-big-o-tell-us-2">What does Big O tell us?</a></li>
+</ul></li>
+
+<li><a href="#calculating-operation-speed">Calculating Operation Speed</a></li>
+
+<li><a href="#arrays-vs-linked-lists">Arrays vs Linked Lists</a></li>
+
+<li><a href="#selection-sort">Selection Sort</a></li>
+
+<li><a href="#quick-sort">Quick Sort</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+
+<li><a href="#references">References</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="big-o-for-beginners">Big O for Beginners</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>When you first start learning algorithms (Binary Search, Quick Sort, Breadth-first Search etc), you&rsquo;ll quickly realise that in order to take advantage of these algorithms, you need to know how fast they are.</p>
+
+<p>Otherwise, when presented with a programming problem in which you want to select an algorithm to use to solve that problem, how will you know which algorithm is more efficient?</p>
+
+<p>One way to know how fast an algorithm is, would be to use the <a href="https://en.wikipedia.org/wiki/The_Big_O" target="_blank">Big O</a> notation.</p>
+
+<h2 id="understanding-big-o">Understanding Big O</h2>
+
+<p>Big O doesn&rsquo;t tell you how fast in time (e.g. seconds) an algorithm is. Instead it informs you of the number of <em>operations</em>, and how those operations will grow over time.</p>
+
+<p>Although we&rsquo;ll see how to calculate the speed of operations later on in this post, the primary benefit is to see &lsquo;at a glance&rsquo; the growth of operations as your data becomes larger.</p>
+
+<blockquote>
+<p>So the O in &ldquo;Big O&rdquo; means &ldquo;Operation&rdquo;</p>
+</blockquote>
+
+<p>This means in order for you to really understand Big O you&rsquo;re going to need to know some maths. Now, this is OK. I&rsquo;m genuinely terrible at maths, but you&rsquo;ll see as we go along that it&rsquo;s not as complicated as you might think.</p>
+
+<p>Effectively there are two math concepts we need to know:</p>
+
+<ol>
+<li>Logarithms</li>
+<li>Factorials</li>
+</ol>
+
+<p>You don&rsquo;t even need to know that much about them. Only the bare minimum is required. So let&rsquo;s make a start with Logarithms and then move onto Factorials afterwards. Once we understand those two concepts we can go back to Big O and start tying together some examples.</p>
+
+<h3 id="logarithms">Logarithms</h3>
+
+<p>As I said, in order to understand Big O, you&rsquo;ll need to understand how <a href="https://en.wikipedia.org/wiki/Logarithm" target="_blank">Logarithms</a> work.</p>
+
+<p>I&rsquo;m terrible at Math, but luckily the awesome book &ldquo;<a href="https://www.manning.com/books/grokking-algorithms" target="_blank">Grokking Algorithms: An Illustrated Guide</a>&rdquo; (which I highly recommend) helped me at least understand the basics of Logarithms; enough so that I could then go on to understand Big O.</p>
+
+<p>In essence the Logarithm notation looks something like:</p>
+
+<pre><code>Log n (х)
+</code></pre>
+
+<blockquote>
+<p>Note: I had used a nice <code>𝑛</code> icon instead of <code>n</code> but on my phone I noticed it wasn&rsquo;t showing :-/ so I had to change it to something that wasn&rsquo;t a symbol.</p>
+</blockquote>
+
+<p>&hellip;where the <code>n</code> is what&rsquo;s called the &ldquo;base&rdquo; and <code>х</code> is the number you&rsquo;re aiming for. But really what we&rsquo;re interested in is the <em>result</em> of this calculation.</p>
+
+<h3 id="logarithm-example">Logarithm Example</h3>
+
+<p>Imagine we have the following Logarthim:</p>
+
+<pre><code>Log5(100)
+</code></pre>
+
+<p>What this is effectively asking is:</p>
+
+<p>&ldquo;how many times do I need to multiple 5 by itself in order to reach the number 100?&rdquo;</p>
+
+<p>Let&rsquo;s find out:</p>
+
+<pre><code>5*5*5 = 125
+</code></pre>
+
+<p>Looks like the result of our Logarithm would&rsquo;ve been <code>3</code>, because there were three <code>5</code>&rsquo;s used in order to get to a number that was equal or greater than <code>100</code>.</p>
+
+<p>In this case the calculation wasn&rsquo;t exactly equal. By that I mean we went <em>past</em> <code>100</code> and ended up at <code>125</code>. But that&rsquo;s the essence of how to understand what a Logarithm is asking and how to calculate the result.</p>
+
+<p>So we can see the calculation looks like this:</p>
+
+<pre><code>Log5(100) = 3
+</code></pre>
+
+<p>The <code>3</code> is effectively the worst case number of steps involved when calculating that particular item.</p>
+
+<p>The number <code>100</code> in this case represents the number of items we have to execute our algorithm against. So if you were using an algorithm (such as a Binary Search; demonstrated later on below) and it was running over a collection of items, then the length of the items (in the above example Logarithm) would be <code>100</code>.</p>
+
+<p>We&rsquo;ll see how this is useful in measuring an algorithm&rsquo;s <em>speed</em> in a later section of this post. But for now let&rsquo;s go and understand Factorials&hellip;</p>
+
+<h3 id="factorials">Factorials</h3>
+
+<p>Factorials are one of those things that can come in handy for a number of reasons. But generally they&rsquo;re really useful for identifying &lsquo;variations&rsquo;.</p>
+
+<p>Imagine you have three letters:</p>
+
+<ul>
+<li><code>A</code></li>
+<li><code>B</code></li>
+<li><code>C</code></li>
+</ul>
+
+<p>How many variations of these letters can you produce? So we have <code>A, B, C</code> as one variation. <code>A, C, B</code> would be another variation and then maybe <code>B, A, C</code> would be another etc. But how do you calculate how many variations there are?</p>
+
+<p>The solution is the factorial: <code>n!</code> (where <code>n</code> is the number of items you have).</p>
+
+<p>So in our example we had three items, so that would be written as <code>3!</code> factorial.</p>
+
+<p>Which really means:</p>
+
+<pre><code>3*2*1 = 6
+</code></pre>
+
+<p>So that&rsquo;s six variations you have for three items.</p>
+
+<p>But what if you have 10 items?</p>
+
+<pre><code>10*9*8*7*6*5*4*3*2*1 = 3,628,800
+</code></pre>
+
+<p>You can see that with a small number of items, the number of operations is massive. This is the total oposite of Logarithms which we looked at earlier (remember its growth of operations stayed consistently good when the collection grew).</p>
+
+<p>Although Factorials serve a useful purpose (the example given in the book &ldquo;Grokking Algorithms&rdquo; is one called &lsquo;The Travelling Salesperson&rsquo; - which is a problem that required calculating the quickest route the saleperson can take in order to visit n number of cities) they are probably the worst performing algorithm.</p>
+
+<p>So if you see <code>n!</code> you should be wary.</p>
+
+<h2 id="back-to-big-o">Back to Big O</h2>
+
+<p>So now we understand how Logarithms and Factorials work we can come back to the Big O notation and understand that it&rsquo;s really a simple visual wrapper around these different mathematical calculations.</p>
+
+<pre><code>O(х)
+</code></pre>
+
+<p>In the above snippet, <code>х</code> is a calculation.</p>
+
+<p>If we were considering Logarithms, then it would look like the following:</p>
+
+<pre><code>O(Log n (х))
+</code></pre>
+
+<p>If we were considering Factorials, then it would look like the following:</p>
+
+<pre><code>O(n!)
+</code></pre>
+
+<p>It&rsquo;s important noting that you&rsquo;ll never see a specific calculation like <code>O(Log5(100))</code> or <code>O(3!)</code> in Big O. It&rsquo;ll always be an abstract version like <code>O(Log n (х))</code> or <code>O(n!)</code> because Big O notation is a way of <em>talking</em> to other people and having a &lsquo;common language&rsquo;.</p>
+
+<p>For example:</p>
+
+<p>&ldquo;Hey Bob, I don&rsquo;t think we should use the Simple Search algorithm because it&rsquo;s <code>O(n)</code>. We&rsquo;d be much better off using a Binary Search, as that&rsquo;s <code>O(Log n (х))</code>&rdquo;.</p>
+
+<p>See how this gives us a common language. It&rsquo;s similar to Design Patterns. Patterns can be implemented in a variety of different ways and yet we have common language for easily identifying code that follows a certain pattern (or when we think a particular pattern might be a good solution to a design problem, we have a common language for explaining the solution to someone else without needing to actually implement it first).</p>
+
+<p>Now my mention of &lsquo;Simple Search&rsquo; and &lsquo;Binary Search&rsquo; might not mean much to you, as you might not know how these algorithms work. So let&rsquo;s look at these two algorithms next and then after that you&rsquo;ll hopefully understand why Big O helps us understand the performance of these algorithms.</p>
+
+<h2 id="simple-search">Simple Search</h2>
+
+<p>Simple Search is probably the simplest algorithm you&rsquo;ll ever learn. You&rsquo;ll see why in just a moment&hellip;</p>
+
+<p>Imagine you have a collection of twelve items (and these items are numbers), which are sorted/in order. You are required to locate a particular item within that collection.</p>
+
+<p>Here is the collection:</p>
+
+<pre><code>[1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 21]
+</code></pre>
+
+<p>The Simple Search approach is to loop over the collection one item at a time and check whether the current item matches the item you&rsquo;re looking for.</p>
+
+<p>So if the number you were looking for was <code>19</code>, then that means you&rsquo;ll first check <code>1</code>, nope that&rsquo;s not it. You&rsquo;ll then check <code>3</code>, nope that&rsquo;s not it either&hellip; and keep going until you reach the number you&rsquo;re looking for.</p>
+
+<p>So what does this algorithm look like in Big O?</p>
+
+<pre><code>O(n)
+</code></pre>
+
+<h3 id="what-does-big-o-tell-us">What does Big O tell us?</h3>
+
+<p>Big O is telling us that this algorithm performs in &lsquo;linear&rsquo; time. This means the number of operations increase linearly with the number of items in the collection. So in the above example, the worst case number of operations will be 12. But if the collection length was 100 items, then the worst case number of operations would be 100.</p>
+
+<p>So in effect, the bigger the collection, the more <em>expensive</em> this algorithm becomes. With a very small collection it&rsquo;s fast because of its simplicity, but beyond a small collection it&rsquo;s a poor performing choice of algorithm. This is what Big O is telling us here.</p>
+
+<h2 id="binary-search">Binary Search</h2>
+
+<p>Consider the same example as before, a collection of 12 items. The Binary Search algorithm is quite straight forward: you set the start and end indexes (usually zero for &lsquo;start&rsquo;, and the length of the collection for the &lsquo;end&rsquo;).</p>
+
+<p>Now you locate the middle of the collection and check if the value you&rsquo;re looking for either matches or is too low/high. If it matches, then hey great you&rsquo;ve just reduced the number of operations by a large amount compared to the Simple Search.</p>
+
+<p>If the middle item (our &lsquo;guess&rsquo;) is lower than the actual item we&rsquo;re looking for, then you reassign the value of &lsquo;start&rsquo; to be the middle index (the &lsquo;end&rsquo; stays set to the length of the collection). You&rsquo;ve now reduced the sliding window of items by half.</p>
+
+<p>Alternatively if the middle item was larger than the item we&rsquo;re looking for, then you reassign the value &lsquo;end&rsquo; to be the middle index (the &lsquo;start&rsquo; stays set to zero). You&rsquo;ve again reduced the sliding window of items by half.</p>
+
+<p>From here we &lsquo;rinse/repeat&rsquo; until the next &lsquo;middle of the collection&rsquo; selection is the item we&rsquo;re looking for.</p>
+
+<p>This is a much more efficient search algorithm compared to Simple Search.</p>
+
+<p>Let&rsquo;s see what this looks like in Big O notation&hellip;</p>
+
+<pre><code>O(Log n (х))
+</code></pre>
+
+<h3 id="what-does-big-o-tell-us-1">What does Big O tell us?</h3>
+
+<p>Big O is telling us that this algorithm works in &lsquo;log time&rsquo;, which means the performance improves as the size of the collection increases! You can tell this &lsquo;at a glance&rsquo; with Big O syntax (especially as you now know how Logarithms work). This algorithm will perform well across a wide range of collection sizes.</p>
+
+<p>Big O in effect tells us how the operations <em>grow</em>.</p>
+
+<p>So for this particular algorithm example, the worst case number of operations is <code>4</code>. Take a look at our earlier explanation of Logarithms if you&rsquo;re unsure why that is, but in a non-abstract sense this would look like: <code>O(Log2(12))</code>. We&rsquo;re dividing our collection in two (<code>Log2</code>) for each operation (<code>(12)</code>).</p>
+
+<p>This is probably one of the best Big O&rsquo;s you&rsquo;ll come across as effectively the performance (and by that I mean the growth of the operations) stays consistently good as the size of the collection increases.</p>
+
+<p>So if you have a collection of 1000 items, then that would result in (worst case) <code>10</code> operations required to locate the item you&rsquo;re looking for:</p>
+
+<pre><code>2*2*2*2*2*2*2*2*2*2 = 1024
+</code></pre>
+
+<p>How about a collection of a million items? That would be result in (worst case) <code>20</code> (yes 20!) operations to find the item you were looking for amongst one million items. That&rsquo;s incredible.</p>
+
+<h2 id="the-travelling-salesperson">The Travelling Salesperson</h2>
+
+<p>Not much to say here that we haven&rsquo;t already mentioned earlier when talking about Factorials. This problem is about calculating the number of different routes someone can take in order to ensure they reach all the specified number of cities, and then working out which route was quickest.</p>
+
+<p>In Big O notation this looks like:</p>
+
+<pre><code>O(n!)
+</code></pre>
+
+<h3 id="what-does-big-o-tell-us-2">What does Big O tell us?</h3>
+
+<p>Big O is telling us this algorithm results in &lsquo;factorial time&rsquo;, and this is one of the worst performing algorithms known to mankind. Apparently it baffles the maths community, in that there isn&rsquo;t actually a better algorithm to solve this problem.</p>
+
+<p>So as we saw earlier, if there were ten cities to visit and we need to identify the quickest route to visit all ten cities, it would take us approximately <code>3,628,800</code> operations to just calculate all the variations, before we could identify which one was quickest.</p>
+
+<h2 id="calculating-operation-speed">Calculating Operation Speed</h2>
+
+<p>In order to calculate the speed of an algorithm, we need to know the worst case number of operations. This is what Big O in effect gives us (whether it be linear time, log time or factorial time). So how do we calculate the speed based on the number of operations?</p>
+
+<p>First we need to know how many operations can be executed within one second.</p>
+
+<p>The answer to that question is ten operations:</p>
+
+<pre><code>1 second / 0.1 = 10 operations
+</code></pre>
+
+<blockquote>
+<p>Note: your computer can handle more than 10 operations a second, but as we&rsquo;ve said before, Big O is about worst case scenarios and so although not realistic; this number does give us a nice base line to work from</p>
+</blockquote>
+
+<p>We can then calculate the <em>time</em> associated with a number of operations.</p>
+
+<p>Imagine we have the following Big O:</p>
+
+<pre><code>O(Log n (х))
+</code></pre>
+
+<p>If this was a collection of 16 items, then the non-abstract version would look something like:</p>
+
+<pre><code>O(Log2(16))
+</code></pre>
+
+<p>We know from our earlier discussions that this would result in a worst case result of <code>4</code> operations to find the item we&rsquo;re searching for.</p>
+
+<blockquote>
+<p>Remember: <code>2x2x2x2 = 16</code><br>
+That&rsquo;s <code>4</code> times we multipled <code>2</code> by itself to reach <code>16</code></p>
+</blockquote>
+
+<p>We also now know that a single operation takes <code>0.1</code> of a second.</p>
+
+<p>So with this in mind we can calculate the speed of <code>O(Log2(16))</code> as being: <code>0.4</code> seconds</p>
+
+<pre><code>0.1 * 4 operations = 0.4
+</code></pre>
+
+<p>If we were using the Simple Search algorithm (which is <code>O(n)</code>) on a collection of 16 items, then we know that this would take <code>1.6</code> seconds to complete:</p>
+
+<pre><code>0.1 * 16 operations = 1.6
+</code></pre>
+
+<h2 id="arrays-vs-linked-lists">Arrays vs Linked Lists</h2>
+
+<p>Let&rsquo;s consider what Big O looks like for the Array and Linked List data structures.</p>
+
+<p>An Array supports &lsquo;index access&rsquo;, meaning you can jump straight to an Array index. Whereas with Linked Lists you have to traverse the entire list in order to locate a specific item.</p>
+
+<blockquote>
+<p>Note: another difference comes in memory management. Arrays require n number of memory &lsquo;slots&rsquo; to be next to each other, whereas Linked List memory can be sparse and spread out due to how it implements its internal chaining of nodes. This is why Arrays are typically considered to be &lsquo;fixed size&rsquo; and not easily expanded, because expansion of the Array&rsquo;s size could potentially require an expensive movement of the Array to a new location in memory in order to faciliate a new index and yet still have memory slots side-by-side</p>
+</blockquote>
+
+<p>This suggests that Array lookups are <code>O(1)</code>, known as &lsquo;constant time&rsquo; because the lookup growth stays the same no matter the length of the collection (i.e. it&rsquo;s constant).</p>
+
+<p>Linked List lookups on the other hand are <code>O(n)</code>, which we already know is &lsquo;linear time&rsquo; (remember this is how the Simple Search algorithm performed).</p>
+
+<p>But what about new data insertions? Well, with an Array you insert new items at the end of the Array, and because of its index access it would indicate <code>O(1)</code>. But if you&rsquo;re inserting an item into the middle of the Array, then this changes to <code>O(n)</code> because of the internal implementation of Arrays in memory, it means you need to re-order all the following items, which is expensive (hence the side-effect of inserting into the middle is really more like linear time).</p>
+
+<p>Linked List insertions are generally <code>O(1)</code> if inserting at the beginning or end of the list, but more like <code>O(n) + O(1)</code> if inserting into the middle of the list because you have to traverse the list first and then insert your new item.</p>
+
+<h2 id="selection-sort">Selection Sort</h2>
+
+<p>The &lsquo;selection sort&rsquo; algorithm sorts an unordered list by looping over the list <code>n</code> number of times, and for each loop it identifies either the smallest or largest element (which - smallest/largest - depends on how you&rsquo;re hoping to sort your list: do you want ascending or descending order). But ultimately you&rsquo;ll end up constructing a <em>new</em> &lsquo;ordered&rsquo; list.</p>
+
+<p>Specifically you loop a number of times to match the collection length. Then you loop the collection looking for smallest/largest item. Then you mutate the collection so it&rsquo;s smaller by one.</p>
+
+<p>This ends up being <code>O(n₂)</code> (n to the power of 2, or <code>O(n * n)</code>).</p>
+
+<blockquote>
+<p>Note: although you&rsquo;re looping over the collection multiple times, you are in fact looping over a slightly smaller collection each time. But it&rsquo;s <em>still</em> considered <code>O(n)</code> for each time you loop over the collection because regardless of how many items are in there you treat it as abstract</p>
+</blockquote>
+
+<p>So if your collection is 10 items long, then it would calculate as follows:</p>
+
+<pre><code>10 * 10 (i.e. n₂ meaning: 10 to the power of 2) = 100 operations
+0.1 * 100 = 10 seconds
+</code></pre>
+
+<h2 id="quick-sort">Quick Sort</h2>
+
+<p>The &lsquo;quick sort&rsquo; algorithm achieves the same result as &lsquo;selection sort&rsquo;, but is much faster. This particular algorithm sorts an unordered list using recusion instead.</p>
+
+<p>Specifically it uses the D&amp;C (Divide and Conquer) approach to problem solving.</p>
+
+<p>The process is as follows:</p>
+
+<ul>
+<li>You pick a &lsquo;pivot&rsquo; (a random array index)</li>
+<li>Loop the array storing items less than the pivot</li>
+<li>Loop the array storing items greater than the pivot</li>
+<li>Assuming the &lsquo;less&rsquo; and &lsquo;greater&rsquo; collections are already sorted</li>
+<li>You can now return &lsquo;less&rsquo; + pivot + &lsquo;greater&rsquo;</li>
+</ul>
+
+<p>In reality you&rsquo;ll use recursion to then sort both the &lsquo;less&rsquo; and &lsquo;greater&rsquo; arrays using the same algorithm.</p>
+
+<p>This ends up being <code>O(n₂)</code> in the worst case, but can be <code>O(n Log₂ n)</code> in the better case.</p>
+
+<p>The explanation for this, is that the quicksort function takes in a single collection and loops over it. In the process it then splits the collection into three chunks (less, pivot and greater) and it recursively calls itself (i.e. quicksort calls quicksort) on the &lsquo;less&rsquo; and &lsquo;greater&rsquo; chunks, subsequently looping over those collections as well.</p>
+
+<p>Big O notation helps us to understand the hidden complexity of the algorithm. If you see something like <code>O(n₂)</code>, then you know that there are nested loops or some kind of recursion happening in order to cause that.</p>
+
+<p>Now it&rsquo;s worth being aware that Quick Sort&rsquo;s performance is dependent on the pivot you choose. Take a look at some of the example implementations of the quick sort algorithm in the reference list below <a href="#15">&ldquo;Gist: Algorithms in Python&rdquo;</a>.</p>
+
+<p>There you&rsquo;ll see we have three implementations: one where we pick the first index every time as the pivot, one where we pick the middle index every time and one where we pick an index at random.</p>
+
+<p>Picking an index at random will give you the best chance of high performance. If you, for example, always pick the first index then you&rsquo;ll have a situation where you&rsquo;re potentially sorting items unnecessarily.</p>
+
+<p>So in the best case scenario, if your collection is 10 items long, then it would calculate as follows:</p>
+
+<pre><code>10 * 4 (Log₂10 == 2*2*2*2) = 40 operations
+0.1 * 40 = 4 seconds
+</code></pre>
+
+<p>But in the worst case scenario, if your collection was 10 items long, then it could calculate as follows:</p>
+
+<pre><code>10 * 10 = 100 operations
+0.1 * 100 = 10 seconds
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>This has been a very basic introduction to the concept of Big O. Hopefully you&rsquo;ve found it useful and have a greater appreciation for what Big O offers in the way of understanding the performance of particular algorithms (although we&rsquo;ve only really looked at a very small selection).</p>
+
+<p>We&rsquo;ve seen the following Big O types:</p>
+
+<ul>
+<li><code>O(Log n (x))</code>: log time</li>
+<li><code>O(n!)</code>: factorial time</li>
+<li><code>O(n)</code>: linear time</li>
+<li><code>O(1)</code>: constant time</li>
+<li><code>O(n * n)</code> (also known as <code>O(n₂)</code>): selection sort example</li>
+<li><code>O(n Log n (x))</code>: quick sort example</li>
+</ul>
+
+<p>There are many more algorithms and calculations for Big O, and as I learn them I&rsquo;ll be sure to update this blog post accordingly. If in the mean time you notice any mistakes, then please feel free to let me know.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://gist.github.com/Integralist/9763bded76e7d826535a3caeafc3bdff" target="_blank">Gist: Algorithms in Python</a></li>
+<li><a href="https://rob-bell.net/2009/06/a-beginners-guide-to-big-o-notation/" target="_blank">Beginners Guide to Big O</a></li>
+</ul>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

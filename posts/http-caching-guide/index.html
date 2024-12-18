@@ -1,0 +1,835 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#http-caching-guide">HTTP Caching Guide</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#caching-at-multiple-layers">Caching at multiple layers</a></li>
+
+<li><a href="#cache-control-directives">Cache-Control Directives</a>
+<ul>
+<li><a href="#client-requests">client requests</a></li>
+
+<li><a href="#no-cache-vs-must-revalidate">no-cache vs must-revalidate</a></li>
+</ul></li>
+
+<li><a href="#surrogate-control-directives">Surrogate-Control Directives</a></li>
+
+<li><a href="#fastly-cdn">Fastly CDN</a>
+<ul>
+<li><a href="#default-ttls">Default TTLs</a></li>
+</ul></li>
+
+<li><a href="#disable-caching">Disable Caching</a></li>
+
+<li><a href="#serving-stale-content">Serving Stale Content</a>
+<ul>
+<li><a href="#etag-or-last-modified">ETag or Last-Modified?</a></li>
+
+<li><a href="#revalidation-ttl">Revalidation TTL</a></li>
+
+<li><a href="#strong-and-weak-validators">Strong and Weak Validators</a></li>
+</ul></li>
+
+<li><a href="#cache-headers-example">Cache Headers Example</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="http-caching-guide">HTTP Caching Guide</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Caching is hard. Let&rsquo;s try and understand it a little better.</p>
+
+<blockquote>
+<p>Note: some sections are purposefully brief. I&rsquo;m not aiming to be a specification document.</p>
+</blockquote>
+
+<h2 id="caching-at-multiple-layers">Caching at multiple layers</h2>
+
+<p>Caching can occur at both a &lsquo;client&rsquo; level and a &lsquo;cache proxy&rsquo; level.</p>
+
+<p>Consider the following request flow architecture diagram&hellip;</p>
+
+<p><a href="../../assets/images/buzzfeed-request-flow-arch.png">
+<img src="../../assets/images/buzzfeed-request-flow-arch.png">
+</a></p>
+
+<p>In the above diagram, the &ldquo;CDN&rdquo; is a &lsquo;caching proxy&rsquo; and so caching can (and of course does) happen there.</p>
+
+<p>The box that&rsquo;s labelled &ldquo;proxy&rdquo; in the above diagram <em>isn&rsquo;t</em> a caching proxy, it&rsquo;s just a standard &lsquo;reverse proxy&rsquo; that&rsquo;s figuring out which (of many) &lsquo;origins&rsquo; the request should be proxied onto (meaning: caching does <em>not</em> happen there).</p>
+
+<p>We&rsquo;re able to control caching for both &lsquo;clients&rsquo; and &lsquo;cache proxies&rsquo;, using the following two HTTP response headers:</p>
+
+<ul>
+<li><code>Cache-Control</code>: tells a &lsquo;client&rsquo; (e.g. web browser) how caching should be handled.</li>
+<li><code>Surrogate-Control</code>: tells a &lsquo;proxy&rsquo; (e.g. caching proxy/cdn) how caching should be handled.</li>
+</ul>
+
+<p>In order to cache content efficiently we need to use a combination of the two headers.</p>
+
+<blockquote>
+<p>Note: <code>Surrogate-Control</code> is typically stripped from the response, by a cache proxy, before the client receives it.</p>
+</blockquote>
+
+<ul>
+<li><a href="#cache-control-directives">Cache-Control Directives</a>
+
+<ul>
+<li><a href="#client-requests">client requests</a></li>
+<li><a href="#no-cache-vs-must-revalidate">no-cache vs must-revalidate</a></li>
+</ul></li>
+<li><a href="#surrogate-control-directives">Surrogate-Control Directives</a></li>
+<li><a href="#fastly-cdn">Fastly CDN</a>
+
+<ul>
+<li><a href="#default-ttls">Default TTLs</a></li>
+</ul></li>
+<li><a href="#disable-caching">Disable Caching</a></li>
+<li><a href="#serving-stale-content">Serving Stale Content</a>
+
+<ul>
+<li><a href="#etag-or-last-modified">ETag or Last-Modified?</a></li>
+<li><a href="#revalidation-ttl">Revalidation TTL</a></li>
+<li><a href="#strong-and-weak-validators">Strong and Weak Validators</a></li>
+</ul></li>
+<li><a href="#cache-headers-example">Cache Headers Example</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+
+<h2 id="cache-control-directives">Cache-Control Directives</h2>
+
+<p>The <code>Cache-Control</code> cache response header has many directives you can configure, the following are some important ones to understand and will help you make an informed choice as to what values you set if you intend on controlling the caching of your content.</p>
+
+<ul>
+<li><code>public</code>: content can be cached by both client and proxy (implicit default).</li>
+<li><code>private</code>: content can be cached by client, but not proxy (as content is <em>unique</em> to the user).</li>
+<li><code>max-age</code>: determines how long (seconds) content is cached, after which requests will reach origin.</li>
+<li><code>s-maxage</code>: used by &lsquo;shared cache&rsquo; proxies and is equivalent to <code>Surrogate-Control: max-age=&lt;...&gt;</code> (except not stripped).</li>
+<li><code>must-revalidate</code>: cached content can be served if TTL hasn&rsquo;t expired, but do not serve &lsquo;stale&rsquo; content under <em>any</em> circumstance.</li>
+<li><code>no-cache</code>: cached content must revalidate on all requests (i.e. serve stale is fine, but only after consulting origin).</li>
+<li><code>no-store</code>: prevents client or proxies from caching the content.</li>
+<li><code>no-transform</code>: proxies aren&rsquo;t allowed to modify content (e.g. don&rsquo;t send compressed content if origin didn&rsquo;t).</li>
+</ul>
+
+<blockquote>
+<p>References: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control" target="_blank">MDN: <code>Cache-Control</code></a> and <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html" target="_blank">W3C Specification</a> (see also: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching" target="_blank">MDN: Caching</a>).</p>
+</blockquote>
+
+<h3 id="client-requests">client requests</h3>
+
+<p>One typically unmentioned feature of the <code>Cache-Control</code> HTTP header is that it can also be utilised at the client level for indicating to a cache what it will and wont accept.</p>
+
+<p>This is an interesting perspective on caching that we rarely see.</p>
+
+<p>In the case of Fastly CDN, they will ignore the <code>Cache-Control</code> header and its directives when provided as part of the client request.</p>
+
+<blockquote>
+<p>Reference: <a href="https://tools.ietf.org/html/rfc7234#page-22" target="_blank">RFC</a>.</p>
+</blockquote>
+
+<h3 id="no-cache-vs-must-revalidate">no-cache vs must-revalidate</h3>
+
+<p>A lot of the <code>Cache-Control</code> directives have subtle overlapping responsibilities, and <code>no-cache</code>/<code>must-revalidate</code> is one of the more confusing ones, so I&rsquo;d like to take a moment to add some extra clarity&hellip;</p>
+
+<p>With <code>must-revalidate</code> it&rsquo;s suggesting that cached content must revalidate and not serve stale after the cached content&rsquo;s <code>max-age</code> TTL has expired.</p>
+
+<p>This is effectively saying &ldquo;we have some content cached and its TTL is still valid so we&rsquo;ll return that to you&rdquo;, but the moment the <code>max-age</code> TTL expires it then changes to &ldquo;sorry, we <em>had</em> cached content but it&rsquo;s now stale and we&rsquo;re not allowed to use it. we&rsquo;ll go to the origin and grab fresh content for you.&rdquo;</p>
+
+<p>Unlike <code>no-cache</code> which is effectively saying &ldquo;we have cached content, but before we release it to you we&rsquo;re going to check with the origin that there isn&rsquo;t a fresher version first&rdquo;. It&rsquo;s a way of enforcing a <em>rigid</em> &lsquo;freshness&rsquo; plan.</p>
+
+<p>Whenever using these (and other similar) directives, you need give consideration to what else needs to be in place to make them function efficiently. Specifically you need to be sure your origins are actually capable of handling revalidation (see &lsquo;<a href="#serving-stale-content">Serving Stale Content</a>&rsquo; for more details), otherwise the behaviours might not work as intended or perform as well as you think they will.</p>
+
+<h2 id="surrogate-control-directives">Surrogate-Control Directives</h2>
+
+<p>For the <code>Surrogate-Control</code> cache response header you&rsquo;ll mostly utilize the <code>max-age</code> directive along with the &lsquo;<a href="https://httpwg.org/specs/rfc5861.html" target="_blank">extensions</a>&rsquo; for serving stale content (e.g. <code>stale-while-revalidate</code> and <code>stale-if-error</code>).</p>
+
+<p>There are some other directives defined in the <a href="https://www.w3.org/TR/edge-arch/" target="_blank">W3C Specification</a>, but it&rsquo;s unclear how well those are supported by our primary CDN provider (Fastly) and so it&rsquo;s best to avoid them unless you fully understand why you are setting them.</p>
+
+<h2 id="fastly-cdn">Fastly CDN</h2>
+
+<p>Fastly <a href="https://docs.fastly.com/guides/tutorials/cache-control-tutorial" target="_blank">has some rules</a> about the various caching response headers it respects and in what order this behaviour is applied. The following is a summary of these rules:</p>
+
+<ul>
+<li><code>Surrogate-Control</code> determines proxy caching behaviour (takes priority over <code>Cache-Control</code>) †.</li>
+<li><code>Cache-Control</code> determines client caching behaviour.</li>
+<li><code>Cache-Control</code> determines both client/proxy caching behaviour if no <code>Surrogate-Control</code> †.</li>
+<li><code>Cache-Control</code> determines both client/proxy caching behaviour if it includes both <code>max-age</code> and <code>s-maxage</code>.</li>
+<li><code>Expires</code> determines both client/proxy caching behaviour if no <code>Cache-Control</code> or <code>Surrogate-Control</code> headers.</li>
+<li><code>Expires</code> ignored if <code>Cache-Control</code> is also set (recommended to avoid <code>Expires</code>).</li>
+<li><code>Pragma</code> is a legacy cache header only recommended if you need to support older HTTP/1.0 protocol.</li>
+</ul>
+
+<blockquote>
+<p>† <em>except</em> when <code>Cache-Control</code> contains <code>private</code>.</p>
+</blockquote>
+
+<p>It&rsquo;s worth reiterating a segment of the above priority list which is that <code>Cache-Control</code> <em>can</em> include serving stale directives such as <code>stale-while-revalidate</code> and <code>stale-if-error</code>, but they are typically utilized with <code>Surrogate-Control</code> more than they are with <code>Cache-Control</code>. If Fastly receives no <code>Surrogate-Control</code> but it does get <code>Cache-Control</code> with those directives it <em>will</em> presume those are defined for its benefit.</p>
+
+<p>Client devices (e.g. web browsers) can respect those stale directives, but it&rsquo;s not very well supported currently (see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#Browser_compatibility" target="_blank">MDN compatibility table</a>).</p>
+
+<p>If you&rsquo;re interested in learning more about Fastly (inc. Varnish and VCL), then <a href="/posts/fastly-varnish">read my blog post</a> on the topic.</p>
+
+<h3 id="default-ttls">Default TTLs</h3>
+
+<p>The CDN (Fastly) <a href="https://docs.fastly.com/guides/performance-tuning/controlling-caching" target="_blank">has some rules</a> about how long it will cache content for.</p>
+
+<p>Below is a (oversimplified †) summary of these rules.</p>
+
+<ul>
+<li>If your origin doesn&rsquo;t set a cache response header, then cache content TTL will be 1hr.</li>
+<li>1hr TTL is set by <a href="https://docs.fastly.com/vcl/custom-vcl/creating-custom-vcl/" target="_blank">Fastly&rsquo;s VCL boilerplate</a> (applied by default).</li>
+<li>1hr TTL can be overridden by your own custom VCL.</li>
+</ul>
+
+<blockquote>
+<p>† Fastly has many factors it takes into account when deciding if an object stays in its cache (see: <a href="https://docs.fastly.com/guides/performance-tuning/serving-stale-content#why-serving-stale-content-may-not-work-as-expected" target="_blank">LRU</a>).</p>
+</blockquote>
+
+<h2 id="disable-caching">Disable Caching</h2>
+
+<p>Depending on your requirements, when trying to disable caching it can be confusing to know which cache control directives to utilize due to the various permutations. Below is a Fastly recommended list of directives your origin can use for handling three common scenarios.</p>
+
+<ul>
+<li>Disable Client Caching (<a href="https://docs.fastly.com/guides/tutorials/cache-control-tutorial#applying-different-cache-rules-for-fastly-and-browsers" target="_blank">docs</a>): <code>Cache-Control: no-store, must-revalidate</code></li>
+<li>Disable Proxy Caching (<a href="https://docs.fastly.com/guides/tutorials/cache-control-tutorial#do-not-cache" target="_blank">docs</a>): <code>Cache-Control: private</code></li>
+<li>Disable ALL Caching (<a href="https://docs.fastly.com/guides/debugging/temporarily-disabling-caching" target="_blank">docs</a>):
+
+<ul>
+<li><code>Cache-Control: no-cache, no-store, private, must-revalidate, max-age=0, max-stale=0, post-check=0, pre-check=0</code></li>
+<li><code>Pragma: no-cache</code></li>
+<li><code>Expires: 0</code></li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p>Note: regarding the disabling of caching at the client level, I reached out to Fastly because of their suggested use of <code>must-revalidate</code> <em>with</em> <code>no-store</code> (which doesn&rsquo;t make sense). They have since consulted with their resident RFC expert who confirmed this was redundant, and so expect their documentation to be updated to just <code>no-store</code>.</p>
+
+<p>It&rsquo;s also worth mentioning that Fastly&rsquo;s use of <code>post-check</code> and <code>pre-check</code> is <em>also</em> redundant as per <a href="https://blogs.msdn.microsoft.com/ie/2006/06/01/a-caching-issue-in-ie7-beta-2/" target="_blank">this old Microsoft article</a> that states setting them to zero does not actually &lsquo;do anything&rsquo;!</p>
+</blockquote>
+
+<h2 id="serving-stale-content">Serving Stale Content</h2>
+
+<p>As you saw at the beginning of this post, we have a &lsquo;reverse proxy&rsquo; that&rsquo;s placed in front of our origin servers. This proxy will configure (as a default) cache settings that will result in stale versions of our origin&rsquo;s cached content being served when the <code>max-age</code> TTL for that content has expired.</p>
+
+<p>There are two distinct types of serving stale logic:</p>
+
+<ul>
+<li><code>stale-while-revalidate</code>: serve stale content while asynchronously checking for fresh content.</li>
+<li><code>stale-if-error</code>: serve stale content if request to origin fails.</li>
+</ul>
+
+<p>A key part of the <code>stale-while-revalidate</code> flow is for the origin to indicate when a particular resource has been &lsquo;refreshed&rsquo; (i.e. a newer version is available). This is achieved by the origin providing either an <code>ETag</code> (entity tag) or a <code>Last-Modified</code> response header.</p>
+
+<p>The <code>ETag</code> and <code>Last-Modified</code> response headers (sent from the origin) are used as values in a &lsquo;<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests" target="_blank">conditional request</a>&rsquo; made by the cache (client or proxy cache) to determine if the origin should send back either a full response or a smaller <code>304 Not Modified</code> if the revalidated content hasn&rsquo;t changed.</p>
+
+<p>The benefit of a conditional request is that we&rsquo;re able to reduce bandwidth whenever a <code>304 Not Modified</code> is returned from the origin, because it will be sent with an empty response body (where as, of course, <code>200 OK</code> will include the full response body).</p>
+
+<p>There are many <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests#Conditional_headers" target="_blank">conditional headers</a>, but the following are the most common when dealing with <code>ETag</code>/<code>Last-Modified</code>:</p>
+
+<ul>
+<li>ETag: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match" target="_blank"><code>If-None-Match</code></a></li>
+<li>Last-Modified: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since" target="_blank"><code>If-Modified-Since</code></a></li>
+</ul>
+
+<blockquote>
+<p>Reference: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests#Use_cases" target="_blank">sequence diagrams demonstrating the various request flows</a>.</p>
+</blockquote>
+
+<p>If neither <code>ETag</code> nor <code>Last-Modified</code> is sent by the origin, then the cache will not be able to update the cache object. This means the object&rsquo;s TTL (i.e. <code>max-age</code>) will still be expired, and other properties of the cache object will also not be updated, such as its &lsquo;age&rsquo; (reset it back to zero once the content is refreshed), nor its &lsquo;grace&rsquo; period (how long it will be able to serve that content stale for).</p>
+
+<h3 id="etag-or-last-modified">ETag or Last-Modified?</h3>
+
+<p>The official <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.3.4" target="_blank">W3C specification</a> provides &lsquo;rules&rsquo; for when to use ETag vs Last-Modified. In summary&hellip;</p>
+
+<blockquote>
+<p>the preferred behavior for an HTTP/1.1 origin server is to send <strong>both</strong> a strong entity tag and a Last-Modified value.</p>
+</blockquote>
+
+<p>A good additional reference is MDN&rsquo;s article on <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching#Cache_validation" target="_blank">Cache Validation</a>.</p>
+
+<h3 id="revalidation-ttl">Revalidation TTL</h3>
+
+<p>One aspect of serving stale content that normally confuses people is how to determine the TTL for <code>stale-while-revalidate</code>. It would seem that determining a TTL for <code>stale-if-error</code> is fairly straight forward, in that you&rsquo;ll just pick an arbitrarily long time period to serve stale, while the <code>stale-while-revalidate</code> directive isn&rsquo;t as simple.</p>
+
+<p>Consider the following diagram which highlights a typical request flow when using (for example) an <code>ETag</code> to handle the revalidation step:</p>
+
+<blockquote>
+<p>Note: this diagram presumes the use of a CDN like Fastly which has specific behaviours, such as &lsquo;request collapsing&rsquo; built-in.</p>
+</blockquote>
+
+<p><a href="../../assets/images/http-conditional-requests.png">
+<img src="../../assets/images/http-conditional-requests.png">
+</a></p>
+
+<p>In this request flow we can see that although we&rsquo;re successfully serving stale content when a cached object&rsquo;s TTL has expired, this is still potentially going to result in multiple requests to the origin (rather than acting as a cache HIT) if we have an influx of requests for the same resource.</p>
+
+<p>Now with that said, the ability to reach the origin (if we&rsquo;re using Fastly at least, other CDN providers may differ) is only going to be on a datacenter by datacenter basis. The reason being, each <a href="https://www.integralist.co.uk/posts/fastly-varnish/#clustering" target="_blank">cache node</a> will perform <a href="https://docs.fastly.com/guides/performance-tuning/request-collapsing" target="_blank">request collapsing</a> which will mitigate the damage of having to allow a request through to your origin.</p>
+
+<p>With this in mind, having a large <code>stale-while-revalidate</code> TTL might not necessarily be a good idea because ultimately for that time period, if there is no updated version of the content, new client requests are going to be able to reach the origin.</p>
+
+<p>Yes, it&rsquo;s not going to be millions of requests (even if you&rsquo;re a globally distributed brand), and Yes, having an empty response sent back from origin with the <code>304 Not Modified</code> is better as far as bandwidth consumption is concerned, but the origin still has to spend time and resources constructing the response.</p>
+
+<p>So depending on your origin and potentially the costs related to these types of requests it might be better to have a shorter <code>stale-while-revalidate</code> TTL so that it would expire more quickly.</p>
+
+<p>This would then mean the request would go back to the origin <em>sooner</em>, in order to get a full response back to be re-cached, which would then result in future client requests actually getting a cache HIT and saving the origin from having to handle that extra unnecessary load.</p>
+
+<p>On the &lsquo;flip side&rsquo;, I think the <em>actual</em> question needed to be asked is: &ldquo;how important is it that you get fresh content as quickly as possible&rdquo;?</p>
+
+<p>The answer to <em>that</em> will firstly depend on whether we were using a CDN where purging content dynamically was not possible (specifically whenever fresh content was published by an origin). Fastly enables this dynamic purging by providing support for setting a <code>Surrogate-Key</code> HTTP response header.</p>
+
+<p>So if we <em>were</em> in that situation where we couldn&rsquo;t dynamically purge our CDN cache, and the freshness of our content was important then I would imagine we would set a longer <code>stale-while-revalidate</code> TTL in order to force the caching proxy to attempt to revalidate <em>more often</em>.</p>
+
+<p>Otherwise, again if we were in that situation where we couldn&rsquo;t dynamically purge our CDN cache and we had ended up setting a <em>short</em> <code>stale-while-revalidate</code> TTL, then that would mean we&rsquo;d go back to origin and get a new <code>max-age</code> TTL set (which could be set to a very long value) and so we could end up with users getting a cache HIT for content which for all extensive purposes could very well be stale anyway but you would lose the opportunity to try and acquire fresh content via revalidation now.</p>
+
+<p>If you&rsquo;re using a CDN such as Fastly, you can utilize <code>Surrogate-Key</code> to purge your content dynamically whenever fresher versions have been published. Meaning, you could have a short revalidation TTL and if there was no fresh content within that time period you wouldn&rsquo;t actually have to worry about going to origin and getting the same content back but now with a long <code>max-age</code> TTL, because you know you could dynamically trigger a cache MISS whenever your fresh content was published anyway.</p>
+
+<blockquote>
+<p>Open Question: do <em>you</em> think <code>stale-while-revalidate</code> should contain a long or short TTL (and why)?</p>
+</blockquote>
+
+<h3 id="strong-and-weak-validators">Strong and Weak Validators</h3>
+
+<p>As far as the actual <em>setting</em> of an <code>ETag</code> is concerned, this isn&rsquo;t necessarily as straight forward as you might first imagine. For example, a typical approach is to use a hash function to generate a digest of the response body to verify the content has changed.</p>
+
+<p>Of course there is the potential for the hash function to not be robust enough to avoid hash conflicts, but additionally there is a concept referred to as &ldquo;<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests#Validators" target="_blank">validation</a>&rdquo; which needs to be considered (e.g. should the <code>ETag</code> be marked as being a &ldquo;strong&rdquo; validator or a &ldquo;weak&rdquo; validator).</p>
+
+<p>These are things that you&rsquo;ll need to consider when generating an <code>ETag</code> for a resource, and it&rsquo;s recommended you read documentation on <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests#Strong_validation" target="_blank">what constitutes a &ldquo;strong&rdquo; or &ldquo;weak&rdquo; validator</a>.</p>
+
+<blockquote>
+<p>Note: it&rsquo;s important to realize that generating an <code>ETag</code> and figuring out the <code>Last-Modified</code> date of a resource is outside the responsibility of a proxy, hence the proxy sat in front of our origins doesn&rsquo;t set these headers even when they aren&rsquo;t set by the origin.</p>
+</blockquote>
+
+<p>In essence a strong ETag indicates that the resource&rsquo;s content is the same with regards to both the response body and the response headers, whereas a weak ETag indicates that the two representations are semantically equivalent. It compares only the response body. Weak ETags are prefixed with <code>W\</code> and thus can easily be distinguished between weak and strong.</p>
+
+<h2 id="cache-headers-example">Cache Headers Example</h2>
+
+<p>Let&rsquo;s wrap up by considering a real-world example of cache headers and what they look like, and why.</p>
+
+<p>The request flow architecture that I have at work takes the form of:</p>
+
+<pre><code>Client &gt; CDN &gt; Load Balancer(LB) &gt; Proxy &gt; LB &gt; Proxy &gt; LB &gt; Origin
+</code></pre>
+
+<p>There are reasons for the multiple proxy layers in front of our origin servers, but I&rsquo;m not going to dig into that here.</p>
+
+<p>The proxy nearest the front of that list is acting as a gateway of sorts, and so if our origins fail to set any caching instructions, that proxy will add some defaults on their behalf.</p>
+
+<p>This is all documented as service contracts, and so these origins are choosing to opt into those defaults, but they have full control over how their content is cached if they so choose to.</p>
+
+<p>This proxy layer will by default tell the client to <em>not</em> cache your content, while indicating to any &lsquo;caching proxies&rsquo; (e.g. Fastly CDN) that they <em>should</em> cache your content:</p>
+
+<ul>
+<li><code>Cache-Control: no-store</code></li>
+<li><code>Surrogate-Control: max-age=86400, stale-while-revalidate=60, stale-if-error=31536000</code></li>
+</ul>
+
+<blockquote>
+<p>Note: values are in seconds, so <code>86400</code> = 1 day, <code>60</code> = 1 minute, <code>31536000</code> = 1 year.</p>
+</blockquote>
+
+<p>The reason for choosing to only cache content at the CDN rather than the client is because we have very granular control over our CDN cached content (thanks to our CDN provider, <a href="https://www.fastly.com/" target="_blank">Fastly</a>) and so its preferable, for our situation, to have complete control over the caching of our content rather than let a client&rsquo;s browser determine what happens.</p>
+
+<p>For example, if we <em>didn&rsquo;t</em> do this and we allowed the client to cache our content in their own private caches, then it would mean if we had a request from our legal department to take down a piece of content, we wouldn&rsquo;t be able to remove it from the client&rsquo;s cache as that&rsquo;s outside of our control.</p>
+
+<p>Things can get a bit murky if there are proxies placed <em>in front</em> of our CDN (e.g. ISP proxies or maybe client is inside a local corporate network that runs caching proxies), but we set <code>no-store</code> which <em>should</em> tell clients/proxies to not cache. The reason this works with Fastly is because it doesn&rsquo;t respect <code>no-store</code> (it sees that as a client cache directive), it instead respects <code>private</code> (which is more appropriate), and so that&rsquo;s another way of us hopefully catching any unknown proxies in front of our CDN.</p>
+
+<p>All of this leads us to the fact that when we purge our cache, we feel confident that we&rsquo;re capable of successfully purging it from the internet as a whole.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Yes, caching <em>is</em> hard but it&rsquo;s also not rocket science either. Take some time to read over the <code>Cache-Control</code> directives. Try to get comfortable with them.</p>
+
+<p>It&rsquo;s our responsibility as engineers building HTTP services to understand the platform we&rsquo;re building services upon.</p>
+
+<p>❤️</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>

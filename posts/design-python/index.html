@@ -1,0 +1,922 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+  <head>
+    <title>Integralist</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo"><strong>Home</strong></a>
+							<ul class="icons">
+							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
+							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+						</ul>
+					</header>
+
+          <!-- Content -->
+          <section>
+						<!--
+            <header class="main">
+              <h1>Royal Rumble 1989</h1>
+              <p>A Bizarre Spectacle Where the Madness Multiplies</p>
+            </header>
+            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+						-->
+						<nav>
+
+<ul>
+<li><a href="#python-code-design-and-dependency-management">Python Code Design and Dependency Management</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+
+<li><a href="#type-hints-and-static-analysis">Type Hints and Static Analysis</a></li>
+
+<li><a href="#interfaces-protocols-and-abstract-methods">Interfaces, Protocols and Abstract Methods</a>
+<ul>
+<li><a href="#interfaces">Interfaces</a></li>
+
+<li><a href="#protocols">Protocols</a></li>
+
+<li><a href="#abstract-classes-methods">Abstract Classes/Methods</a></li>
+</ul></li>
+
+<li><a href="#dependency-management-with-pipenv">Dependency Management (with pipenv)</a></li>
+
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+
+</nav>
+
+<h1 id="python-code-design-and-dependency-management">Python Code Design and Dependency Management</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This post is going to cover a few tools and features I plan on using when writing Python code in 2019.</p>
+
+<blockquote>
+<p>† read my post &ldquo;<a href="/posts/python-app-dependencies/">Python Management and Project Dependencies</a>&rdquo;.</p>
+</blockquote>
+
+<h2 id="type-hints-and-static-analysis">Type Hints and Static Analysis</h2>
+
+<p>Some languages are weakly typed (JavaScript), some are strongly typed (Python) and some are statically typed (Go, Rust). Being <em>strongly</em> typed means you can&rsquo;t perform operations inappropriate to the type. For example, in Python you can&rsquo;t add a number typed variable with a string typed variable.</p>
+
+<p>In Python 3.5 we get &lsquo;type hints&rsquo; which are a way of annotating Python code with type information in a bid to allow for external tools to provide safety similar to what you might see with a <em>statically</em> typed language.</p>
+
+<p>Python actually ignores these annotations so type hints won&rsquo;t break your code if you specify one expected type but provide a different one at runtime.</p>
+
+<p>Consider the following code snippet, which uses type hint annotations to indicate the types for both a function&rsquo;s parameters as well as the function&rsquo;s return value:</p>
+
+<pre><code>def foo(n: int) -&gt; str:
+    print(f'integer: {n}')
+    return n
+
+foo('not an integer')  # prints 'integer: not an integer'
+</code></pre>
+
+<p>So we can see that the code is stating we expect our <code>foo</code> function to receive a parameter of type integer but when the function is called it&rsquo;s actually passed a string. You&rsquo;ll find this incorrect argument type <em>isn&rsquo;t</em> going to break your program.</p>
+
+<p>Our example code also expects a string to be returned by the <code>foo</code> function, but we return an integer value. So this also doesn&rsquo;t break our program.</p>
+
+<p>If you did nothing else at this point, your code would at the very least be very descriptive of the expectations for its use, but what these type hints afford us is the ability to use external tools for handling static analysis.</p>
+
+<p>The most popular tool currently is called &lsquo;<a href="http://mypy-lang.org/" target="_blank">mypy</a>&rsquo;. You can run mypy via the command line, and it also provides integrated support for most code editors. This means you can catch yourself breaking the expectations of your program when writing/editing code.</p>
+
+<p>Type hints by themselves are quite basic and don&rsquo;t offer much additional contextual information, so Python added a new <a href="https://docs.python.org/3/library/typing.html" target="_blank">typing module</a> to allow for more contextual annotations. One nice feature provided by this typing module is the ability to alias types. The following example is copied verbatim from the Python documentation:</p>
+
+<pre><code>from typing import Dict, Tuple, List
+
+ConnectionOptions = Dict[str, str]
+Address = Tuple[str, int]
+Server = Tuple[Address, ConnectionOptions]
+
+def broadcast_message(message: str, servers: List[Server]) -&gt; None:
+    ...
+
+# The static type checker will treat the previous type signature as
+# being exactly equivalent to this one.
+def broadcast_message(
+        message: str,
+        servers: List[Tuple[Tuple[str, int], Dict[str, str]]]) -&gt; None:
+    ...
+</code></pre>
+
+<p>I intend to use type hints a lot more in 2019 to help me both identify potential issues in my code during development, as well as being a means of code clarity as to what input/output types are expected.</p>
+
+<p>For more examples of using the typing module, please refer to either the official documentation or this useful <a href="https://code.tutsplus.com/tutorials/python-3-type-hints-and-static-analysis--cms-25731" target="_blank">tutsplus.com article</a>.</p>
+
+<h2 id="interfaces-protocols-and-abstract-methods">Interfaces, Protocols and Abstract Methods</h2>
+
+<p>In the field of programming there are two concepts that can be a bit confusing to understand:</p>
+
+<ol>
+<li>interfaces</li>
+<li>abstract classes/methods</li>
+</ol>
+
+<p>We&rsquo;ll cover both of these in the following sections, along with Python&rsquo;s own &lsquo;protocols&rsquo; and &lsquo;abstract base classes&rsquo;.</p>
+
+<p>In summary: an interface is a contract that defines &lsquo;behaviour&rsquo;, but has no <em>implementation</em>. An abstract class is an actual class that can define common behaviour (including its implementation) along with <em>abstract</em> methods that have no implementation. The implementation of the abstract methods will be defined by the subclass.</p>
+
+<h3 id="interfaces">Interfaces</h3>
+
+<p>An interface is useful for when you don&rsquo;t necessarily care for a specific concrete implementation of some functionality and will happily accept any object as long as it abides by the behavioural contract your receiver requires.</p>
+
+<p>For the specific use case of interfaces Python has traditionally relied on &lsquo;duck typing&rsquo;, which is where a caller provides an object and the receiver will attempt to call the appropriate method on the object (thus trusting the object has a corresponding method available).</p>
+
+<blockquote>
+<p>Note: this is where the term duck typing comes from &ldquo;If it walks like a duck and it quacks like a duck, then it must be a duck&rdquo;. If the provided object has the expected method exposed, then we presume it&rsquo;s of a suitable type.</p>
+</blockquote>
+
+<p>In some cases, such as a reusable shared library, it might be preferable to write code defensibly. Meaning you verify the provided object has the interface the receiver is expecting. This is demonstrated in the following example which expects a <code>client</code> object to be provided, and that object needs to be a HTTP client and so must have both a <code>get</code> and a <code>post</code> method.</p>
+
+<p>We could trust the caller has read the documentation and provided an appropriate object, but we don&rsquo;t want to rely on that, so we manually defend against that failure scenario in our code:</p>
+
+<pre><code>async def execute_fetch(client, endpoint):
+    &quot;&quot;&quot;Make asynchronous requests via given http client.&quot;&quot;&quot;
+
+    if invalid_client_interface(client):
+        raise tornado.web.HTTPError(500, reason=&quot;Invalid HTTP Client&quot;)
+
+    ...
+
+def invalid_client_interface(client):
+    &quot;&quot;&quot;Ensure http client has supported interface.&quot;&quot;&quot;
+
+    if hasattr(client, 'post') and hasattr(client, 'get'):
+        return False
+    return True
+</code></pre>
+
+<p>Python not being a statically typed language means it has no support for traditional &lsquo;interfaces&rsquo; but the above example &lsquo;defensive&rsquo; code is a way to manually mimic it at runtime (as we have no means to validate this at any other time as there is no compilation step with Python, being it&rsquo;s a dynamic language).</p>
+
+<h3 id="protocols">Protocols</h3>
+
+<p>Python provides &lsquo;<a href="https://docs.python.org/3.7/library/collections.abc.html#module-collections.abc" target="_blank">protocols</a>&rsquo; as part of their &lsquo;collections&rsquo; module, which are also homed alongside another concept in Python called &lsquo;abstract base classes&rsquo; (this is something we&rsquo;ll look at shortly as ABC&rsquo;s are designed to play nicely with protocols).</p>
+
+<p>Protocols are similar in spirit to interfaces in other languages, but in practice act more like <em>guidelines</em> (this is because Python is a dynamic language and so strictly speaking it isn&rsquo;t able to validate code correctness because there&rsquo;s no compilation step with Python).</p>
+
+<p>In essence a protocol <em>is</em> an interface (it defines expected behaviours), while Python&rsquo;s &lsquo;Abstract Base Classes&rsquo; provide a way to offer a form of runtime safety for the interface.</p>
+
+<p>But to understand &lsquo;protocols&rsquo; and how we can utilize either MyPy or Abstract Base Classes with them, you&rsquo;ll need to know a bit about &lsquo;magic methods&rsquo; in Python&hellip;</p>
+
+<p><strong>Magic Methods</strong>:<br>
+If one of your custom defined objects implements specific <a href="https://rszalski.github.io/magicmethods/" target="_blank">&lsquo;magic&rsquo; methods</a> (e.g. <code>__len__</code>, <code>__del__</code> etc), then you&rsquo;ll find a selection of builtin Python functions become available to use on those objects that otherwise those builtin functions wouldn&rsquo;t necessarily support.</p>
+
+<p>For example, if we implement the <code>__len__</code> magic method, then our object will be able to utilise the builtin <code>len</code> function.</p>
+
+<p>If we utilize protocols, then we can use mypy along with type hinting to implement a development time interface check.</p>
+
+<p>Consider the following code snippet:</p>
+
+<pre><code>class Team:
+    def __init__(self, members):
+        self.members = members
+
+t = Team(['foo', 'bar', 'baz'])
+
+t.members  # ['foo', 'bar', 'baz']
+
+len(t)  # TypeError: object of type 'Team' has no len()
+</code></pre>
+
+<p>This code doesn&rsquo;t work because the <code>len</code> function provided by the Python standard library doesn&rsquo;t work on custom classes <em>unless</em> the class defines a <code>__len__</code> magic method.</p>
+
+<p>If we add a <code>__len__</code> method to the above example (see below), then we would find the <code>Team</code> class now supports the <a href="https://docs.python.org/3.7/library/collections.abc.html#collections.abc.Sized" target="_blank">collections.abc.Sized protocol</a> and so the <code>len</code> function will be able to work when given an instance of <code>Team</code>:</p>
+
+<pre><code>class Team:
+    def __init__(self, members):
+        self.members = members
+
+    def __len__(self):
+        return len(self.members)
+
+t = Team(['foo', 'bar', 'baz'])
+
+t.members  # ['foo', 'bar', 'baz']
+
+len(t)  # 3
+</code></pre>
+
+<p>Now if we want to utilise mypy to help verifying our code at development time, let&rsquo;s say we have a function that we want to accept any argument type that supports the <code>len</code> function (i.e. anything that supports the <code>collections.abc.Sized</code> protocol), then we can do so using the <code>typing.Sized</code> type (see below example which adds such a function called <code>print_size</code>):</p>
+
+<pre><code>import typing
+
+
+class Team:
+    def __init__(self, members):
+        self.members = members
+
+    def __len__(self):
+        return len(self.members)
+
+
+t = Team(['foo', 'bar', 'baz'])
+
+
+def print_size(s: typing.Sized):
+    print(len(s))
+
+
+print_size(t)
+</code></pre>
+
+<p>Notice that in the above example we state that the first argument to <code>print_size</code> should be a type of the <code>typing.Sized</code>, which is actually a mapping to the <code>collections.abc.Sized</code> protocol.</p>
+
+<p>If we use the mypy static analysis tool as part of our application testing process (e.g. we only deploy the code if mypy is happy), then we can feel confident our code will be safe.</p>
+
+<p>This is because if we were ever to change the code in a way where we were passing something to <code>print_size</code> that <em>didn&rsquo;t</em> support calling <code>len()</code> on it, then the mypy analysis would fail.</p>
+
+<p><strong>Custom Protocols</strong></p>
+
+<p>The Python typing module also let&rsquo;s you define your own protocols using <code>typing.NewType</code>.</p>
+
+<p>Let&rsquo;s look at a simple example first to understand the use of <code>NewType</code>:</p>
+
+<pre><code>from typing import NewType
+
+I = NewType('I', int)
+
+def foo() -&gt; I:
+   return I(123)
+</code></pre>
+
+<p>Notice a few things in the above example:</p>
+
+<ol>
+<li>the first argument to <code>typing.NewType</code> needs to match the name of the variable it is assigned to.</li>
+<li>we can&rsquo;t just return an integer, it needs to be casted to the new type <code>I</code> first.</li>
+</ol>
+
+<p>Now we have a basic understanding of <code>NewType</code> let&rsquo;s consider the following example where we create a new custom protocol called <code>CustomProtocol</code>:</p>
+
+<pre><code>import typing
+
+
+class Team:
+    def __init__(self, members):
+        self.members = members
+
+    def __len__(self):
+        return len(self.members)
+
+
+t = Team(['foo', 'bar', 'baz'])
+
+
+def print_size(s: typing.Sized):
+    print(len(s))
+
+
+print_size(t)  # prints '3'
+
+CustomProtocol = typing.NewType('CustomProtocol', Team)
+
+cp = CustomProtocol(Team(['beep', 'boop']))  # &lt;class '__main__.Team'&gt;
+
+print_size(cp)  # prints '2'
+</code></pre>
+
+<blockquote>
+<p>Note: when we create an instance of <code>CustomProtocol</code> the underlying &lsquo;type&rsquo; is <code>Team</code>.</p>
+</blockquote>
+
+<p>The mypy static analysis tool can subsequently be used to verify code for both native protocols <em>and</em> custom protocols, like so (see the type hint annotation added to the <code>print_size</code> function, which mypy is happy with):</p>
+
+<pre><code>class Team:
+    def __init__(self, members):
+        self.members = members
+
+    def __len__(self):
+        return len(self.members)
+
+
+CustomProtocol = typing.NewType('CustomProtocol', Team)
+
+
+def print_size(s: CustomProtocol):  # we could also set type to `Team` 
+    print(len(s))  # prints '2'
+
+
+cp = CustomProtocol(Team(['beep', 'boop']))
+
+print_size(cp)
+</code></pre>
+
+<blockquote>
+<p>Note: the argument type passed to <code>print_size</code> is <code>CustomProtocol</code> which doesn&rsquo;t make mypy complain because the underlying type for <code>CustomProtocol</code> is actually the <code>Team</code> class, and the underlying <code>Team</code> class is supporting the <code>typing.Sized</code> interface (which maps to the <code>collections.abc.Sized</code> protocol).</p>
+</blockquote>
+
+<p>If you want more information on mypy&rsquo;s support of protocols, I suggest reading their <a href="https://mypy.readthedocs.io/en/latest/protocols.html" target="_blank">specific documentation here</a>.</p>
+
+<h3 id="abstract-classes-methods">Abstract Classes/Methods</h3>
+
+<p>An abstract class allows you to define common behaviour as well as &lsquo;abstract methods&rsquo; that have no implementation, in which the subclass will be required to provide the implementation.</p>
+
+<p>We can mimic that concept in Python using standard classes along with the classic <a href="https://en.wikipedia.org/wiki/Template_method_pattern" target="_blank">&lsquo;template method&rsquo; pattern</a> as shown in the following example:</p>
+
+<pre><code>class MyAbstractClass:
+    def common(self):
+        print('common behaviour')
+
+    def MyAbstractMethod(self):
+        raise NotImplementedError
+
+class Foo(MyAbstractClass):
+    def MyAbstractMethod(self):
+        print('do something')
+
+class Bar(MyAbstractClass):
+    pass
+
+f = Foo()
+f.common()  # prints 'common behaviour'
+f.MyAbstractMethod()  # prints 'do something'
+
+b = Bar()
+b.common()  # prints 'common behaviour'
+b.MyAbstractMethod()  # raises NotImplementedError
+
+o = MyAbstractClass()  # not possible in other languages (see note below)
+o.common()  # prints 'common behaviour'
+o.MyAbstractMethod()  # raises NotImplementedError
+</code></pre>
+
+<blockquote>
+<p>Note: in other languages that support proper abstract classes, you would not be able to instantiate the abstract class directly (like we have done in our example).</p>
+</blockquote>
+
+<p>Luckily Python does also provide us with what it refers to as &lsquo;Abstract Base Classes&rsquo; (here in referred to as ABC&rsquo;s) which are a form of traditional abstract class, so there&rsquo;s no need to necessarily mimic the behaviour like in our earlier example. See the following example that demonstrates this feature:</p>
+
+<pre><code>import abc
+
+class Foo(abc.ABC):
+    @abc.abstractmethod
+    def bar(self):
+        pass
+        
+class Thing(Foo):
+    pass
+    
+t = Thing()  # TypeError: Can't instantiate abstract class Thing with abstract methods bar
+</code></pre>
+
+<p>To make the above example code work correctly we need our class <code>Thing</code> to actually implement the exepected behaviour (i.e. a <code>bar</code> method). If <code>Thing</code> doesn&rsquo;t provide the expected behaviour then we can&rsquo;t instantiate a subclass of <code>Foo</code>.</p>
+
+<p>This also means that if we&rsquo;re using a static analysis tool such as mypy, we could have a receiver state it expects a type of <code>Thing</code> and know more confidently that <code>Thing</code> will definitely provide the behaviour we need.</p>
+
+<p>It&rsquo;s important to understand that the use of an abstract class is subtly different to the use of traditional interfaces in that an interface doesn&rsquo;t rely on a concrete implemention.</p>
+
+<p>For example, our <code>Thing</code> class is a <em>concrete</em> implementation, and so we can&rsquo;t provide the receiver with a <em>different</em> class (even if the other class also happened to inherit from <code>Foo</code>) as it won&rsquo;t be equivalent to a <code>Thing</code> type.</p>
+
+<blockquote>
+<p>Note: the mypy docs have <a href="https://mypy.readthedocs.io/en/latest/kinds_of_types.html#the-type-of-class-objects" target="_blank">a good detailed breakdown</a> of how to indicate a dependency of a specific class type.</p>
+</blockquote>
+
+<h2 id="dependency-management-with-pipenv">Dependency Management (with pipenv)</h2>
+
+<p><strong>UPDATE 2019.12.20</strong>: I no longer use Pipenv (as per below). I&rsquo;ve written an updated version of how best to handle dependencies <a href="/posts/python-app-dependencies/">here</a>.</p>
+
+<p>Python has historically utilised a <code>requirements.txt</code> file for defining the dependencies required of your program, but there are <a href="https://medium.com/knerd/the-nine-circles-of-python-dependency-hell-481d53e3e025" target="_blank">various</a> annoying <a href="https://realpython.com/pipenv-guide/#dependency-management-with-requirementstxt" target="_blank">complications</a> that go along with the traditional model of handling dependencies which has meant we have a few new players in the field to help us.</p>
+
+<p>One such concern is the setting up of multiple virtual environments for the various projects we need to work on:</p>
+
+<p><center>
+  <a href="../../assets/images/python-env.png">
+<img src="../../assets/images/python-env.png">
+  </a>
+</center></p>
+
+<p><center class="image-caption"><em>XKCD: right as always</em></center></p>
+
+<p>So here are the various alternatives we have to play with in 2019:</p>
+
+<ul>
+<li><a href="https://github.com/ofek/hatch" target="_blank">Hatch</a></li>
+<li><a href="https://github.com/sdispater/poetry" target="_blank">Poetry</a></li>
+<li><a href="https://github.com/pypa/pipenv" target="_blank">Pipenv</a></li>
+</ul>
+
+<p>I&rsquo;ll be showing you the last tool in the list: <strong>Pipenv</strong>.</p>
+
+<p>Although <em>another</em> alternative approach to the specific problem of virtual environments is to utilise docker containers for doing your development, but you&rsquo;ll need to be comfortable using a terminal editor like Vim (unless you want to jump through some X11 hoops). Using containers also doesn&rsquo;t eliminate the other issues with determining the right dependencies, so keep reading anyway.</p>
+
+<blockquote>
+<p>Note: if using Docker with a terminal editor like Vim to solve this problem sounds like a good approach for you, then review <a href="/posts/docker-nginx/">an older post of mine that explains how to do that</a>.</p>
+</blockquote>
+
+<p>Here are the commands necessary to install Pipenv on macOS:</p>
+
+<ul>
+<li><code>brew install pyenv</code></li>
+<li><code>pip install pipenv</code></li>
+</ul>
+
+<blockquote>
+<p>Note: you&rsquo;ll need <a href="https://brew.sh/" target="_blank">Homebrew</a> to install the <a href="https://github.com/pyenv/pyenv" target="_blank"><code>pyenv</code></a> command (a sub dependency) using <code>brew</code>, and macOS should have Python 2.7.x installed by default so you should have the <code>pip</code> command available already.</p>
+</blockquote>
+
+<p>Here are my quick steps for setting up a new project with Pipenv:</p>
+
+<ul>
+<li><code>mkdir foobar &amp;&amp; cd foobar</code></li>
+<li><code>pipenv --python 3.7</code></li>
+</ul>
+
+<blockquote>
+<p>Note: use <code>pyenv install --list</code> to find out what Python versions are available to install.</p>
+</blockquote>
+
+<p>Now when working on a Pipenv project:</p>
+
+<ul>
+<li><code>cd foobar</code></li>
+<li><code>pipenv shell</code> or <code>pipenv run python ./app.py</code></li>
+</ul>
+
+<blockquote>
+<p>Note: use the <code>shell</code> subcommand to have your current terminal permanently use the chosen Python version (e.g. <code>python ./app.py</code> will work as if the current Python version is what you&rsquo;ve defined), otherwise use the <code>run</code> subcommand to execute the given command (e.g. <code>python ./app.py</code>) within the chosen Python version temporarily.</p>
+</blockquote>
+
+<p>You can now install dependencies specifically for the project&rsquo;s specific Python environment:</p>
+
+<ul>
+<li><code>pipenv install tornado==5.0.2</code></li>
+<li><code>pipenv install --dev mypy tox flake8</code></li>
+</ul>
+
+<blockquote>
+<p>Note: if you have an existing <code>requirements.txt</code> file, then you can generate a Pipfile from that using <code>pipenv install -r requirements.txt</code>, alternatively if you need to do the reverse (generate a requirements from a Pipfile): <code>pipenv lock --requirements</code></p>
+</blockquote>
+
+<p>Now none of these new tools are perfect, and if you want a good run down of one engineer&rsquo;s perspective on them, <a href="https://chriswarrick.com/blog/2018/07/17/pipenv-promises-a-lot-delivers-very-little/" target="_blank">read here</a>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&rsquo;s it. We&rsquo;ve looked at how to handle dependencies with Pipenv, and how to utilise static analysis tool mypy along with type hinting to give us more confidence in our code (as well as having the code become clearer intent).</p>
+
+<p>Lastly we looked at how to utilise interfaces and abstract classes to help improve the structure and safety of our code.</p>
+
+<p>Along with new additions to the <code>asyncio</code> module (a simpler api for a start) and cleaner abstractions such as the new <a href="https://realpython.com/python-data-classes/" target="_blank">data classes</a> features, the future of Python hasn&rsquo;t looked brighter.</p>
+
+          </section>
+        </div>
+      </div>
+      <!-- Sidebar -->
+<div id="sidebar">
+  <div class="inner">
+    <!-- Search -->
+    <!--<section id="search" class="alt">-->
+    <!--  <form method="post" action="#">-->
+    <!--    <input type="text" name="query" id="query" placeholder="Search" />-->
+    <!--  </form>-->
+    <!--</section>-->
+    <!-- Menu -->
+    <nav id="menu">
+      <header class="major">
+        <h2>Menu</h2>
+      </header>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <!--<li><a href="../resume/index.html">Resume</a></li>-->
+				
+	<li>
+	  <span class="opener">Pages</span>
+	  <ul>
+		
+	<li><a href="../../pages/christmas-movies/index.html">Christmas Movies</a></li>
+	
+	<li><a href="../../pages/resume/index.html">Resume</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2024</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-concurrency-patterns/index.html">Go Concurrency Patterns</a></li>
+	
+	<li><a href="../../posts/bitwise-operations-in-go/index.html">Bitwise Operations In Go</a></li>
+	
+	<li><a href="../../posts/go-typed-nil/index.html">Go Typed Nil</a></li>
+	
+	<li><a href="../../posts/programming-at-the-edge-with-fastly-compute/index.html">Programming At The Edge With Fastly Compute</a></li>
+	
+	<li><a href="../../posts/ci-cd-with-terraform-cloud-and-github-actions/index.html">Ci Cd With Terraform Cloud And Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2023</span>
+	  <ul>
+		
+	<li><a href="../../posts/openapi/index.html">Openapi</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2022</span>
+	  <ul>
+		
+	<li><a href="../../posts/terraform-build-a-provider/index.html">Terraform Build A Provider</a></li>
+	
+	<li><a href="../../posts/rust-smart-pointers/index.html">Rust Smart Pointers</a></li>
+	
+	<li><a href="../../posts/laptop-setup-v2/index.html">Laptop Setup V2</a></li>
+	
+	<li><a href="../../posts/go-install/index.html">Go Install</a></li>
+	
+	<li><a href="../../posts/neovim-rust-go/index.html">Neovim Rust Go</a></li>
+	
+	<li><a href="../../posts/vim-themes/index.html">Vim Themes</a></li>
+	
+	<li><a href="../../posts/dev-tools/index.html">Dev Tools</a></li>
+	
+	<li><a href="../../posts/go-style-guide/index.html">Go Style Guide</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2021</span>
+	  <ul>
+		
+	<li><a href="../../posts/vim-advanced/index.html">Vim Advanced</a></li>
+	
+	<li><a href="../../posts/rust-ownership/index.html">Rust Ownership</a></li>
+	
+	<li><a href="../../posts/github-actions/index.html">Github Actions</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2020</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-reflection/index.html">Go Reflection</a></li>
+	
+	<li><a href="../../posts/software-comparison/index.html">Software Comparison</a></li>
+	
+	<li><a href="../../posts/rate-limiting/index.html">Rate Limiting</a></li>
+	
+	<li><a href="../../posts/git-internals/index.html">Git Internals</a></li>
+	
+	<li><a href="../../posts/python-context-managers/index.html">Python Context Managers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2019</span>
+	  <ul>
+		
+	<li><a href="../../posts/python-generators/index.html">Python Generators</a></li>
+	
+	<li><a href="../../posts/tox-ini/index.html">Tox Ini</a></li>
+	
+	<li><a href="../../posts/python-app-dependencies/index.html">Python App Dependencies</a></li>
+	
+	<li><a href="../../posts/python-asyncio/index.html">Python Asyncio</a></li>
+	
+	<li><a href="../../posts/go-arrays-and-slices/index.html">Go Arrays And Slices</a></li>
+	
+	<li><a href="../../posts/anonymity/index.html">Anonymity</a></li>
+	
+	<li><a href="../../posts/http-caching-guide/index.html">Http Caching Guide</a></li>
+	
+	<li><a href="../../posts/laptop-setup/index.html">Laptop Setup</a></li>
+	
+	<li><a href="../../posts/git-multiple-branches/index.html">Git Multiple Branches</a></li>
+	
+	<li><a href="../../posts/algorithms-in-python/index.html">Algorithms In Python</a></li>
+	
+	<li><a href="../../posts/remote-working/index.html">Remote Working</a></li>
+	
+	<li><a href="../../posts/python-mocking/index.html">Python Mocking</a></li>
+	
+	<li><a href="../../posts/calculating-big-o/index.html">Calculating Big O</a></li>
+	
+	<li><a href="../../posts/algorithmic-complexity-in-python/index.html">Algorithmic Complexity In Python</a></li>
+	
+	<li><a href="../../posts/data-types-and-data-structures/index.html">Data Types And Data Structures</a></li>
+	
+	<li><a href="../../posts/design-python/index.html">Design Python</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2018</span>
+	  <ul>
+		
+	<li><a href="../../posts/js-modern/index.html">Js Modern</a></li>
+	
+	<li><a href="../../posts/engineer-to-manager/index.html">Engineer To Manager</a></li>
+	
+	<li><a href="../../posts/interview-techniques/index.html">Interview Techniques</a></li>
+	
+	<li><a href="../../posts/post-mortems/index.html">Post Mortems</a></li>
+	
+	<li><a href="../../posts/slackbot-opsbot/index.html">Slackbot Opsbot</a></li>
+	
+	<li><a href="../../posts/go-interfaces/index.html">Go Interfaces</a></li>
+	
+	<li><a href="../../posts/multigrain-services/index.html">Multigrain Services</a></li>
+	
+	<li><a href="../../posts/authentication-with-aws-cognito/index.html">Authentication With Aws Cognito</a></li>
+	
+	<li><a href="../../posts/a-guide-to-effective-1-1-meetings/index.html">A Guide To Effective 1 1 Meetings</a></li>
+	
+	<li><a href="../../posts/project-management/index.html">Project Management</a></li>
+	
+	<li><a href="../../posts/reading-list/index.html">Reading List</a></li>
+	
+	<li><a href="../../posts/python-security/index.html">Python Security</a></li>
+	
+	<li><a href="../../posts/static-site-search/index.html">Static Site Search</a></li>
+	
+	<li><a href="../../posts/interview-topics/index.html">Interview Topics</a></li>
+	
+	<li><a href="../../posts/go-reverse-proxy/index.html">Go Reverse Proxy</a></li>
+	
+	<li><a href="../../posts/hashing-encryption-encoding/index.html">Hashing Encryption Encoding</a></li>
+	
+	<li><a href="../../posts/computers-101/index.html">Computers 101</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2017</span>
+	  <ul>
+		
+	<li><a href="../../posts/statistics-basics/index.html">Statistics Basics</a></li>
+	
+	<li><a href="../../posts/queue-best-practices/index.html">Queue Best Practices</a></li>
+	
+	<li><a href="../../posts/monitoring-best-practices/index.html">Monitoring Best Practices</a></li>
+	
+	<li><a href="../../posts/load-testing-guidelines/index.html">Load Testing Guidelines</a></li>
+	
+	<li><a href="../../posts/logging-101/index.html">Logging 101</a></li>
+	
+	<li><a href="../../posts/fastly-varnish/index.html">Fastly Varnish</a></li>
+	
+	<li><a href="../../posts/profiling-python/index.html">Profiling Python</a></li>
+	
+	<li><a href="../../posts/profiling-go/index.html">Profiling Go</a></li>
+	
+	<li><a href="../../posts/dev-environments-within-docker-containers/index.html">Dev Environments Within Docker Containers</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2016</span>
+	  <ul>
+		
+	<li><a href="../../posts/key-architecture/index.html">Key Architecture</a></li>
+	
+	<li><a href="../../posts/go-hitchhikers-guide/index.html">Go Hitchhikers Guide</a></li>
+	
+	<li><a href="../../posts/concepts-from-the-c-programming-language/index.html">Concepts From The C Programming Language</a></li>
+	
+	<li><a href="../../posts/man-pages/index.html">Man Pages</a></li>
+	
+	<li><a href="../../posts/c-and-syscalls/index.html">C And Syscalls</a></li>
+	
+	<li><a href="../../posts/bits-and-bytes/index.html">Bits And Bytes</a></li>
+	
+	<li><a href="../../posts/terminal-password-manager/index.html">Terminal Password Manager</a></li>
+	
+	<li><a href="../../posts/terminal-utils/index.html">Terminal Utils</a></li>
+	
+	<li><a href="../../posts/github-pull-request-formatting/index.html">Github Pull Request Formatting</a></li>
+	
+	<li><a href="../../posts/big-o-for-beginners/index.html">Big O For Beginners</a></li>
+	
+	<li><a href="../../posts/the-perfect-developer/index.html">The Perfect Developer</a></li>
+	
+	<li><a href="../../posts/git-merge-strategies/index.html">Git Merge Strategies</a></li>
+	
+	<li><a href="../../posts/grpc-for-beginners/index.html">Grpc For Beginners</a></li>
+	
+	<li><a href="../../posts/bash-watchtower/index.html">Bash Watchtower</a></li>
+	
+	<li><a href="../../posts/rpc-variations-in-go/index.html">Rpc Variations In Go</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2015</span>
+	  <ul>
+		
+	<li><a href="../../posts/go-func-type/index.html">Go Func Type</a></li>
+	
+	<li><a href="../../posts/github-multiple-ssh/index.html">Github Multiple Ssh</a></li>
+	
+	<li><a href="../../posts/http2/index.html">Http2</a></li>
+	
+	<li><a href="../../posts/building-systems-with-make/index.html">Building Systems With Make</a></li>
+	
+	<li><a href="../../posts/client-cert-authentication/index.html">Client Cert Authentication</a></li>
+	
+	<li><a href="../../posts/dns-101/index.html">Dns 101</a></li>
+	
+	<li><a href="../../posts/security-basics/index.html">Security Basics</a></li>
+	
+	<li><a href="../../posts/docker-nginx/index.html">Docker Nginx</a></li>
+	
+	<li><a href="../../posts/designing-for-simplicity/index.html">Designing For Simplicity</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2014</span>
+	  <ul>
+		
+	<li><a href="../../posts/concurrency/index.html">Concurrency</a></li>
+	
+	<li><a href="../../posts/github-workflow/index.html">Github Workflow</a></li>
+	
+	<li><a href="../../posts/functional-recursive-javascript-programming/index.html">Functional Recursive Javascript Programming</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2013</span>
+	  <ul>
+		
+	<li><a href="../../posts/refactoring-techniques/index.html">Refactoring Techniques</a></li>
+	
+	<li><a href="../../posts/design-mvcp/index.html">Design Mvcp</a></li>
+	
+	<li><a href="../../posts/basic-shell-scripting/index.html">Basic Shell Scripting</a></li>
+	
+	<li><a href="../../posts/clean-coder/index.html">Clean Coder</a></li>
+	
+	<li><a href="../../posts/message-passing-in-object-oriented-code/index.html">Message Passing In Object Oriented Code</a></li>
+	
+	<li><a href="../../posts/design-oop/index.html">Design Oop</a></li>
+	
+	  </ul>
+	</li>
+	
+	<li>
+	  <span class="opener">2012</span>
+	  <ul>
+		
+	<li><a href="../../posts/git-tips/index.html">Git Tips</a></li>
+	
+	<li><a href="../../posts/maintainable-css-with-bem/index.html">Maintainable Css With Bem</a></li>
+	
+	<li><a href="../../posts/host-methods-vs-native-methods/index.html">Host Methods Vs Native Methods</a></li>
+	
+	<li><a href="../../posts/javascript-101/index.html">Javascript 101</a></li>
+	
+	  </ul>
+	</li>
+	
+      </ul>
+    </nav>
+    <!-- Section -->
+		<!--
+    <section>
+      <header class="major">
+        <h2>Highlights</h2>
+      </header>
+      <div class="mini-posts">
+        <article>
+          <a href="ppv-survivorseries-88.html" class="image"><img src="../images/survivor-88-index.jpg" alt="" /></a>
+          <p>Get ready for the ultimate showdown as Survivor Series 1988 brings non-stop tag team action, fierce rivalries, and unforgettable battles between the biggest WWF superstars!</p>
+        </article>
+        <article>
+          <a href="ppv-royalrumble-89.html" class="image"><img src="../images/rumble-89-index.jpg" alt="" /></a>
+          <p>Royal Rumble 1989 unleashes chaos with 30 superstars battling for glory in an unforgettable over-the-top-rope showdown!</p>
+        </article>
+        <article>
+          <a href="ppv-summerslam-88.html" class="image"><img src="../images/slam-88-index.jpg" alt="" /></a>
+          <p>SummerSlam 1988 delivers explosive action with iconic matchups, as the WWF's biggest stars collide in the hottest event of the summer!</p>
+        </article>
+      </div>
+    </section>
+		-->
+    <!-- Section -->
+    <!--<section>-->
+    <!--  <header class="major">-->
+    <!--    <h2>Get in touch</h2>-->
+    <!--  </header>-->
+    <!--  <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>-->
+    <!--  <ul class="contact">-->
+    <!--    <li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>-->
+    <!--    <li class="icon solid fa-phone">(000) 000-0000</li>-->
+    <!--    <li class="icon solid fa-home">1234 Somewhere Road #8254<br />-->
+    <!--      Nashville, TN 00000-0000</li>-->
+    <!--  </ul>-->
+    <!--</section>-->
+    <!-- Footer -->
+    <footer id="footer">
+      <p class="copyright">&copy; Integralist. All rights reserved.</p>
+      <p class="copyright small">Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+    </footer>
+  </div>
+</div>
+
+    </div>
+    <!-- Scripts -->
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/browser.min.js"></script>
+    <script src="../../assets/js/breakpoints.min.js"></script>
+    <script src="../../assets/js/util.js"></script>
+    <script src="../../assets/js/main.js"></script>
+
+		<!-- The following script is for handling the automatic TOC generated by `make build` -->
+		<script>
+		// Get references to the elements
+		const nav = document.querySelector('#main nav');
+		const h1 = document.querySelector('#main h1');
+
+		// Move the `nav` element to be underneath the `h1`
+		h1.insertAdjacentElement('afterend', nav);
+
+		// Hide the `nav` element by default using inline styles
+		nav.style.display = 'none';
+
+		// Create a new `h2` element with the text "TOC"
+		const toc = document.createElement('h2');
+		toc.textContent = 'TOC';
+		toc.className = "toc"
+
+		// Add inline styles to make the `h2` look clickable
+		// DISABLED: done with className
+		//
+		// toc.style.cursor = 'pointer';
+		// toc.style.color = 'blue';
+		// toc.style.textDecoration = 'underline';
+
+		// Add a click event listener to toggle the visibility of the `nav`
+		toc.addEventListener('click', () => {
+				nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Insert the `h2` element above the `nav`
+		nav.insertAdjacentElement('beforebegin', toc);
+		</script>
+
+		<!-- The following script highlights the current page in the side nav -->
+		<script>
+		// Get the current page's URL path and normalize it
+    const currentUrl = window.location.pathname;
+    const normalizedCurrentUrl = currentUrl
+        .replace(/.*\/(pages|posts)\//, '/$1/') // Ensure leading slash and extract from `pages/` or `posts/`
+        .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+    // Select all menu links
+    const links = document.querySelectorAll('#menu ul li a');
+
+    let matchedParentSpan = null;
+
+    links.forEach(link => {
+        // Normalize the link's href for comparison
+        const normalizedHref = link.getAttribute('href')
+            .replace(/^(\.\.\/)+/, '/') // Convert `../../` to `/` for consistency
+            .replace(/index\.html$/, ''); // Remove `index.html` suffix
+
+        // Check if the normalized href matches the normalized current URL
+        if (normalizedHref === normalizedCurrentUrl) {
+            // Add the inline style to the matching link
+            link.style.color = 'black';
+
+            // Find the parent span with the class 'opener'
+            matchedParentSpan = link.closest('ul').previousElementSibling;
+        }
+    });
+
+    // If a matching parent span was found, add the 'active' class
+    if (matchedParentSpan && matchedParentSpan.classList.contains('opener')) {
+        matchedParentSpan.classList.add('active');
+    }
+		</script>
+  </body>
+</html>
