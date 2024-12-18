@@ -84,63 +84,7 @@
               <h2>Articles</h2>
             </header>
             <div class="posts">
-							
-	<article>
-	<h3>Royal Rumble 1990</h3>
-	<p class="pubdate">1990-01-21</p>
-	<ul class="actions">
-	<li><a href="posts/royal-rumble-1990/index.html" class="button">Read</a></li>
-	</ul>
-	</article>
-	
-	<article>
-	<h3>Royal Rumble 1989</h3>
-	<p class="pubdate">1989-01-15</p>
-	<ul class="actions">
-	<li><a href="posts/royal-rumble-1989/index.html" class="button">Read</a></li>
-	</ul>
-	</article>
-	
-	<article>
-	<h3>Survivor Series 1988</h3>
-	<p class="pubdate">1988-11-24</p>
-	<ul class="actions">
-	<li><a href="posts/survivor-series-1988/index.html" class="button">Read</a></li>
-	</ul>
-	</article>
-	
-	<article>
-	<h3>Summerslam 1988</h3>
-	<p class="pubdate">1988-08-29</p>
-	<ul class="actions">
-	<li><a href="posts/summerslam-1988/index.html" class="button">Read</a></li>
-	</ul>
-	</article>
-	
-	<article>
-	<h3>Wrestlemania 4</h3>
-	<p class="pubdate">1988-03-27</p>
-	<ul class="actions">
-	<li><a href="posts/wrestlemania-4/index.html" class="button">Read</a></li>
-	</ul>
-	</article>
-	
-	<article>
-	<h3>Survivor Series 1987</h3>
-	<p class="pubdate">1987-11-26</p>
-	<ul class="actions">
-	<li><a href="posts/survivor-series-1987/index.html" class="button">Read</a></li>
-	</ul>
-	</article>
-	
-	<article>
-	<h3>Wrestlemania 3</h3>
-	<p class="pubdate">1987-03-29</p>
-	<ul class="actions">
-	<li><a href="posts/wrestlemania-3/index.html" class="button">Read</a></li>
-	</ul>
-	</article>
-	
+							{INSERT_MAIN}
 							<!--
               <article>
                 <a href="./pages/ppv-wrestlemania-3.html" class="image"><img src="images/mania-3-index.jpg" alt="" /></a>
@@ -172,58 +116,7 @@
             <ul>
               <li><a href="index.html">Home</a></li>
 							<!--<li><a href="resume/index.html">Resume</a></li>-->
-							
-	<li>
-	  <span class="opener">Pages</span>
-	  <ul>
-		
-	<li><a href="pages/testing/index.html">Testing</a></li>
-	
-	  </ul>
-	</li>
-	
-	<li>
-	  <span class="opener">1990</span>
-	  <ul>
-		
-	<li><a href="posts/royal-rumble-1990/index.html">Royal Rumble 1990</a></li>
-	
-	  </ul>
-	</li>
-	
-	<li>
-	  <span class="opener">1989</span>
-	  <ul>
-		
-	<li><a href="posts/royal-rumble-1989/index.html">Royal Rumble 1989</a></li>
-	
-	  </ul>
-	</li>
-	
-	<li>
-	  <span class="opener">1988</span>
-	  <ul>
-		
-	<li><a href="posts/survivor-series-1988/index.html">Survivor Series 1988</a></li>
-	
-	<li><a href="posts/summerslam-1988/index.html">Summerslam 1988</a></li>
-	
-	<li><a href="posts/wrestlemania-4/index.html">Wrestlemania 4</a></li>
-	
-	  </ul>
-	</li>
-	
-	<li>
-	  <span class="opener">1987</span>
-	  <ul>
-		
-	<li><a href="posts/survivor-series-1987/index.html">Survivor Series 1987</a></li>
-	
-	<li><a href="posts/wrestlemania-3/index.html">Wrestlemania 3</a></li>
-	
-	  </ul>
-	</li>
-	
+							{INSERT_NAV}
             </ul>
           </nav>
           <!-- Section -->
