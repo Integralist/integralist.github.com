@@ -42,6 +42,23 @@ SOMETHING HERE TO IGNORE
 <!-- markdownlint-enable -->
 ```
 
+## Images
+
+To generate an animated gif from a video clip:
+
+```shell
+ffmpeg -i ~/Downloads/1990.01.15\ -\ Royal\ Rumble\ 1990.mp4 -ss 02:37:40 -to 02:40:00 -vf "fps=15,scale=480:-1:flags=lanczos" assets/images/rumble-90-24.gif
+```
+
+> \[!WARNING\]
+> Requires [https://git-lfs.com/](https://git-lfs.com/)
+
+To convert a screenshot from a png to optimized jpg:
+
+```shell
+magick ~/Desktop/Screenshots/Screenshot\ 2025-01-02\ at\ 16.16.26.png -quality 70 assets/images/rumble-90-16.jpg
+```
+
 ## DNS
 
 ```shell
