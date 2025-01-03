@@ -149,9 +149,9 @@ a {
   text-decoration: none; }
   a:hover {
     border-bottom-color: #f56a6a;
-    color: #f56a6a !important; }
+    color: #000000 !important; }
     a:hover strong {
-      color: inherit; }
+      color: #000000; }
 
 strong, b {
   color: #3d4449;
