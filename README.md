@@ -47,16 +47,32 @@ SOMETHING HERE TO IGNORE
 To generate an animated gif from a video clip:
 
 ```shell
-ffmpeg -i ~/Downloads/1990.01.15\ -\ Royal\ Rumble\ 1990.mp4 -ss 02:37:40 -to 02:40:00 -vf "fps=15,scale=480:-1:flags=lanczos" assets/images/rumble-90-24.gif
+ffmpeg -i input.mp4 -ss 02:37:40 -to 02:40:00 -vf "fps=15,scale=480:-1:flags=lanczos" assets/images/output.gif
 ```
 
+If you need to reduce the size of a gif then reduce the dimensions by half:
+
+```shell
+ffmpeg -i input.gif -vf "scale=iw/2:ih/2" output.gif
+```
+
+> \[!TIP\]
+> `scale=250:-1` will scale the width to 250 and auto-scale the height.
+
+<!---->
+
 > \[!WARNING\]
-> Requires [https://git-lfs.com/](https://git-lfs.com/)
+> Storage of gifs with GitHub/Git requires [https://git-lfs.com/](https://git-lfs.com/)
+
+<!---->
+
+> \[!IMPORTANT\]
+> The gifs were taking up too much space so I've uploaded them to giphy instead.
 
 To convert a screenshot from a png to optimized jpg:
 
 ```shell
-magick ~/Desktop/Screenshots/Screenshot\ 2025-01-02\ at\ 16.16.26.png -quality 70 assets/images/rumble-90-16.jpg
+magick input.png -quality 70 assets/images/output.jpg
 ```
 
 ## DNS
