@@ -1040,6 +1040,18 @@ header p,
 	margin-bottom: 2em;
 }
 
+@media screen and (max-width: 736px) {
+	.strapline {
+		margin-top: -1em;
+	}
+}
+
+@media screen and (max-width: 830px) {
+	.image.main.half {
+		width: 100%;
+	}
+}
+
 header.major > :last-child {
   border-bottom: solid 3px #f56a6a;
   display: inline-block;
