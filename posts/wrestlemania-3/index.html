@@ -23,6 +23,7 @@
 							<ul class="icons">
 							<!--<li><a href="https://x.com/integralist" class="icon brands fa-twitter" target="blank"><span class="label">Twitter</span></a></li>-->
 							<!--<li><a href="https://instagram.com/wwfsuperstarsofwrestling" class="icon brands fa-instagram" target="blank"><span class="label">Instagram</span></a></li>-->
+              <li><a href="mailto:manager@classicwwf.com" class="icon fa-regular fa-envelope" target="blank"><span class="label">manager@classicwwf.com</span></a></li>
 						</ul>
 					</header>
 

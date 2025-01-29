@@ -42,6 +42,12 @@ SOMETHING HERE TO IGNORE
 <!-- markdownlint-enable -->
 ```
 
+## Font Icons
+
+We use Font Awesome.
+
+[https://fontawesome.com/search][fa-search]
+
 ## Images
 
 To generate an animated gif from a video clip:
@@ -107,3 +113,4 @@ classicwwf.com.		14400	IN	A	185.199.109.153
 [1]: https://go.dev/
 [2]: https://integralist.github.io/
 [3]: https://classicwwf.com/
+[fa-search]: https://fontawesome.com/search
