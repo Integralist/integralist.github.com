@@ -22,12 +22,14 @@ import (
 )
 
 var (
-	skipDirs         = []string{".git", "assets", "cmd"}
-	initOnce         sync.Once
-	contentSubPage   []byte
-	needleMainInsert = []byte("{INSERT_MAIN}")
-	needleNavInsert  = []byte("{INSERT_NAV}")
-	errInit          error
+	skipDirs                   = []string{".git", "assets", "cmd"}
+	initOnce                   sync.Once
+	contentSubPage             []byte
+	contentWatchAlongNote      []byte
+	needleWatchAlongNoteInsert = []byte("{WATCH_ALONG_NOTE}")
+	needleMainInsert           = []byte("{INSERT_MAIN}")
+	needleNavInsert            = []byte("{INSERT_NAV}")
+	errInit                    error
 )
 
 func main() {
@@ -74,6 +76,18 @@ func initTemplates() {
 		if err != nil {
 			errInit = fmt.Errorf("failed to read page template: %w", err)
 		}
+
+		n, err := os.Open("assets/templates/note.tpl")
+		if err != nil {
+			errInit = fmt.Errorf("failed to open page template: %w", err)
+			return
+		}
+		defer n.Close()
+
+		contentWatchAlongNote, err = io.ReadAll(n)
+		if err != nil {
+			errInit = fmt.Errorf("failed to read 'watch along note' template: %w", err)
+		}
 	})
 }
 
@@ -99,6 +113,7 @@ func renderPosts(page, sideNavContent string) {
 	_ = f.Close()
 
 	h := mdToHTML(md)
+	h = bytes.Replace(h, needleWatchAlongNoteInsert, contentWatchAlongNote, 1)
 	content := bytes.Replace(contentSubPage, needleMainInsert, h, 1)
 
 	segs := strings.Split(page, "/")

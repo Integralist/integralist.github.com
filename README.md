@@ -78,7 +78,7 @@ ffmpeg -i input.gif -vf "scale=iw/2:ih/2" output.gif
 To convert a screenshot from a png to optimized jpg:
 
 ```shell
-magick input.png -quality 70 assets/images/output.jpg
+export n=1; magick ~/Desktop/Screenshots/SS87-$n.png -quality 70 assets/images/SS87-$n.jpg && rm ~/Desktop/Screenshots/SS87-$n.png
 ```
 
 ## DNS
