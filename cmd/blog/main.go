@@ -44,7 +44,7 @@ func main() {
 			fmt.Printf("skipping: %+v\n", d.Name())
 			return filepath.SkipDir
 		}
-		if filepath.Ext(d.Name()) == ".md" && d.Name() != "README.md" {
+		if filepath.Ext(d.Name()) == ".md" && d.Name() != "README.md" && d.Name() != "CLAUDE.md" {
 			pages = append(pages, path)
 		}
 		return nil
