@@ -4,29 +4,15 @@
 
 ## History
 
-I've been a fan of wrestling for as long as I can remember.
+I've been a wrestling fan for as long as I can remember, catching the bug way back in 1987. But, like many from that era, I eventually drifted away; by 1995, the product had become a little too cheesy for my teenage tastes.
 
-I started watching around 1987.
-
-Somewhere around 1995 I stopped (it was getting too cheesy for me as a
-teenager).
-
-I completely slept on the Attitude era (doh) and started watching again in the
-year 2000.
-
-I then dropped out again around 2003 / 2004 and I've not gone back since.
+As a result, I completely missed the Attitude Era (doh!), only to rediscover wrestling in 2000. I stuck with it for a few years before bowing out again around 2003 or 2004, and I haven't really looked back since.
 
 ## Best Years?
 
-For me the best years were 1987 to 1992 (1990 probably being peak fandom).
+For me, the golden age was undoubtedly 1987 to 1992, with 1990 marking the absolute peak of my fandom. Even now, I find myself revisiting the 1987–1990 period more than any other.
 
-I rewatch 1987 to 1990 the most.
-
-In 2024 I got access to every episode of [WWF Prime Time][prime time], [WWF
-Wrestling Challenge][wrestling challenge] and [WWF Superstars or
-Wrestling][superstars] (the latter being the hardest to find) and I've been
-watching each episode across each show in chronological order. That has been
-such a joy as I get to relive my youth.
+In 2024, I managed to track down every episode of [WWF Prime Time][prime time], [WWF Wrestling Challenge][wrestling challenge], and [WWF Superstars of Wrestling][superstars]—the latter being notoriously difficult to find. I've been watching every episode of every show in chronological order, and honestly, reliving my youth this way has been pure joy.
 
 [prime time]: https://en.wikipedia.org/wiki/WWF_Prime_Time_Wrestling
 [superstars]: https://en.wikipedia.org/wiki/WWF_Superstars_of_Wrestling
