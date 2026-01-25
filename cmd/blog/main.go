@@ -149,6 +149,7 @@ func renderSideNav(pages []string, root string) string { // nolint:revive // fun
 	type post struct {
 		date    string // expects ISO 8601 format, e.g., "2024-12-15"
 		year    string
+		title   string
 		content string
 	}
 
@@ -163,14 +164,39 @@ func renderSideNav(pages []string, root string) string { // nolint:revive // fun
 		link := filepath.Join(root, dir, "index.html")
 		contentNav := strings.Replace(tplNavSingleLink, "{TITLE}", title, 1)
 		contentNav = strings.Replace(contentNav, "{LINK}", link, 1)
-		links = append(links, post{date: date, year: year, content: contentNav})
+		links = append(links, post{date: date, year: year, title: title, content: contentNav})
 	}
 
 	sort.Slice(links, func(i, j int) bool {
-		// Parse dates for comparison
-		date1, _ := time.Parse("2006-01-02", links[i].date)
-		date2, _ := time.Parse("2006-01-02", links[j].date)
-		return date2.Before(date1) // Descending order
+		if links[i].year != links[j].year {
+			return links[i].year < links[j].year // Ascending order for years
+		}
+
+		getPriority := func(t string) int {
+			tLower := strings.ToLower(t)
+			if strings.Contains(tLower, "royal rumble") {
+				return 1
+			}
+			if strings.Contains(tLower, "wrestlemania") {
+				return 2
+			}
+			if strings.Contains(tLower, "summerslam") {
+				return 3
+			}
+			if strings.Contains(tLower, "survivor series") {
+				return 4
+			}
+			return 5
+		}
+
+		p1 := getPriority(links[i].title)
+		p2 := getPriority(links[j].title)
+
+		if p1 != p2 {
+			return p1 < p2
+		}
+
+		return links[i].title < links[j].title
 	})
 
 	// key is the year
@@ -196,7 +222,7 @@ func renderSideNav(pages []string, root string) string { // nolint:revive // fun
 		keys = append(keys, k)
 	}
 	sort.Slice(keys, func(i, j int) bool {
-		return keys[i] > keys[j] // descending order (e.g. []string{"index", "2024", "2023"})
+		return keys[i] < keys[j] // ascending order (e.g. []string{"2023", "2024", "index"})
 	})
 	var yearLinks string
 	for _, k := range keys {
