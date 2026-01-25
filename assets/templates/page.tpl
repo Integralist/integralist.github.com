@@ -34,11 +34,10 @@
               <h1>Royal Rumble 1989</h1>
               <p>A Bizarre Spectacle Where the Madness Multiplies</p>
             </header>
-            <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
-						-->
-						{INSERT_MAIN}
-          </section>
-        </div>
+                        <span class="image main"><img src="../images/rumble-89.jpg" alt="" /></span>
+                                                            -->
+                                                            {{.Main}}
+                      </section>        </div>
       </div>
       <!-- Sidebar -->
 <div id="sidebar">
@@ -55,11 +54,10 @@
         <h2>Menu</h2>
       </header>
       <ul>
-        <li><a href="../../index.html">Home</a></li>
-        <!--<li><a href="../resume/index.html">Resume</a></li>-->
-				{INSERT_NAV}
-      </ul>
-    </nav>
+                <li><a href="../../index.html">Home</a></li>
+                <!--<li><a href="../resume/index.html">Resume</a></li>-->
+                                        {{.Nav}}
+              </ul>    </nav>
     <!-- Section -->
 		<!--
     <section>

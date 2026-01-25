@@ -84,10 +84,9 @@
             <header class="major">
               <h2>Articles</h2>
             </header>
-            <div class="posts">
-							{INSERT_MAIN}
-							<!--
-              <article>
+                        <div class="posts">
+                                                                    {{.Main}}
+                                                                    <!--              <article>
                 <a href="./pages/ppv-wrestlemania-3.html" class="image"><img src="images/mania-3-index.jpg" alt="" /></a>
                 <h3>WrestleMania 3</h3>
                 <p>The subtle art of two grown men in spandex solving their differences with flying elbows and body slams, because therapy is overrated.</p>
@@ -115,11 +114,10 @@
               <h2>Menu</h2>
             </header>
             <ul>
-              <li><a href="index.html">Home</a></li>
-							<!--<li><a href="resume/index.html">Resume</a></li>-->
-							{INSERT_NAV}
-            </ul>
-          </nav>
+                      <li><a href="index.html">Home</a></li>
+                                                                      <!--<li><a href="resume/index.html">Resume</a></li>-->
+                                                                      {{.Nav}}
+                          </ul>          </nav>
           <!-- Section -->
 					<!--
           <section>

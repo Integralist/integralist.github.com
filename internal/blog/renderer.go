@@ -3,6 +3,7 @@ package blog
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"io"
 	"io/fs"
 	"os"
@@ -18,30 +19,40 @@ import (
 
 var (
 	needleWatchAlongNoteInsert = []byte("{WATCH_ALONG_NOTE}")
-	needleMainInsert           = []byte("{INSERT_MAIN}")
-	needleNavInsert            = []byte("{INSERT_NAV}")
 	skipDirs                   = []string{".git", "assets", "cmd", "internal"}
 )
 
 type Renderer struct {
-	contentSubPage        []byte
+	tplPage *template.Template
+	tplHome *template.Template
+	// tplNote content is still used for manual replacement inside markdown content
+	// because markdown processing happens before template execution.
 	contentWatchAlongNote []byte
+}
+
+type PageData struct {
+	Main template.HTML
+	Nav  template.HTML
 }
 
 func NewRenderer() (*Renderer, error) {
 	r := &Renderer{}
 
-	f, err := os.Open("assets/templates/page.tpl")
+	// Parse page.tpl
+	tplPage, err := template.ParseFiles("assets/templates/page.tpl")
 	if err != nil {
-		return nil, fmt.Errorf("failed to open page template: %w", err)
+		return nil, fmt.Errorf("failed to parse page template: %w", err)
 	}
-	defer f.Close()
+	r.tplPage = tplPage
 
-	r.contentSubPage, err = io.ReadAll(f)
+	// Parse index.tpl
+	tplHome, err := template.ParseFiles("assets/templates/index.tpl")
 	if err != nil {
-		return nil, fmt.Errorf("failed to read page template: %w", err)
+		return nil, fmt.Errorf("failed to parse index template: %w", err)
 	}
+	r.tplHome = tplHome
 
+	// Read note.tpl for manual insertion into markdown
 	n, err := os.Open("assets/templates/note.tpl")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open note template: %w", err)
@@ -105,11 +116,19 @@ func (r *Renderer) renderPost(p Post, sideNavContent string) {
 
 	h := mdToHTML(mdContent)
 	h = bytes.Replace(h, needleWatchAlongNoteInsert, r.contentWatchAlongNote, 1)
-	content := bytes.Replace(r.contentSubPage, needleMainInsert, h, 1)
 
-	content = bytes.Replace(content, needleNavInsert, []byte(sideNavContent), 1)
+	data := PageData{
+		Main: template.HTML(h),
+		Nav:  template.HTML(sideNavContent),
+	}
 
-	err = writeFile(p.Link, content)
+	var buf bytes.Buffer
+	if err := r.tplPage.Execute(&buf, data); err != nil {
+		fmt.Printf("failed to execute page template for '%s': %v\n", p.Path, err)
+		return
+	}
+
+	err = writeFile(p.Link, buf.Bytes())
 	if err != nil {
 		fmt.Printf("failed to write file '%s': %s\n", p.Link, err)
 		return
@@ -205,20 +224,6 @@ func (r *Renderer) renderSideNav(posts []Post, root string) string {
 func (r *Renderer) renderHome(posts []Post) {
 	sideNavContent := r.renderSideNav(posts, "")
 
-	tplIndex := "assets/templates/index.tpl"
-
-	fi, err := os.Open(tplIndex)
-	if err != nil {
-		panic(fmt.Errorf("failed to open index template: %w", err))
-	}
-	defer fi.Close()
-
-	contentIndex, err := io.ReadAll(fi)
-	if err != nil {
-		panic(fmt.Errorf("failed to read index template: %w", err))
-	}
-
-	dst := "index.html"
 	tplMain := `
 	<article>
 	<h3>{TITLE}</h3>
@@ -250,16 +255,24 @@ func (r *Renderer) renderHome(posts []Post) {
 		_, _ = bufMain.WriteString(contentMain)
 	}
 
-	contentIndex = bytes.Replace(contentIndex, needleMainInsert, bufMain.Bytes(), 1)
-	contentIndex = bytes.Replace(contentIndex, needleNavInsert, []byte(sideNavContent), 1)
+	data := PageData{
+		Main: template.HTML(bufMain.String()),
+		Nav:  template.HTML(sideNavContent),
+	}
 
-	err = writeFile("index.html", contentIndex)
+	var bufIndex bytes.Buffer
+	if err := r.tplHome.Execute(&bufIndex, data); err != nil {
+		fmt.Printf("failed to execute index template: %v\n", err)
+		return
+	}
+
+	err := writeFile("index.html", bufIndex.Bytes())
 	if err != nil {
 		fmt.Printf("failed to write index file: %s\n", err)
 		return
 	}
 
-	fmt.Printf("rendered: %s -> %s\n", tplIndex, dst)
+	fmt.Printf("rendered: index.tpl -> index.html\n")
 }
 
 func writeFile(filename string, content []byte) error {
